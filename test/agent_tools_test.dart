@@ -901,6 +901,34 @@ void main() {
       expect(svc.messages.length, 5);
     });
   });
+
+  group('消息到达事件（多监听者）', () {
+    test('外壳的顶部气泡监听器不会顶掉智能体的消息任务回调', () {
+      final st = AppState();
+      final got = <String>[];
+      void agentCb(String s, String t, String? g) => got.add('agent:$s/$t');
+      void shellCb(String s, String t, String? g) => got.add('shell:$s/$t');
+      // 智能体先注册（AgentOverlay.initState），外壳后注册（HomePage.initState）
+      // —— 旧实现是单槽 `onNewMessage = f`，外壳这一句会把 agentCb 覆盖掉，
+      // 于是「新消息来了但消息任务不触发」静默发生。
+      st.addNewMessageListener(agentCb);
+      st.addNewMessageListener(shellCb);
+      st.emitNewMessageForTest('BG2HCB', 'hi', null);
+      expect(got, containsAll(['agent:BG2HCB/hi', 'shell:BG2HCB/hi']));
+
+      // 外壳重建（切布局/主题）只注销自己，智能体回调仍在。
+      st.removeNewMessageListener(shellCb);
+      got.clear();
+      st.emitNewMessageForTest('BG2HCB', 'yo', null);
+      expect(got, ['agent:BG2HCB/yo']);
+
+      // 重复注册不产生重复投递。
+      st.addNewMessageListener(agentCb);
+      got.clear();
+      st.emitNewMessageForTest('BG2HCB', 'dup', null);
+      expect(got, ['agent:BG2HCB/dup']);
+    });
+  });
 }
 
 /// 测试里不想引 dart:convert 只用一次，包一层返回 null 表示解析失败。

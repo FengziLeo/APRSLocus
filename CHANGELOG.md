@@ -24,6 +24,9 @@
 - 顺带修复冷启动竞态：消息比本地配置更早到达时，先等配置/任务读完再判断，
   不再因「读到空列表」而漏跑。
 - 消息任务的 `last_run` 现在会正常更新，执行记录也会记下失败原因，便于排查。
+- 另修一处更隐蔽的失效：顶部气泡通知与消息任务**共用同一个回调槽**，外壳
+  重建（换布局/主题/语言）时会把消息任务的回调顶掉。现改为多监听者，两者
+  互不干扰。
 
 ### 变更：封面彩蛋改为「点一下抖一下」
 
@@ -60,6 +63,10 @@
 - Fixed a cold-start race where a message arriving before local config was loaded
   caused tasks to be skipped.
 - `last_run` now updates for message tasks, and run history records failures.
+- Also fixed a subtler failure: the top message-bubble handler and the
+  message-task handler shared a single callback slot, so a shell rebuild
+  (layout/theme/locale) clobbered the task handler. Now multiple listeners
+  coexist.
 
 ### Change: hero easter egg now tap instead of long-press
 

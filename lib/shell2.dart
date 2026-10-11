@@ -276,39 +276,43 @@ class _HomeShell2State extends State<HomeShell2>
         ),
       );
     };
-    widget.state.onNewMessage = (src, text, groupId) {
-      String? groupName;
-      if (groupId != null) {
-        for (final g in widget.state.chatGroups) {
-          if (g.id == groupId) {
-            groupName = g.name;
-            break;
-          }
-        }
-      }
-      if (!mounted) return;
-      setState(() {
-        _bubbleCall =
-            groupName != null ? S.of(context).groupBubble(groupName) : src;
-        _bubbleText = text;
-        _showBubble = true;
-      });
-      _bubbleTimer?.cancel();
-      _bubbleTimer = Timer(const Duration(seconds: 4), () {
-        if (mounted) setState(() => _showBubble = false);
-      });
-    };
+    // 用多监听者注册，避免把智能体（消息触发任务）注册的回调顶掉。
+    widget.state.addNewMessageListener(_onIncomingMessage);
   }
 
   @override
   void dispose() {
     _anim.dispose();
     _bubbleTimer?.cancel();
-    widget.state.onNewMessage = null;
+    widget.state.removeNewMessageListener(_onIncomingMessage);
     widget.state.removeListener(_onState);
     widget.state.onGarminShared = null;
     widget.state.onGarminShareNoLink = null;
     super.dispose();
+  }
+
+  /// 顶部气泡：收到新消息时弹一条，4 秒后自动收起。
+  void _onIncomingMessage(String src, String text, String? groupId) {
+    String? groupName;
+    if (groupId != null) {
+      for (final g in widget.state.chatGroups) {
+        if (g.id == groupId) {
+          groupName = g.name;
+          break;
+        }
+      }
+    }
+    if (!mounted) return;
+    setState(() {
+      _bubbleCall =
+          groupName != null ? S.of(context).groupBubble(groupName) : src;
+      _bubbleText = text;
+      _showBubble = true;
+    });
+    _bubbleTimer?.cancel();
+    _bubbleTimer = Timer(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _showBubble = false);
+    });
   }
 
   /// 只在「外壳真正显示的值」变化时重建。

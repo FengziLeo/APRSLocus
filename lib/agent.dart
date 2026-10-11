@@ -312,8 +312,8 @@ class AgentTask {
 
   /// 下一次该跑的时刻（只跑一次的任务跑完即视为不再触发）。
   ///
-  /// 消息触发型**没有「时刻」**（由 [AppState.onNewMessage] 唤醒），返回 null，
-  /// 于是 [dueTasks] 天然不会把它当定时任务轮询到。
+  /// 消息触发型**没有「时刻」**（由 [AppState.addNewMessageListener] 唤醒），
+  /// 返回 null，于是 [dueTasks] 天然不会把它当定时任务轮询到。
   DateTime? get nextRun {
     if (!enabled) return null;
     if (trigger == AgentTaskTrigger.message) return null;

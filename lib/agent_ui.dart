@@ -781,8 +781,9 @@ class _AgentOverlayState extends State<AgentOverlay> {
     // 定时任务到点轮询。60 秒粒度足够（最短循环 5 分钟），且不必为每个任务各起
     // 一个 timer —— 任务在磁盘里可随时增删，单一轮询器最容易保持一致。
     _taskTimer = Timer.periodic(const Duration(seconds: 60), (_) => _runDueTasks());
-    // 接收消息激活：收到别人发来的消息时可自动回复（默认关，见配置页）。
-    widget.state.onNewMessage = _onIncoming;
+    // 接收消息激活：收到别人发来的消息时跑「消息触发」任务（见 [_onIncoming]）。
+    // 必须走多监听者注册：外壳（顶部气泡）也监听同一事件，用单槽赋值会互相顶掉。
+    widget.state.addNewMessageListener(_onIncoming);
     // 消息一变（用户发送 / 模型回复 / 工具结果）就滚到底。
     svc.addListener(_onSvcChanged);
     // 展开面板（初始即展开）后也要滚到底：延迟启动时不显示面板，
@@ -845,6 +846,7 @@ class _AgentOverlayState extends State<AgentOverlay> {
     svc.removeListener(_onSvcChanged);
     _scroll.dispose();
     _taskTimer?.cancel();
+    widget.state.removeNewMessageListener(_onIncoming);
     super.dispose();
 
   }

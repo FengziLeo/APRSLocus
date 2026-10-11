@@ -115,28 +115,8 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     };
-    // 收到新消息时弹出顶部气泡
-    widget.state.onNewMessage = (src, text, groupId) {
-      String? groupName;
-      if (groupId != null) {
-        for (final g in widget.state.chatGroups) {
-          if (g.id == groupId) {
-            groupName = g.name;
-            break;
-          }
-        }
-      }
-      _showBubble = true;
-      _bubbleCall = groupName != null
-          ? S.of(context).groupBubble(groupName)
-          : src;
-      _bubbleText = text;
-      if (mounted) setState(() {});
-      _bubbleTimer?.cancel();
-      _bubbleTimer = Timer(const Duration(seconds: 4), () {
-        if (mounted) setState(() => _showBubble = false);
-      });
-    };
+    // 收到新消息时弹出顶部气泡（用多监听者注册，避免把智能体的消息任务回调顶掉）
+    widget.state.addNewMessageListener(_onIncomingMessage);
     // 收到群聊邀请时弹窗
     widget.state.onInviteReceived = (from, groupCall, groupName) {
       _showInviteDialog(from, groupCall, groupName);
@@ -300,13 +280,34 @@ class _HomePageState extends State<HomePage> {
     widget.state.removeListener(_onStateChanged);
     widget.state.onGarminShared = null;
     widget.state.onGarminShareNoLink = null;
-    widget.state.onNewMessage = null;
+    widget.state.removeNewMessageListener(_onIncomingMessage);
     widget.state.onInviteReceived = null;
     widget.state.onGroupEvent = null;
     widget.state.onAskBeaconAuto = null;
     _searchDebounce?.cancel();
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  /// 顶部气泡：收到新消息时弹一条，4 秒后自动收起。
+  void _onIncomingMessage(String src, String text, String? groupId) {
+    String? groupName;
+    if (groupId != null) {
+      for (final g in widget.state.chatGroups) {
+        if (g.id == groupId) {
+          groupName = g.name;
+          break;
+        }
+      }
+    }
+    _showBubble = true;
+    _bubbleCall = groupName != null ? S.of(context).groupBubble(groupName) : src;
+    _bubbleText = text;
+    if (mounted) setState(() {});
+    _bubbleTimer?.cancel();
+    _bubbleTimer = Timer(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _showBubble = false);
+    });
   }
 
   /// 页签的图标与文案都来自主题：

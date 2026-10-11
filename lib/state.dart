@@ -182,8 +182,36 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  /// 收到新消息时回调（src, text, groupId），用于顶部气泡通知
-  void Function(String src, String text, String? groupId)? onNewMessage;
+  /// 收到新消息时的回调（src, text, groupId）。
+  ///
+  /// **多监听者**：顶部气泡通知（外壳）与「消息到达触发 AI 任务」（智能体聊天框）
+  /// 都要用。早期是单槽 `onNewMessage = f`，谁最后赋值谁生效 —— 外壳一重建
+  /// （换主题/换布局/换语言重挂）就把智能体注册的回调顶掉，于是
+  /// 「新消息来了但 AI 任务不触发」静默发生（用户实测）。改成列表后互不干扰。
+  final List<void Function(String src, String text, String? groupId)>
+      _newMessageListeners = [];
+
+  void addNewMessageListener(
+          void Function(String src, String text, String? groupId) f) {
+    if (!_newMessageListeners.contains(f)) _newMessageListeners.add(f);
+  }
+
+  void removeNewMessageListener(
+          void Function(String src, String text, String? groupId) f) {
+    _newMessageListeners.remove(f);
+  }
+
+  void _emitNewMessage(String src, String text, String? groupId) {
+    // 先复制再遍历：监听者在回调里可能反注册（dispose），直接遍历会并发修改。
+    for (final f in List.of(_newMessageListeners)) {
+      f(src, text, groupId);
+    }
+  }
+
+  /// 供测试驱动「新消息到达」事件（生产代码由收包路径调用 [_emitNewMessage]）。
+  @visibleForTesting
+  void emitNewMessageForTest(String src, String text, String? groupId) =>
+      _emitNewMessage(src, text, groupId);
 
   /// 收到群聊邀请时回调（from, groupCall, groupName），用于弹窗确认
   void Function(String from, String groupCall, String groupName)?
@@ -6794,7 +6822,7 @@ class AppState extends ChangeNotifier {
     _recalcUnread();
     _saveMessages();
     AchievementCenter.instance.bump('receiveMsg'); // 听没听到
-    onNewMessage?.call(src, text, groupId);
+    _emitNewMessage(src, text, groupId);
     return (text, ackId);
   }
 
@@ -8048,7 +8076,7 @@ class AppState extends ChangeNotifier {
     _recalcUnread();
     _saveMessages();
     AchievementCenter.instance.bump('receiveMsg');
-    onNewMessage?.call(src, l10n.msgLocation, null);
+    _emitNewMessage(src, l10n.msgLocation, null);
     _notify();
   }
 

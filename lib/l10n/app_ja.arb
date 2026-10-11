@@ -659,7 +659,7 @@
   "huangyanTagDxcc": "DXCC BS7",
   "huangyanTagAxis": "中沙諸島",
   "huangyanFootNote": "公開された地理・歴史資料を基に、参考としてまとめたものです。",
-  "huangyanSourceHint": "紹介ページは埋め込みウェブページで表示されます（一部環境ではブラウザで開きます）。",
+  "huangyanOpen": "紹介ページを開く",
   "codeContributionTranslation": "翻訳",
   "dataSourceTxHint": "複数のリンクを同時に有効にして受信できますが、**送信は 1 つだけ**です（右側のドット）。同じコールサインを 2 つのリンクから送ると重複パケットになります。",
   "dataSourceTxBadge": "送信",

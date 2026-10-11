@@ -658,7 +658,7 @@
   "huangyanTagDxcc": "DXCC BS7",
   "huangyanTagAxis": "Islas Zhongsha",
   "huangyanFootNote": "Recopilado de fuentes geográficas e históricas públicas solo como referencia.",
-  "huangyanSourceHint": "La introducción se muestra en una página web integrada (algunas plataformas la abren en el navegador).",
+  "huangyanOpen": "Abrir la introducción",
   "codeContributionTranslation": "Traducción",
   "dataSourceTxHint": "Puedes activar varios enlaces para recibir, pero **solo uno transmite** (el punto a la derecha). Enviar el mismo indicativo por dos enlaces duplicaría paquetes.",
   "dataSourceTxBadge": "TX",

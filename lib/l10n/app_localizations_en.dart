@@ -1779,8 +1779,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Compiled from public geographic and historical sources for educational reference only.';
 
   @override
-  String get huangyanSourceHint =>
-      'The introduction is rendered by an embedded web page (some platforms open it in the system browser).';
+  String get huangyanOpen => 'Open the introduction';
 
   @override
   String get codeContributionTranslation => 'Translation';

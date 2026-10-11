@@ -1789,8 +1789,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Recopilado de fuentes geográficas e históricas públicas solo como referencia.';
 
   @override
-  String get huangyanSourceHint =>
-      'La introducción se muestra en una página web integrada (algunas plataformas la abren en el navegador).';
+  String get huangyanOpen => 'Abrir la introducción';
 
   @override
   String get codeContributionTranslation => 'Traducción';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'l10n/app_localizations.dart';
+import 'material.dart';
 import 'models.dart';
 import 'theme.dart';
 import 'web_embed.dart';
@@ -59,12 +60,12 @@ Station huangyanStation(AppLocalizations s) => Station(
   toCall: 'APRS',
 );
 
-/// 黄岩岛介绍卡（放在标准台站面板顶部）：标题 + 说明 + 介绍内容。
+/// 黄岩岛介绍卡（放在标准台站面板里）：标题 + 说明 + 打开介绍页。
 ///
-/// 支持内嵌网页的平台（Android / iOS / macOS）用 [WebEmbed] 渲染
-/// [huangyanIntroHtml]；其余平台（Web / Linux / Windows）**不会**退化成
-/// 一个打不开的「浏览器打开」按钮 —— 内容本就自带，直接原生文案渲染，
-/// 保证任何平台上都看得到。
+/// **刻意不在面板里内嵌网页**：面板本体是 `SingleChildScrollView`，而 WebView
+/// 是平台视图，会自己吃掉竖向滑动 —— 手指落在网页上，面板就滑不动了（网页
+/// 也只在 300px 小窗里，两头别扭）。所以这里只放一个入口，点开走独立的
+/// [HuangyanIntroPage] 整页渲染，网页自己占满一屏、原生滚动。
 class HuangyanIntroCard extends StatelessWidget {
   const HuangyanIntroCard({super.key});
 
@@ -97,58 +98,123 @@ class HuangyanIntroCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(s.huangyanTagline, style: ts(11, c: C.slate)),
-          const SizedBox(height: 10),
-          if (webEmbedSupported)
-            WebEmbed(
-              url: huangyanIntroUrl(s),
-              html: huangyanIntroHtml(s),
-              height: 300,
-            )
-          else
-            _nativeIntro(s),
-          const SizedBox(height: 8),
-          Text(
-            webEmbedSupported ? s.huangyanSourceHint : s.huangyanFootNote,
-            style: ts(10, c: C.grey),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: C.blue,
+                padding: const EdgeInsets.symmetric(vertical: 11),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () =>
+                  Navigator.of(context).push(HuangyanIntroPage.route()),
+              icon: const Icon(Icons.public_rounded, size: 16),
+              label: Text(
+                s.huangyanOpen,
+                style: ts(12, c: Colors.white, w: FontWeight.w700),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  /// 无内嵌网页能力时的原生兜底：与网页同源文案，分段展示。
-  Widget _nativeIntro(AppLocalizations s) {
-    Widget head(String t) => Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Text(t, style: ts(12, c: C.blue, w: FontWeight.w800)),
-    );
-    Widget body(String t) => Padding(
-      padding: const EdgeInsets.only(top: 3),
-      child: Text(t, style: ts(12, c: C.slate)),
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        head(s.huangyanGeoHead),
-        body(s.huangyanGeoBody),
-        head(s.huangyanHistoryHead),
-        body(s.huangyanHistory1),
-        body(s.huangyanHistory2),
-        head(s.huangyanHamHead),
-        body(s.huangyanHamBody),
-        const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          decoration: BoxDecoration(
-            color: C.greyBg,
-            borderRadius: BorderRadius.circular(6),
-            border: Border(left: BorderSide(color: C.blue, width: 3)),
+/// 黄岩岛介绍**整页**：内嵌网页占满一屏，可自由上下滚动。
+///
+/// 页面级挂载是为了绕开「WebView 在滚动列表里吃掉手势」的老问题；不支持
+/// 内嵌网页的平台直接原生分段渲染，保证任何平台都看得到、也都滑得动。
+class HuangyanIntroPage extends StatelessWidget {
+  const HuangyanIntroPage({super.key});
+
+  static Route<void> route() =>
+      MaterialPageRoute(builder: (_) => const HuangyanIntroPage());
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    return Scaffold(
+      backgroundColor: C.bg,
+      appBar: MaterialAppBar(
+        AppBar(
+          backgroundColor: C.surfaceFillStrong,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: C.ink, size: 20),
+            onPressed: () => Navigator.pop(context),
           ),
-          child: Text(s.huangyanLegal, style: ts(11, c: C.ink)),
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.anchor_rounded, size: 16, color: C.blue),
+              const SizedBox(width: 6),
+              Text(
+                s.huangyanTitle,
+                style: ts(16, c: C.ink, w: FontWeight.w700),
+              ),
+            ],
+          ),
+          centerTitle: true,
         ),
-      ],
+      ),
+      body: webEmbedSupported
+          ? WebEmbed(
+              url: huangyanIntroUrl(s),
+              html: huangyanIntroHtml(s),
+              height: double.infinity,
+              radius: 0,
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: _nativeIntro(s),
+            ),
     );
   }
+}
+
+/// 无内嵌网页能力时的原生兜底：与网页同源文案，分段展示（可滚动）。
+Widget _nativeIntro(AppLocalizations s) {
+  Widget head(String t) => Padding(
+    padding: const EdgeInsets.only(top: 12),
+    child: Text(t, style: ts(13, c: C.blue, w: FontWeight.w800)),
+  );
+  Widget body(String t) => Padding(
+    padding: const EdgeInsets.only(top: 4),
+    child: Text(t, style: ts(13, c: C.slate)),
+  );
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(s.huangyanTitle, style: ts(18, c: C.ink, w: FontWeight.w800)),
+      const SizedBox(height: 2),
+      Text('BS7H · 15.1500°N 117.7667°E', style: ts(12, c: C.grey)),
+      const SizedBox(height: 6),
+      body(s.huangyanTagline),
+      head(s.huangyanGeoHead),
+      body(s.huangyanGeoBody),
+      head(s.huangyanHistoryHead),
+      body(s.huangyanHistory1),
+      body(s.huangyanHistory2),
+      head(s.huangyanHamHead),
+      body(s.huangyanHamBody),
+      const SizedBox(height: 12),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        decoration: BoxDecoration(
+          color: C.greyBg,
+          borderRadius: BorderRadius.circular(6),
+          border: Border(left: BorderSide(color: C.blue, width: 3)),
+        ),
+        child: Text(s.huangyanLegal, style: ts(12, c: C.ink)),
+      ),
+      const SizedBox(height: 16),
+      Text(s.huangyanFootNote, style: ts(11, c: C.grey)),
+    ],
+  );
 }
 
 /// 介绍页的 data URI（内嵌 HTML，Content-Type 显式声明以免中文乱码）。

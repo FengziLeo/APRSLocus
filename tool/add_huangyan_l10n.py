@@ -171,13 +171,8 @@ DATA = {
         '公開された地理・歴史資料を基に、参考としてまとめたものです。',
         'Recopilado de fuentes geográficas e históricas públicas solo como referencia.',
         'Disusun dari sumber geografis dan sejarah publik, hanya sebagai referensi.'),
-    'huangyanSourceHint': (
-        '介绍页由内嵌网页渲染（部分平台将跳转系统浏览器）。',
-        '介紹頁由內嵌網頁渲染（部分平台將跳轉系統瀏覽器）。',
-        'The introduction is rendered by an embedded web page (some platforms open it in the system browser).',
-        '紹介ページは埋め込みウェブページで表示されます（一部環境ではブラウザで開きます）。',
-        'La introducción se muestra en una página web integrada (algunas plataformas la abren en el navegador).',
-        'Halaman perkenalan dirender oleh halaman web tersemat (sebagian platform membukanya di peramban).'),
+    'huangyanOpen': ('打开介绍页', '開啟介紹頁', 'Open the introduction', '紹介ページを開く',
+                     'Abrir la introducción', 'Buka perkenalan'),
 }
 
 ANCHOR = '"codeContributionTranslation"'

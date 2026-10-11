@@ -1776,8 +1776,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Disusun dari sumber geografis dan sejarah publik, hanya sebagai referensi.';
 
   @override
-  String get huangyanSourceHint =>
-      'Halaman perkenalan dirender oleh halaman web tersemat (sebagian platform membukanya di peramban).';
+  String get huangyanOpen => 'Buka perkenalan';
 
   @override
   String get codeContributionTranslation => 'Terjemahan';

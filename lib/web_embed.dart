@@ -38,12 +38,21 @@ class WebEmbed extends StatelessWidget {
   final String? html;
   final double height;
 
-  const WebEmbed({super.key, required this.url, this.html, this.height = 220});
+  /// 圆角半径。[height] 传 `double.infinity`（整页内嵌）时一般传 0。
+  final double radius;
+
+  const WebEmbed({
+    super.key,
+    required this.url,
+    this.html,
+    this.height = 220,
+    this.radius = 12,
+  });
 
   @override
   Widget build(BuildContext context) {
     if (!webEmbedSupported) return _FallbackCard(url: url, height: height);
-    return _MobileEmbed(url: url, html: html, height: height);
+    return _MobileEmbed(url: url, html: html, height: height, radius: radius);
   }
 }
 
@@ -51,12 +60,17 @@ class WebEmbed extends StatelessWidget {
 class _EmbedFrame extends StatelessWidget {
   final Widget child;
   final double height;
-  const _EmbedFrame({required this.child, required this.height});
+  final double radius;
+  const _EmbedFrame({
+    required this.child,
+    required this.height,
+    this.radius = 12,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(radius),
       child: SizedBox(width: double.infinity, height: height, child: child),
     );
   }
@@ -67,7 +81,13 @@ class _MobileEmbed extends StatefulWidget {
   final String url;
   final String? html;
   final double height;
-  const _MobileEmbed({required this.url, this.html, required this.height});
+  final double radius;
+  const _MobileEmbed({
+    required this.url,
+    this.html,
+    required this.height,
+    this.radius = 12,
+  });
 
   @override
   State<_MobileEmbed> createState() => _MobileEmbedState();
@@ -75,13 +95,24 @@ class _MobileEmbed extends StatefulWidget {
 
 class _MobileEmbedState extends State<_MobileEmbed> {
   late final WebViewController _controller;
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(C.bgSoft);
+      ..setBackgroundColor(C.bgSoft)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (_) {
+            if (mounted) setState(() => _loading = true);
+          },
+          onPageFinished: (_) {
+            if (mounted) setState(() => _loading = false);
+          },
+        ),
+      );
     final html = widget.html;
     if (html != null) {
       // baseUrl 给一个合法 https 源，避免相对资源/编码在某些 WebView 上被判非法。
@@ -95,7 +126,29 @@ class _MobileEmbedState extends State<_MobileEmbed> {
   Widget build(BuildContext context) {
     return _EmbedFrame(
       height: widget.height,
-      child: WebViewWidget(controller: _controller),
+      radius: widget.radius,
+      child: Stack(
+        children: [
+          WebViewWidget(controller: _controller),
+          // 加载指示：整页内嵌时首帧是空白，给个转圈避免「看起来坏了」
+          if (_loading)
+            Positioned.fill(
+              child: ColoredBox(
+                color: C.bgSoft,
+                child: Center(
+                  child: SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.2,
+                      color: C.blue,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

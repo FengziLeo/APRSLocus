@@ -3422,11 +3422,11 @@ abstract class AppLocalizations {
   /// **'资料整理自公开地理与历史文献，仅供科普参考。'**
   String get huangyanFootNote;
 
-  /// No description provided for @huangyanSourceHint.
+  /// No description provided for @huangyanOpen.
   ///
   /// In zh, this message translates to:
-  /// **'介绍页由内嵌网页渲染（部分平台将跳转系统浏览器）。'**
-  String get huangyanSourceHint;
+  /// **'打开介绍页'**
+  String get huangyanOpen;
 
   /// No description provided for @codeContributionTranslation.
   ///

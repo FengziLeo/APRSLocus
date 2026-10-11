@@ -708,7 +708,7 @@
   "huangyanTagDxcc": "DXCC BS7",
   "huangyanTagAxis": "中沙群島",
   "huangyanFootNote": "資料整理自公開地理與歷史文獻，僅供科普參考。",
-  "huangyanSourceHint": "介紹頁由內嵌網頁渲染（部分平台將跳轉系統瀏覽器）。",
+  "huangyanOpen": "開啟介紹頁",
   "codeContributionTranslation": "翻譯",
   "dataSourceTxHint": "可以同時勾選多條鏈路一起收報文，但**發射只有一條**（右側圓點為發射來源）——同一個呼號從兩條鏈路發出去會造成重複報文。",
   "dataSourceTxBadge": "發射",

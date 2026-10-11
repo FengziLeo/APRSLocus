@@ -659,7 +659,7 @@
   "huangyanTagDxcc": "DXCC BS7",
   "huangyanTagAxis": "Kepulauan Zhongsha",
   "huangyanFootNote": "Disusun dari sumber geografis dan sejarah publik, hanya sebagai referensi.",
-  "huangyanSourceHint": "Halaman perkenalan dirender oleh halaman web tersemat (sebagian platform membukanya di peramban).",
+  "huangyanOpen": "Buka perkenalan",
   "codeContributionTranslation": "Terjemahan",
   "dataSourceTxHint": "Beberapa tautan dapat diaktifkan sekaligus untuk menerima, tetapi **hanya satu yang memancar** (titik di kanan). Mengirim tanda panggil sama lewat dua tautan akan menduplikasi paket.",
   "dataSourceTxBadge": "TX",

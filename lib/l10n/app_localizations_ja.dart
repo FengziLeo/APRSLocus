@@ -1741,7 +1741,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get huangyanFootNote => '公開された地理・歴史資料を基に、参考としてまとめたものです。';
 
   @override
-  String get huangyanSourceHint => '紹介ページは埋め込みウェブページで表示されます（一部環境ではブラウザで開きます）。';
+  String get huangyanOpen => '紹介ページを開く';
 
   @override
   String get codeContributionTranslation => '翻訳';

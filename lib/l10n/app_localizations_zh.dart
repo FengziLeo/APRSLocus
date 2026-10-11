@@ -1734,7 +1734,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get huangyanFootNote => '资料整理自公开地理与历史文献，仅供科普参考。';
 
   @override
-  String get huangyanSourceHint => '介绍页由内嵌网页渲染（部分平台将跳转系统浏览器）。';
+  String get huangyanOpen => '打开介绍页';
 
   @override
   String get codeContributionTranslation => '翻译';
@@ -10503,7 +10503,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get huangyanFootNote => '資料整理自公開地理與歷史文獻，僅供科普參考。';
 
   @override
-  String get huangyanSourceHint => '介紹頁由內嵌網頁渲染（部分平台將跳轉系統瀏覽器）。';
+  String get huangyanOpen => '開啟介紹頁';
 
   @override
   String get codeContributionTranslation => '翻譯';

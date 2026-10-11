@@ -726,7 +726,7 @@
   "huangyanTagDxcc": "DXCC BS7",
   "huangyanTagAxis": "Zhongsha Islands",
   "huangyanFootNote": "Compiled from public geographic and historical sources for educational reference only.",
-  "huangyanSourceHint": "The introduction is rendered by an embedded web page (some platforms open it in the system browser).",
+  "huangyanOpen": "Open the introduction",
   "codeContributionTranslation": "Translation",
   "dataSourceTxHint": "You can enable several links at once to receive from all of them, but **only one transmits** (the dot on the right). Sending the same callsign over two links would duplicate packets.",
   "dataSourceTxBadge": "TX",

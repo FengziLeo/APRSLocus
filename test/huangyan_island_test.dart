@@ -1,4 +1,5 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:aprslocus/huangyan_island.dart';
@@ -109,4 +110,48 @@ void main() {
       }
     });
   });
+
+  /// WebView 是平台视图、在测试 VM 里起不来；这里把平台强制成 Linux，
+  /// 走「原生兜底」分支，专门验证整页可渲染、可滚动、入口能跳转。
+  ///
+  /// 注意：`debugDefaultTargetPlatformOverride` 必须在**测试体结束前**清回 null，
+  /// 否则框架收尾的 `debugAssertAllFoundationVarsUnset` 会直接判失败
+  /// （tearDown 太晚，赶不上这个校验）。
+  group('黄岩岛介绍页（原生兜底路径）', () {
+    testWidgets('整页渲染标题/坐标/正文，且内容可滚动', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.linux;
+      final ls = lookupAppLocalizations(const Locale('zh'));
+      await tester.pumpWidget(_host(const HuangyanIntroPage()));
+      expect(find.text(ls.huangyanTitle), findsWidgets);
+      expect(find.text('BS7H · 15.1500°N 117.7667°E'), findsOneWidget);
+      expect(find.textContaining('中国固有领土'), findsWidgets);
+      expect(find.byType(SingleChildScrollView), findsOneWidget);
+      // 能滑动（不再被 WebView 吃掉手势）
+      await tester.drag(
+        find.byType(SingleChildScrollView),
+        const Offset(0, -240),
+      );
+      await tester.pump();
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('面板里的介绍卡点按钮 → 跳转介绍整页', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.linux;
+      await tester.pumpWidget(
+        _host(const Scaffold(body: HuangyanIntroCard())),
+      );
+      expect(find.byType(HuangyanIntroPage), findsNothing);
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(HuangyanIntroPage), findsOneWidget);
+      debugDefaultTargetPlatformOverride = null;
+    });
+  });
 }
+
+Widget _host(Widget home) => MaterialApp(
+  locale: const Locale('zh'),
+  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  supportedLocales: AppLocalizations.supportedLocales,
+  home: home,
+);

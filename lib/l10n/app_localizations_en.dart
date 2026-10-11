@@ -1653,6 +1653,136 @@ class AppLocalizationsEn extends AppLocalizations {
       'The AI agent sends your conversation and the local data it reads (stations, location, messages, settings, …) to the third-party model service you configure (e.g. OpenAI, DeepSeek, a self-hosted endpoint) for processing. Do not share state secrets, trade secrets, personal privacy or sensitive location information in the chat.\n\nYou are responsible for confirming that the model service you choose is lawful and compliant, and you bear the consequences of any cross-border data transfer or personal-data processing. We do not operate any such service and have no affiliation, agency or partnership with it.\n\nBy default the agent can only read data; actions with side effects (sending messages, changing settings) require your separate authorization and per-action confirmation, and you can disable the agent at any time.\n\nTapping \"Agree and enable\" means you have read, understood and accepted the above (see the agent clauses of the User Agreement).';
 
   @override
+  String get agentMemory => 'Long-term memory';
+
+  @override
+  String get agentMemoryDesc =>
+      'Let the agent remember your preferences across chats';
+
+  @override
+  String get agentMemoryOn => 'Enable long-term memory';
+
+  @override
+  String get agentMemoryHint =>
+      'The agent can call the remember/forget tools, or just take “remember …”. Stored on this device only.';
+
+  @override
+  String get agentMemoryEmpty =>
+      'No memories yet. Tell the agent “remember …” to add one.';
+
+  @override
+  String get agentMemoryClear => 'Clear all memories';
+
+  @override
+  String get agentMemoryClearConfirm =>
+      'Clear all long-term memories? This cannot be undone.';
+
+  @override
+  String get agentCompress => 'Conversation compression';
+
+  @override
+  String get agentCompressDesc =>
+      'Fold old turns into a summary when history grows, to save context';
+
+  @override
+  String get agentCompressOn => 'Enable auto compression';
+
+  @override
+  String get agentCompressHint =>
+      'Compresses beyond ~40 messages. The summary stays in the system prompt; recent turns are untouched.';
+
+  @override
+  String get agentCompressNow => 'Compress now';
+
+  @override
+  String get agentCompressNothing => 'Nothing to compress';
+
+  @override
+  String get agentCompressDone => 'Conversation compressed';
+
+  @override
+  String get agentAllowNetwork => 'Allow network requests';
+
+  @override
+  String get agentAllowNetworkDesc =>
+      'Let the agent make HTTP requests (GET / POST / PUT / DELETE…). Off by default; every request still asks you first.';
+
+  @override
+  String get agentTool_http_request => 'Make a network request';
+
+  @override
+  String get agentTool_save_memory => 'Remember a fact';
+
+  @override
+  String get agentTool_list_memories => 'Read memories';
+
+  @override
+  String get agentTool_forget_memory => 'Forget a fact';
+
+  @override
+  String get huangyanTitle => 'Huangyan Island';
+
+  @override
+  String get huangyanBadge => 'Hidden station · Chinese territory';
+
+  @override
+  String get huangyanTagline =>
+      'An atoll in the eastern Zhongsha Islands, South China Sea — Chinese territory';
+
+  @override
+  String get huangyanShort =>
+      'Chinese territory · atoll in the eastern Zhongsha Islands, South China Sea';
+
+  @override
+  String get huangyanGrid => 'OL98gd';
+
+  @override
+  String get huangyanGeoHead => 'Geography';
+
+  @override
+  String get huangyanGeoBody =>
+      'Huangyan Island (also known as Scarborough Shoal) lies in the eastern Zhongsha Islands of the South China Sea. It is a large, roughly isosceles-triangular atoll with a perimeter of about 55 km and a reef area of roughly 150 km², enclosing a lagoon about 15 km long. Most of the reef rim is submerged; parts emerge at low tide, making it the only feature of the Zhongsha Islands that breaks the surface.';
+
+  @override
+  String get huangyanHistoryHead => 'History';
+
+  @override
+  String get huangyanHistory1 =>
+      'Chinese records of Huangyan Island go back centuries. In 1297 the Yuan-dynasty astronomer Guo Shoujing set up an observation point in these waters during the \"four-seas survey\"; later official maps and nautical documents consistently placed it within Chinese territory, and fishermen from Hainan and Guangdong have worked these waters for generations under the name \"Huangyan\". Western charts later adopted the name Scarborough Shoal.';
+
+  @override
+  String get huangyanHistory2 =>
+      'In modern times the Chinese government has continuously exercised sovereignty and jurisdiction over Huangyan Island and its adjacent waters. In 1983 the China Committee on Geographical Names formally published the standard name \"Huangyan Island\".';
+
+  @override
+  String get huangyanHamHead => 'Amateur radio';
+
+  @override
+  String get huangyanHamBody =>
+      'In amateur radio, Huangyan Island is known by the DXCC entity prefix BS7. In 1995 Chinese and international amateurs mounted the BS7H DXpedition, putting the atoll on the air for the first time and earning it a reputation as a rare and sought-after DX destination.';
+
+  @override
+  String get huangyanLegal =>
+      'Material on this card is provided for amateur-radio educational display only. Huangyan Island is Chinese territory, over which China has indisputable sovereignty, as it does over its adjacent waters.';
+
+  @override
+  String get huangyanTagReef => 'Coral atoll';
+
+  @override
+  String get huangyanTagDxcc => 'DXCC BS7';
+
+  @override
+  String get huangyanTagAxis => 'Zhongsha Islands';
+
+  @override
+  String get huangyanFootNote =>
+      'Compiled from public geographic and historical sources for educational reference only.';
+
+  @override
+  String get huangyanSourceHint =>
+      'The introduction is rendered by an embedded web page (some platforms open it in the system browser).';
+
+  @override
   String get codeContributionTranslation => 'Translation';
 
   @override
@@ -9017,64 +9147,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit mono)';
-  @override
-  String get agentMemory => "Long-term memory";
-
-  @override
-  String get agentMemoryDesc => "Let the agent remember your preferences across chats";
-
-  @override
-  String get agentMemoryOn => "Enable long-term memory";
-
-  @override
-  String get agentMemoryHint => "The agent can call the remember/forget tools, or just take “remember …”. Stored on this device only.";
-
-  @override
-  String get agentMemoryEmpty => "No memories yet. Tell the agent “remember …” to add one.";
-
-  @override
-  String get agentMemoryClear => "Clear all memories";
-
-  @override
-  String get agentMemoryClearConfirm => "Clear all long-term memories? This cannot be undone.";
-
-  @override
-  String get agentCompress => "Conversation compression";
-
-  @override
-  String get agentCompressDesc => "Fold old turns into a summary when history grows, to save context";
-
-  @override
-  String get agentCompressOn => "Enable auto compression";
-
-  @override
-  String get agentCompressHint => "Compresses beyond ~40 messages. The summary stays in the system prompt; recent turns are untouched.";
-
-  @override
-  String get agentCompressNow => "Compress now";
-
-  @override
-  String get agentCompressNothing => "Nothing to compress";
-
-  @override
-  String get agentCompressDone => "Conversation compressed";
-
-  @override
-  String get agentTool_save_memory => "Remember a fact";
-
-  @override
-  String get agentTool_list_memories => "Read memories";
-
-  @override
-  String get agentTool_forget_memory => "Forget a fact";
-
-  @override
-  String get agentAllowNetwork => "Allow network requests";
-
-  @override
-  String get agentAllowNetworkDesc => "Let the agent make HTTP requests (GET / POST / PUT / DELETE…). Off by default; every request still asks you first.";
-
-  @override
-  String get agentTool_http_request => "Make a network request";
-
 }

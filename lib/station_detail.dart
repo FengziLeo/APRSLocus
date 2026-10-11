@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'theme.dart';
 import 'material.dart';
+import 'huangyan_island.dart';
 import 'models.dart';
 import 'services.dart';
 import 'state.dart';
@@ -421,6 +422,11 @@ class _StationDetailState extends State<StationDetail> {
                         ),
                         // 台站荣誉徽章（该呼号在荣誉墙名单中时展示）
                         _honorRow(s.call),
+                        // 黄岩岛彩蛋：命中 BS7H 时在标准面板里追加「介绍 + 历史由来」网页卡
+                        if (isHuangyanCall(s.call)) ...[
+                          const SizedBox(height: 14),
+                          const HuangyanIntroCard(),
+                        ],
                         if (related.isNotEmpty) ...[
                           SizedBox(height: 14),
                           // 相关台站（同基础呼号）

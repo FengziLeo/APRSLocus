@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'theme.dart';
 import 'guide.dart';
+import 'huangyan_island.dart';
 import 'models.dart';
 import 'state.dart';
 import 'aprs_device.dart';
@@ -78,6 +79,11 @@ class _StationsPageState extends State<StationsPage> {
     // 台站筛选（状态/类型/同款软件/设备）—— 与地图共用同一套判定
     final f = st.stationFilter;
     if (!f.isEmpty) s = s.where(f.matches).toList();
+    // 黄岩岛彩蛋：**只**在搜索命中的那一刻临时拼一条进来。
+    //
+    // 它从不进 AppState.stations，所以「在列表里一直往下翻」永远翻不到；
+    // 过滤（国家/类型等）已在前一步完成，此处只在结果里追加，不会污染统计或地图。
+    if (isHuangyanQuery(q)) s.add(huangyanStation(S.of(context)));
     final my = st.myStation;
     switch (_sort) {
       case 'recent':

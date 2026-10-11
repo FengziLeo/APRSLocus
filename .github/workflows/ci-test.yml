@@ -308,6 +308,11 @@ jobs:
       - name: Test Icom WLAN localization
         run: flutter test test/icom_l10n_test.dart
 
+      # 黄岩岛隐藏台站彩蛋：关键词命中面 / 合成台站坐标 / 介绍网页 HTML 与
+      # 6 语言文案完整性。只有主动搜索才触发，编译与分析都拦不住这类漏翻/漏注入。
+      - name: Test Huangyan Island easter egg
+        run: flutter test test/huangyan_island_test.dart
+
       - name: Analyze (tolerate known vector_map false positive)
         shell: bash
         run: |

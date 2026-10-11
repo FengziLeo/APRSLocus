@@ -1650,6 +1650,136 @@ class AppLocalizationsId extends AppLocalizations {
       'Agen mengirim percakapanmu dan data lokal yang dibacanya (stasiun, lokasi, pesan, setelan, …) ke layanan model pihak ketiga yang kamu konfigurasi (mis. OpenAI, DeepSeek, endpoint sendiri) untuk diproses. Jangan bagikan rahasia negara, rahasia dagang, privasi pribadi, atau lokasi sensitif di obrolan.\n\nKamu bertanggung jawab memastikan layanan model yang kamu pilih sah dan patuh aturan, serta menanggung konsekuensi dari transfer data lintas negara atau pemrosesan data pribadi. Kami tidak mengoperasikan layanan tersebut dan tidak memiliki afiliasi, keagenan, atau kemitraan dengannya.\n\nSecara bawaan agen hanya bisa membaca data; tindakan berdampak (mengirim pesan, mengubah setelan) butuh izin terpisah darimu dan konfirmasi tiap kali, dan kamu bisa menonaktifkan agen kapan saja.\n\nDengan menekan \"Setuju dan aktifkan\", kamu menyatakan telah membaca, memahami, dan menerima hal di atas.';
 
   @override
+  String get agentMemory => 'Memori jangka panjang';
+
+  @override
+  String get agentMemoryDesc =>
+      'Biarkan agen mengingat preferensi Anda antar percakapan';
+
+  @override
+  String get agentMemoryOn => 'Aktifkan memori jangka panjang';
+
+  @override
+  String get agentMemoryHint =>
+      'Agen dapat memakai alat ingat/lupakan, atau cukup bilang \"ingat …\". Hanya tersimpan di perangkat ini.';
+
+  @override
+  String get agentMemoryEmpty =>
+      'Belum ada memori. Bilang \"ingat …\" ke agen untuk menambah.';
+
+  @override
+  String get agentMemoryClear => 'Hapus semua memori';
+
+  @override
+  String get agentMemoryClearConfirm =>
+      'Hapus semua memori jangka panjang? Tidak dapat dibatalkan.';
+
+  @override
+  String get agentCompress => 'Kompresi percakapan';
+
+  @override
+  String get agentCompressDesc =>
+      'Lipat obrolan lama jadi ringkasan saat riwayat memanjang';
+
+  @override
+  String get agentCompressOn => 'Aktifkan kompresi otomatis';
+
+  @override
+  String get agentCompressHint =>
+      'Mengompres di atas ~40 pesan. Ringkasan tetap di prompt sistem.';
+
+  @override
+  String get agentCompressNow => 'Kompres sekarang';
+
+  @override
+  String get agentCompressNothing => 'Tidak ada yang dikompres';
+
+  @override
+  String get agentCompressDone => 'Percakapan dikompres';
+
+  @override
+  String get agentAllowNetwork => 'Izinkan permintaan jaringan';
+
+  @override
+  String get agentAllowNetworkDesc =>
+      'Biarkan agen membuat permintaan HTTP (GET / POST / PUT / DELETE…). Nonaktif secara bawaan; tiap permintaan tetap minta konfirmasi.';
+
+  @override
+  String get agentTool_http_request => 'Buat permintaan jaringan';
+
+  @override
+  String get agentTool_save_memory => 'Ingat sebuah fakta';
+
+  @override
+  String get agentTool_list_memories => 'Lihat memori';
+
+  @override
+  String get agentTool_forget_memory => 'Lupakan sebuah fakta';
+
+  @override
+  String get huangyanTitle => 'Pulau Huangyan';
+
+  @override
+  String get huangyanBadge => 'Stasiun tersembunyi · wilayah Tiongkok';
+
+  @override
+  String get huangyanTagline =>
+      'Atol di timur Kepulauan Zhongsha, Laut Tiongkok Selatan — wilayah Tiongkok';
+
+  @override
+  String get huangyanShort =>
+      'Wilayah Tiongkok · atol di timur Kepulauan Zhongsha, Laut Tiongkok Selatan';
+
+  @override
+  String get huangyanGrid => 'OL98gd';
+
+  @override
+  String get huangyanGeoHead => 'Geografi';
+
+  @override
+  String get huangyanGeoBody =>
+      'Pulau Huangyan (juga dikenal sebagai Karang Scarborough) terletak di timur Kepulauan Zhongsha, Laut Tiongkok Selatan. Ini adalah atol besar berbentuk hampir segitiga sama kaki, dengan keliling sekitar 55 km dan luas terumbu sekitar 150 km², melingkupi laguna sepanjang sekitar 15 km. Sebagian besar tepi terumbu terendam; sebagian muncul saat air surut, menjadikannya satu-satunya fitur di Kepulauan Zhongsha yang muncul ke permukaan.';
+
+  @override
+  String get huangyanHistoryHead => 'Sejarah';
+
+  @override
+  String get huangyanHistory1 =>
+      'Tiongkok telah memiliki catatan sejarah tentang Pulau Huangyan sejak berabad-abad lalu. Pada 1297 astronom Dinasti Yuan, Guo Shoujing, mendirikan titik pengamatan di perairan ini dalam \"survei empat laut\"; peta resmi dan dokumen pelayaran berikutnya secara konsisten menempatkannya di dalam wilayah Tiongkok, dan nelayan dari Hainan serta Guangdong turun-temurun melaut di sini dengan nama \"Huangyan\". Peta Barat kemudian memakai nama Karang Scarborough.';
+
+  @override
+  String get huangyanHistory2 =>
+      'Pada masa modern, Pemerintah Tiongkok terus menjalankan kedaulatan dan yurisdiksi atas Pulau Huangyan beserta perairan di sekitarnya. Pada 1983, Komite Nama Geografi Tiongkok secara resmi mengumumkan nama baku \"Pulau Huangyan\".';
+
+  @override
+  String get huangyanHamHead => 'Radio amatir';
+
+  @override
+  String get huangyanHamBody =>
+      'Dalam radio amatir, Pulau Huangyan dikenal dengan prefiks entitas DXCC BS7. Pada 1995, amatir Tiongkok dan berbagai negara menggelar ekspedisi BS7H, menampilkan atol ini untuk pertama kalinya di udara dan membuatnya dikenal sebagai tujuan DX yang langka dan dicari.';
+
+  @override
+  String get huangyanLegal =>
+      'Materi pada kartu ini hanya untuk keperluan edukasi radio amatir. Pulau Huangyan adalah wilayah Tiongkok, yang atasnya dan perairan sekitarnya Tiongkok memiliki kedaulatan yang tak terbantahkan.';
+
+  @override
+  String get huangyanTagReef => 'Atol karang';
+
+  @override
+  String get huangyanTagDxcc => 'DXCC BS7';
+
+  @override
+  String get huangyanTagAxis => 'Kepulauan Zhongsha';
+
+  @override
+  String get huangyanFootNote =>
+      'Disusun dari sumber geografis dan sejarah publik, hanya sebagai referensi.';
+
+  @override
+  String get huangyanSourceHint =>
+      'Halaman perkenalan dirender oleh halaman web tersemat (sebagian platform membukanya di peramban).';
+
+  @override
   String get codeContributionTranslation => 'Terjemahan';
 
   @override
@@ -9028,64 +9158,4 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit mono)';
-  @override
-  String get agentMemory => "Memori jangka panjang";
-
-  @override
-  String get agentMemoryDesc => "Biarkan agen mengingat preferensi Anda antar percakapan";
-
-  @override
-  String get agentMemoryOn => "Aktifkan memori jangka panjang";
-
-  @override
-  String get agentMemoryHint => "Agen dapat memakai alat ingat/lupakan, atau cukup bilang \"ingat …\". Hanya tersimpan di perangkat ini.";
-
-  @override
-  String get agentMemoryEmpty => "Belum ada memori. Bilang \"ingat …\" ke agen untuk menambah.";
-
-  @override
-  String get agentMemoryClear => "Hapus semua memori";
-
-  @override
-  String get agentMemoryClearConfirm => "Hapus semua memori jangka panjang? Tidak dapat dibatalkan.";
-
-  @override
-  String get agentCompress => "Kompresi percakapan";
-
-  @override
-  String get agentCompressDesc => "Lipat obrolan lama jadi ringkasan saat riwayat memanjang";
-
-  @override
-  String get agentCompressOn => "Aktifkan kompresi otomatis";
-
-  @override
-  String get agentCompressHint => "Mengompres di atas ~40 pesan. Ringkasan tetap di prompt sistem.";
-
-  @override
-  String get agentCompressNow => "Kompres sekarang";
-
-  @override
-  String get agentCompressNothing => "Tidak ada yang dikompres";
-
-  @override
-  String get agentCompressDone => "Percakapan dikompres";
-
-  @override
-  String get agentTool_save_memory => "Ingat sebuah fakta";
-
-  @override
-  String get agentTool_list_memories => "Lihat memori";
-
-  @override
-  String get agentTool_forget_memory => "Lupakan sebuah fakta";
-
-  @override
-  String get agentAllowNetwork => "Izinkan permintaan jaringan";
-
-  @override
-  String get agentAllowNetworkDesc => "Biarkan agen membuat permintaan HTTP (GET / POST / PUT / DELETE…). Nonaktif secara bawaan; tiap permintaan tetap minta konfirmasi.";
-
-  @override
-  String get agentTool_http_request => "Buat permintaan jaringan";
-
 }

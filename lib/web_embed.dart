@@ -31,14 +31,19 @@ bool get webEmbedSupported =>
 /// 与项目其它「拿不到就如实说」的做法一致。
 class WebEmbed extends StatelessWidget {
   final String url;
+
+  /// 直接内嵌渲染的 HTML（可空）。给了它就优先用 [WebViewController.loadHtmlString]
+  /// 渲染 —— iOS 的 `WKWebView` **不支持**顶层 `data:` URL，用 loadRequest 会白屏，
+  /// 故内嵌内容走 html 字符串这条稳的路。[url] 仍保留给「在浏览器打开」兜底。
+  final String? html;
   final double height;
 
-  const WebEmbed({super.key, required this.url, this.height = 220});
+  const WebEmbed({super.key, required this.url, this.html, this.height = 220});
 
   @override
   Widget build(BuildContext context) {
     if (!webEmbedSupported) return _FallbackCard(url: url, height: height);
-    return _MobileEmbed(url: url, height: height);
+    return _MobileEmbed(url: url, html: html, height: height);
   }
 }
 
@@ -60,8 +65,9 @@ class _EmbedFrame extends StatelessWidget {
 /// Android / iOS / macOS：webview_flutter
 class _MobileEmbed extends StatefulWidget {
   final String url;
+  final String? html;
   final double height;
-  const _MobileEmbed({required this.url, required this.height});
+  const _MobileEmbed({required this.url, this.html, required this.height});
 
   @override
   State<_MobileEmbed> createState() => _MobileEmbedState();
@@ -76,7 +82,13 @@ class _MobileEmbedState extends State<_MobileEmbed> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(C.bgSoft);
-    _controller.loadRequest(Uri.parse(widget.url));
+    final html = widget.html;
+    if (html != null) {
+      // baseUrl 给一个合法 https 源，避免相对资源/编码在某些 WebView 上被判非法。
+      _controller.loadHtmlString(html, baseUrl: 'https://theez.top/');
+    } else {
+      _controller.loadRequest(Uri.parse(widget.url));
+    }
   }
 
   @override

@@ -3200,6 +3200,234 @@ abstract class AppLocalizations {
   /// **'智能体会把你与它的对话内容，以及它读取到的本机数据（如台站、位置、消息、设置等），发送给你所配置的第三方大模型服务（如 OpenAI、DeepSeek、自建接口等）进行处理。请勿在对话中提供国家秘密、商业秘密、个人隐私或敏感位置信息。\n\n请自行确认你所选择的模型服务合法合规，并自行承担因数据出境、个人信息处理等产生的责任。我们不运营任何上述服务，与其也不存在隶属、代理或合作关系。\n\n智能体默认只能读取数据；发送消息、修改设置等有副作用的操作需要你在聊天框内单独授权并逐次确认，你也可以随时关闭智能体。\n\n点击「同意并启用」表示你已阅读、理解并接受上述内容（详见《用户协议》智能体相关条款）。'**
   String get agentNoticeBody;
 
+  /// No description provided for @agentMemory.
+  ///
+  /// In zh, this message translates to:
+  /// **'长期记忆'**
+  String get agentMemory;
+
+  /// No description provided for @agentMemoryDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'让智能体跨对话记住你的偏好与常用信息'**
+  String get agentMemoryDesc;
+
+  /// No description provided for @agentMemoryOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'启用长期记忆'**
+  String get agentMemoryOn;
+
+  /// No description provided for @agentMemoryHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能体可自行调用「记住 / 忘记」工具，也可由你直接说「记住…」。记忆只存在本机。'**
+  String get agentMemoryHint;
+
+  /// No description provided for @agentMemoryEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无记忆。对智能体说「记住…」即可添加。'**
+  String get agentMemoryEmpty;
+
+  /// No description provided for @agentMemoryClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清空全部记忆'**
+  String get agentMemoryClear;
+
+  /// No description provided for @agentMemoryClearConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定清空全部长期记忆？此操作不可撤销。'**
+  String get agentMemoryClearConfirm;
+
+  /// No description provided for @agentCompress.
+  ///
+  /// In zh, this message translates to:
+  /// **'对话压缩'**
+  String get agentCompress;
+
+  /// No description provided for @agentCompressDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'历史变长时自动把旧对话折叠成摘要，省上下文'**
+  String get agentCompressDesc;
+
+  /// No description provided for @agentCompressOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'启用自动压缩'**
+  String get agentCompressOn;
+
+  /// No description provided for @agentCompressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'超过约 40 条消息时自动压缩。摘要会保留在系统提示里，最近的对话不受影响。'**
+  String get agentCompressHint;
+
+  /// No description provided for @agentCompressNow.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即压缩'**
+  String get agentCompressNow;
+
+  /// No description provided for @agentCompressNothing.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有可压缩的内容'**
+  String get agentCompressNothing;
+
+  /// No description provided for @agentCompressDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'已压缩对话'**
+  String get agentCompressDone;
+
+  /// No description provided for @agentAllowNetwork.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许联网请求'**
+  String get agentAllowNetwork;
+
+  /// No description provided for @agentAllowNetworkDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许智能体主动发起 HTTP 请求（GET / POST / PUT / DELETE…）。默认关闭；开启后每次请求仍需你确认。'**
+  String get agentAllowNetworkDesc;
+
+  /// No description provided for @agentTool_http_request.
+  ///
+  /// In zh, this message translates to:
+  /// **'发起网络请求'**
+  String get agentTool_http_request;
+
+  /// No description provided for @agentTool_save_memory.
+  ///
+  /// In zh, this message translates to:
+  /// **'记住一条信息'**
+  String get agentTool_save_memory;
+
+  /// No description provided for @agentTool_list_memories.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看记忆'**
+  String get agentTool_list_memories;
+
+  /// No description provided for @agentTool_forget_memory.
+  ///
+  /// In zh, this message translates to:
+  /// **'忘记一条信息'**
+  String get agentTool_forget_memory;
+
+  /// No description provided for @huangyanTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'黄岩岛'**
+  String get huangyanTitle;
+
+  /// No description provided for @huangyanBadge.
+  ///
+  /// In zh, this message translates to:
+  /// **'隐藏台站 · 中国固有领土'**
+  String get huangyanBadge;
+
+  /// No description provided for @huangyanTagline.
+  ///
+  /// In zh, this message translates to:
+  /// **'南海中沙群岛东部的环礁，中国固有领土'**
+  String get huangyanTagline;
+
+  /// No description provided for @huangyanShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'中国固有领土 · 南海中沙群岛东部环礁'**
+  String get huangyanShort;
+
+  /// No description provided for @huangyanGrid.
+  ///
+  /// In zh, this message translates to:
+  /// **'OL98gd'**
+  String get huangyanGrid;
+
+  /// No description provided for @huangyanGeoHead.
+  ///
+  /// In zh, this message translates to:
+  /// **'地理位置'**
+  String get huangyanGeoHead;
+
+  /// No description provided for @huangyanGeoBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'黄岩岛（又称民主礁）位于南海中沙群岛东部，是一个呈等腰三角形的大环礁，周长约 55 公里，礁盘面积约 150 平方公里，其中包括长约 15 公里的潟湖。礁缘多数隐没于水下，退潮时可见部分礁块露出海面，是中沙群岛中唯一露出水面的岛礁。'**
+  String get huangyanGeoBody;
+
+  /// No description provided for @huangyanHistoryHead.
+  ///
+  /// In zh, this message translates to:
+  /// **'历史由来'**
+  String get huangyanHistoryHead;
+
+  /// No description provided for @huangyanHistory1.
+  ///
+  /// In zh, this message translates to:
+  /// **'中国很早便有关于黄岩岛的历史记载。元代天文学家郭守敬奉旨「四海测验」，1297 年曾在该海域设立观测点；此后历代官方舆图与航海文献均把黄岩岛列入中国版图，海南、广东一带渔民世代在此海域捕鱼作业，并称之为「黄岩」，西方海图后沿称 Scarborough Shoal。'**
+  String get huangyanHistory1;
+
+  /// No description provided for @huangyanHistory2.
+  ///
+  /// In zh, this message translates to:
+  /// **'现代以来，中国政府一直对黄岩岛及其附近海域行使主权和管辖。1983 年，中国地名委员会正式公布标准名称为「黄岩岛」。'**
+  String get huangyanHistory2;
+
+  /// No description provided for @huangyanHamHead.
+  ///
+  /// In zh, this message translates to:
+  /// **'业余无线电'**
+  String get huangyanHamHead;
+
+  /// No description provided for @huangyanHamBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'在业余无线电领域，黄岩岛以 DXCC 实体呼号前缀 BS7 为人熟知。1995 年，中国与多国爱好者联合发起 BS7H 远征，让这片环礁首次出现在全球广播电台的日志之中，此后被称为「稀有而令人向往」的 DX 目的地。'**
+  String get huangyanHamBody;
+
+  /// No description provided for @huangyanLegal.
+  ///
+  /// In zh, this message translates to:
+  /// **'本卡片所引资料仅用于业余无线电科普展示。黄岩岛是中国固有领土，中国对其及其附近海域拥有无可争辩的主权。'**
+  String get huangyanLegal;
+
+  /// No description provided for @huangyanTagReef.
+  ///
+  /// In zh, this message translates to:
+  /// **'珊瑚环礁'**
+  String get huangyanTagReef;
+
+  /// No description provided for @huangyanTagDxcc.
+  ///
+  /// In zh, this message translates to:
+  /// **'DXCC BS7'**
+  String get huangyanTagDxcc;
+
+  /// No description provided for @huangyanTagAxis.
+  ///
+  /// In zh, this message translates to:
+  /// **'中沙群岛'**
+  String get huangyanTagAxis;
+
+  /// No description provided for @huangyanFootNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'资料整理自公开地理与历史文献，仅供科普参考。'**
+  String get huangyanFootNote;
+
+  /// No description provided for @huangyanSourceHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'介绍页由内嵌网页渲染（部分平台将跳转系统浏览器）。'**
+  String get huangyanSourceHint;
+
   /// No description provided for @codeContributionTranslation.
   ///
   /// In zh, this message translates to:
@@ -15685,126 +15913,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'12000 Hz (LPCM 16-bit 单声道)'**
   String get icomAudioFmtValue;
-  /// No description provided for @agentMemory.
-  ///
-  /// In zh, this message translates to:
-  /// **'长期记忆'**
-  String get agentMemory;
-
-  /// No description provided for @agentMemoryDesc.
-  ///
-  /// In zh, this message translates to:
-  /// **'让智能体跨对话记住你的偏好与常用信息'**
-  String get agentMemoryDesc;
-
-  /// No description provided for @agentMemoryOn.
-  ///
-  /// In zh, this message translates to:
-  /// **'启用长期记忆'**
-  String get agentMemoryOn;
-
-  /// No description provided for @agentMemoryHint.
-  ///
-  /// In zh, this message translates to:
-  /// **'智能体可自行调用「记住 / 忘记」工具，也可由你直接说「记住…」。记忆只存在本机。'**
-  String get agentMemoryHint;
-
-  /// No description provided for @agentMemoryEmpty.
-  ///
-  /// In zh, this message translates to:
-  /// **'暂无记忆。对智能体说「记住…」即可添加。'**
-  String get agentMemoryEmpty;
-
-  /// No description provided for @agentMemoryClear.
-  ///
-  /// In zh, this message translates to:
-  /// **'清空全部记忆'**
-  String get agentMemoryClear;
-
-  /// No description provided for @agentMemoryClearConfirm.
-  ///
-  /// In zh, this message translates to:
-  /// **'确定清空全部长期记忆？此操作不可撤销。'**
-  String get agentMemoryClearConfirm;
-
-  /// No description provided for @agentCompress.
-  ///
-  /// In zh, this message translates to:
-  /// **'对话压缩'**
-  String get agentCompress;
-
-  /// No description provided for @agentCompressDesc.
-  ///
-  /// In zh, this message translates to:
-  /// **'历史变长时自动把旧对话折叠成摘要，省上下文'**
-  String get agentCompressDesc;
-
-  /// No description provided for @agentCompressOn.
-  ///
-  /// In zh, this message translates to:
-  /// **'启用自动压缩'**
-  String get agentCompressOn;
-
-  /// No description provided for @agentCompressHint.
-  ///
-  /// In zh, this message translates to:
-  /// **'超过约 40 条消息时自动压缩。摘要会保留在系统提示里，最近的对话不受影响。'**
-  String get agentCompressHint;
-
-  /// No description provided for @agentCompressNow.
-  ///
-  /// In zh, this message translates to:
-  /// **'立即压缩'**
-  String get agentCompressNow;
-
-  /// No description provided for @agentCompressNothing.
-  ///
-  /// In zh, this message translates to:
-  /// **'没有可压缩的内容'**
-  String get agentCompressNothing;
-
-  /// No description provided for @agentCompressDone.
-  ///
-  /// In zh, this message translates to:
-  /// **'已压缩对话'**
-  String get agentCompressDone;
-
-  /// No description provided for @agentTool_save_memory.
-  ///
-  /// In zh, this message translates to:
-  /// **'记住一条信息'**
-  String get agentTool_save_memory;
-
-  /// No description provided for @agentTool_list_memories.
-  ///
-  /// In zh, this message translates to:
-  /// **'查看记忆'**
-  String get agentTool_list_memories;
-
-  /// No description provided for @agentTool_forget_memory.
-  ///
-  /// In zh, this message translates to:
-  /// **'忘记一条信息'**
-  String get agentTool_forget_memory;
-
-  /// No description provided for @agentAllowNetwork.
-  ///
-  /// In zh, this message translates to:
-  /// **'允许联网请求'**
-  String get agentAllowNetwork;
-
-  /// No description provided for @agentAllowNetworkDesc.
-  ///
-  /// In zh, this message translates to:
-  /// **'允许智能体主动发起 HTTP 请求（GET / POST / PUT / DELETE…）。默认关闭；开启后每次请求仍需你确认。'**
-  String get agentAllowNetworkDesc;
-
-  /// No description provided for @agentTool_http_request.
-  ///
-  /// In zh, this message translates to:
-  /// **'发起网络请求'**
-  String get agentTool_http_request;
-
 }
 
 class _AppLocalizationsDelegate

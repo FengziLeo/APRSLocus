@@ -1663,6 +1663,136 @@ class AppLocalizationsEs extends AppLocalizations {
       'El agente envía tu conversación y los datos locales que lee (estaciones, ubicación, mensajes, ajustes…) al servicio de modelo de terceros que configures (p. ej. OpenAI, DeepSeek, un endpoint propio) para su procesamiento. No compartas secretos de Estado, secretos comerciales, privacidad personal ni ubicaciones sensibles en el chat.\n\nEres responsable de confirmar que el servicio de modelo que elijas sea lícito y cumpla la normativa, y asumes las consecuencias de cualquier transferencia transfronteriza de datos o tratamiento de datos personales. No operamos dicho servicio ni tenemos afiliación, agencia o sociedad con él.\n\nPor defecto el agente solo puede leer datos; las acciones con efectos (enviar mensajes, cambiar ajustes) requieren tu autorización por separado y confirmación en cada caso, y puedes desactivar el agente cuando quieras.\n\nAl pulsar «Aceptar y activar» declaras haber leído, entendido y aceptado lo anterior.';
 
   @override
+  String get agentMemory => 'Memoria a largo plazo';
+
+  @override
+  String get agentMemoryDesc =>
+      'Permite al agente recordar tus preferencias entre chats';
+
+  @override
+  String get agentMemoryOn => 'Activar memoria a largo plazo';
+
+  @override
+  String get agentMemoryHint =>
+      'El agente puede usar las herramientas de recordar/olvidar, o basta con decir «recuerda…». Solo en este dispositivo.';
+
+  @override
+  String get agentMemoryEmpty =>
+      'Aún no hay memorias. Dile al agente «recuerda…» para añadir una.';
+
+  @override
+  String get agentMemoryClear => 'Borrar todas las memorias';
+
+  @override
+  String get agentMemoryClearConfirm =>
+      '¿Borrar todas las memorias? No se puede deshacer.';
+
+  @override
+  String get agentCompress => 'Compresión de conversación';
+
+  @override
+  String get agentCompressDesc =>
+      'Pliega turnos antiguos en un resumen cuando crece el historial';
+
+  @override
+  String get agentCompressOn => 'Activar compresión automática';
+
+  @override
+  String get agentCompressHint =>
+      'Comprime a partir de ~40 mensajes. El resumen queda en el prompt del sistema.';
+
+  @override
+  String get agentCompressNow => 'Comprimir ahora';
+
+  @override
+  String get agentCompressNothing => 'Nada que comprimir';
+
+  @override
+  String get agentCompressDone => 'Conversación comprimida';
+
+  @override
+  String get agentAllowNetwork => 'Permitir solicitudes de red';
+
+  @override
+  String get agentAllowNetworkDesc =>
+      'Permite al agente hacer solicitudes HTTP (GET / POST / PUT / DELETE…). Desactivado por defecto; cada solicitud te pregunta antes.';
+
+  @override
+  String get agentTool_http_request => 'Hacer una solicitud de red';
+
+  @override
+  String get agentTool_save_memory => 'Recordar un dato';
+
+  @override
+  String get agentTool_list_memories => 'Ver memorias';
+
+  @override
+  String get agentTool_forget_memory => 'Olvidar un dato';
+
+  @override
+  String get huangyanTitle => 'Isla Huangyan';
+
+  @override
+  String get huangyanBadge => 'Estación oculta · territorio de China';
+
+  @override
+  String get huangyanTagline =>
+      'Un atolón en el este de las islas Zhongsha, mar de China Meridional — territorio de China';
+
+  @override
+  String get huangyanShort =>
+      'Territorio de China · atolón en el este de las islas Zhongsha, mar de China Meridional';
+
+  @override
+  String get huangyanGrid => 'OL98gd';
+
+  @override
+  String get huangyanGeoHead => 'Geografía';
+
+  @override
+  String get huangyanGeoBody =>
+      'La isla Huangyan (también conocida como arrecife Scarborough) se encuentra en el este de las islas Zhongsha, en el mar de China Meridional. Es un gran atolón de forma casi triangular isósceles, con un perímetro de unos 55 km y una superficie de arrecife de unos 150 km², que encierra una laguna de unos 15 km de largo. La mayor parte del borde está sumergida; parte emerge en marea baja, lo que lo convierte en el único elemento de las islas Zhongsha que aflora.';
+
+  @override
+  String get huangyanHistoryHead => 'Historia';
+
+  @override
+  String get huangyanHistory1 =>
+      'China posee registros históricos de la isla Huangyan desde hace siglos. En 1297 el astrónomo de la dinastía Yuan Guo Shoujing estableció un punto de observación en estas aguas durante el «levantamiento de los cuatro mares»; los mapas oficiales y documentos náuticos posteriores la situaron de forma constante dentro del territorio chino, y los pescadores de Hainan y Guangdong faenan estas aguas desde generaciones con el nombre de «Huangyan». Las cartas occidentales adoptaron después el nombre de arrecife Scarborough.';
+
+  @override
+  String get huangyanHistory2 =>
+      'En la época moderna, el Gobierno chino ha ejercido de forma continua su soberanía y jurisdicción sobre la isla Huangyan y sus aguas adyacentes. En 1983, el Comité de Nombres Geográficos de China publicó oficialmente el nombre estándar «isla Huangyan».';
+
+  @override
+  String get huangyanHamHead => 'Radioafición';
+
+  @override
+  String get huangyanHamBody =>
+      'En radioafición, la isla Huangyan es conocida por el prefijo de entidad DXCC BS7. En 1995 aficionados chinos e internacionales realizaron la expedición BS7H, poniendo el atolón en el aire por primera vez y ganándose la reputación de destino DX raro y codiciado.';
+
+  @override
+  String get huangyanLegal =>
+      'El material de esta tarjeta se ofrece únicamente con fines divulgativos sobre radioafición. La isla Huangyan es territorio chino, sobre el que China tiene soberanía indiscutible, al igual que sobre sus aguas adyacentes.';
+
+  @override
+  String get huangyanTagReef => 'Atolón de coral';
+
+  @override
+  String get huangyanTagDxcc => 'DXCC BS7';
+
+  @override
+  String get huangyanTagAxis => 'Islas Zhongsha';
+
+  @override
+  String get huangyanFootNote =>
+      'Recopilado de fuentes geográficas e históricas públicas solo como referencia.';
+
+  @override
+  String get huangyanSourceHint =>
+      'La introducción se muestra en una página web integrada (algunas plataformas la abren en el navegador).';
+
+  @override
   String get codeContributionTranslation => 'Traducción';
 
   @override
@@ -9076,64 +9206,4 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16 bits mono)';
-  @override
-  String get agentMemory => "Memoria a largo plazo";
-
-  @override
-  String get agentMemoryDesc => "Permite al agente recordar tus preferencias entre chats";
-
-  @override
-  String get agentMemoryOn => "Activar memoria a largo plazo";
-
-  @override
-  String get agentMemoryHint => "El agente puede usar las herramientas de recordar/olvidar, o basta con decir «recuerda…». Solo en este dispositivo.";
-
-  @override
-  String get agentMemoryEmpty => "Aún no hay memorias. Dile al agente «recuerda…» para añadir una.";
-
-  @override
-  String get agentMemoryClear => "Borrar todas las memorias";
-
-  @override
-  String get agentMemoryClearConfirm => "¿Borrar todas las memorias? No se puede deshacer.";
-
-  @override
-  String get agentCompress => "Compresión de conversación";
-
-  @override
-  String get agentCompressDesc => "Pliega turnos antiguos en un resumen cuando crece el historial";
-
-  @override
-  String get agentCompressOn => "Activar compresión automática";
-
-  @override
-  String get agentCompressHint => "Comprime a partir de ~40 mensajes. El resumen queda en el prompt del sistema.";
-
-  @override
-  String get agentCompressNow => "Comprimir ahora";
-
-  @override
-  String get agentCompressNothing => "Nada que comprimir";
-
-  @override
-  String get agentCompressDone => "Conversación comprimida";
-
-  @override
-  String get agentTool_save_memory => "Recordar un dato";
-
-  @override
-  String get agentTool_list_memories => "Ver memorias";
-
-  @override
-  String get agentTool_forget_memory => "Olvidar un dato";
-
-  @override
-  String get agentAllowNetwork => "Permitir solicitudes de red";
-
-  @override
-  String get agentAllowNetworkDesc => "Permite al agente hacer solicitudes HTTP (GET / POST / PUT / DELETE…). Desactivado por defecto; cada solicitud te pregunta antes.";
-
-  @override
-  String get agentTool_http_request => "Hacer una solicitud de red";
-
 }

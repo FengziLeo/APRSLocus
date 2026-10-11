@@ -1622,6 +1622,128 @@ class AppLocalizationsJa extends AppLocalizations {
       'エージェントは、あなたとの会話内容と、それが読み取った端末内データ（局・位置・メッセージ・設定など）を、あなたが設定したサードパーティのモデルサービス（OpenAI、DeepSeek、自前のエンドポイント等）に送信して処理します。会話に国家機密・企業秘密・個人のプライバシー・機微な位置情報を含めないでください。\n\n選択したモデルサービスの適法性はご自身で確認し、データの越境移転や個人情報の処理に起因する責任を負ってください。当方は当該サービスを運営しておらず、提携・代理・協力関係もありません。\n\nエージェントは既定で読み取りのみ可能です。メッセージ送信や設定変更など副作用のある操作は、チャット欄での個別の許可と都度の確認が必要で、いつでも無効化できます。\n\n「同意して有効化」を押すと、上記を読み・理解し・受け入れたものとみなされます。';
 
   @override
+  String get agentMemory => '長期記憶';
+
+  @override
+  String get agentMemoryDesc => 'エージェントに好みを会話をまたいで記憶させます';
+
+  @override
+  String get agentMemoryOn => '長期記憶を有効化';
+
+  @override
+  String get agentMemoryHint =>
+      'エージェントが記憶/忘却ツールを使えます。「…を覚えて」と頼んでも可。本機にのみ保存されます。';
+
+  @override
+  String get agentMemoryEmpty => 'まだありません。「…を覚えて」と伝えると追加できます。';
+
+  @override
+  String get agentMemoryClear => 'すべての記憶を消去';
+
+  @override
+  String get agentMemoryClearConfirm => '長期記憶をすべて消去しますか？元に戻せません。';
+
+  @override
+  String get agentCompress => '会話の圧縮';
+
+  @override
+  String get agentCompressDesc => '履歴が長くなると古い会話を要約に畳み、コンテキストを節約します';
+
+  @override
+  String get agentCompressOn => '自動圧縮を有効化';
+
+  @override
+  String get agentCompressHint =>
+      '約 40 件を超えると自動圧縮。要約はシステムプロンプトに残り、直近の会話は変わりません。';
+
+  @override
+  String get agentCompressNow => '今すぐ圧縮';
+
+  @override
+  String get agentCompressNothing => '圧縮する内容がありません';
+
+  @override
+  String get agentCompressDone => '会話を圧縮しました';
+
+  @override
+  String get agentAllowNetwork => 'ネットワーク要求を許可';
+
+  @override
+  String get agentAllowNetworkDesc =>
+      'エージェントが HTTP リクエスト（GET / POST / PUT / DELETE…）を送れるようにします。既定はオフ。実行前に毎回確認します。';
+
+  @override
+  String get agentTool_http_request => 'ネットワーク要求';
+
+  @override
+  String get agentTool_save_memory => '情報を記憶';
+
+  @override
+  String get agentTool_list_memories => '記憶を表示';
+
+  @override
+  String get agentTool_forget_memory => '情報を忘却';
+
+  @override
+  String get huangyanTitle => '黄岩島';
+
+  @override
+  String get huangyanBadge => '隠し局 · 中国の固有の領土';
+
+  @override
+  String get huangyanTagline => '南シナ海・中沙諸島東部の環礁、中国の固有の領土';
+
+  @override
+  String get huangyanShort => '中国の固有の領土 · 南シナ海 中沙諸島東部の環礁';
+
+  @override
+  String get huangyanGrid => 'OL98gd';
+
+  @override
+  String get huangyanGeoHead => '地理';
+
+  @override
+  String get huangyanGeoBody =>
+      '黄岩島（別名スカボロー礁）は南シナ海の中沙諸島東部に位置する、ほぼ二等辺三角形の大型環礁で、周囲約55km、礁原面積は約150平方キロ、長さ約15kmのラグーンを内包する。礁縁の大半は水面下にあり、干潮時に一部が海面上に現れ、中沙諸島で唯一海面上に出る島礁である。';
+
+  @override
+  String get huangyanHistoryHead => '歴史';
+
+  @override
+  String get huangyanHistory1 =>
+      '中国には古くから黄岩島に関する歴史的記録がある。元代の天文学者・郭守敬は「四海測験」の命により1297年にこの海域へ観測点を設けた。以降、歴代の官製地図や航海文献は黄岩島を中国の版図に含め、海南・広東の漁民は代々この海域で操業し「黄岩」と呼んだ。西洋海図は後に Scarborough Shoal の名を用いた。';
+
+  @override
+  String get huangyanHistory2 =>
+      '現代においても中国政府は黄岩島およびその周辺海域で主権と管轄を行使し続けている。1983年、中国地名委員会が標準名称「黄岩島」を正式に公布した。';
+
+  @override
+  String get huangyanHamHead => 'アマチュア無線';
+
+  @override
+  String get huangyanHamBody =>
+      'アマチュア無線では、黄岩島は DXCC エンティティのコールサイン接頭辞 BS7 で知られる。1995年、中国と各国のアマチュアが BS7H の DXペディションを敢行し、この環礁が初めて世界中のログに載り、希少な DX 目的地として知られるようになった。';
+
+  @override
+  String get huangyanLegal =>
+      '本カードの資料はアマチュア無線の教育・紹介のみを目的とする。黄岩島は中国の固有の領土であり、中国はその周辺海域とともに争う余地のない主権を有する。';
+
+  @override
+  String get huangyanTagReef => '珊瑚環礁';
+
+  @override
+  String get huangyanTagDxcc => 'DXCC BS7';
+
+  @override
+  String get huangyanTagAxis => '中沙諸島';
+
+  @override
+  String get huangyanFootNote => '公開された地理・歴史資料を基に、参考としてまとめたものです。';
+
+  @override
+  String get huangyanSourceHint => '紹介ページは埋め込みウェブページで表示されます（一部環境ではブラウザで開きます）。';
+
+  @override
   String get codeContributionTranslation => '翻訳';
 
   @override
@@ -8750,64 +8872,4 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit モノラル)';
-  @override
-  String get agentMemory => "長期記憶";
-
-  @override
-  String get agentMemoryDesc => "エージェントに好みを会話をまたいで記憶させます";
-
-  @override
-  String get agentMemoryOn => "長期記憶を有効化";
-
-  @override
-  String get agentMemoryHint => "エージェントが記憶/忘却ツールを使えます。「…を覚えて」と頼んでも可。本機にのみ保存されます。";
-
-  @override
-  String get agentMemoryEmpty => "まだありません。「…を覚えて」と伝えると追加できます。";
-
-  @override
-  String get agentMemoryClear => "すべての記憶を消去";
-
-  @override
-  String get agentMemoryClearConfirm => "長期記憶をすべて消去しますか？元に戻せません。";
-
-  @override
-  String get agentCompress => "会話の圧縮";
-
-  @override
-  String get agentCompressDesc => "履歴が長くなると古い会話を要約に畳み、コンテキストを節約します";
-
-  @override
-  String get agentCompressOn => "自動圧縮を有効化";
-
-  @override
-  String get agentCompressHint => "約 40 件を超えると自動圧縮。要約はシステムプロンプトに残り、直近の会話は変わりません。";
-
-  @override
-  String get agentCompressNow => "今すぐ圧縮";
-
-  @override
-  String get agentCompressNothing => "圧縮する内容がありません";
-
-  @override
-  String get agentCompressDone => "会話を圧縮しました";
-
-  @override
-  String get agentTool_save_memory => "情報を記憶";
-
-  @override
-  String get agentTool_list_memories => "記憶を表示";
-
-  @override
-  String get agentTool_forget_memory => "情報を忘却";
-
-  @override
-  String get agentAllowNetwork => "ネットワーク要求を許可";
-
-  @override
-  String get agentAllowNetworkDesc => "エージェントが HTTP リクエスト（GET / POST / PUT / DELETE…）を送れるようにします。既定はオフ。実行前に毎回確認します。";
-
-  @override
-  String get agentTool_http_request => "ネットワーク要求";
-
 }

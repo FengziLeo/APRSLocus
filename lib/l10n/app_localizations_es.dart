@@ -1445,6 +1445,181 @@ class AppLocalizationsEs extends AppLocalizations {
   String get agentPermissions => 'Permisos';
 
   @override
+  String get agentTabConnection => 'Conexión';
+
+  @override
+  String get agentTabPermissions => 'Permisos';
+
+  @override
+  String get agentTabAutomation => 'Automatización';
+
+  @override
+  String get agentSystemPromptHint =>
+      'Déjalo vacío para usar el prompt integrado';
+
+  @override
+  String get agentAlwaysAllow => 'Permitir siempre';
+
+  @override
+  String get agentAlwaysAllowDesc =>
+      'Estas herramientas se ejecutan sin preguntar. Pulsa «Permitir siempre» para añadir una.';
+
+  @override
+  String get agentAlwaysAllowEmpty =>
+      'Ninguna aún. Pulsa «Permitir siempre» en una barra de confirmación.';
+
+  @override
+  String get agentAlwaysAllowClear => 'Borrar todo';
+
+  @override
+  String get agentAutoReply => 'Respuesta automática';
+
+  @override
+  String get agentAutoReplyDesc =>
+      'El agente responde solo a los mensajes nuevos (experimental)';
+
+  @override
+  String get agentAutoReplyOn => 'Activar respuesta automática';
+
+  @override
+  String get agentAutoReplyHint =>
+      'Solo mensajes directos; sujeto a horas de silencio y enfriamiento; requiere «Permitir enviar mensajes».';
+
+  @override
+  String get agentReplyGroups => 'Responder también en grupos';
+
+  @override
+  String get agentReplyGroupsDesc =>
+      'Hablar automáticamente en grupos es más arriesgado; desactivado por defecto';
+
+  @override
+  String get agentQuietHours => 'Horas de silencio';
+
+  @override
+  String get agentQuietHoursDesc =>
+      'p. ej. 23:00-07:00; vacío = sin límite. No responde en esa franja.';
+
+  @override
+  String get agentTasks => 'Tareas programadas';
+
+  @override
+  String get agentTasksDesc =>
+      'Ejecuta una instrucción más tarde automáticamente';
+
+  @override
+  String get agentTasksEmpty => 'Aún no hay tareas programadas';
+
+  @override
+  String get agentTaskNew => 'Nueva tarea programada';
+
+  @override
+  String get agentTaskPrompt => 'Instrucción';
+
+  @override
+  String get agentTaskPromptHint =>
+      'p. ej. resume las estaciones de la última hora';
+
+  @override
+  String get agentTaskInterval => 'Intervalo (minutos)';
+
+  @override
+  String get agentTaskIntervalHint => '0 = una vez; repetir mínimo 1 min';
+
+  @override
+  String get agentTaskCreate => 'Crear';
+
+  @override
+  String get agentTaskDelete => 'Eliminar';
+
+  @override
+  String agentTaskEvery(int n) {
+    return 'Cada $n min';
+  }
+
+  @override
+  String get agentTaskOnce => 'Una vez';
+
+  @override
+  String agentAutoReplyPrompt(String from, String text) {
+    return '[Respuesta automática] $from te escribió: $text\nPuedes usar herramientas de solo lectura (estaciones, mensajes…) para obtener datos, pero no cambies ajustes ni envíes nada. Escribe solo el mensaje a responder.';
+  }
+
+  @override
+  String get agentTool_get_app_state => 'Leer estado de la app';
+
+  @override
+  String get agentTool_list_groups => 'Listar grupos';
+
+  @override
+  String get agentTool_search_stations => 'Buscar estaciones';
+
+  @override
+  String get agentTool_list_stations => 'Listar estaciones';
+
+  @override
+  String get agentTool_station_detail => 'Detalles de estación';
+
+  @override
+  String get agentTool_read_messages => 'Leer mensajes';
+
+  @override
+  String get agentTool_send_message => 'Enviar mensaje';
+
+  @override
+  String get agentTool_send_beacon_now => 'Enviar baliza ahora';
+
+  @override
+  String get agentTool_set_preferences => 'Cambiar preferencias';
+
+  @override
+  String get agentTool_set_station_filters => 'Cambiar filtros de estaciones';
+
+  @override
+  String get agentTool_set_nickname => 'Cambiar datos de indicativo';
+
+  @override
+  String get agentTool_navigate => 'Cambiar de pantalla';
+
+  @override
+  String get agentTool_create_task => 'Crear tarea programada';
+
+  @override
+  String get agentTool_list_tasks => 'Listar tareas programadas';
+
+  @override
+  String get agentTool_cancel_task => 'Cancelar tarea programada';
+
+  @override
+  String get agentTool_set_connection_server => 'Cambiar servidor';
+
+  @override
+  String get agentTool_set_connection_source => 'Cambiar fuente de conexión';
+
+  @override
+  String get agentTool_connect => 'Conectar';
+
+  @override
+  String get agentTool_disconnect => 'Desconectar';
+
+  @override
+  String get agentTool_nearby_stations => 'Estaciones cercanas';
+
+  @override
+  String get agentTool_reply_message => 'Responder mensaje';
+
+  @override
+  String get agentTool_send_group_message => 'Enviar a grupo';
+
+  @override
+  String get agentTool_create_group => 'Crear grupo';
+
+  @override
+  String get agentTool_set_task_enabled => 'Pausar/reanudar tarea';
+
+  @override
+  String get agentTool_unknown => 'Ejecutar acción';
+
+  @override
   String get codeContributionTranslation => 'Traducción';
 
   @override
@@ -8854,157 +9029,4 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16 bits mono)';
-  @override
-  String get agentTabConnection => "Conexión";
-
-  @override
-  String get agentTabPermissions => "Permisos";
-
-  @override
-  String get agentTabAutomation => "Automatización";
-
-  @override
-  String get agentSystemPromptHint => "Déjalo vacío para usar el prompt integrado";
-
-  @override
-  String get agentAllowTasks => "Permitir tareas programadas";
-
-  @override
-  String get agentAllowTasksDesc => "Permite al agente crear, listar y cancelar tareas programadas";
-
-  @override
-  String get agentAlwaysAllow => "Permitir siempre";
-
-  @override
-  String get agentAlwaysAllowDesc => "Estas herramientas se ejecutan sin preguntar. Pulsa «Permitir siempre» para añadir una.";
-
-  @override
-  String get agentAlwaysAllowEmpty => "Ninguna aún. Pulsa «Permitir siempre» en una barra de confirmación.";
-
-  @override
-  String get agentAlwaysAllowClear => "Borrar todo";
-
-  @override
-  String get agentAutoReply => "Respuesta automática";
-
-  @override
-  String get agentAutoReplyDesc => "El agente responde solo a los mensajes nuevos (experimental)";
-
-  @override
-  String get agentAutoReplyOn => "Activar respuesta automática";
-
-  @override
-  String get agentAutoReplyHint => "Solo mensajes directos; sujeto a horas de silencio y enfriamiento; requiere «Permitir enviar mensajes».";
-
-  @override
-  String get agentReplyGroups => "Responder también en grupos";
-
-  @override
-  String get agentReplyGroupsDesc => "Hablar automáticamente en grupos es más arriesgado; desactivado por defecto";
-
-  @override
-  String get agentQuietHours => "Horas de silencio";
-
-  @override
-  String get agentQuietHoursDesc => "p. ej. 23:00-07:00; vacío = sin límite. No responde en esa franja.";
-
-  @override
-  String get agentTasks => "Tareas programadas";
-
-  @override
-  String get agentTasksDesc => "Ejecuta una instrucción más tarde automáticamente (requiere «Permitir tareas programadas»)";
-
-  @override
-  String get agentTasksEmpty => "Aún no hay tareas programadas";
-
-  @override
-  String get agentTaskNew => "Nueva tarea programada";
-
-  @override
-  String get agentTaskPrompt => "Instrucción";
-
-  @override
-  String get agentTaskPromptHint => "p. ej. resume las estaciones de la última hora";
-
-  @override
-  String get agentTaskInterval => "Intervalo (minutos)";
-
-  @override
-  String get agentTaskIntervalHint => "0 = una vez; repetir mínimo 5 min";
-
-  @override
-  String get agentTaskCreate => "Crear";
-
-  @override
-  String get agentTaskDelete => "Eliminar";
-
-  @override
-  String agentTaskEvery(int n) => "Cada $n min";
-
-  @override
-  String get agentTaskOnce => "Una vez";
-
-  @override
-  String agentAutoReplyPrompt(String from, String text) => "[Respuesta automática] $from te escribió: $text\nEscribe solo el mensaje a responder (sin explicación, sin usar herramientas).";
-
-  @override
-  String get agentTool_get_app_state => "Leer estado de la app";
-
-  @override
-  String get agentTool_list_groups => "Listar grupos";
-
-  @override
-  String get agentTool_search_stations => "Buscar estaciones";
-
-  @override
-  String get agentTool_list_stations => "Listar estaciones";
-
-  @override
-  String get agentTool_station_detail => "Detalles de estación";
-
-  @override
-  String get agentTool_read_messages => "Leer mensajes";
-
-  @override
-  String get agentTool_send_message => "Enviar mensaje";
-
-  @override
-  String get agentTool_send_beacon_now => "Enviar baliza ahora";
-
-  @override
-  String get agentTool_set_preferences => "Cambiar preferencias";
-
-  @override
-  String get agentTool_set_station_filters => "Cambiar filtros de estaciones";
-
-  @override
-  String get agentTool_set_nickname => "Cambiar datos de indicativo";
-
-  @override
-  String get agentTool_navigate => "Cambiar de pantalla";
-
-  @override
-  String get agentTool_create_task => "Crear tarea programada";
-
-  @override
-  String get agentTool_list_tasks => "Listar tareas programadas";
-
-  @override
-  String get agentTool_cancel_task => "Cancelar tarea programada";
-
-  @override
-  String get agentTool_unknown => "Ejecutar acción";
-
-  @override
-  String get agentTool_set_connection_server => "Cambiar servidor";
-
-  @override
-  String get agentTool_set_connection_source => "Cambiar fuente de conexión";
-
-  @override
-  String get agentTool_connect => "Conectar";
-
-  @override
-  String get agentTool_disconnect => "Desconectar";
-
 }

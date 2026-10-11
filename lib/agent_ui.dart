@@ -315,13 +315,6 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
             if (mounted) setState(() {});
           }),
           SettingsHint(s.agentAllowSettingsDesc),
-          SettingsSwitch(s.agentAllowTasks,
-              value: cfg.allowTasks, color: C.orange, onChanged: (v) async {
-            cfg.allowTasks = v;
-            await AgentService.instance.saveConfig();
-            if (mounted) setState(() {});
-          }),
-          SettingsHint(s.agentAllowTasksDesc),
         ],
       ),
       const SizedBox(height: 16),
@@ -523,8 +516,37 @@ class _AgentOverlayState extends State<AgentOverlay> {
   /// 待确认的「清空对话」
   bool _clearPending = false;
 
+  /// 聊天消息列表的滚动控制器：每次新增消息 / 展开面板都跳到最底部，
+  /// 否则会停在历史顶部（用户反馈「每次打开都在最上面」）。
+  final ScrollController _scroll = ScrollController();
+
+  /// 待执行的「滚到底」回调（合并同一帧内的多次请求）
+  bool _scrollScheduled = false;
+
   AgentService get svc => AgentService.instance;
   AgentConfig get cfg => svc.config;
+
+  /// 打开面板或收到新消息时滚到底部。
+  ///
+  /// * 面板展开用 `jumpTo`：列表刚 build 完，位置还没稳定，动画会滚不到底；
+  /// * 新增消息用 `animateTo`（若已在底部附近）：观感更自然。
+  ///
+  /// 二者都延到帧后执行 —— 这一刻 `maxScrollExtent` 才是新内容算完的值。
+  void _scrollToBottom({bool animate = false}) {
+    if (_scrollScheduled) return;
+    _scrollScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollScheduled = false;
+      if (!mounted || !_scroll.hasClients) return;
+      final max = _scroll.position.maxScrollExtent;
+      if (animate && (max - _scroll.position.pixels).abs() > 4) {
+        _scroll.animateTo(max,
+            duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+      } else {
+        _scroll.jumpTo(max);
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -535,14 +557,26 @@ class _AgentOverlayState extends State<AgentOverlay> {
     _taskTimer = Timer.periodic(const Duration(seconds: 60), (_) => _runDueTasks());
     // 接收消息激活：收到别人发来的消息时可自动回复（默认关，见配置页）。
     widget.state.onNewMessage = _onIncoming;
+    // 消息一变（用户发送 / 模型回复 / 工具结果）就滚到底。
+    svc.addListener(_onSvcChanged);
+    // 展开面板（初始即展开）后也要滚到底：延迟启动时不显示面板，
+    // 之后 `_minimized` 转 false 时会在 build 里补一次。
+    if (!_minimized) _scrollToBottom();
   }
 
   Timer? _taskTimer;
 
+  void _onSvcChanged() {
+    _scrollToBottom(animate: true);
+  }
+
   @override
   void dispose() {
+    svc.removeListener(_onSvcChanged);
+    _scroll.dispose();
     _taskTimer?.cancel();
     super.dispose();
+
   }
 
   /// 定时任务到点：逐个跑（串行，避免并发占用把对话搅乱）。
@@ -618,7 +652,11 @@ class _AgentOverlayState extends State<AgentOverlay> {
 
   Widget _bubble() {
     return GestureDetector(
-      onTap: () => setState(() => _minimized = false),
+      onTap: () {
+        setState(() => _minimized = false);
+        // 展开后滚到最新消息处（用户上次可能没看完就收起了）。
+        _scrollToBottom();
+      },
       child: MaterialSurface(
         radius: 999,
         child: Container(
@@ -663,26 +701,35 @@ class _AgentOverlayState extends State<AgentOverlay> {
       onPanEnd: (_) => setState(() {}),
       child: MaterialSurface(
         radius: 20,
-        child: Container(
-          width: w,
-          height: h,
-          decoration: BoxDecoration(
-            color: C.sheetFill,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: C.border),
-            boxShadow: elev2(),
+        child: Material(
+          // 面板里用到了 TextField 和一堆 TextButton/FilledButton/IconButton，
+          // 它们都要求有 Material 祖先（渲染墨水/涟漪）。MaterialSurface 只负责
+          // 磨砂与投影，**不提供** Material；漏了它每个这类控件都会抛
+          // "No Material widget found"，整块面板连同布局一起崩成黄黑条纹 ——
+          // 这正是用户看到的「聊天框里的下划线」。type 用 transparency 让
+          // Material 不画自己的底，填色/描边/阴影照旧由下面的 Container 出。
+          type: MaterialType.transparency,
+          child: Container(
+            width: w,
+            height: h,
+            decoration: BoxDecoration(
+              color: C.sheetFill,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: C.border),
+              boxShadow: elev2(),
+            ),
+            child: Column(children: [
+              _header(s),
+              Divider(height: 1, color: C.border),
+              if (!cfg.ready) _notReady(s),
+              Expanded(child: _messageList(s)),
+              if (svc.busy && _pendingCall == null) _thinking(s),
+              if (_clearPending) _clearBar(s),
+              if (_pendingCall != null) _confirmBar(s, _pendingCall!),
+              Divider(height: 1, color: C.border),
+              _input(s),
+            ]),
           ),
-          child: Column(children: [
-            _header(s),
-            Divider(height: 1, color: C.border),
-            if (!cfg.ready) _notReady(s),
-            Expanded(child: _messageList(s)),
-            if (svc.busy && _pendingCall == null) _thinking(s),
-            if (_clearPending) _clearBar(s),
-            if (_pendingCall != null) _confirmBar(s, _pendingCall!),
-            Divider(height: 1, color: C.border),
-            _input(s),
-          ]),
         ),
       ),
     );
@@ -775,6 +822,7 @@ class _AgentOverlayState extends State<AgentOverlay> {
     ];
     if (items.isEmpty) return const SizedBox.shrink();
     return ListView(
+      controller: _scroll,
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       children: items,
     );
@@ -1067,17 +1115,13 @@ class _AgentOverlayState extends State<AgentOverlay> {
     try {
       await svc.send(
         text,
-        tools: agentToolSchemas(
-          allowSend: cfg.allowSend,
-          allowTasks: cfg.allowTasks,
-        ),
+        tools: agentToolSchemas(allowSend: cfg.allowSend),
         execute: (name, args) => executeAgentTool(
           widget.state,
           name,
           args,
           allowedSend: cfg.allowSend,
           allowedSettings: cfg.allowSettings,
-          allowedTasks: cfg.allowTasks,
         ),
         confirm: background ? _denyBackground : _confirm,
         needsConfirm: agentNeedsConfirm,
@@ -1151,6 +1195,16 @@ extension AgentToolLabel on AppLocalizations {
         return agentTool_connect;
       case 'disconnect':
         return agentTool_disconnect;
+      case 'nearby_stations':
+        return agentTool_nearby_stations;
+      case 'reply_message':
+        return agentTool_reply_message;
+      case 'send_group_message':
+        return agentTool_send_group_message;
+      case 'create_group':
+        return agentTool_create_group;
+      case 'set_task_enabled':
+        return agentTool_set_task_enabled;
       default:
         return agentTool_unknown;
     }

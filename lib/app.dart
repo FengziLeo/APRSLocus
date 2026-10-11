@@ -80,6 +80,11 @@ class _AppState extends State<App> {
   /// 用于取得 Navigator 之下的 context / overlay（庆祝层要插在它上面）
   final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
 
+  /// 智能体聊天框的 Overlay 条目 —— 挂在根 Navigator 的 Overlay 里，
+  /// 因此位于所有路由之上（切页不丢），且能拿到 Navigator / Overlay 祖先。
+  OverlayEntry? _agentEntry;
+  OverlayState? _agentOverlay;
+
   @override
   void initState() {
     super.initState();
@@ -88,8 +93,36 @@ class _AppState extends State<App> {
     // 启动后应用保存的主题（深色/自定义色）——_loadPrefs 完成后还会再应用一次
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _state.applySavedTheme();
+      _syncAgentOverlay();
       if (mounted) setState(() {});
     });
+  }
+
+  /// 把智能体聊天框挂进根 Overlay。
+  ///
+  /// 为什么是 OverlayEntry 而不是 `MaterialApp.builder` 里的一层 Stack：
+  ///   * builder 在 Navigator **之上** → 聊天框里的 `Navigator.of(context)`
+  ///     取不到当前 Navigator（设置按钮点了没反应）、Tooltip 找不到 Overlay
+  ///     祖先而抛 "No Overlay widget found" → 布局崩出黄黑条纹（「下划线」）；
+  ///   * 放在 Overlay 里则同时拿到 Navigator 与 Overlay，且位于所有路由之上
+  ///     —— 从首页 push 出设置子页时聊天框依旧在、不会消失。
+  ///
+  /// 幂等：Navigator 未就绪或 Overlay 未变时什么都不做；`reloadTick` 会让
+  /// MaterialApp 换 key、连同 Navigator 一起重建，这时需要往新 Overlay 里重挂。
+  void _syncAgentOverlay() {
+    final overlay = _navKey.currentState?.overlay;
+    if (overlay == null) return; // Navigator 还没就绪，等下一次调用
+    if (identical(overlay, _agentOverlay) && _agentEntry != null) return;
+    // 旧 Overlay 已被重建/销毁：它自己会连同条目一起回收，这里只丢引用。
+    _agentEntry = null;
+    _agentOverlay = overlay;
+    final entry = OverlayEntry(
+      // 必须 Positioned.fill：聊天框根节点是 Stack，靠满屏约束才能把面板
+      // 定位到右下角；否则在 Overlay 的 Stack 里被挤成零尺寸。
+      builder: (_) => Positioned.fill(child: AgentOverlay(state: _state)),
+    );
+    overlay.insert(entry);
+    _agentEntry = entry;
   }
 
   void _onThemeChange() {
@@ -124,6 +157,11 @@ class _AppState extends State<App> {
       _lastReloadTick = rt;
       _lastThemeRevision = tr;
       if (mounted) setState(() {});
+      // MaterialApp 换了 key（reloadTick）时 Navigator 会连同 Overlay 一起重建，
+      // 聊天框要挂回新 Overlay 上；没换 key 时这次调用是幂等的。
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _syncAgentOverlay();
+      });
     }
   }
 
@@ -132,6 +170,8 @@ class _AppState extends State<App> {
     _honorListenerAttached = false;
     memberListVersion.removeListener(_onHonorsMaybeChanged);
     _state.removeListener(_onThemeChange);
+    _agentEntry?.remove();
+    _agentEntry = null;
     _state.dispose();
     super.dispose();
   }
@@ -253,12 +293,15 @@ class _AppState extends State<App> {
           // ——它位于 Localizations **之下**，所以里面 AppLocalizations.of(context)
           // 拿到的就是当前真正生效的语言（包括「跟随系统」那档）。换到 App 层
           // 就得自己重算 locale，一旦算错，组件上的文字会和界面差一个语言。
-          child: Stack(children: [
-            Positioned.fill(child: content),
-            // 智能体聊天框：挂在所有页面之上，因此任何页面都能看到它。
-            // 关闭「智能体模式」时 AgentOverlay 自己返回空，不吃手势、零开销。
-            Positioned.fill(child: AgentOverlay(state: _state)),
-          ]),
+          //
+          // ⚠ 智能体聊天框不在这里。它在 Navigator 的 Overlay 里（见
+          // `_syncAgentOverlay`）：builder 位于 Navigator **之上**，而聊天框
+          // 用到 `Navigator.of(context)`（打开设置页）与 Tooltip（需要 Overlay
+          // 祖先）—— 挂在这里会取到上层 Navigator / 找不到 Overlay，Tooltip 抛
+          // "No Overlay widget found"，布局连带崩出黄黑条纹（用户看到的
+          // 「下划线」），设置按钮点了也毫无反应。放进根 Overlay 就同时拿到
+          // 当前 Navigator 与 Overlay，且居所有路由之上、切页不丢。
+          child: content,
         );
       },
       home: ListenableBuilder(

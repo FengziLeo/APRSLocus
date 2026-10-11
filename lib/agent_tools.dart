@@ -368,6 +368,93 @@ final List<AgentToolSpec> kAgentTools = [
     mutating: true,
     parameters: {'type': 'object', 'properties': {}},
   ),
+  const AgentToolSpec(
+    name: 'nearby_stations',
+    description:
+        'List the stations currently nearest to the user (by distance from '
+        'their position), nearest first. Use this for "who is near me / around '
+        'me" — no need to search by callsign. Read-only, never needs confirmation.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'radius_km': {
+          'type': 'number',
+          'description': 'Only stations within this many km (default: current filter).',
+        },
+        'limit': {'type': 'integer', 'description': 'How many to return (default 5).'},
+      },
+    },
+  ),
+  const AgentToolSpec(
+    name: 'reply_message',
+    description:
+        'Reply to the person who sent you the latest message in a conversation. '
+        'This is the natural tool for answering an incoming message — you do not '
+        'need to know the callsign, just pass the sender it came from. Requires '
+        'the "allow sending" permission and the user\'s confirmation.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'to': {
+          'type': 'string',
+          'description': 'Call sign (or group call) the incoming message came from.',
+        },
+        'text': {'type': 'string', 'description': 'The reply text.'},
+      },
+      'required': ['to', 'text'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'send_group_message',
+    description:
+        'Send a message to a chat group by its name or group call (see '
+        '"list_groups"). Use "send_message" for a single person. Requires the '
+        '"allow sending" permission and the user\'s confirmation.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group name or group call.'},
+        'text': {'type': 'string', 'description': 'The message text.'},
+      },
+      'required': ['group', 'text'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'create_group',
+    description:
+        'Create a new chat group with the given members. Requires the '
+        '"allow settings" permission and the user\'s confirmation.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'name': {'type': 'string', 'description': 'Display name of the group.'},
+        'members': {
+          'type': 'array',
+          'items': {'type': 'string'},
+          'description': 'Call signs to invite (the owner is added automatically).',
+        },
+      },
+      'required': ['name'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'set_task_enabled',
+    description:
+        'Pause or resume a scheduled task by its id (see "list_tasks"). '
+        'Pausing keeps it but stops it from running.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'id': {'type': 'string', 'description': 'Task id from list_tasks.'},
+        'enabled': {'type': 'boolean', 'description': 'true = resume, false = pause.'},
+      },
+      'required': ['id', 'enabled'],
+    },
+  ),
 ];
 
 /// 名称 → spec
@@ -390,20 +477,19 @@ const Map<String, int> _screens = {
 
 /// 发给模型的 schema 列表。
 ///
-/// 未开启发送权限时连 `send_*` 的 schema 都不给 —— 既有明确的权限边界，
-/// 也避免模型反复尝试一个注定被拒的操作。定时任务同理。
-List<Map<String, dynamic>> agentToolSchemas({
-  required bool allowSend,
-  bool allowTasks = false,
-}) =>
-    [
+/// 未开启发送权限时连会发消息的工具都不给 —— 既有明确的权限边界，
+/// 也避免模型反复尝试一个注定被拒的操作。定时任务**不再**单独设开关：
+/// 任务只是「到点自动跑一句话」，真正能不能做仍由发送/改设置权限与确认决定，
+/// 所以没有理由再挡一道（旧版的「允许定时任务」开关已移除）。
+List<Map<String, dynamic>> agentToolSchemas({required bool allowSend}) => [
       for (final t in kAgentTools)
-        if (allowSend || !t.name.startsWith('send_'))
-          if (allowTasks || !_isTaskTool(t.name)) t.toSchema(),
+        if (allowSend || !_isSendingTool(t.name)) t.toSchema(),
     ];
 
-bool _isTaskTool(String name) =>
-    name == 'create_task' || name == 'cancel_task' || name == 'list_tasks';
+/// 会发出 APRS 消息的工具（受「允许发送」开关约束）。
+/// `reply_message` 不以 `send_` 开头，但同样是发送，必须一并纳入。
+bool _isSendingTool(String name) =>
+    name.startsWith('send_') || name == 'reply_message';
 
 /// 免确认白名单：这些工具无副作用，执行前不问用户。
 ///
@@ -472,17 +558,13 @@ Future<AgentToolOutcome> executeAgentTool(
   Map<String, dynamic> args, {
   required bool allowedSend,
   required bool allowedSettings,
-  bool allowedTasks = false,
 }) async {
   final spec = _byName[name];
   if (spec == null) return _err('Unknown tool: $name');
 
-  // 权限闸门（schema 层已隐藏 send_* / 任务工具，但模型仍可能凭空调用）
-  if (name.startsWith('send_') && !allowedSend) {
+  // 权限闸门（schema 层已隐藏发送类工具，但模型仍可能凭空调用）
+  if (_isSendingTool(name) && !allowedSend) {
     return _err('Permission denied: sending messages is disabled in settings.');
-  }
-  if (_isTaskTool(name) && name != 'list_tasks' && !allowedTasks) {
-    return _err('Permission denied: scheduled tasks are disabled in settings.');
   }
   if (spec.mutating && name != 'navigate' && !allowedSettings) {
     return _err('Permission denied: changing settings is disabled.');
@@ -571,6 +653,21 @@ Future<AgentToolOutcome> executeAgentTool(
             note: 'list_stations → ${list.length}');
       }
 
+    case 'nearby_stations':
+      {
+        if (!st.myHasFix || st.myLat == null || st.myLng == null) {
+          return _err('No position fix yet; cannot compute nearby stations.');
+        }
+        final radiusKm =
+            _asDouble(args['radius_km']) ?? st.filterRadius.toDouble();
+        if (radiusKm <= 0) return _err('radius_km must be > 0');
+        final lim = _asInt(args['limit']) ?? 5;
+        final hits = st.nearbyStations(radiusKm, limit: lim.clamp(1, 50));
+        final list = [for (final s in hits) _stationBrief(s)];
+        return AgentToolOutcome(jsonEncode(list),
+            note: 'nearby_stations ${radiusKm.round()}km → ${list.length}');
+      }
+
     case 'station_detail':
       {
         final q = _val(args, 'call').trim().toUpperCase();
@@ -641,6 +738,72 @@ Future<AgentToolOutcome> executeAgentTool(
         st.sendMessage(to, text);
         return AgentToolOutcome('Message queued to $to: $text',
             note: 'send_message → $to');
+      }
+
+    case 'reply_message':
+      {
+        final to = _val(args, 'to').trim().toUpperCase();
+        final text = _val(args, 'text').trim();
+        if (to.isEmpty || text.isEmpty) {
+          return _err('"to" and "text" are required');
+        }
+        if (st.usingRf && text.length > 67) {
+          return _err('Radio mode limits a message to 67 characters.');
+        }
+        // 若目标其实是某个群（群名/群呼号），走群发，否则按单播回。
+        final g = st.chatGroups
+            .where((g) =>
+                g.groupCall.toUpperCase() == to ||
+                g.name.toUpperCase() == to)
+            .firstOrNull;
+        if (g != null) {
+          st.sendGroupMessage(g.groupCall, text, groupId: g.id);
+          return AgentToolOutcome('Reply sent to group ${g.name}: $text',
+              note: 'reply_message → group ${g.name}');
+        }
+        st.sendMessage(to, text);
+        return AgentToolOutcome('Reply sent to $to: $text',
+            note: 'reply_message → $to');
+      }
+
+    case 'send_group_message':
+      {
+        final q = _val(args, 'group').trim().toUpperCase();
+        final text = _val(args, 'text').trim();
+        if (q.isEmpty || text.isEmpty) {
+          return _err('"group" and "text" are required');
+        }
+        final g = st.chatGroups
+            .where((g) =>
+                g.groupCall.toUpperCase() == q || g.name.toUpperCase() == q)
+            .firstOrNull;
+        if (g == null) return _err('No group named "$q".');
+        if (st.usingRf && text.length > 67) {
+          return _err('Radio mode limits a message to 67 characters.');
+        }
+        st.sendGroupMessage(g.groupCall, text, groupId: g.id);
+        return AgentToolOutcome('Group message sent to ${g.name}: $text',
+            note: 'send_group_message → ${g.name}');
+      }
+
+    case 'create_group':
+      {
+        final groupName = _val(args, 'name').trim();
+        if (groupName.isEmpty) return _err('name is required');
+        final raw = args['members'];
+        final members = <String>{};
+        if (raw is List) {
+          for (final m in raw) {
+            final s = '$m'.trim().toUpperCase();
+            if (s.isNotEmpty) members.add(s);
+          }
+        }
+        final g = st.createGroup(groupName, members);
+        return AgentToolOutcome(
+          'Created group ${g.name} (${g.groupCall}) with '
+          '${g.recipients.length} member(s).',
+          note: 'create_group ${g.name}',
+        );
       }
 
     case 'send_beacon_now':
@@ -889,10 +1052,7 @@ Future<AgentToolOutcome> executeAgentTool(
         if (prompt.isEmpty) return _err('prompt is required');
         var mins = _asInt(args['interval_minutes']) ?? 0;
         if (mins < 0) mins = 0;
-        // 循环任务最短 5 分钟：再短就会不断烧 API 配额、也不停打扰用户。
-        if (mins > 0 && mins < 5) {
-          return _err('interval_minutes must be 0 (once) or >= 5.');
-        }
+        // 循环任务间隔没有额外下限（轮询本身 60 秒一次，实际最快就是每分钟）。
         final t = await AgentService.instance.addTask(prompt, intervalMinutes: mins);
         return AgentToolOutcome(
           'Task ${t.id} scheduled '
@@ -925,6 +1085,19 @@ Future<AgentToolOutcome> executeAgentTool(
         if (hit.isEmpty) return _err('No task with id $id.');
         await AgentService.instance.removeTask(id);
         return AgentToolOutcome('Task $id canceled.', note: 'cancel_task $id');
+      }
+
+    case 'set_task_enabled':
+      {
+        final id = _val(args, 'id').trim();
+        if (id.isEmpty) return _err('id is required');
+        final on = _asBool(args['enabled']);
+        if (on == null) return _err('"enabled" must be true or false.');
+        final hit = AgentService.instance.tasks.where((t) => t.id == id).toList();
+        if (hit.isEmpty) return _err('No task with id $id.');
+        await AgentService.instance.setTaskEnabled(id, on);
+        return AgentToolOutcome('Task $id ${on ? 'resumed' : 'paused'}.',
+            note: 'set_task_enabled $id → $on');
       }
 
     case 'set_connection_server':

@@ -146,9 +146,6 @@ class AgentConfig {
   /// 安静时段，格式 `HH:MM-HH:MM`（可为空 = 不限）。跨零点（如 23:00-07:00）也支持。
   String quietHours;
 
-  /// 允许智能体创建 / 管理定时任务
-  bool allowTasks;
-
   AgentConfig({
     this.enabled = false,
     this.baseUrl = 'https://api.openai.com/v1',
@@ -162,7 +159,6 @@ class AgentConfig {
     this.replyGroups = false,
     this.autoReplyCooldownSec = 60,
     this.quietHours = '',
-    this.allowTasks = false,
   }) : alwaysAllow = alwaysAllow ?? <String>{};
 
   /// 配置是否已填写到「可发起请求」的程度
@@ -195,7 +191,6 @@ class AgentConfig {
         'replyGroups': replyGroups,
         'autoReplyCooldownSec': autoReplyCooldownSec,
         'quietHours': quietHours,
-        'allowTasks': allowTasks,
       };
 
   static AgentConfig fromJson(Object? j) {
@@ -218,7 +213,6 @@ class AgentConfig {
       autoReplyCooldownSec:
           int.tryParse('${j['autoReplyCooldownSec']}') ?? c.autoReplyCooldownSec,
       quietHours: s('quietHours', c.quietHours),
-      allowTasks: j['allowTasks'] == true,
     );
   }
 }
@@ -300,6 +294,12 @@ screen.
 
 Rules:
 - Always reply in the SAME language the user writes in.
+- BE PROACTIVE WITH TOOLS. Whenever an answer depends on current data (what is
+  on the air, the user's settings, their chats, connectivity) or the user asks
+  you to DO something, CALL THE TOOLS instead of answering from memory, guessing
+  or asking the user to look it up themselves. Do not say "I cannot" or "I don't
+  know" before you have tried the relevant tool — chain several tool calls when
+  needed (read -> decide -> act), then summarise what you did.
 - Before changing settings or sending anything, call `get_app_state` first to
   see the current values. Respect the allowed value ranges it returns.
 - Never invent stations, messages or settings. Only state facts that came from
@@ -307,8 +307,12 @@ Rules:
 - Tools that change settings or send messages require the user's confirmation;
   explain briefly what you are about to do before calling them.
 - Use `read_messages` to read the user's conversations and `list_stations` /
-  `search_stations` / `station_detail` to inspect what is on the air. These are
-  read-only and never need confirmation.
+  `search_stations` / `nearby_stations` / `station_detail` to inspect what is on
+  the air. These are read-only and never need confirmation.
+- To answer an incoming message use `reply_message`; to talk to a whole group use
+  `send_group_message` (find it with `list_groups`). `create_group` makes a new
+  group. All of these need the "allow sending"/"allow settings" permission and
+  the user's confirmation.
 - You can schedule work with `create_task` (interval_minutes = 0 runs once).
   A scheduled run happens WITHOUT the user watching: only use it for things that
   are already permitted (e.g. reading and reporting), never for a one-off action
@@ -428,8 +432,7 @@ class AgentService extends ChangeNotifier {
       ..autoReply = from.autoReply
       ..replyGroups = from.replyGroups
       ..autoReplyCooldownSec = from.autoReplyCooldownSec
-      ..quietHours = from.quietHours
-      ..allowTasks = from.allowTasks;
+      ..quietHours = from.quietHours;
   }
 
   Future<void> saveConfig() async {
@@ -587,14 +590,39 @@ class AgentService extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // 有些模型（尤其是小模型）会「聊一句」就收尾、明明该查数据却不调工具。
+      // 头一轮若一个工具都没调，就**再要一轮**并临时把 tool_choice 设成
+      // required，逼它先取一次数据 / 执行动作；只逼这一次，之后回到 auto，
+      // 免得把每一句寒暄都变成工具调用。
+      var nudged = false;
       for (var round = 0; round < maxToolRounds; round++) {
         if (_epoch != my) return; // 被取消
-        final reply = await _chat(tools);
+        final force = !nudged && tools.isNotEmpty;
+        // 只在本轮「逼」；下轮起回到 auto（否则模型永远给不出最终回答，
+        // 会一路调到 maxToolRounds 也没有收尾）。
+        nudged = true;
+        AgentMessage reply;
+        try {
+          reply = await _chat(tools, requireTool: force);
+        } on AgentException {
+          // 有的 OpenAI 兼容后端不认 tool_choice:"required"：退回 auto 再试一次，
+          // 不能因为「强制」这一步失败就把整轮对话搞挂。
+          if (!force) rethrow;
+          reply = await _chat(tools);
+        }
         if (_epoch != my) return;
+        final calls = reply.toolCalls;
+
+        if (calls.isEmpty && force) {
+          // 被强制却仍没调工具（少见）：收下这条回复，当普通回答结束本轮。
+          messages.add(reply);
+          notifyListeners();
+          break;
+        }
+
         messages.add(reply);
         notifyListeners();
 
-        final calls = reply.toolCalls;
         if (calls.isEmpty) break;
 
         for (final call in calls) {
@@ -669,12 +697,17 @@ class AgentService extends ChangeNotifier {
   }
 
   /// 调一次 chat/completions，返回助手消息（可能带 tool_calls）
-  Future<AgentMessage> _chat(List<Map<String, dynamic>> tools) async {
+  ///
+  /// [requireTool] = true 时用 `tool_choice: "required"` 强制模型这一步必须调
+  /// 工具（见 [send] 里的「主动调工具」nudge）；默认 `"auto"`。
+  Future<AgentMessage> _chat(List<Map<String, dynamic>> tools,
+      {bool requireTool = false}) async {
     final body = <String, dynamic>{
       'model': config.model.trim(),
       'messages': _wireMessages(),
       if (tools.isNotEmpty) 'tools': tools,
-      if (tools.isNotEmpty) 'tool_choice': 'auto',
+      if (tools.isNotEmpty)
+        'tool_choice': requireTool ? 'required' : 'auto',
       'temperature': 0.3,
     };
     String resp;

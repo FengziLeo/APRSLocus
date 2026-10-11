@@ -19,7 +19,11 @@ import 'package:aprslocus/state.dart';
 /// - `_val` 的 null 归一（没传的字段不能变成字符串 "null"）。
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUp(() => SharedPreferences.setMockInitialValues({}));
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    AgentService.instance.tasks.clear();
+    AgentService.instance.messages.clear();
+  });
 
   Future<AgentToolOutcome> run(
     AppState st,
@@ -27,12 +31,9 @@ void main() {
     Map<String, dynamic> args, {
     bool allowSend = true,
     bool allowSettings = true,
-    bool allowTasks = false,
   }) =>
       executeAgentTool(st, name, args,
-          allowedSend: allowSend,
-          allowedSettings: allowSettings,
-          allowedTasks: allowTasks);
+          allowedSend: allowSend, allowedSettings: allowSettings);
 
   group('schema', () {
     test('未授权发送时，send_* 工具不出现在 schema 里', () {
@@ -225,38 +226,28 @@ void main() {
   });
 
   group('定时任务工具', () {
-    test('未授权时 create_task / cancel_task 被拒（list_tasks 不受限）', () async {
+    test('无权限闸门：直接能建、列、取消', () async {
       final st = AppState();
-      final r = await run(st, 'create_task', {'prompt': 'ping'},
-          allowTasks: false);
-      expect(r.text, contains('Permission denied'));
-      final l = await run(st, 'list_tasks', {}, allowTasks: false);
-      expect(l.text, isNot(contains('Permission denied')));
-    });
-
-    test('授权后能建、列、取消；间隔过短被拒', () async {
-      final st = AppState();
-      final short = await run(
-          st, 'create_task', {'prompt': 'x', 'interval_minutes': 1},
-          allowTasks: true);
-      expect(short.text, contains('ERROR'));
-
       final created = await run(
-          st, 'create_task', {'prompt': 'summarize', 'interval_minutes': 30},
-          allowTasks: true);
+          st, 'create_task', {'prompt': 'summarize', 'interval_minutes': 30});
       expect(created.text, isNot(contains('ERROR')));
       expect(AgentService.instance.tasks.length, 1);
 
-      final listed = jsonDecodeSafe(
-          (await run(st, 'list_tasks', {}, allowTasks: true)).text) as List;
+      final listed = jsonDecodeSafe((await run(st, 'list_tasks', {})).text) as List;
       expect(listed.single['prompt'], 'summarize');
       expect(listed.single['every_min'], 30);
 
       final id = listed.single['id'] as String;
-      final canceled =
-          await run(st, 'cancel_task', {'id': id}, allowTasks: true);
+      final canceled = await run(st, 'cancel_task', {'id': id});
       expect(canceled.text, isNot(contains('ERROR')));
       expect(AgentService.instance.tasks, isEmpty);
+    });
+
+    test('间隔不受限（1 分钟也可）', () async {
+      final st = AppState();
+      final r = await run(
+          st, 'create_task', {'prompt': 'x', 'interval_minutes': 1});
+      expect(r.text, isNot(contains('ERROR')));
     });
   });
 
@@ -270,49 +261,107 @@ void main() {
         'station_detail',
         'read_messages',
         'list_tasks',
+        'nearby_stations',
       ]) {
         expect(agentNeedsConfirm(name), isFalse, reason: name);
       }
       for (final name in [
         'send_message',
+        'reply_message',
+        'send_group_message',
+        'create_group',
         'set_preferences',
         'create_task',
         'cancel_task',
+        'set_task_enabled',
       ]) {
         expect(agentNeedsConfirm(name), isTrue, reason: name);
       }
       expect(agentNeedsConfirm('navigate'), isFalse);
     });
 
-    test('任务工具的 schema 仅在授权后出现', () {
-      final off = agentToolSchemas(allowSend: false, allowTasks: false)
+    test('任务工具的 schema 始终可用（不再有权限开关）', () {
+      final names = agentToolSchemas(allowSend: false)
           .map((t) => t['function']['name'])
           .toSet();
-      expect(off, isNot(contains('create_task')));
-      expect(off, isNot(contains('list_tasks')));
-      final on = agentToolSchemas(allowSend: false, allowTasks: true)
+      expect(names, contains('create_task'));
+      expect(names, contains('list_tasks'));
+      expect(names, contains('set_task_enabled'));
+    });
+
+    test('未授权发送时 reply_message 也不出现（它同样是发送）', () {
+      final off = agentToolSchemas(allowSend: false)
           .map((t) => t['function']['name'])
           .toSet();
-      expect(on, contains('create_task'));
-      expect(on, contains('list_tasks'));
+      expect(off, isNot(contains('reply_message')));
+      final on = agentToolSchemas(allowSend: true)
+          .map((t) => t['function']['name'])
+          .toSet();
+      expect(on, contains('reply_message'));
+    });
+  });
+
+  group('新增工具', () {
+    test('create_group 建群并加入成员', () async {
+      final st = AppState();
+      final r = await run(st, 'create_group', {
+        'name': '测试群',
+        'members': ['BG1AAA', 'bg2bbb'],
+      });
+      expect(r.text, isNot(contains('ERROR')));
+      expect(st.chatGroups.length, 1);
+      final g = st.chatGroups.single;
+      expect(g.name, '测试群');
+      // 成员统一大写，群主自动 joined
+      expect(g.memberStatus.containsKey('BG1AAA'), isTrue);
+      expect(g.memberStatus.containsKey('BG2BBB'), isTrue);
+      expect(g.owner, g.owner.toUpperCase());
+    });
+
+    test('create_group 缺 name 被拒', () async {
+      final st = AppState();
+      final r = await run(st, 'create_group', {'name': '  '});
+      expect(r.text, contains('ERROR'));
+      expect(st.chatGroups, isEmpty);
+    });
+
+    test('nearby_stations 无定位时给出明确错误', () async {
+      final st = AppState();
+      final r = await run(st, 'nearby_stations', {});
+      expect(r.text, contains('ERROR'));
+    });
+
+    test('send_group_message 找不到群时给出错误', () async {
+      final st = AppState();
+      final r = await run(st, 'send_group_message', {'group': 'nope', 'text': 'hi'});
+      expect(r.text, contains('ERROR'));
+    });
+
+    test('set_task_enabled 可暂停 / 恢复', () async {
+      final st = AppState();
+      final t = await AgentService.instance.addTask('ping', intervalMinutes: 10);
+      final off = await run(st, 'set_task_enabled', {'id': t.id, 'enabled': false});
+      expect(off.text, isNot(contains('ERROR')));
+      expect(AgentService.instance.tasks.single.enabled, isFalse);
+      final on = await run(st, 'set_task_enabled', {'id': t.id, 'enabled': true});
+      expect(on.text, isNot(contains('ERROR')));
+      expect(AgentService.instance.tasks.single.enabled, isTrue);
     });
   });
 
   group('配置与任务持久化（round-trip）', () {
-    test('AgentConfig 序列化含 alwaysAllow / 自动回复 / 任务权限', () {
+    test('AgentConfig 序列化含 alwaysAllow / 自动回复', () {
       final c = AgentConfig()
         ..autoReply = true
         ..replyGroups = true
         ..autoReplyCooldownSec = 120
         ..quietHours = '23:00-07:00'
-        ..allowTasks = true
         ..alwaysAllow.addAll({'navigate', 'set_preferences'});
       final back = AgentConfig.fromJson(jsonDecode(jsonEncode(c.toJson())));
       expect(back.autoReply, isTrue);
       expect(back.replyGroups, isTrue);
       expect(back.autoReplyCooldownSec, 120);
       expect(back.quietHours, '23:00-07:00');
-      expect(back.allowTasks, isTrue);
       expect(back.alwaysAllow, containsAll(['navigate', 'set_preferences']));
     });
 

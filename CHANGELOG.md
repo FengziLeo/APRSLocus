@@ -1,5 +1,77 @@
 # 更新日志
 
+## [2.0.59] - 2026-10-11
+
+### 新增：智能体可自行建群、群发与回复
+
+- `create_group`：按名称与成员呼号建群（群主自动加入，其余待确认）；
+- `send_group_message`：向指定群发消息；
+- `reply_message`：回复某会话的最后一位发信人；
+- `nearby_stations`：按当前位置列出附近台站；
+- `set_task_enabled`：暂停 / 恢复定时任务。
+
+除只读的 `nearby_stations` 外，以上都属敏感操作：需「允许改设置 / 允许发送」
+权限，并在聊天框内联确认；工具名一律经本地化标签显示，不再出现下划线标识符。
+
+### 变更：取消「允许定时任务」总开关
+
+- 移除定时任务权限开关及其文案。任务只是「到点自动跑一句指令」，真正能不能
+  做仍由发送 / 改设置权限与确认决定，没有理由再单独设一道卡。
+- `create_task` 间隔校验放宽：循环任务最短 1 分钟（原为 5 分钟）。
+- 修正安全隐患：`reply_message` 此前绕过了「允许发送」闸门，现与 `send_*`
+  一并受其约束。
+
+### 优化：触发点与提示词
+
+- 系统提示词补充建群 / 群发 / 回复 / 附近台站等新能力与用法。
+- 收到新消息触发自动回复时，允许智能体调用只读工具查证事实，再输出**单条**
+  回复（不会在后台执行发送或改动设置的写操作）。
+
+### 其他
+
+- 版本号提升至 2.0.59。
+
+---
+
+## [2.0.59] - 2026-10-11 (English)
+
+### New: the agent can create groups, send to groups and reply
+
+- `create_group`: create a group from a name and member call signs (the owner
+  joins automatically, the rest are pending);
+- `send_group_message`: send a message to a specific group;
+- `reply_message`: reply to the sender of the last message in a conversation;
+- `nearby_stations`: list stations near the current position;
+- `set_task_enabled`: pause / resume a scheduled task.
+
+Except for the read-only `nearby_stations`, these are sensitive: they require the
+"allow settings" / "allow sending" permission and an inline confirmation in the
+chat box, and their names are shown through localized labels — no raw underscore
+identifiers.
+
+### Changed: the "allow scheduled tasks" master switch is gone
+
+- Removed the scheduled-task permission switch and its strings. A task is just
+  "run one instruction later"; whether it is allowed still follows the
+  sending / settings permissions and confirmation, so a separate gate was
+  pointless.
+- `create_task` interval validation relaxed: repeating tasks may be as short as
+  1 minute (was 5).
+- Security fix: `reply_message` used to bypass the "allow sending" gate; it is now
+  gated together with `send_*`.
+
+### Improved: triggers and prompt
+
+- The system prompt now documents the new group / reply / nearby-station abilities.
+- When an incoming message triggers an auto reply, the agent may call read-only
+  tools for facts, then output a **single** reply (no background writes).
+
+### Other
+
+- Version bumped to 2.0.59.
+
+---
+
 ## [2.0.58] - 2026-10-11
 
 ### 新增：智能体可以自己连接服务器 / 建立电台连接

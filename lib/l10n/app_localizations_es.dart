@@ -9029,4 +9029,37 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16 bits mono)';
+  @override
+  String get agentMessageTasks => "Disparadores por mensaje";
+
+  @override
+  String get agentMessageTasksDesc => "Ejecuta una instrucción al recibir un mensaje nuevo";
+
+  @override
+  String get agentMessageTasksEmpty => "Aún no hay disparadores por mensaje";
+
+  @override
+  String get agentMessageTaskNew => "Nuevo disparador por mensaje";
+
+  @override
+  String get agentMessageTaskPromptHint => "p. ej. anota la ubicación de este mensaje";
+
+  @override
+  String get agentMessageTaskEvery => "Al recibir un mensaje";
+
+  @override
+  String agentMessageTaskRunPrompt(int n, String task, String from, String text) => "[Disparador por mensaje] Se activó tu tarea disparadora n.º $n.\nInstrucción: $task\nMensaje entrante de $from: $text\nEjecuta la instrucción y muestra solo el resultado o la conclusión, no este aviso.";
+
+  @override
+  String get agentNoticeTitle => "Aviso sobre el agente de IA";
+
+  @override
+  String get agentNoticeAccept => "Aceptar y activar";
+
+  @override
+  String get agentNoticeDecline => "Ahora no";
+
+  @override
+  String get agentNoticeBody => "El agente envía tu conversación y los datos locales que lee (estaciones, ubicación, mensajes, ajustes…) al servicio de modelo de terceros que configures (p. ej. OpenAI, DeepSeek, un endpoint propio) para su procesamiento. No compartas secretos de Estado, secretos comerciales, privacidad personal ni ubicaciones sensibles en el chat.\n\nEres responsable de confirmar que el servicio de modelo que elijas sea lícito y cumpla la normativa, y asumes las consecuencias de cualquier transferencia transfronteriza de datos o tratamiento de datos personales. No operamos dicho servicio ni tenemos afiliación, agencia o sociedad con él.\n\nPor defecto el agente solo puede leer datos; las acciones con efectos (enviar mensajes, cambiar ajustes) requieren tu autorización por separado y confirmación en cada caso, y puedes desactivar el agente cuando quieras.\n\nAl pulsar «Aceptar y activar» declaras haber leído, entendido y aceptado lo anterior.";
+
 }

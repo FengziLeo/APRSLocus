@@ -8608,6 +8608,39 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit 单声道)';
+  @override
+  String get agentMessageTasks => "消息触发";
+
+  @override
+  String get agentMessageTasksDesc => "收到新消息时让智能体跑一段指令";
+
+  @override
+  String get agentMessageTasksEmpty => "暂无消息触发任务";
+
+  @override
+  String get agentMessageTaskNew => "新建消息触发任务";
+
+  @override
+  String get agentMessageTaskPromptHint => "例如：把这条消息里的位置记下来";
+
+  @override
+  String get agentMessageTaskEvery => "收到消息时";
+
+  @override
+  String agentMessageTaskRunPrompt(int n, String task, String from, String text) => "【消息触发】已启用你的第 $n 条消息触发任务。\n任务指令：$task\n本条新消息来自 $from：$text\n请执行该任务指令，只输出执行结果或结论本身，不要输出这句说明。";
+
+  @override
+  String get agentNoticeTitle => "智能体使用告知";
+
+  @override
+  String get agentNoticeAccept => "同意并启用";
+
+  @override
+  String get agentNoticeDecline => "暂不启用";
+
+  @override
+  String get agentNoticeBody => "智能体会把你与它的对话内容，以及它读取到的本机数据（如台站、位置、消息、设置等），发送给你所配置的第三方大模型服务（如 OpenAI、DeepSeek、自建接口等）进行处理。请勿在对话中提供国家秘密、商业秘密、个人隐私或敏感位置信息。\n\n请自行确认你所选择的模型服务合法合规，并自行承担因数据出境、个人信息处理等产生的责任。我们不运营任何上述服务，与其也不存在隶属、代理或合作关系。\n\n智能体默认只能读取数据；发送消息、修改设置等有副作用的操作需要你在聊天框内单独授权并逐次确认，你也可以随时关闭智能体。\n\n点击「同意并启用」表示你已阅读、理解并接受上述内容（详见《用户协议》智能体相关条款）。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -17213,4 +17246,37 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit 單聲道)';
+  @override
+  String get agentMessageTasks => "訊息觸發";
+
+  @override
+  String get agentMessageTasksDesc => "收到新訊息時讓智慧代理跑一段指令";
+
+  @override
+  String get agentMessageTasksEmpty => "暫無訊息觸發任務";
+
+  @override
+  String get agentMessageTaskNew => "新建訊息觸發任務";
+
+  @override
+  String get agentMessageTaskPromptHint => "例如：把這則訊息裡的位置記下來";
+
+  @override
+  String get agentMessageTaskEvery => "收到訊息時";
+
+  @override
+  String agentMessageTaskRunPrompt(int n, String task, String from, String text) => "【訊息觸發】已啟用你的第 $n 條訊息觸發任務。\n任務指令：$task\n這則新訊息來自 $from：$text\n請執行該任務指令，只輸出執行結果或結論本身，不要輸出這句說明。";
+
+  @override
+  String get agentNoticeTitle => "智慧代理使用告知";
+
+  @override
+  String get agentNoticeAccept => "同意並啟用";
+
+  @override
+  String get agentNoticeDecline => "暫不啟用";
+
+  @override
+  String get agentNoticeBody => "智慧代理會把你與它的對話內容，以及它讀取到的本機資料（如台站、位置、訊息、設定等），傳送給你所設定的第三方大語言模型服務（如 OpenAI、DeepSeek、自建介面等）處理。請勿在對話中提供國家秘密、商業秘密、個人隱私或敏感位置資訊。\n\n請自行確認你所選擇的模型服務合法合規，並自行承擔因資料出境、個人資訊處理等產生的責任。我們不營運任何上述服務，與其也不存在隸屬、代理或合作關係。\n\n智慧代理預設只能讀取資料；傳送訊息、修改設定等有副作用的操作需要你在聊天框內單獨授權並逐次確認，你也可以隨時關閉智慧代理。\n\n點擊「同意並啟用」表示你已閱讀、理解並接受上述內容。";
+
 }

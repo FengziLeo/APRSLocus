@@ -2158,6 +2158,46 @@ class AppState extends ChangeNotifier {
     _notify();
   }
 
+  /// ── 智能体使用告知 ──
+  ///
+  /// 启用智能体前必须签署（与「数据与网络使用告知」相互独立、各签各的）：
+  /// 智能体会把对话与上下文发给你选定的第三方大模型服务，且能读取本机数据、
+  /// 在授权后改动设置 / 发消息。风险与「连服务器」不同，因此单独一份协议。
+  /// 存本地，签过就不再问；用户取消则不启用。
+  bool agentNoticeAccepted = false;
+
+  /// 用户打开智能体开关、但还没签告知 → 弹告知页（见 app.dart）。
+  bool pendingAgentNotice = false;
+
+  /// 签署「智能体使用告知」并启用智能体。
+  void acceptAgentNotice() {
+    agentNoticeAccepted = true;
+    pendingAgentNotice = false;
+    AgentService.instance.config.enabled = true;
+    unawaited(AgentService.instance.saveConfig());
+    persist();
+    _notify();
+  }
+
+  /// 拒绝告知（不启用智能体）。
+  void declineAgentNotice() {
+    pendingAgentNotice = false;
+    _notify();
+  }
+
+  /// 切换智能体开启状态。开启入口有两处（实验设置、智能体设置页），都走这里，
+  /// 闸门只此一个口子：未签告知时改为弹告知页，签完 [acceptAgentNotice] 才真正启用。
+  void setAgentEnabled(bool v) {
+    if (v && !agentNoticeAccepted) {
+      pendingAgentNotice = true;
+      _notify();
+      return;
+    }
+    AgentService.instance.config.enabled = v;
+    unawaited(AgentService.instance.saveConfig());
+    _notify();
+  }
+
   /// 本会话是否已经**成功**拉到过名单。
   ///
   /// 为什么需要它：名单是"远程开关"，紧急封禁不该等 6 小时。所以**每次启动（新会话）
@@ -3383,6 +3423,9 @@ class AppState extends ChangeNotifier {
     beaconEnabled = true;
     beaconAutoAsked = false;
     dataNoticeAccepted = false;
+    pendingDataNotice = false;
+    agentNoticeAccepted = false;
+    pendingAgentNotice = false;
     beaconInterval = 60;
     beaconNetInterval = 300;
     smartBeaconEnabled = false;
@@ -3680,6 +3723,7 @@ class AppState extends ChangeNotifier {
       beaconEnabled = p.getBool('beacon') ?? beaconEnabled;
       beaconAutoAsked = p.getBool('beaconAutoAsked') ?? beaconAutoAsked;
     dataNoticeAccepted = p.getBool('dataNoticeAccepted') ?? false;
+    agentNoticeAccepted = p.getBool('agentNoticeAccepted') ?? false;
       beaconInterval = p.getInt('beaconInterval') ?? beaconInterval;
       beaconNetInterval =
           p.getInt('beaconNetInterval') ?? beaconNetInterval;
@@ -3983,6 +4027,7 @@ class AppState extends ChangeNotifier {
     await p.setBool('beacon', beaconEnabled);
     await p.setBool('beaconAutoAsked', beaconAutoAsked);
     await p.setBool('dataNoticeAccepted', dataNoticeAccepted);
+    await p.setBool('agentNoticeAccepted', agentNoticeAccepted);
     await p.setInt('beaconInterval', beaconInterval);
     await p.setInt('beaconNetInterval', beaconNetInterval);
     _ensureSmartTiers();

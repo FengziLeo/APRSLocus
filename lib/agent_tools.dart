@@ -269,11 +269,12 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'create_task',
     description:
-        'Schedule a task that runs later without the user present. "prompt" is '
-        'what to do (written as if the user said it); "interval_minutes" > 0 '
-        'repeats it every N minutes, 0 runs it once. Requires the "scheduled '
-        'tasks" permission. Use "list_tasks" to show existing ones first to '
-        'avoid duplicates.',
+        'Create a task that runs without the user present. "prompt" is what to '
+        'do (written as if the user said it). "trigger" = "timer" (default) runs '
+        'on a schedule: "interval_minutes" > 0 repeats it every N minutes, 0 runs '
+        'it once. "trigger" = "message" runs the instruction each time a new APRS '
+        'message arrives (and may run a burst of them back to back, so avoid '
+        'long tasks). Use "list_tasks" first to avoid duplicates.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -282,9 +283,17 @@ final List<AgentToolSpec> kAgentTools = [
           'type': 'string',
           'description': 'The instruction to run at that time.',
         },
+        'trigger': {
+          'type': 'string',
+          'enum': ['timer', 'message'],
+          'description':
+              '"timer" = on a schedule (default); "message" = on each new message.',
+        },
         'interval_minutes': {
           'type': 'integer',
-          'description': '0 = once, otherwise repeat every N minutes (min 5).',
+          'description':
+              'timer trigger only: 0 = once, otherwise repeat every N minutes '
+              '(min 1). Ignored for the message trigger.',
         },
       },
       'required': ['prompt'],
@@ -1050,13 +1059,23 @@ Future<AgentToolOutcome> executeAgentTool(
       {
         final prompt = _val(args, 'prompt').trim();
         if (prompt.isEmpty) return _err('prompt is required');
+        final trigger = _val(args, 'trigger').toLowerCase() == 'message'
+            ? AgentTaskTrigger.message
+            : AgentTaskTrigger.timer;
         var mins = _asInt(args['interval_minutes']) ?? 0;
         if (mins < 0) mins = 0;
-        // 循环任务间隔没有额外下限（轮询本身 60 秒一次，实际最快就是每分钟）。
-        final t = await AgentService.instance.addTask(prompt, intervalMinutes: mins);
+        // 消息触发型没有间隔；定时型循环间隔没有额外下限（轮询本身 60 秒一次）。
+        final isMessage = trigger == AgentTaskTrigger.message;
+        final t = await AgentService.instance.addTask(
+          prompt,
+          trigger: trigger,
+          intervalMinutes: isMessage ? 0 : mins,
+        );
+        final desc = isMessage
+            ? 'on each new message'
+            : (mins == 0 ? 'once' : 'every $mins min');
         return AgentToolOutcome(
-          'Task ${t.id} scheduled '
-          '(${mins == 0 ? 'once' : 'every $mins min'}): $prompt',
+          'Task ${t.id} created ($desc): $prompt',
           note: 'create_task ${t.id}',
         );
       }
@@ -1068,6 +1087,7 @@ Future<AgentToolOutcome> executeAgentTool(
             {
               'id': t.id,
               'prompt': t.prompt,
+              'trigger': t.trigger.name,
               'every_min': t.intervalMinutes,
               'enabled': t.enabled,
               'next_run': t.nextRun?.toIso8601String(),

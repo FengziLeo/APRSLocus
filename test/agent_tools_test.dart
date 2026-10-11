@@ -243,6 +243,31 @@ void main() {
       expect(AgentService.instance.tasks, isEmpty);
     });
 
+    test('create_task 支持消息触发（trigger=message）', () async {
+      final st = AppState();
+      final created = await run(st, 'create_task',
+          {'prompt': 'note the location', 'trigger': 'message'});
+      expect(created.text, isNot(contains('ERROR')));
+      final t = AgentService.instance.tasks.single;
+      expect(t.trigger, AgentTaskTrigger.message);
+      // 消息触发型没有「下一次时刻」，也就不会被定时轮询当成到期任务。
+      expect(t.nextRun, isNull);
+      expect(AgentService.instance.dueTasks(DateTime(2030)), isEmpty);
+
+      final listed =
+          jsonDecodeSafe((await run(st, 'list_tasks', {})).text) as List;
+      expect(listed.single['trigger'], 'message');
+      expect(listed.single['every_min'], 0);
+    });
+
+    test('create_task 未给 trigger 仍按定时处理（兼容旧行为）', () async {
+      final st = AppState();
+      await run(st, 'create_task', {'prompt': 'ping', 'interval_minutes': 5});
+      final t = AgentService.instance.tasks.single;
+      expect(t.trigger, AgentTaskTrigger.timer);
+      expect(t.nextRun, isNotNull);
+    });
+
     test('间隔不受限（1 分钟也可）', () async {
       final st = AppState();
       final r = await run(
@@ -375,10 +400,24 @@ void main() {
       final back = AgentTask.fromJson(jsonDecode(jsonEncode(t.toJson())))!;
       expect(back.id, 't1');
       expect(back.prompt, 'ping');
+      expect(back.trigger, AgentTaskTrigger.timer);
       expect(back.intervalMinutes, 15);
       expect(back.lastRun, t.lastRun);
       // 空 prompt 的任务被丢弃（避免历史脏数据造出空转任务）。
       expect(AgentTask.fromJson({'id': 'x', 'prompt': '  '}), isNull);
+    });
+
+    test('AgentTask 序列化保留消息触发类型；旧数据默认定时', () {
+      final t = AgentTask(
+        id: 't2',
+        prompt: 'on msg',
+        trigger: AgentTaskTrigger.message,
+      );
+      final back = AgentTask.fromJson(jsonDecode(jsonEncode(t.toJson())))!;
+      expect(back.trigger, AgentTaskTrigger.message);
+      // 老数据没有 trigger 字段 → 回退为定时，行为不变。
+      final legacy = AgentTask.fromJson({'id': 't3', 'prompt': 'old'})!;
+      expect(legacy.trigger, AgentTaskTrigger.timer);
     });
 
     test('quietHours 跨零点判断', () {

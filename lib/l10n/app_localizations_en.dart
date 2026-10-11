@@ -8970,4 +8970,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit mono)';
+  @override
+  String get agentMessageTasks => "Message triggers";
+
+  @override
+  String get agentMessageTasksDesc => "Run an instruction when a new message arrives";
+
+  @override
+  String get agentMessageTasksEmpty => "No message triggers yet";
+
+  @override
+  String get agentMessageTaskNew => "New message trigger";
+
+  @override
+  String get agentMessageTaskPromptHint => "e.g. note the location in this message";
+
+  @override
+  String get agentMessageTaskEvery => "On incoming message";
+
+  @override
+  String agentMessageTaskRunPrompt(int n, String task, String from, String text) => "[Message trigger] Your message-trigger task #$n fired.\nTask instruction: $task\nIncoming message from $from: $text\nCarry out the task instruction and output only the result or conclusion, not this notice.";
+
+  @override
+  String get agentNoticeTitle => "AI agent notice";
+
+  @override
+  String get agentNoticeAccept => "Agree and enable";
+
+  @override
+  String get agentNoticeDecline => "Not now";
+
+  @override
+  String get agentNoticeBody => "The AI agent sends your conversation and the local data it reads (stations, location, messages, settings, …) to the third-party model service you configure (e.g. OpenAI, DeepSeek, a self-hosted endpoint) for processing. Do not share state secrets, trade secrets, personal privacy or sensitive location information in the chat.\n\nYou are responsible for confirming that the model service you choose is lawful and compliant, and you bear the consequences of any cross-border data transfer or personal-data processing. We do not operate any such service and have no affiliation, agency or partnership with it.\n\nBy default the agent can only read data; actions with side effects (sending messages, changing settings) require your separate authorization and per-action confirmation, and you can disable the agent at any time.\n\nTapping \"Agree and enable\" means you have read, understood and accepted the above (see the agent clauses of the User Agreement).";
+
 }

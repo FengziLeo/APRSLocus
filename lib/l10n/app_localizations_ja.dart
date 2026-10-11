@@ -8706,4 +8706,37 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit モノラル)';
+  @override
+  String get agentMessageTasks => "メッセージトリガー";
+
+  @override
+  String get agentMessageTasksDesc => "新着メッセージ受信時にエージェントが指示を実行します";
+
+  @override
+  String get agentMessageTasksEmpty => "メッセージトリガーはありません";
+
+  @override
+  String get agentMessageTaskNew => "メッセージトリガーを追加";
+
+  @override
+  String get agentMessageTaskPromptHint => "例：このメッセージ内の位置を記録する";
+
+  @override
+  String get agentMessageTaskEvery => "メッセージ受信時";
+
+  @override
+  String agentMessageTaskRunPrompt(int n, String task, String from, String text) => "【メッセージトリガー】$n 番目のメッセージトリガータスクが発火しました。\nタスク指示：$task\n受信メッセージ（$from）：$text\nこのタスク指示を実行し、結果または結論のみを出力してください。この説明は出力しないでください。";
+
+  @override
+  String get agentNoticeTitle => "エージェント利用に関する告知";
+
+  @override
+  String get agentNoticeAccept => "同意して有効化";
+
+  @override
+  String get agentNoticeDecline => "今はしない";
+
+  @override
+  String get agentNoticeBody => "エージェントは、あなたとの会話内容と、それが読み取った端末内データ（局・位置・メッセージ・設定など）を、あなたが設定したサードパーティのモデルサービス（OpenAI、DeepSeek、自前のエンドポイント等）に送信して処理します。会話に国家機密・企業秘密・個人のプライバシー・機微な位置情報を含めないでください。\n\n選択したモデルサービスの適法性はご自身で確認し、データの越境移転や個人情報の処理に起因する責任を負ってください。当方は当該サービスを運営しておらず、提携・代理・協力関係もありません。\n\nエージェントは既定で読み取りのみ可能です。メッセージ送信や設定変更など副作用のある操作は、チャット欄での個別の許可と都度の確認が必要で、いつでも無効化できます。\n\n「同意して有効化」を押すと、上記を読み・理解し・受け入れたものとみなされます。";
+
 }

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'agent.dart';
 import 'agent_tools.dart';
 import 'l10n/app_localizations.dart';
+import 'markdown_view.dart';
 import 'material.dart';
 import 'settings_widgets.dart';
 import 'state.dart';
@@ -203,8 +204,8 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
         children: [
           SettingsSwitch(s.agentEnabled,
               value: cfg.enabled, color: C.purple, onChanged: (v) async {
-            cfg.enabled = v;
-            await AgentService.instance.saveConfig();
+            // 开启需先签「智能体使用告知」：未签时 setAgentEnabled 会改为弹告知页。
+            widget.state.setAgentEnabled(v);
             if (mounted) setState(() {});
           }),
           SettingsHint(s.agentApiKeyTip),
@@ -397,10 +398,10 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
         open: true,
         onToggle: () {},
         children: [
-          if (AgentService.instance.tasks.isEmpty)
+          if (_tasksOf(AgentTaskTrigger.timer).isEmpty)
             SettingsHint(s.agentTasksEmpty)
           else
-            for (final t in AgentService.instance.tasks)
+            for (final t in _tasksOf(AgentTaskTrigger.timer))
               _TaskRow(
                 task: t,
                 onToggle: (v) async {
@@ -417,7 +418,7 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
             child: Row(children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: _newTask,
+                  onPressed: () => _newTask(AgentTaskTrigger.timer),
                   icon: const Icon(Icons.add_rounded, size: 16),
                   label: Text(s.agentTaskNew),
                   style: OutlinedButton.styleFrom(
@@ -432,18 +433,71 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
           ),
         ],
       ),
+      const SizedBox(height: 16),
+      // 消息触发：收到别人发来的 APRS 消息时，跑一段给智能体的指令。
+      // 与定时任务是同一套任务模型（[AgentTask.trigger] 区分「到点」还是「来消息」），
+      // 所以「改了一处」不会出现两条路径行为不一致。
+      SettingsFold(
+        title: s.agentMessageTasks,
+        subtitle: s.agentMessageTasksDesc,
+        icon: Icons.mark_email_unread_rounded,
+        color: C.cyan,
+        open: true,
+        onToggle: () {},
+        children: [
+          if (_tasksOf(AgentTaskTrigger.message).isEmpty)
+            SettingsHint(s.agentMessageTasksEmpty)
+          else
+            for (final t in _tasksOf(AgentTaskTrigger.message))
+              _TaskRow(
+                task: t,
+                onToggle: (v) async {
+                  await AgentService.instance.setTaskEnabled(t.id, v);
+                  if (mounted) setState(() {});
+                },
+                onDelete: () async {
+                  await AgentService.instance.removeTask(t.id);
+                  if (mounted) setState(() {});
+                },
+              ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _newTask(AgentTaskTrigger.message),
+                  icon: const Icon(Icons.add_rounded, size: 16),
+                  label: Text(s.agentMessageTaskNew),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: C.cyan,
+                    side: BorderSide(color: C.cyan.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    textStyle: ts(12, w: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        ],
+      ),
     ]);
   }
 
-  /// 手动新建一个定时任务（也让用户不靠模型就能用上这个能力）。
-  Future<void> _newTask() async {
+  List<AgentTask> _tasksOf(AgentTaskTrigger t) =>
+      [for (final x in AgentService.instance.tasks) if (x.trigger == t) x];
+
+  /// 手动新建一个任务（也让用户不靠模型就能用上这个能力）。
+  ///
+  /// [trigger] 决定是「到点」还是「来消息」触发：定时型多问一个间隔，消息型没有间隔。
+  Future<void> _newTask(AgentTaskTrigger trigger) async {
     final s = S.of(context);
+    final isMessage = trigger == AgentTaskTrigger.message;
     final prompt = TextEditingController();
     final interval = TextEditingController(text: '0');
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(s.agentTaskNew),
+        title: Text(isMessage ? s.agentMessageTaskNew : s.agentTaskNew),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           TextField(
             controller: prompt,
@@ -451,18 +505,22 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
             maxLines: 3,
             decoration: InputDecoration(
               labelText: s.agentTaskPrompt,
-              hintText: s.agentTaskPromptHint,
+              hintText: isMessage
+                  ? s.agentMessageTaskPromptHint
+                  : s.agentTaskPromptHint,
             ),
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: interval,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: s.agentTaskInterval,
-              helperText: s.agentTaskIntervalHint,
+          if (!isMessage) ...[
+            const SizedBox(height: 12),
+            TextField(
+              controller: interval,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: s.agentTaskInterval,
+                helperText: s.agentTaskIntervalHint,
+              ),
             ),
-          ),
+          ],
         ]),
         actions: [
           TextButton(
@@ -483,8 +541,11 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
       return;
     }
     final mins = int.tryParse(interval.text.trim()) ?? 0;
-    await AgentService.instance
-        .addTask(p, intervalMinutes: mins < 0 ? 0 : mins);
+    await AgentService.instance.addTask(
+      p,
+      trigger: trigger,
+      intervalMinutes: trigger == AgentTaskTrigger.message || mins < 0 ? 0 : mins,
+    );
     prompt.dispose();
     interval.dispose();
     if (mounted) setState(() {});
@@ -596,28 +657,50 @@ class _AgentOverlayState extends State<AgentOverlay> {
     }
   }
 
-  /// 收到新消息：若开启了自动回复，则让模型「起草一条回复」（纯文本，不带工具），
-  /// 再由本地直接发送 —— 不在后台执行工具，避免无人确认时挂起。
+  /// 收到新消息：先跑「消息触发」的任务（用户在自动化里配置的指令），
+  /// 再按原有逻辑做自动回复。
+  ///
+  /// 两条路径都走同一套闸门（智能体开启、不在安静时段、就绪且不忙、[allowSend]、
+  /// 冷却）。消息触发的任务**只在后台跑、不改设置也不发消息**（`background: true`
+  /// 时 [AgentConfirmResult.deny]），因此需要「允许发送 / 改设置」的工具会被拒，
+  /// 它自己也不会去发消息——「怎么发」由自动回复那一档单独负责。
   Future<void> _onIncoming(String src, String text, String? groupId) async {
     final now = DateTime.now();
     if (!svc.canAutoReply(now)) return;
     if (groupId != null && !cfg.replyGroups) return;
     if (!cfg.allowSend) return; // 没开「允许发送」就不自动发
     if (!cfg.ready || svc.busy) return;
-    // 只回复看起来像人发的消息（跳过系统 / 位置点提示）。
+    // 只处理看起来像人发的消息（跳过系统 / 位置点提示）。
     if (text.trim().isEmpty || src == '系统') return;
     final key = (groupId ?? src).toUpperCase();
     if (!svc.autoReplyAllowed(key, now)) return;
     if (!mounted) return;
 
-    // 目标：群 → 群呼号；私聊 → 对方呼号。
+    final s = S.of(context);
+
+    // ① 消息触发的任务：每条指令依次跑一轮（串行，避免把对话搅乱）。
+    final triggers = [
+      for (final t in svc.tasks)
+        if (t.enabled && t.trigger == AgentTaskTrigger.message) t
+    ];
+    for (var i = 0; i < triggers.length; i++) {
+      if (!mounted || svc.busy) break;
+      await _runChat(
+        s,
+        s.agentMessageTaskRunPrompt(i + 1, triggers[i].prompt, src, text),
+        background: true,
+      );
+      if (!mounted) return;
+    }
+    if (!mounted) return;
+
+    // ② 自动回复：让模型「起草一条回复」，再由本地直接发送。
     String target = src;
     if (groupId != null) {
       final g = widget.state.chatGroups.where((g) => g.id == groupId).firstOrNull;
       if (g == null) return;
       target = g.groupCall;
     }
-    final s = S.of(context);
     final draft = await _runChat(
       s,
       s.agentAutoReplyPrompt(src, text),
@@ -642,12 +725,18 @@ class _AgentOverlayState extends State<AgentOverlay> {
         return Stack(children: [
           Positioned(
             right: 12,
-            bottom: 88,
+            bottom: _panelBottom(context),
             child: Transform.translate(offset: _drag, child: _panel(context)),
           ),
         ]);
       },
     );
+  }
+
+  /// 面板距屏幕底部的距离：键盘弹出时抬到键盘之上，否则固定 88（与胶囊一致）。
+  double _panelBottom(BuildContext context) {
+    final kb = MediaQuery.of(context).viewInsets.bottom;
+    return kb > 0 ? kb + 12 : 88.0;
   }
 
   Widget _bubble() {
@@ -692,9 +781,14 @@ class _AgentOverlayState extends State<AgentOverlay> {
   }
 
   Widget _panel(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final mq = MediaQuery.of(context);
+    final size = mq.size;
     final w = size.width < 480 ? size.width - 24 : 380.0;
-    final h = (size.height * 0.62).clamp(320.0, 560.0);
+    // 键盘弹出时面板会整体上移（见 `_panelBottom`），这里只需要把高度压到
+    // 「键盘顶到状态栏之间的可用高度」以内，否则小屏 + 键盘会顶出屏幕。
+    final kb = mq.viewInsets.bottom;
+    final maxH = (size.height - mq.viewPadding.top - kb - 24).clamp(240.0, 560.0);
+    final h = (size.height * 0.62).clamp(320.0, maxH);
     final s = S.of(context);
     return GestureDetector(
       onPanUpdate: (d) => setState(() => _drag += d.delta),
@@ -866,6 +960,14 @@ class _AgentOverlayState extends State<AgentOverlay> {
       return const SizedBox.shrink();
     }
     final isUser = m.role == 'user';
+    // 助手回复按 Markdown 渲染（模型几乎总是输出 `**粗体**` / 列表 / 代码），
+    // 直接当纯文本显示会满屏星号与井号。用户自己的输入保持纯文本。
+    final body = isUser
+        ? SelectableText(
+            m.content,
+            style: ts(12, c: Colors.white, h: 1.4),
+          )
+        : SelectionArea(child: MarkdownView(m.content));
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -876,10 +978,7 @@ class _AgentOverlayState extends State<AgentOverlay> {
           color: isUser ? C.blue : C.bgSoft,
           borderRadius: BorderRadius.circular(14),
         ),
-        child: SelectableText(
-          m.content,
-          style: ts(12, c: isUser ? Colors.white : C.ink, h: 1.4),
-        ),
+        child: body,
       ),
     );
   }
@@ -1222,9 +1321,11 @@ class _TaskRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    final every = task.recurring
-        ? s.agentTaskEvery(task.intervalMinutes)
-        : s.agentTaskOnce;
+    final subtitle = task.trigger == AgentTaskTrigger.message
+        ? s.agentMessageTaskEvery
+        : (task.recurring
+            ? s.agentTaskEvery(task.intervalMinutes)
+            : s.agentTaskOnce);
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
       decoration: BoxDecoration(
@@ -1237,7 +1338,7 @@ class _TaskRow extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis),
             const SizedBox(height: 2),
-            Text(every,
+            Text(subtitle,
                 style: ts(10, c: task.enabled ? C.purple : C.greyLight)),
           ]),
         ),

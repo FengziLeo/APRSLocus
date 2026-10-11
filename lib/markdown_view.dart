@@ -298,12 +298,22 @@ class MarkdownView extends StatelessWidget {
             border: Border.all(color: C.border),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Table(
-            border: TableBorder.symmetric(
-              inside: BorderSide(color: C.border, width: 0.6),
+          // 表格可能比气泡宽（列多 / 单元格长）。给一个不小于可用宽度的下限，
+          // 再允许横向滚动：既不挤扁列，也不会触发 RenderFlex overflow。
+          child: LayoutBuilder(
+            builder: (ctx, cons) => SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minWidth: cons.maxWidth),
+                child: Table(
+                  border: TableBorder.symmetric(
+                    inside: BorderSide(color: C.border, width: 0.6),
+                  ),
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: body,
+                ),
+              ),
             ),
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            children: body,
           ),
         ),
       ),

@@ -217,18 +217,27 @@ class AgentConfig {
   }
 }
 
-/// 一个定时任务：到点后以 [prompt] 作为用户指令跑一轮智能体。
+/// 一个由智能体「到点」或「收到消息」触发的任务，触发后以 [prompt] 作为用户
+/// 指令跑一轮智能体。
 ///
 /// 设计上**只存「做什么」不存「怎么发」**：真正执行走的是和手动聊天完全相同的
-/// [AgentService.send] 路径（因此权限闸门、确认、工具链全部一致），定时器只负责
-/// 到点触发。这样「改了一处」不会出现「手动能用、定时不能用」的分叉。
+/// [AgentService.send] 路径（因此权限闸门、确认、工具链全部一致），定时器 / 消息
+/// 回调只负责触发。这样「改了一处」不会出现「手动能用、触发不能用」的分叉。
+///
+/// [trigger] 区分两种触发源：定时（[AgentTaskTrigger.timer]）与收到消息
+/// （[AgentTaskTrigger.message]）。二者的「做什么」是同一套，只是被谁唤醒不同。
+enum AgentTaskTrigger { timer, message }
+
 class AgentTask {
   final String id;
   String prompt;
   final DateTime createdAt;
   DateTime? lastRun;
 
-  /// 循环间隔（分钟）。0 = 只跑一次。
+  /// 触发源。默认定时（兼容旧数据）。
+  AgentTaskTrigger trigger;
+
+  /// 循环间隔（分钟）。0 = 只跑一次。[trigger] 为 message 时不使用。
   int intervalMinutes;
 
   bool enabled;
@@ -238,6 +247,7 @@ class AgentTask {
     required this.prompt,
     DateTime? createdAt,
     this.lastRun,
+    this.trigger = AgentTaskTrigger.timer,
     this.intervalMinutes = 0,
     this.enabled = true,
   }) : createdAt = createdAt ?? DateTime.now();
@@ -245,8 +255,12 @@ class AgentTask {
   bool get recurring => intervalMinutes > 0;
 
   /// 下一次该跑的时刻（只跑一次的任务跑完即视为不再触发）。
+  ///
+  /// 消息触发型**没有「时刻」**（由 [AppState.onNewMessage] 唤醒），返回 null，
+  /// 于是 [dueTasks] 天然不会把它当定时任务轮询到。
   DateTime? get nextRun {
     if (!enabled) return null;
+    if (trigger == AgentTaskTrigger.message) return null;
     if (!recurring) {
       return lastRun == null ? createdAt : null;
     }
@@ -259,6 +273,7 @@ class AgentTask {
         'prompt': prompt,
         'createdAt': createdAt.toIso8601String(),
         'lastRun': lastRun?.toIso8601String(),
+        'trigger': trigger.name,
         'intervalMinutes': intervalMinutes,
         'enabled': enabled,
       };
@@ -274,6 +289,9 @@ class AgentTask {
       prompt: prompt,
       createdAt: dt(j['createdAt']),
       lastRun: dt(j['lastRun']),
+      trigger: '${j['trigger']}' == AgentTaskTrigger.message.name
+          ? AgentTaskTrigger.message
+          : AgentTaskTrigger.timer,
       intervalMinutes:
           int.tryParse('${j['intervalMinutes']}') ?? 0,
       enabled: j['enabled'] != false,
@@ -313,11 +331,13 @@ Rules:
   `send_group_message` (find it with `list_groups`). `create_group` makes a new
   group. All of these need the "allow sending"/"allow settings" permission and
   the user's confirmation.
-- You can schedule work with `create_task` (interval_minutes = 0 runs once).
-  A scheduled run happens WITHOUT the user watching: only use it for things that
-  are already permitted (e.g. reading and reporting), never for a one-off action
-  that still needs a confirmation — that will just be denied. List existing tasks
-  before creating one so you do not duplicate it.
+- You can create work that runs without the user watching, with `create_task`.
+  `trigger` = "timer" (default) runs on a schedule (interval_minutes = 0 runs
+  once); `trigger` = "message" runs the instruction each time a new APRS message
+  arrives. A background run happens WITHOUT the user watching: only use it for
+  things that are already permitted (e.g. reading and reporting), never for a
+  one-off action that still needs a confirmation — that will just be denied.
+  List existing tasks before creating one so you do not duplicate it.
 - You can help with connectivity: `set_connection_server` changes the APRS-IS
   server, `set_connection_source` enables/disables a link, and `connect` /
   `disconnect` bring the link up or down. Setting a server does NOT connect by
@@ -452,11 +472,16 @@ class AgentService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 新增一个定时任务并落盘，返回它。
-  Future<AgentTask> addTask(String prompt, {int intervalMinutes = 0}) async {
+  /// 新增一个任务并落盘，返回它。
+  Future<AgentTask> addTask(
+    String prompt, {
+    AgentTaskTrigger trigger = AgentTaskTrigger.timer,
+    int intervalMinutes = 0,
+  }) async {
     final t = AgentTask(
       id: 't${DateTime.now().microsecondsSinceEpoch}',
       prompt: prompt.trim(),
+      trigger: trigger,
       intervalMinutes: intervalMinutes < 0 ? 0 : intervalMinutes,
     );
     tasks.add(t);

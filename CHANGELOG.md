@@ -1,5 +1,74 @@
 # 更新日志
 
+## [2.0.60] - 2026-10-11
+
+### 新增：智能体工具路线图补全（工具 25 → 44）
+
+按能力审计路线图把缺口一次性补上，智能体现在能读、能改的更多了：
+
+- **群运维**：`list_groups` 带出成员（呼号、状态、是否被屏蔽）；
+  `update_group`（改名 / 加人 / 踢人）、`join_group`、`leave_group`、
+  `dismiss_group`；
+- **消息**：`read_messages` 支持关键词与时间段过滤（`query` / `since` /
+  `until`），并如实报告是否标记已读；新增 `broadcast_message`，一次发给多个呼号；
+- **任务**：`update_task`（改内容 / 触发方式 / 间隔 / 绝对时刻 `run_at`）、
+  `list_task_runs`、`clear_task_runs`，任务执行记录落盘；
+- **台站与数据**：`list_contacts`、`set_favorite`、`set_station_ignored`、
+  `get_station_packets`（原始帧 + 转发路径）、`get_track`、
+  `export_track_gpx`、`distance_between`；
+- **传感器**：`get_sensors`（心率 / 步数 / 电量 / 速度 / 航向 / 里程，
+  并带「多久前」）；`set_my_position` / `clear_my_position`（模拟定位）、
+  `set_status_text`。
+
+### 变更：读消息不再「顺手」清未读
+
+`read_messages` 只在**完整读完某个会话**时才顺带标记已读；带关键词或时间过滤时
+只返回结果，不再误清未读小红点。
+
+### 其他
+
+- `broadcast_message` 纳入「允许发送」权限闸门。
+- 系统提示补全新工具的说明与权限边界。
+- 版本号提升至 2.0.60。
+
+---
+
+## [2.0.60] - 2026-10-11 (English)
+
+### New: the agent tooling roadmap is filled in (25 → 44 tools)
+
+The capability-audit gaps are closed in one pass — the agent can now read and
+change much more:
+
+- **Group ops**: `list_groups` now returns members (call sign, status, whether
+  blocked); `update_group` (rename / add / remove), `join_group`, `leave_group`,
+  `dismiss_group`;
+- **Messages**: `read_messages` supports keyword and time filters (`query` /
+  `since` / `until`) and honestly reports whether it marked read; new
+  `broadcast_message` sends one message to several call signs;
+- **Tasks**: `update_task` (prompt / trigger / interval / absolute `run_at`),
+  `list_task_runs`, `clear_task_runs`, with run history persisted;
+- **Stations & data**: `list_contacts`, `set_favorite`, `set_station_ignored`,
+  `get_station_packets` (raw frames + digipeater path), `get_track`,
+  `export_track_gpx`, `distance_between`;
+- **Sensors**: `get_sensors` (heart rate / steps / battery / speed / course /
+  mileage, with "how long ago"); `set_my_position` / `clear_my_position`
+  (simulated position), `set_status_text`.
+
+### Changed: reading messages no longer clears unread by accident
+
+`read_messages` only marks a conversation read when the **whole conversation** is
+read; with a keyword or time filter it just returns results and no longer clears
+the unread badge.
+
+### Other
+
+- `broadcast_message` is now gated by the "allow sending" permission.
+- The system prompt documents the new tools and their permission boundaries.
+- Version bumped to 2.0.60.
+
+---
+
 ## [2.0.59] - 2026-10-11
 
 ### 新增：智能体可自行建群、群发与回复

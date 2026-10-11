@@ -1,5 +1,77 @@
 # 更新日志
 
+## [2.0.62] - 2026-10-11
+
+### 新增：智能体长期记忆与对话压缩
+
+- **长期记忆**：智能体会记住你的呼号、偏好、常用地点等持久信息，跨对话保留；
+  可用 `save_memory` / `list_memories` / `forget_memory` 增删，设置页新增「记忆」
+  标签页可查看与清空。换机备份会一并带上（不会「失忆」）。
+- **对话压缩**：历史变长时自动把旧对话折叠成摘要，长对话不再撑爆上下文；
+  设置页可手动压缩、可开关。
+
+### 新增：智能体联网能力（实验，默认关闭）
+
+- 新增 `http_request` 工具，可发起任意方法（GET / POST / PUT / PATCH / DELETE / HEAD）
+  的 HTTP 请求，用于「帮我调一下这个接口」这类需求。
+- 属**单独权限**，默认关闭；开启后每次请求仍会先弹确认，双重把关。
+
+### 修复：消息触发型任务不再静默失效
+
+- 此前「收到新消息时触发」的任务被错误地挂在**自动回复**开关上，默认关闭的
+  用户会遇到任务永不触发（`last_run` 一直为空）。现已解耦：消息任务只要智能体
+  开启且配置就绪即可运行，自动回复仍走各自开关。
+- 顺带修复冷启动竞态：消息比本地配置更早到达时，先等配置/任务读完再判断，
+  不再因「读到空列表」而漏跑。
+- 消息任务的 `last_run` 现在会正常更新，执行记录也会记下失败原因，便于排查。
+
+### 变更：封面彩蛋改为「点一下抖一下」
+
+- 关于页封面彩蛋由长按触发改为点击触发，每点一次抖动一次；连点 5 秒后翻面。
+
+### 其它
+
+- 智能体最小化气泡支持拖动，位置会记住（吸附到屏幕边缘）。
+- 天气开始变凉了 记得加点被子
+
+---
+
+## [2.0.62] - 2026-10-11 (English)
+
+### New: agent long-term memory & conversation compression
+
+- **Long-term memory**: the agent remembers durable facts (callsign, preferences,
+  favourite places) across conversations, managed via `save_memory` /
+  `list_memories` / `forget_memory` and a new Memory tab in settings. Carried over
+  in backups so it doesn't "lose its memory" on a new device.
+- **Conversation compression**: long histories are folded into a summary
+  automatically, with manual compress and on/off toggles in settings.
+
+### New: agent network access (experimental, off by default)
+
+- New `http_request` tool for any method (GET / POST / PUT / PATCH / DELETE / HEAD).
+- A separate permission, off by default; every request still asks for confirmation.
+
+### Fix: message-triggered tasks no longer fail silently
+
+- Message-triggered tasks were mistakenly gated behind the auto-reply switch, so
+  users with auto-reply off saw them never fire (`last_run` stayed null). Now
+  decoupled; auto-reply keeps its own gates.
+- Fixed a cold-start race where a message arriving before local config was loaded
+  caused tasks to be skipped.
+- `last_run` now updates for message tasks, and run history records failures.
+
+### Change: hero easter egg now tap instead of long-press
+
+- Tap the About hero to shake once per tap; repeated taps still flip it after 5s.
+
+### Other
+
+- The agent's minimized bubble is now draggable and remembers its position.
+- The weather is turning cold — remember to add a blanket.
+
+---
+
 ## [2.0.61] - 2026-10-11
 
 ### 其它

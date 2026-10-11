@@ -8652,6 +8652,66 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit 单声道)';
+  @override
+  String get agentMemory => "长期记忆";
+
+  @override
+  String get agentMemoryDesc => "让智能体跨对话记住你的偏好与常用信息";
+
+  @override
+  String get agentMemoryOn => "启用长期记忆";
+
+  @override
+  String get agentMemoryHint => "智能体可自行调用「记住 / 忘记」工具，也可由你直接说「记住…」。记忆只存在本机。";
+
+  @override
+  String get agentMemoryEmpty => "暂无记忆。对智能体说「记住…」即可添加。";
+
+  @override
+  String get agentMemoryClear => "清空全部记忆";
+
+  @override
+  String get agentMemoryClearConfirm => "确定清空全部长期记忆？此操作不可撤销。";
+
+  @override
+  String get agentCompress => "对话压缩";
+
+  @override
+  String get agentCompressDesc => "历史变长时自动把旧对话折叠成摘要，省上下文";
+
+  @override
+  String get agentCompressOn => "启用自动压缩";
+
+  @override
+  String get agentCompressHint => "超过约 40 条消息时自动压缩。摘要会保留在系统提示里，最近的对话不受影响。";
+
+  @override
+  String get agentCompressNow => "立即压缩";
+
+  @override
+  String get agentCompressNothing => "没有可压缩的内容";
+
+  @override
+  String get agentCompressDone => "已压缩对话";
+
+  @override
+  String get agentTool_save_memory => "记住一条信息";
+
+  @override
+  String get agentTool_list_memories => "查看记忆";
+
+  @override
+  String get agentTool_forget_memory => "忘记一条信息";
+
+  @override
+  String get agentAllowNetwork => "允许联网请求";
+
+  @override
+  String get agentAllowNetworkDesc => "允许智能体主动发起 HTTP 请求（GET / POST / PUT / DELETE…）。默认关闭；开启后每次请求仍需你确认。";
+
+  @override
+  String get agentTool_http_request => "发起网络请求";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -17301,4 +17361,64 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit 單聲道)';
+  @override
+  String get agentMemory => "長期記憶";
+
+  @override
+  String get agentMemoryDesc => "讓智慧代理跨對話記住你的偏好與常用資訊";
+
+  @override
+  String get agentMemoryOn => "啟用長期記憶";
+
+  @override
+  String get agentMemoryHint => "智慧代理可自行呼叫「記住 / 忘記」工具，也可由你直接說「記住…」。記憶只存在本機。";
+
+  @override
+  String get agentMemoryEmpty => "暫無記憶。對智慧代理說「記住…」即可加入。";
+
+  @override
+  String get agentMemoryClear => "清除全部記憶";
+
+  @override
+  String get agentMemoryClearConfirm => "確定清除全部長期記憶？此操作無法復原。";
+
+  @override
+  String get agentCompress => "對話壓縮";
+
+  @override
+  String get agentCompressDesc => "歷史變長時自動把舊對話摺疊成摘要，節省上下文";
+
+  @override
+  String get agentCompressOn => "啟用自動壓縮";
+
+  @override
+  String get agentCompressHint => "超過約 40 條訊息時自動壓縮。摘要會保留在系統提示裡，最近的對話不受影響。";
+
+  @override
+  String get agentCompressNow => "立即壓縮";
+
+  @override
+  String get agentCompressNothing => "沒有可壓縮的內容";
+
+  @override
+  String get agentCompressDone => "已壓縮對話";
+
+  @override
+  String get agentTool_save_memory => "記住一則資訊";
+
+  @override
+  String get agentTool_list_memories => "查看記憶";
+
+  @override
+  String get agentTool_forget_memory => "忘記一則資訊";
+
+  @override
+  String get agentAllowNetwork => "允許聯網請求";
+
+  @override
+  String get agentAllowNetworkDesc => "允許智慧代理主動發起 HTTP 請求（GET / POST / PUT / DELETE…）。預設關閉；開啟後每次請求仍需你確認。";
+
+  @override
+  String get agentTool_http_request => "發起網路請求";
+
 }

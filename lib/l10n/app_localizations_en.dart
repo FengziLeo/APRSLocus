@@ -9017,4 +9017,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit mono)';
+  @override
+  String get agentMemory => "Long-term memory";
+
+  @override
+  String get agentMemoryDesc => "Let the agent remember your preferences across chats";
+
+  @override
+  String get agentMemoryOn => "Enable long-term memory";
+
+  @override
+  String get agentMemoryHint => "The agent can call the remember/forget tools, or just take “remember …”. Stored on this device only.";
+
+  @override
+  String get agentMemoryEmpty => "No memories yet. Tell the agent “remember …” to add one.";
+
+  @override
+  String get agentMemoryClear => "Clear all memories";
+
+  @override
+  String get agentMemoryClearConfirm => "Clear all long-term memories? This cannot be undone.";
+
+  @override
+  String get agentCompress => "Conversation compression";
+
+  @override
+  String get agentCompressDesc => "Fold old turns into a summary when history grows, to save context";
+
+  @override
+  String get agentCompressOn => "Enable auto compression";
+
+  @override
+  String get agentCompressHint => "Compresses beyond ~40 messages. The summary stays in the system prompt; recent turns are untouched.";
+
+  @override
+  String get agentCompressNow => "Compress now";
+
+  @override
+  String get agentCompressNothing => "Nothing to compress";
+
+  @override
+  String get agentCompressDone => "Conversation compressed";
+
+  @override
+  String get agentTool_save_memory => "Remember a fact";
+
+  @override
+  String get agentTool_list_memories => "Read memories";
+
+  @override
+  String get agentTool_forget_memory => "Forget a fact";
+
+  @override
+  String get agentAllowNetwork => "Allow network requests";
+
+  @override
+  String get agentAllowNetworkDesc => "Let the agent make HTTP requests (GET / POST / PUT / DELETE…). Off by default; every request still asks you first.";
+
+  @override
+  String get agentTool_http_request => "Make a network request";
+
 }

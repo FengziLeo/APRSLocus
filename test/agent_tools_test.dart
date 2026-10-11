@@ -23,6 +23,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     AgentService.instance.tasks.clear();
     AgentService.instance.messages.clear();
+    AgentService.instance.memories.clear();
   });
 
   Future<AgentToolOutcome> run(
@@ -31,9 +32,12 @@ void main() {
     Map<String, dynamic> args, {
     bool allowSend = true,
     bool allowSettings = true,
+    bool allowedNetwork = true,
   }) =>
       executeAgentTool(st, name, args,
-          allowedSend: allowSend, allowedSettings: allowSettings);
+          allowedSend: allowSend,
+          allowedSettings: allowSettings,
+          allowedNetwork: allowedNetwork);
 
   group('schema', () {
     test('未授权发送时，send_* 工具不出现在 schema 里', () {
@@ -49,6 +53,21 @@ void main() {
           .toSet();
       expect(withSend, contains('send_message'));
       expect(withSend, contains('send_beacon_now'));
+    });
+
+    test('联网工具默认隐藏，开启后才出现且需权限', () async {
+      Set<Object?> names({required bool net}) => agentToolSchemas(
+              allowSend: true, allowNetwork: net)
+          .map((t) => t['function']['name'])
+          .toSet();
+      expect(names(net: false), isNot(contains('http_request')));
+      expect(names(net: true), contains('http_request'));
+      // 即使 schema 被绕过，执行层闸门也要拒绝。
+      final r = await run(
+          AppState(), 'http_request', {'url': 'https://example.com'},
+          allowedNetwork: false);
+      expect(r.text, contains('Permission denied'));
+      expect(agentNeedsConfirm('http_request'), isTrue);
     });
   });
 
@@ -282,6 +301,63 @@ void main() {
           jsonDecodeSafe((await run(st, 'list_tasks', {})).text) as List;
       expect(listed.single['trigger'], 'message');
       expect(listed.single['every_min'], 0);
+    });
+
+    test('消息触发任务只由 messageTasks 选出，且与自动回复开关无关', () {
+      final svc = AgentService.instance;
+      svc.tasks
+        ..clear()
+        ..addAll([
+          AgentTask(id: 'm1', prompt: 'a', trigger: AgentTaskTrigger.message),
+          AgentTask(id: 'm2', prompt: 'b', trigger: AgentTaskTrigger.message),
+          AgentTask(
+              id: 't1',
+              prompt: 'c',
+              trigger: AgentTaskTrigger.timer,
+              intervalMinutes: 5),
+        ]);
+      // 关掉自动回复：消息任务**仍**应被选出（BG7LZQ-2 报告的核心回归点 ——
+      // 旧实现把它挂在 canAutoReply 上，默认关时静默永不触发）。
+      svc.config.autoReply = false;
+      expect(svc.canAutoReply(DateTime(2026, 1, 1, 12, 0)), isFalse);
+      expect(
+        svc.messageTasks().map((t) => t.id).toList(),
+        ['m1', 'm2'],
+      );
+      // 禁用的消息任务不选。
+      svc.tasks[1].enabled = false;
+      expect(svc.messageTasks().map((t) => t.id).toList(), ['m1']);
+      svc.tasks.clear();
+    });
+
+    test('touchTaskRun 记录 last_run 但不把消息任务停用', () async {
+      final svc = AgentService.instance;
+      svc.tasks
+        ..clear()
+        ..add(AgentTask(
+            id: 'm9',
+            prompt: 'x',
+            trigger: AgentTaskTrigger.message,
+            enabled: true));
+      expect(svc.tasks.single.lastRun, isNull);
+      await svc.touchTaskRun('m9');
+      // 关键：last_run 有值（用户据此判定「跑过了」），且任务仍启用
+      // —— markTaskRun 会因 recurring==false 把它永久关掉，故不能复用。
+      expect(svc.tasks.single.lastRun, isNotNull);
+      expect(svc.tasks.single.enabled, isTrue);
+      svc.tasks.clear();
+    });
+
+    test('并发 load() 共享同一份 Future，读完才置 loaded', () async {
+      final svc = AgentService.instance;
+      final a = svc.load();
+      final b = svc.load();
+      // 幂等：并发的两个调用拿到同一个 Future，不会各自读一遍盘、
+      // 也不会第二个调用提前返回去跑空数据（冷启动丢消息任务的根因）。
+      expect(identical(a, b), isTrue);
+      await a;
+      expect(svc.loaded, isTrue);
+      expect(identical(svc.load(), a), isTrue); // 之后再调用仍是同一份
     });
 
     test('create_task 未给 trigger 仍按定时处理（兼容旧行为）', () async {
@@ -769,6 +845,60 @@ void main() {
       expect(p.containsKey('allow_send'), isTrue);
       expect(p.containsKey('allow_settings'), isTrue);
       expect(m.containsKey('my_fix_min_ago'), isTrue);
+    });
+  });
+
+  group('长期记忆', () {
+    test('save_memory 去重 / 截断 / list / forget 全链路', () async {
+      final svc = AgentService.instance;
+      final st = AppState();
+      // 未授权改设置时不该写入。
+      final denied = await run(st, 'save_memory', {'text': 'x'},
+          allowSettings: false);
+      expect(denied.text, contains('Permission denied'));
+      expect(svc.memories, isEmpty);
+
+      expect((await run(st, 'save_memory', {'text': '呼号 BG2HCB'})).text,
+          contains('saved'));
+      // 相同文本二次写入 = 刷新而非新增。
+      expect((await run(st, 'save_memory', {'text': '呼号 BG2HCB'})).text,
+          contains('Already'));
+      expect(svc.memories.length, 1);
+      // 超长文本被截断，不会无限增长。
+      await run(st, 'save_memory', {'text': 'z' * 900});
+      expect(svc.memories.last.text.length, 500);
+
+      final listed = jsonDecodeSafe((await run(st, 'list_memories', {})).text)
+          as List;
+      expect(listed.length, 2);
+      // 按文本子串遗忘。
+      expect((await run(st, 'forget_memory', {'key': 'BG2HCB'})).text,
+          contains('1'));
+      expect(svc.memories.length, 1);
+      expect((await run(st, 'forget_memory', {'key': 'nope'})).text,
+          contains('No matching'));
+    });
+
+    test('记忆随配置序列化保留，并在开关关闭时不注入提示', () {
+      final c = AgentConfig();
+      expect(c.memoryEnabled, isTrue); // 默认开启
+      final j = c.toJson();
+      expect(j.containsKey('memoryEnabled'), isTrue);
+      final back = AgentConfig.fromJson(j);
+      expect(back.memoryEnabled, isTrue);
+      back.memoryEnabled = false;
+      expect(AgentConfig.fromJson(back.toJson()).memoryEnabled, isFalse);
+    });
+
+    test('对话压缩：条数不足时不做，且保留最近若干条', () async {
+      final svc = AgentService.instance;
+      svc.messages.clear();
+      for (var i = 0; i < 5; i++) {
+        svc.messages.add(AgentMessage(role: 'user', content: 'm$i'));
+      }
+      // 少于保留阈值（16）→ 直接返回 false，不动历史。
+      expect(await svc.compressNow(), isFalse);
+      expect(svc.messages.length, 5);
     });
   });
 }

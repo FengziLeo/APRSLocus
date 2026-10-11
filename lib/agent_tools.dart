@@ -21,6 +21,7 @@ import 'garmin.dart';
 import 'group_chat.dart';
 import 'map_math.dart';
 import 'models.dart';
+import 'net/http_send.dart';
 import 'state.dart';
 
 /// 工具定义：名称、说明（给模型看）、参数 schema、是否有副作用。
@@ -739,6 +740,73 @@ final List<AgentToolSpec> kAgentTools = [
     mutating: true,
     parameters: {'type': 'object', 'properties': {}},
   ),
+  const AgentToolSpec(
+    name: 'http_request',
+    description:
+        'Make an HTTP request to a URL and return the response body (truncated). '
+        'Use for any API call the user asks for: GET to read, POST/PUT/PATCH/'
+        'DELETE to send data. Requires the "Allow network requests" permission.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'url': {'type': 'string', 'description': 'Full URL (http/https).'},
+        'method': {
+          'type': 'string',
+          'description': 'HTTP method. Default GET.',
+          'enum': ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'],
+        },
+        'headers': {
+          'type': 'object',
+          'description': 'Optional request headers.',
+        },
+        'body': {
+          'type': 'string',
+          'description': 'Optional request body (e.g. JSON string).',
+        },
+      },
+      'required': ['url'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'save_memory',
+    description:
+        'Permanently remember a durable fact about the user so it survives '
+        'future conversations (their name, callsign, preferences, routines, '
+        'favourite places). Do NOT store secrets or transient details. Writes to '
+        'local long-term memory.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'text': {
+          'type': 'string',
+          'description': 'The fact to remember, one short sentence.',
+        },
+      },
+      'required': ['text'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'list_memories',
+    description: 'List the long-term memories currently stored. Read-only.',
+    parameters: {'type': 'object', 'properties': {}},
+  ),
+  const AgentToolSpec(
+    name: 'forget_memory',
+    description:
+        'Delete long-term memories matching an id or a text substring. Use when '
+        'the user asks you to forget something. Read the list first.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'key': {
+          'type': 'string',
+          'description': 'A memory id, or a substring of its text.',
+        },
+      },
+      'required': ['key'],
+    },
+  ),
 ];
 
 /// 名称 → spec
@@ -765,10 +833,19 @@ const Map<String, int> _screens = {
 /// 也避免模型反复尝试一个注定被拒的操作。定时任务**不再**单独设开关：
 /// 任务只是「到点自动跑一句话」，真正能不能做仍由发送/改设置权限与确认决定，
 /// 所以没有理由再挡一道（旧版的「允许定时任务」开关已移除）。
-List<Map<String, dynamic>> agentToolSchemas({required bool allowSend}) => [
+List<Map<String, dynamic>> agentToolSchemas({
+  required bool allowSend,
+  bool allowNetwork = false,
+}) =>
+    [
       for (final t in kAgentTools)
-        if (allowSend || !_isSendingTool(t.name)) t.toSchema(),
+        if ((allowSend || !_isSendingTool(t.name)) &&
+            (allowNetwork || !_isNetworkTool(t.name)))
+          t.toSchema(),
     ];
+
+/// 需要联网权限的工具（`http_request` 可向任意地址发请求）。
+bool _isNetworkTool(String name) => name == 'http_request';
 
 /// 会发出 APRS 消息的工具（受「允许发送」开关约束）。
 /// `reply_message` 不以 `send_` 开头，但同样是发送，必须一并纳入；
@@ -845,6 +922,7 @@ Future<AgentToolOutcome> executeAgentTool(
   Map<String, dynamic> args, {
   required bool allowedSend,
   required bool allowedSettings,
+  bool allowedNetwork = false,
 }) async {
   final spec = _byName[name];
   if (spec == null) return _err('Unknown tool: $name');
@@ -852,6 +930,10 @@ Future<AgentToolOutcome> executeAgentTool(
   // 权限闸门（schema 层已隐藏发送类工具，但模型仍可能凭空调用）
   if (_isSendingTool(name) && !allowedSend) {
     return _err('Permission denied: sending messages is disabled in settings.');
+  }
+  if (_isNetworkTool(name) && !allowedNetwork) {
+    return _err(
+        'Permission denied: network requests are disabled in settings.');
   }
   if (spec.mutating && name != 'navigate' && !allowedSettings) {
     return _err('Permission denied: changing settings is disabled.');
@@ -1857,6 +1939,83 @@ Future<AgentToolOutcome> executeAgentTool(
         }
         await st.toggleConnect();
         return AgentToolOutcome('Disconnected.', note: 'disconnect');
+      }
+
+    // ─── 联网 ───
+    // 真正发出请求前已经过确认层（mutating=true → agentNeedsConfirm），
+    // 再加上「联网」权限闸门，双重把关。
+    case 'http_request':
+      {
+        final url = _val(args, 'url').trim();
+        if (url.isEmpty) return _err('"url" is required.');
+        final uri = Uri.tryParse(url);
+        if (uri == null ||
+            !(uri.isScheme('http') || uri.isScheme('https'))) {
+          return _err('"url" must be an http(s) URL.');
+        }
+        final method = _val(args, 'method').trim().toUpperCase();
+        final headers = <String, String>{};
+        final rawHeaders = args['headers'];
+        if (rawHeaders is Map) {
+          rawHeaders.forEach((k, v) {
+            if (v != null) headers['$k'] = '$v';
+          });
+        }
+        final body = _val(args, 'body');
+        try {
+          final r = await httpSend(
+            method.isEmpty ? 'GET' : method,
+            uri,
+            headers: headers.isEmpty ? null : headers,
+            body: body.isEmpty ? null : body,
+            timeout: const Duration(seconds: 30),
+          );
+          final clipped =
+              r.length > 4000 ? '${r.substring(0, 4000)}…(truncated)' : r;
+          return AgentToolOutcome(clipped,
+              note: 'http_request ${method.isEmpty ? 'GET' : method} $url');
+        } catch (e) {
+          return _err('Request failed: $e');
+        }
+      }
+
+    // ─── 长期记忆 ───
+    // 本地写入、无外部副作用，故不设确认（用户说「记住…」即应立刻生效）。
+    // 仍受权限层约束：只读工具的闸门放行，写入前要「允许改设置」。
+    case 'save_memory':
+      {
+        if (!allowedSettings) {
+          return _err('Permission denied: changing settings is disabled.');
+        }
+        final text = _val(args, 'text').trim();
+        if (text.isEmpty) return _err('"text" is required.');
+        final added = await AgentService.instance.addMemory(text);
+        return AgentToolOutcome(
+            added ? 'Memory saved.' : 'Already remembered (refreshed).',
+            note: 'save_memory');
+      }
+
+    case 'list_memories':
+      {
+        final list = [
+          for (final m in AgentService.instance.memories)
+            {'id': m.id, 'text': m.text, 'at': m.at.toIso8601String()},
+        ];
+        return AgentToolOutcome(jsonEncode(list),
+            note: 'list_memories → ${list.length}');
+      }
+
+    case 'forget_memory':
+      {
+        if (!allowedSettings) {
+          return _err('Permission denied: changing settings is disabled.');
+        }
+        final key = _val(args, 'key').trim();
+        if (key.isEmpty) return _err('"key" is required.');
+        final n = await AgentService.instance.forgetMemory(key);
+        return AgentToolOutcome(
+            n == 0 ? 'No matching memory found.' : 'Forgot $n memory(ies).',
+            note: 'forget_memory $key');
       }
   }
   return _err('Unhandled tool: $name');

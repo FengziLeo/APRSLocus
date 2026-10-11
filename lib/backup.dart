@@ -120,6 +120,14 @@ const List<BackupGroupSpec> kBackupGroups = [
     // 智能体配置（接口地址 / Key / 模型 / 权限开关）与聊天历史：都属于
     // 「用户自己配的东西」，换机后不该丢（否则要重新填 Key、重新授权）。
     'agentConfigJson', 'agentChatHistoryJson',
+    // 定时 / 消息触发任务：用户在自动化页一条条配出来的，换机后应保留。
+    'agentTasksJson',
+    // 长期记忆与对话摘要：和聊天历史一样属于「用户自己攒起来的东西」，
+    // 换机后不该丢（否则智能体忽然「失忆」，用户会以为坏了）。
+    'agentMemoryJson', 'agentHistorySummary',
+    // 智能体最小化气泡的位置：与其它界面显示偏好同类，换机后应保留
+    // （用户把气泡拖到了顺手的位置，不该在新机上弹回默认角落）。
+    'agentBubblePos',
     // 界面材质（磨砂玻璃 / 云母）：与深色模式、界面缩放同类的**显示偏好**，
     // 用户换机后当然希望屏幕还是他调好的那副样子。
     'uiMaterial',
@@ -158,8 +166,9 @@ const List<BackupGroupSpec> kBackupGroups = [
     'pkwdwplConfigJson', 'pkwdwplDeviceJson',
     'boxConfigJson', 'boxDeviceJson',
   ]),
-  // 台站与联系人：整份 stations JSON（收藏/手动添加/备注）
-  BackupGroupSpec(BackupCategory.stations, ['stations']),
+  // 台站与联系人：整份 stations JSON（收藏/手动添加/备注）+ 本地屏蔽列表
+  // （用户主动隐藏的台站，属于「用户自己攒的台站偏好」，换机后应保留）。
+  BackupGroupSpec(BackupCategory.stations, ['stations', 'ignoredStations']),
   // 消息记录：单聊消息 + 两套已读时间点
   BackupGroupSpec(BackupCategory.messages, ['messages', 'readAt', 'groupReadAt']),
   // 群聊：群组、成员状态、群内共享的策略地图元素（标点/线/圈/集合点）

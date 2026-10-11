@@ -15685,6 +15685,126 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'12000 Hz (LPCM 16-bit 单声道)'**
   String get icomAudioFmtValue;
+  /// No description provided for @agentMemory.
+  ///
+  /// In zh, this message translates to:
+  /// **'长期记忆'**
+  String get agentMemory;
+
+  /// No description provided for @agentMemoryDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'让智能体跨对话记住你的偏好与常用信息'**
+  String get agentMemoryDesc;
+
+  /// No description provided for @agentMemoryOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'启用长期记忆'**
+  String get agentMemoryOn;
+
+  /// No description provided for @agentMemoryHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能体可自行调用「记住 / 忘记」工具，也可由你直接说「记住…」。记忆只存在本机。'**
+  String get agentMemoryHint;
+
+  /// No description provided for @agentMemoryEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无记忆。对智能体说「记住…」即可添加。'**
+  String get agentMemoryEmpty;
+
+  /// No description provided for @agentMemoryClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清空全部记忆'**
+  String get agentMemoryClear;
+
+  /// No description provided for @agentMemoryClearConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定清空全部长期记忆？此操作不可撤销。'**
+  String get agentMemoryClearConfirm;
+
+  /// No description provided for @agentCompress.
+  ///
+  /// In zh, this message translates to:
+  /// **'对话压缩'**
+  String get agentCompress;
+
+  /// No description provided for @agentCompressDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'历史变长时自动把旧对话折叠成摘要，省上下文'**
+  String get agentCompressDesc;
+
+  /// No description provided for @agentCompressOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'启用自动压缩'**
+  String get agentCompressOn;
+
+  /// No description provided for @agentCompressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'超过约 40 条消息时自动压缩。摘要会保留在系统提示里，最近的对话不受影响。'**
+  String get agentCompressHint;
+
+  /// No description provided for @agentCompressNow.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即压缩'**
+  String get agentCompressNow;
+
+  /// No description provided for @agentCompressNothing.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有可压缩的内容'**
+  String get agentCompressNothing;
+
+  /// No description provided for @agentCompressDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'已压缩对话'**
+  String get agentCompressDone;
+
+  /// No description provided for @agentTool_save_memory.
+  ///
+  /// In zh, this message translates to:
+  /// **'记住一条信息'**
+  String get agentTool_save_memory;
+
+  /// No description provided for @agentTool_list_memories.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看记忆'**
+  String get agentTool_list_memories;
+
+  /// No description provided for @agentTool_forget_memory.
+  ///
+  /// In zh, this message translates to:
+  /// **'忘记一条信息'**
+  String get agentTool_forget_memory;
+
+  /// No description provided for @agentAllowNetwork.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许联网请求'**
+  String get agentAllowNetwork;
+
+  /// No description provided for @agentAllowNetworkDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许智能体主动发起 HTTP 请求（GET / POST / PUT / DELETE…）。默认关闭；开启后每次请求仍需你确认。'**
+  String get agentAllowNetworkDesc;
+
+  /// No description provided for @agentTool_http_request.
+  ///
+  /// In zh, this message translates to:
+  /// **'发起网络请求'**
+  String get agentTool_http_request;
+
 }
 
 class _AppLocalizationsDelegate

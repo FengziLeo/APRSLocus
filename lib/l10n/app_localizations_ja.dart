@@ -8750,4 +8750,64 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit モノラル)';
+  @override
+  String get agentMemory => "長期記憶";
+
+  @override
+  String get agentMemoryDesc => "エージェントに好みを会話をまたいで記憶させます";
+
+  @override
+  String get agentMemoryOn => "長期記憶を有効化";
+
+  @override
+  String get agentMemoryHint => "エージェントが記憶/忘却ツールを使えます。「…を覚えて」と頼んでも可。本機にのみ保存されます。";
+
+  @override
+  String get agentMemoryEmpty => "まだありません。「…を覚えて」と伝えると追加できます。";
+
+  @override
+  String get agentMemoryClear => "すべての記憶を消去";
+
+  @override
+  String get agentMemoryClearConfirm => "長期記憶をすべて消去しますか？元に戻せません。";
+
+  @override
+  String get agentCompress => "会話の圧縮";
+
+  @override
+  String get agentCompressDesc => "履歴が長くなると古い会話を要約に畳み、コンテキストを節約します";
+
+  @override
+  String get agentCompressOn => "自動圧縮を有効化";
+
+  @override
+  String get agentCompressHint => "約 40 件を超えると自動圧縮。要約はシステムプロンプトに残り、直近の会話は変わりません。";
+
+  @override
+  String get agentCompressNow => "今すぐ圧縮";
+
+  @override
+  String get agentCompressNothing => "圧縮する内容がありません";
+
+  @override
+  String get agentCompressDone => "会話を圧縮しました";
+
+  @override
+  String get agentTool_save_memory => "情報を記憶";
+
+  @override
+  String get agentTool_list_memories => "記憶を表示";
+
+  @override
+  String get agentTool_forget_memory => "情報を忘却";
+
+  @override
+  String get agentAllowNetwork => "ネットワーク要求を許可";
+
+  @override
+  String get agentAllowNetworkDesc => "エージェントが HTTP リクエスト（GET / POST / PUT / DELETE…）を送れるようにします。既定はオフ。実行前に毎回確認します。";
+
+  @override
+  String get agentTool_http_request => "ネットワーク要求";
+
 }

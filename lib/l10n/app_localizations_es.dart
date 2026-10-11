@@ -9076,4 +9076,64 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16 bits mono)';
+  @override
+  String get agentMemory => "Memoria a largo plazo";
+
+  @override
+  String get agentMemoryDesc => "Permite al agente recordar tus preferencias entre chats";
+
+  @override
+  String get agentMemoryOn => "Activar memoria a largo plazo";
+
+  @override
+  String get agentMemoryHint => "El agente puede usar las herramientas de recordar/olvidar, o basta con decir «recuerda…». Solo en este dispositivo.";
+
+  @override
+  String get agentMemoryEmpty => "Aún no hay memorias. Dile al agente «recuerda…» para añadir una.";
+
+  @override
+  String get agentMemoryClear => "Borrar todas las memorias";
+
+  @override
+  String get agentMemoryClearConfirm => "¿Borrar todas las memorias? No se puede deshacer.";
+
+  @override
+  String get agentCompress => "Compresión de conversación";
+
+  @override
+  String get agentCompressDesc => "Pliega turnos antiguos en un resumen cuando crece el historial";
+
+  @override
+  String get agentCompressOn => "Activar compresión automática";
+
+  @override
+  String get agentCompressHint => "Comprime a partir de ~40 mensajes. El resumen queda en el prompt del sistema.";
+
+  @override
+  String get agentCompressNow => "Comprimir ahora";
+
+  @override
+  String get agentCompressNothing => "Nada que comprimir";
+
+  @override
+  String get agentCompressDone => "Conversación comprimida";
+
+  @override
+  String get agentTool_save_memory => "Recordar un dato";
+
+  @override
+  String get agentTool_list_memories => "Ver memorias";
+
+  @override
+  String get agentTool_forget_memory => "Olvidar un dato";
+
+  @override
+  String get agentAllowNetwork => "Permitir solicitudes de red";
+
+  @override
+  String get agentAllowNetworkDesc => "Permite al agente hacer solicitudes HTTP (GET / POST / PUT / DELETE…). Desactivado por defecto; cada solicitud te pregunta antes.";
+
+  @override
+  String get agentTool_http_request => "Hacer una solicitud de red";
+
 }

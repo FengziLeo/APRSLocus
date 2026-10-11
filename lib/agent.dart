@@ -111,6 +111,33 @@ class AgentMessage {
       );
 }
 
+/// 一条长期记忆：跨对话保留的事实（偏好、称呼、常用地点……）。
+///
+/// 与 [AgentService.historySummary]（对话压缩出的摘要）分开存：记忆是**用户/
+/// 模型主动要求记住**的稳定事实，摘要是系统自动折叠旧对话得到的过程性要点。
+class AgentMemory {
+  final String id;
+  String text;
+  final DateTime at;
+  AgentMemory({required this.id, required this.text, required this.at});
+
+  Map<String, dynamic> toJson() =>
+      {'id': id, 'text': text, 'at': at.toIso8601String()};
+
+  static AgentMemory? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final t = '${j['text'] ?? ''}'.trim();
+    if (t.isEmpty) return null;
+    return AgentMemory(
+      id: '${j['id'] ?? ''}'.isEmpty
+          ? DateTime.now().microsecondsSinceEpoch.toRadixString(36)
+          : '${j['id']}',
+      text: t,
+      at: DateTime.tryParse('${j['at']}') ?? DateTime.now(),
+    );
+  }
+}
+
 /// 智能体配置（全部由用户填写）
 class AgentConfig {
   bool enabled;
@@ -146,6 +173,16 @@ class AgentConfig {
   /// 安静时段，格式 `HH:MM-HH:MM`（可为空 = 不限）。跨零点（如 23:00-07:00）也支持。
   String quietHours;
 
+  /// 联网权限：允许智能体主动发起 HTTP 请求（GET / POST / PUT / DELETE…）
+  /// 访问用户指定的地址。默认关闭 —— 与 APRS 收发、改设置同级的显式权限。
+  bool allowNetwork;
+
+  /// 长期记忆：把 [AgentMemory] 注入系统提示，让智能体跨对话记住用户偏好。
+  bool memoryEnabled;
+
+  /// 对话压缩：历史变长时自动把旧对话折叠成一段摘要。
+  bool compressEnabled;
+
   AgentConfig({
     this.enabled = false,
     this.baseUrl = 'https://api.openai.com/v1',
@@ -159,6 +196,9 @@ class AgentConfig {
     this.replyGroups = false,
     this.autoReplyCooldownSec = 60,
     this.quietHours = '',
+    this.allowNetwork = false,
+    this.memoryEnabled = true,
+    this.compressEnabled = true,
   }) : alwaysAllow = alwaysAllow ?? <String>{};
 
   /// 配置是否已填写到「可发起请求」的程度
@@ -191,6 +231,9 @@ class AgentConfig {
         'replyGroups': replyGroups,
         'autoReplyCooldownSec': autoReplyCooldownSec,
         'quietHours': quietHours,
+        'allowNetwork': allowNetwork,
+        'memoryEnabled': memoryEnabled,
+        'compressEnabled': compressEnabled,
       };
 
   static AgentConfig fromJson(Object? j) {
@@ -213,6 +256,14 @@ class AgentConfig {
       autoReplyCooldownSec:
           int.tryParse('${j['autoReplyCooldownSec']}') ?? c.autoReplyCooldownSec,
       quietHours: s('quietHours', c.quietHours),
+      allowNetwork: j['allowNetwork'] == true,
+      // 新旧兼容：老配置里没有这两个键 → 默认开启（见构造函数默认值）。
+      memoryEnabled: j.containsKey('memoryEnabled')
+          ? j['memoryEnabled'] != false
+          : c.memoryEnabled,
+      compressEnabled: j.containsKey('compressEnabled')
+          ? j['compressEnabled'] != false
+          : c.compressEnabled,
     );
   }
 }
@@ -414,6 +465,11 @@ Rules:
   itself. Only use a server address the user actually gave you — never make one
   up. If the user has not accepted the data & network usage notice, `connect`
   is refused; tell them to accept it in the app first.
+- Long-term memory: when the user tells you something durable about themselves
+  (a preference, their name, a callsign, a routine, a place they care about),
+  call `save_memory` to keep it across conversations. Use `list_memories` to
+  recall what you already know and `forget_memory` to drop a stale fact. Do not
+  save transient details, secrets, or anything the user asks you to forget.
 - Keep answers short and concrete.
 ''';
 
@@ -459,12 +515,34 @@ class AgentService extends ChangeNotifier {
   static const _kHistory = 'agentChatHistoryJson';
   static const _kTasks = 'agentTasksJson';
   static const _kTaskRuns = 'agentTaskRunsJson';
+  static const _kMemory = 'agentMemoryJson';
+  static const _kSummary = 'agentHistorySummary';
 
   /// 单轮对话里工具调用的最大往返次数（防止模型死循环）
   static const int maxToolRounds = 6;
 
+  /// 长期记忆条数上限 / 单条长度上限（注入系统提示，别把上下文撑爆）。
+  static const int _kMaxMemories = 50;
+  static const int _kMaxMemoryLen = 500;
+
+  /// 存盘时保留的最近消息条数。够长以保留上下文，又不至于让磁盘/请求过大。
+  static const int _kKeepMessages = 80;
+
+  /// 触发压缩的阈值：消息数超过它就把较旧的一段折叠成摘要。
+  static const int _kCompressThreshold = 40;
+
+  /// 压缩后保留的最近消息条数（从这里往前切一段去摘要）。
+  static const int _kCompressKeepRecent = 16;
+
   final AgentConfig config = AgentConfig();
   final List<AgentMessage> messages = [];
+
+  /// 长期记忆（内存 + 磁盘）。智能体可用 `save_memory` 写入、`list_memories` 读、
+  /// `forget_memory` 忘掉；开启 [AgentConfig.memoryEnabled] 时随系统提示注入。
+  final List<AgentMemory> memories = [];
+
+  /// 对话压缩出的历史摘要（可为空）。与 [messages] 一起注入系统提示。
+  String historySummary = '';
 
   /// 定时任务（内存 + 磁盘）。
   final List<AgentTask> tasks = [];
@@ -482,9 +560,15 @@ class AgentService extends ChangeNotifier {
   /// 取消令牌：自增即让进行中的 [send] 在下一个检查点退出
   int _epoch = 0;
 
-  Future<void> load() async {
-    if (loaded) return;
-    loaded = true;
+  /// 用「共享同一个 Future」实现幂等：并发的 [load]（例如冷启动时
+  /// `AgentOverlay.initState` 与抢先到达的消息回调同时触发）都会等同一份
+  /// 读取完成，而不是第二个调用看到 `loaded==true` 就立刻返回、拿着**空的**
+  /// tasks/config 继续跑 —— 那正是「消息触发任务静默不触发」的根因之一。
+  Future<void>? _loadFuture;
+
+  Future<void> load() => _loadFuture ??= _loadFromDisk();
+
+  Future<void> _loadFromDisk() async {
     try {
       final p = await SharedPreferences.getInstance();
       final c = p.getString(_kConfig);
@@ -520,7 +604,83 @@ class AgentService extends ChangeNotifier {
           }
         }
       }
+      final mem = p.getString(_kMemory);
+      if (mem != null && mem.isNotEmpty) {
+        final list = jsonDecode(mem);
+        if (list is List) {
+          for (final m in list) {
+            final e = AgentMemory.fromJson(m);
+            if (e != null) memories.add(e);
+          }
+        }
+      }
+      historySummary = p.getString(_kSummary) ?? '';
     } catch (_) {}
+    loaded = true;
+    notifyListeners();
+  }
+
+  Future<void> _saveMemories() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString(
+          _kMemory, jsonEncode(memories.map((m) => m.toJson()).toList()));
+    } catch (_) {}
+  }
+
+  Future<void> _saveSummary() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString(_kSummary, historySummary);
+    } catch (_) {}
+  }
+
+  /// 记住一条事实（去重：文本相同则不重复添加，但会刷新到最新）。
+  /// 返回 true = 新增，false = 已存在（刷新）。
+  Future<bool> addMemory(String text) async {
+    final t = text.trim();
+    if (t.isEmpty) return false;
+    final capped = t.length > _kMaxMemoryLen ? t.substring(0, _kMaxMemoryLen) : t;
+    final dup = memories.where((m) => m.text == capped).firstOrNull;
+    if (dup != null) {
+      memories.remove(dup);
+      memories.add(dup); // 挪到末尾视作最新
+      await _saveMemories();
+      notifyListeners();
+      return false;
+    }
+    memories.add(AgentMemory(
+      id: DateTime.now().microsecondsSinceEpoch.toRadixString(36),
+      text: capped,
+      at: DateTime.now(),
+    ));
+    // 超出上限丢最旧的，避免无限增长。
+    while (memories.length > _kMaxMemories) {
+      memories.removeAt(0);
+    }
+    await _saveMemories();
+    notifyListeners();
+    return true;
+  }
+
+  /// 按 id 或文本子串删除记忆；返回删除条数。
+  Future<int> forgetMemory(String key) async {
+    final k = key.trim().toLowerCase();
+    if (k.isEmpty) return 0;
+    final before = memories.length;
+    memories.removeWhere((m) =>
+        m.id == key.trim() || m.text.toLowerCase().contains(k));
+    final removed = before - memories.length;
+    if (removed > 0) {
+      await _saveMemories();
+      notifyListeners();
+    }
+    return removed;
+  }
+
+  Future<void> clearMemories() async {
+    memories.clear();
+    await _saveMemories();
     notifyListeners();
   }
 
@@ -537,7 +697,10 @@ class AgentService extends ChangeNotifier {
       ..autoReply = from.autoReply
       ..replyGroups = from.replyGroups
       ..autoReplyCooldownSec = from.autoReplyCooldownSec
-      ..quietHours = from.quietHours;
+      ..quietHours = from.quietHours
+      ..allowNetwork = from.allowNetwork
+      ..memoryEnabled = from.memoryEnabled
+      ..compressEnabled = from.compressEnabled;
   }
 
   Future<void> saveConfig() async {
@@ -672,17 +835,39 @@ class AgentService extends ChangeNotifier {
     await saveTasks();
   }
 
+  /// 消息触发型任务被唤醒时，只更新「上次运行」时间戳（供用户排查
+  /// 「到底跑没跑」，报告里 `last_run=null` 就是最直接的证据）。
+  ///
+  /// 不能复用 [markTaskRun]：那个会把**非循环**任务直接停用，而消息任务
+  /// 正是非循环的（`recurring == false`），一用就被永久关掉。
+  Future<void> touchTaskRun(String id) async {
+    final t = tasks.where((t) => t.id == id).firstOrNull;
+    if (t == null) return;
+    t.lastRun = DateTime.now();
+    await saveTasks();
+    notifyListeners();
+  }
+
   /// 到点该跑的任务（在 [now] 之前应触发且仍启用）。
   List<AgentTask> dueTasks(DateTime now) =>
       [for (final t in tasks) if (t.nextRun != null && !t.nextRun!.isAfter(now)) t];
 
+  /// 收到消息时要跑的任务（已启用 + 触发源为 message）。抽出来便于单测：
+  /// 这条路径的闸门独立于自动回复（见 `_onIncoming`）。
+  List<AgentTask> messageTasks() => [
+        for (final t in tasks)
+          if (t.enabled && t.trigger == AgentTaskTrigger.message) t
+      ];
+
   Future<void> saveHistory() async {
     try {
       final p = await SharedPreferences.getInstance();
-      // 只留最近 60 条。**必须从一个 user 消息开始**：OpenAI 要求 assistant 的
-      // 每个 tool_calls 都紧跟对应的 tool 回复；若裁剪边界正好落在中间，留下
-      // 一条孤立的 tool 消息，下一次请求会整段报错（而且是很难查的 400）。
-      var start = messages.length > 60 ? messages.length - 60 : 0;
+      // 只留最近 [_kKeepMessages] 条。**必须从一个 user 消息开始**：OpenAI 要求
+      // assistant 的每个 tool_calls 都紧跟对应的 tool 回复；若裁剪边界正好落在
+      // 中间，留下一条孤立的 tool 消息，下一次请求会整段报错（很难查的 400）。
+      var start = messages.length > _kKeepMessages
+          ? messages.length - _kKeepMessages
+          : 0;
       while (start < messages.length && messages[start].role != 'user') {
         start++;
       }
@@ -694,14 +879,123 @@ class AgentService extends ChangeNotifier {
 
   Future<void> clearHistory() async {
     messages.clear();
+    historySummary = '';
+    await saveHistory();
+    await _saveSummary();
+    notifyListeners();
+  }
+
+  /// 手动「压缩对话」：把除最近 [_kCompressKeepRecent] 条以外的历史折叠进摘要，
+  /// 然后删掉那部分。返回是否真的压缩了（没什么可压时返回 false）。
+  Future<bool> compressNow({String instructions = ''}) async {
+    if (messages.length <= _kCompressKeepRecent) return false;
+    String keep;
+    try {
+      keep = await _summarize(instructions: instructions);
+    } on AgentException {
+      rethrow;
+    } catch (e) {
+      throw AgentException('$e');
+    }
+    if (keep.trim().isEmpty) return false;
+    historySummary = keep.trim();
+    final drop = messages.length - _kCompressKeepRecent;
+    _compressOldMessages(drop);
+    await _saveSummary();
     await saveHistory();
     notifyListeners();
+    return true;
+  }
+
+  /// 把最旧的 [count] 条从历史里移除（用摘要替代），不触发网络。
+  void _compressOldMessages(int count) {
+    if (count <= 0 || count >= messages.length) return;
+    messages.removeRange(0, count);
+  }
+
+  /// 历史过长时自动压缩（存盘前调用；失败就放弃，不影响正常对话）。
+  Future<void> _maybeAutoCompress() async {
+    if (!config.compressEnabled) return;
+    if (messages.length <= _kCompressThreshold) return;
+    try {
+      final keep = await _summarize();
+      if (keep.trim().isEmpty) return;
+      historySummary = keep.trim();
+      // 只丢到「保留最近 _kCompressKeepRecent 条」，剩下的自然留白。
+      _compressOldMessages(messages.length - _kCompressKeepRecent);
+      await _saveSummary();
+      await saveHistory();
+      notifyListeners();
+    } catch (_) {
+      // 压缩是「锦上添花」：模型/网络出问题也不能影响用户正在用的对话。
+    }
+  }
+
+  /// 让模型把「当前全部历史 + 已有摘要」折叠成一段不超过约 200 字的中文摘要。
+  Future<String> _summarize({String instructions = ''}) async {
+    final sb = StringBuffer();
+    if (historySummary.trim().isNotEmpty) {
+      sb.writeln('Existing summary:\n${historySummary.trim()}\n');
+    }
+    sb.writeln('Conversation to fold in:');
+    for (final m in messages) {
+      final role = switch (m.role) {
+        'user' => 'User',
+        'assistant' => 'Assistant',
+        _ => 'Tool(${m.name ?? ''})',
+      };
+      final c = m.content.replaceAll(RegExp(r'\s+'), ' ').trim();
+      if (c.isEmpty && m.toolCalls.isEmpty) continue;
+      final tc = m.toolCalls.isEmpty
+          ? ''
+          : ' [tools: ${m.toolCalls.map((t) => t.name).join(', ')}]';
+      final line = c.length > 300 ? '${c.substring(0, 300)}…' : c;
+      sb.writeln('$role: $line$tc');
+    }
+    if (instructions.trim().isNotEmpty) {
+      sb.writeln('\nExtra focus: ${instructions.trim()}');
+    }
+    final body = <String, dynamic>{
+      'model': config.model.trim(),
+      'messages': [
+        {
+          'role': 'system',
+          'content': 'You compress chat history for a personal APRS assistant. '
+              'Produce a concise summary (<=200 words) capturing the user\'s '
+              'goals, preferences, decisions, important facts (callsigns, '
+              'places, settings) and any pending items. Plain text, keep names '
+              'and numbers exact, no preamble.',
+        },
+        {'role': 'user', 'content': sb.toString()},
+      ],
+      'temperature': 0.2,
+      'max_tokens': 500,
+    };
+    final resp = await httpSend(
+      'POST',
+      Uri.parse(config.endpoint),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${config.apiKey.trim()}',
+      },
+      body: jsonEncode(body),
+      timeout: const Duration(seconds: 60),
+    );
+    final data = jsonDecode(resp);
+    if (data is! Map) throw AgentException('Unexpected response');
+    final choices = data['choices'];
+    if (choices is! List || choices.isEmpty) return '';
+    final msg = (choices.first as Map)['message'];
+    if (msg is! Map) return '';
+    return '${msg['content'] ?? ''}'.trim();
   }
 
   /// 恢复出厂：清配置与历史（只动内存，磁盘由 AppState.factoryReset 统一清）
   void resetToDefaults() {
     _copy(AgentConfig(), config);
     messages.clear();
+    memories.clear();
+    historySummary = '';
     tasks.clear();
     taskRuns.clear();
     _autoReplyAt.clear();
@@ -865,6 +1159,8 @@ class AgentService extends ChangeNotifier {
       if (_epoch == my) busy = false;
       notifyListeners();
       unawaited(saveHistory());
+      // 历史变长后自动折叠旧对话（失败静默；见 [_maybeAutoCompress]）。
+      if (_epoch == my) unawaited(_maybeAutoCompress());
     }
   }
 
@@ -876,11 +1172,32 @@ class AgentService extends ChangeNotifier {
     final sp = config.systemPrompt.trim().isEmpty
         ? kDefaultSystemPrompt
         : config.systemPrompt.trim();
-    out.add({'role': 'system', 'content': sp});
+    out.add({'role': 'system', 'content': '$sp${_contextBlock()}'});
     for (final m in messages) {
       out.add(m.toJson());
     }
     return out;
+  }
+
+  /// 拼在系统提示后面的「长期记忆 + 历史摘要」块（都为空时返回空串）。
+  ///
+  /// 注入在这里而不是历史里：摘要 / 记忆是**背景知识**，不是对话轮次，
+  /// 放系统提示里既不会破坏 tool_call 配对，用户清理对话时也仍在。
+  String _contextBlock() {
+    final b = StringBuffer();
+    if (config.memoryEnabled && memories.isNotEmpty) {
+      b.writeln('\n\n## Long-term memory (facts you chose to remember about '
+          'this user; treat as true, keep obeying them)');
+      for (final m in memories) {
+        b.writeln('- ${m.text}');
+      }
+    }
+    if (historySummary.trim().isNotEmpty) {
+      b.writeln('\n\n## Summary of earlier conversation (older turns were '
+          'folded to save space; use for context)');
+      b.writeln(historySummary.trim());
+    }
+    return b.toString();
   }
 
   /// 调一次 chat/completions，返回助手消息（可能带 tool_calls）

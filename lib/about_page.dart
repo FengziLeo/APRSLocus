@@ -227,7 +227,7 @@ class _AboutPageState extends State<AboutPage>
   /// Hero 底图视差量（0~240，随滚动量变化）
   final ValueNotifier<double> _heroScroll = ValueNotifier<double>(0);
 
-  // ─── 封面彩蛋：长按抖动 → 5 秒后翻面 ───
+  // ─── 封面彩蛋：点一下抖一下 → 5 秒后翻面 ───
   // 抖动（damped 正弦）与翻牌各占一个控制值；`_flipped` 是逻辑上的「已翻面」。
   // 翻牌过程因为要按角度换内容（正面/背面），所以自己 setState，不用 AnimatedBuilder。
   late final AnimationController _shakeCtrl = AnimationController(
@@ -242,21 +242,20 @@ class _AboutPageState extends State<AboutPage>
   Timer? _flipTimer;
   Offset _eggPos = Offset.zero;
 
-  /// 5 秒内再长按一次就取消翻面（给用户的后悔键）。
-  void _toggleHeroEgg() {
-    if (_flipped) return;
-    if (_flipTimer?.isActive ?? false) {
-      _flipTimer!.cancel();
-      _flipTimer = null;
-      HapticFeedback.selectionClick();
+  /// 点击封面：每点一次抖一次；第一次点击后开始 5 秒倒计时，到点翻面。
+  /// （连续点击只是在反复「抖」，不会重置倒计时。）
+  void _heroTapped() {
+    if (_flipped) {
+      _unflipHeroEgg();
       return;
     }
-    final box = context.findRenderObject() as RenderBox?;
-    if (box != null) _eggPos = box.size.center(Offset.zero);
     HapticFeedback.mediumImpact();
     _shakeCtrl.forward(from: 0);
-    _flipTimer = Timer(const Duration(seconds: 5), () {
+    _flipTimer ??= Timer(const Duration(seconds: 5), () {
+      _flipTimer = null;
       if (!mounted) return;
+      final box = context.findRenderObject() as RenderBox?;
+      if (box != null) _eggPos = box.size.center(Offset.zero);
       _flipped = true;
       _fireParticles(_eggPos);
       HapticFeedback.heavyImpact();
@@ -271,7 +270,7 @@ class _AboutPageState extends State<AboutPage>
     });
   }
 
-  /// 抖动位移：0→6px 的正弦衰减，只在长按后的 0.7 秒里跑。
+  /// 抖动位移：0→6px 的正弦衰减，只在每次点击后的 0.7 秒里跑。
   static double _shakeOffset(double t) {
     if (t <= 0) return 0;
     return sin(t * pi * 9) * 6.0 * (1 - t);
@@ -761,7 +760,7 @@ class _AboutPageState extends State<AboutPage>
     );
   }
 
-  /// 封面：常态是 [_heroFront]，长按触发彩蛋后翻到背面 [_heroBack]。
+  /// 封面：常态是 [_heroFront]，点击触发彩蛋后翻到背面 [_heroBack]。
   ///
   /// 翻牌用透视 + 绕 Y 轴旋转；转过 90° 时把内容换成背面并再做一次水平镜像，
   /// 背面的文字才不会左右反着显示。抖动只作用在最外层位移上，不影响旋转。
@@ -771,9 +770,8 @@ class _AboutPageState extends State<AboutPage>
         final h = _heroHeightFor(cons.maxWidth);
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onLongPress: _toggleHeroEgg,
-          // 翻到背面后，点一下即可翻回正面
-          onTap: _flipped ? _unflipHeroEgg : null,
+          // 点一次抖一次；5 秒后自动翻面；翻到背面后再点一下翻回正面
+          onTap: _heroTapped,
           child: SizedBox(
             height: h,
             width: double.infinity,

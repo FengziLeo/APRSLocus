@@ -9028,4 +9028,64 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit mono)';
+  @override
+  String get agentMemory => "Memori jangka panjang";
+
+  @override
+  String get agentMemoryDesc => "Biarkan agen mengingat preferensi Anda antar percakapan";
+
+  @override
+  String get agentMemoryOn => "Aktifkan memori jangka panjang";
+
+  @override
+  String get agentMemoryHint => "Agen dapat memakai alat ingat/lupakan, atau cukup bilang \"ingat …\". Hanya tersimpan di perangkat ini.";
+
+  @override
+  String get agentMemoryEmpty => "Belum ada memori. Bilang \"ingat …\" ke agen untuk menambah.";
+
+  @override
+  String get agentMemoryClear => "Hapus semua memori";
+
+  @override
+  String get agentMemoryClearConfirm => "Hapus semua memori jangka panjang? Tidak dapat dibatalkan.";
+
+  @override
+  String get agentCompress => "Kompresi percakapan";
+
+  @override
+  String get agentCompressDesc => "Lipat obrolan lama jadi ringkasan saat riwayat memanjang";
+
+  @override
+  String get agentCompressOn => "Aktifkan kompresi otomatis";
+
+  @override
+  String get agentCompressHint => "Mengompres di atas ~40 pesan. Ringkasan tetap di prompt sistem.";
+
+  @override
+  String get agentCompressNow => "Kompres sekarang";
+
+  @override
+  String get agentCompressNothing => "Tidak ada yang dikompres";
+
+  @override
+  String get agentCompressDone => "Percakapan dikompres";
+
+  @override
+  String get agentTool_save_memory => "Ingat sebuah fakta";
+
+  @override
+  String get agentTool_list_memories => "Lihat memori";
+
+  @override
+  String get agentTool_forget_memory => "Lupakan sebuah fakta";
+
+  @override
+  String get agentAllowNetwork => "Izinkan permintaan jaringan";
+
+  @override
+  String get agentAllowNetworkDesc => "Biarkan agen membuat permintaan HTTP (GET / POST / PUT / DELETE…). Nonaktif secara bawaan; tiap permintaan tetap minta konfirmasi.";
+
+  @override
+  String get agentTool_http_request => "Buat permintaan jaringan";
+
 }

@@ -7,6 +7,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'agent.dart';
 import 'agent_tools.dart';
@@ -56,6 +57,7 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
   late final TextEditingController _quiet;
 
   bool _testing = false;
+  bool _compressing = false;
   String _testResult = '';
   bool _testOk = false;
 
@@ -134,7 +136,7 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
     }
   }
 
-  /// 当前分页：0 连接 / 1 权限 / 2 自动化
+  /// 当前分页：0 连接 / 1 权限 / 2 自动化 / 3 记忆
   int _tab = 0;
 
   @override
@@ -153,14 +155,20 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
           if (_tab == 0) _connectionTab(s),
           if (_tab == 1) _permissionsTab(s),
           if (_tab == 2) _automationTab(s),
+          if (_tab == 3) _memoryTab(s),
         ]),
       ),
     );
   }
 
-  /// 顶部分段选择：把原来一长条的功能折成三页，少滚动、少干扰。
+  /// 顶部分段选择：把原来一长条的功能折成几页，少滚动、少干扰。
   Widget _segmented(S s) {
-    final tabs = [s.agentTabConnection, s.agentTabPermissions, s.agentTabAutomation];
+    final tabs = [
+      s.agentTabConnection,
+      s.agentTabPermissions,
+      s.agentTabAutomation,
+      s.agentMemory,
+    ];
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -182,6 +190,8 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
                 ),
                 child: Text(tabs[i],
                     textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: ts(12,
                         c: _tab == i ? Colors.white : C.slate,
                         w: FontWeight.w700)),
@@ -316,6 +326,13 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
             if (mounted) setState(() {});
           }),
           SettingsHint(s.agentAllowSettingsDesc),
+          SettingsSwitch(s.agentAllowNetwork,
+              value: cfg.allowNetwork, color: C.orange, onChanged: (v) async {
+            cfg.allowNetwork = v;
+            await AgentService.instance.saveConfig();
+            if (mounted) setState(() {});
+          }),
+          SettingsHint(s.agentAllowNetworkDesc),
         ],
       ),
       const SizedBox(height: 16),
@@ -486,6 +503,147 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
   List<AgentTask> _tasksOf(AgentTaskTrigger t) =>
       [for (final x in AgentService.instance.tasks) if (x.trigger == t) x];
 
+  /// 记忆与压缩页：长期记忆开关/列表/清空 + 对话压缩开关/立即压缩。
+  Widget _memoryTab(S s) {
+    final svc = AgentService.instance;
+    final mem = svc.memories;
+    return Column(children: [
+      SettingsFold(
+        title: s.agentMemory,
+        subtitle: s.agentMemoryDesc,
+        icon: Icons.psychology_alt_rounded,
+        color: C.purple,
+        open: true,
+        onToggle: () {},
+        children: [
+          SettingsSwitch(s.agentMemoryOn,
+              value: cfg.memoryEnabled, color: C.purple, onChanged: (v) async {
+            cfg.memoryEnabled = v;
+            await svc.saveConfig();
+            if (mounted) setState(() {});
+          }),
+          SettingsHint(s.agentMemoryHint),
+          if (mem.isEmpty)
+            SettingsHint(s.agentMemoryEmpty)
+          else
+            for (final m in mem) _memoryRow(m.text),
+          if (mem.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final ok = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      content: Text(s.agentMemoryClearConfirm),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(false),
+                          child: Text(s.cancel),
+                        ),
+                        FilledButton(
+                          onPressed: () => Navigator.of(ctx).pop(true),
+                          child: Text(s.agentMemoryClear),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (ok == true) {
+                    await svc.clearMemories();
+                    if (mounted) setState(() {});
+                  }
+                },
+                icon: const Icon(Icons.delete_sweep_rounded, size: 16),
+                label: Text(s.agentMemoryClear),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: C.red,
+                  side: BorderSide(color: C.red.withValues(alpha: 0.5)),
+                  padding: const EdgeInsets.symmetric(vertical: 9),
+                  textStyle: ts(12, w: FontWeight.w600),
+                ),
+              ),
+            ),
+        ],
+      ),
+      const SizedBox(height: 16),
+      SettingsFold(
+        title: s.agentCompress,
+        subtitle: s.agentCompressDesc,
+        icon: Icons.compress_rounded,
+        color: C.blue,
+        open: true,
+        onToggle: () {},
+        children: [
+          SettingsSwitch(s.agentCompressOn,
+              value: cfg.compressEnabled, color: C.blue, onChanged: (v) async {
+            cfg.compressEnabled = v;
+            await svc.saveConfig();
+            if (mounted) setState(() {});
+          }),
+          SettingsHint(s.agentCompressHint),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _compressing
+                      ? null
+                      : () async {
+                          if (!svc.config.ready) {
+                            _toast(s.agentNeedConfig, color: C.orange);
+                            return;
+                          }
+                          setState(() => _compressing = true);
+                          try {
+                            final did = await svc.compressNow();
+                            if (mounted) {
+                              _toast(did
+                                  ? s.agentCompressDone
+                                  : s.agentCompressNothing);
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              _toast(s.agentError('$e'), color: C.orange);
+                            }
+                          } finally {
+                            if (mounted) setState(() => _compressing = false);
+                          }
+                        },
+                  icon: const Icon(Icons.compress_rounded, size: 16),
+                  label: Text(s.agentCompressNow),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: C.blue,
+                    side: BorderSide(color: C.blue.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    textStyle: ts(12, w: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        ],
+      ),
+    ]);
+  }
+
+  /// 一条记忆：可换行的文本（记忆往往是一句完整的话，用两栏行会被截断）。
+  Widget _memoryRow(String text) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: C.border, width: 0.4))),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(Icons.circle, size: 6, color: C.purple),
+        ),
+        const SizedBox(width: 8),
+        Expanded(child: Text(text, style: ts(12.5, c: C.slate, h: 1.4))),
+      ]),
+    );
+  }
+
   /// 手动新建一个任务（也让用户不靠模型就能用上这个能力）。
   ///
   /// [trigger] 决定是「到点」还是「来消息」触发：定时型多问一个间隔，消息型没有间隔。
@@ -570,6 +728,12 @@ class _AgentOverlayState extends State<AgentOverlay> {
   bool _minimized = false;
   Offset _drag = Offset.zero;
 
+  /// 收起后圆形胶囊的位置（屏幕坐标，左上角）。null = 未拖动过，用默认右下角位。
+  Offset? _bubblePos;
+  bool _bubbleDragged = false;
+  bool _bubbleDragging = false;
+  static const _kBubblePos = 'agentBubblePos';
+
   /// 待确认的工具调用（有副作用的操作执行前，面板内联询问用户）
   AgentToolCall? _pendingCall;
   Completer<AgentConfirmResult>? _pendingCompleter;
@@ -613,6 +777,7 @@ class _AgentOverlayState extends State<AgentOverlay> {
   void initState() {
     super.initState();
     if (!svc.loaded) svc.load();
+    _loadBubblePos();
     // 定时任务到点轮询。60 秒粒度足够（最短循环 5 分钟），且不必为每个任务各起
     // 一个 timer —— 任务在磁盘里可随时增删，单一轮询器最容易保持一致。
     _taskTimer = Timer.periodic(const Duration(seconds: 60), (_) => _runDueTasks());
@@ -629,6 +794,50 @@ class _AgentOverlayState extends State<AgentOverlay> {
 
   void _onSvcChanged() {
     _scrollToBottom(animate: true);
+  }
+
+  /// 恢复上次拖动到的胶囊位置；从没拖过就保持 null（用默认右下角位）。
+  Future<void> _loadBubblePos() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      final s = p.getString(_kBubblePos);
+      final i = s?.indexOf(',') ?? -1;
+      if (s == null || i < 0) return;
+      final x = double.tryParse(s.substring(0, i));
+      final y = double.tryParse(s.substring(i + 1));
+      if (x == null || y == null || !mounted) return;
+      setState(() => _bubblePos = Offset(x, y));
+    } catch (_) {}
+  }
+
+  void _saveBubblePos(Offset pos) {
+    unawaited(() async {
+      try {
+        final p = await SharedPreferences.getInstance();
+        await p.setString(_kBubblePos, '${pos.dx},${pos.dy}');
+      } catch (_) {}
+    }());
+  }
+
+  /// 把胶囊约束在屏幕内（留一点边距，不能贴到状态栏/导航栏里）。
+  Offset _clampBubble(Offset pos, Size screen) {
+    const m = 6.0, size = 52.0;
+    return Offset(
+      pos.dx.clamp(m, screen.width - size - m),
+      pos.dy.clamp(m, screen.height - size - m),
+    );
+  }
+
+  /// 手势结束时把胶囊吸附到最近的左/右边缘（和很多悬浮球一致，不容易挡内容）。
+  void _snapBubble() {
+    if (_bubblePos == null || !mounted) return;
+    final screen = MediaQuery.of(context).size;
+    final x = _bubblePos!.dx + 26 <= screen.width / 2
+        ? _clampBubble(Offset.zero, screen).dx
+        : screen.width - 52 - 6;
+    final pos = _clampBubble(Offset(x, _bubblePos!.dy), screen);
+    setState(() => _bubblePos = pos);
+    _saveBubblePos(pos);
   }
 
   @override
@@ -669,51 +878,86 @@ class _AgentOverlayState extends State<AgentOverlay> {
   /// 收到新消息：先跑「消息触发」的任务（用户在自动化里配置的指令），
   /// 再按原有逻辑做自动回复。
   ///
-  /// 两条路径都走同一套闸门（智能体开启、不在安静时段、就绪且不忙、[allowSend]、
-  /// 冷却）。消息触发的任务**只在后台跑、不改设置也不发消息**（`background: true`
-  /// 时 [AgentConfirmResult.deny]），因此需要「允许发送 / 改设置」的工具会被拒，
-  /// 它自己也不会去发消息——「怎么发」由自动回复那一档单独负责。
+  /// **两条路径的闸门不同**（这是本方法唯一的复杂之处）：
+  ///
+  /// * 「消息触发任务」由用户在自动化页显式配置，等价于「来消息就跑这句」。
+  ///   它只要求智能体已开启、配置就绪、不忙，**与自动回复开关、安静时段、
+  ///   [allowSend]、冷却都无关** —— 把它挂在自动回复的闸门上，会导致用户
+  ///   一旦没开自动回复（默认就是关的），消息任务就**静默永不触发**
+  ///   （BG7LZQ-2 报告的问题）。
+  /// * 「自动回复」是模型主动回复，走完整闸门（自动回复开关、安静时段、
+  ///   [allowSend]、每会话冷却）。
+  ///
+  /// 消息任务**只在后台跑、不改设置也不发消息**（`background: true` 时
+  /// [AgentConfirmResult.deny]），因此需要「允许发送 / 改设置」的工具会被拒
+  /// ——「怎么发」由自动回复那一档单独负责。
   Future<void> _onIncoming(String src, String text, String? groupId) async {
     final now = DateTime.now();
-    if (!svc.canAutoReply(now)) return;
-    if (groupId != null && !cfg.replyGroups) return;
-    if (!cfg.allowSend) return; // 没开「允许发送」就不自动发
-    if (!cfg.ready || svc.busy) return;
+    // 冷启动时消息可能比 `load()` 更早到达：必须**先等**配置/任务从磁盘读完，
+    // 否则 cfg.enabled 还是 false、svc.tasks 还是空的，消息任务静默不跑
+    // （BG7LZQ-2 报告问题的根因之一）。
+    if (!svc.loaded) await svc.load();
+    if (!mounted) return;
+    if (!cfg.enabled) return;
     // 只处理看起来像人发的消息（跳过系统 / 位置点提示）。
     if (text.trim().isEmpty || src == '系统') return;
+    // 群消息只有在开启「群内回复」时才处理（私聊不受影响）。
+    if (groupId != null && !cfg.replyGroups) return;
+
+    // ① 消息触发的任务：每条指令依次跑一轮（串行，避免把对话搅乱）。
+    if (cfg.ready && !svc.busy) {
+      final triggers = svc.messageTasks();
+      if (triggers.isNotEmpty) {
+        if (!mounted) return;
+        final s = S.of(context);
+        for (var i = 0; i < triggers.length; i++) {
+          if (!mounted || svc.busy) break;
+          final tr = triggers[i];
+          // 先记「上次运行」：即便这一轮模型请求失败，用户也能从 last_run
+          // 看出任务确实被唤醒了（报告里正是拿 last_run 判定「没跑」）。
+          await svc.touchTaskRun(tr.id);
+          if (!mounted || svc.busy) break;
+          String? reply;
+          Object? err;
+          try {
+            reply = await _runChat(
+              s,
+              s.agentMessageTaskRunPrompt(i + 1, tr.prompt, src, text),
+              background: true,
+            );
+          } catch (e) {
+            // 单条任务失败不能让整轮静默 —— 记进执行历史（否则用户查到的
+            // 就是「任务跑没跑都看不出来」，正是报告里最难排查的地方）。
+            err = e;
+          }
+          if (!mounted) return;
+          await svc.recordTaskRun(
+            tr.id,
+            tr.prompt,
+            err == null && reply != null,
+            err != null
+                ? 'Error: $err'
+                : 'Message from $src: ${reply ?? 'no reply'}',
+          );
+        }
+      }
+    }
+    if (!mounted) return;
+
+    // ② 自动回复：让模型「起草一条回复」，再由本地直接发送。
+    //    与①互相独立：这里才需要自动回复开关 / 安静时段 / 发送权限 / 冷却。
+    if (!svc.canAutoReply(now)) return;
+    if (!cfg.allowSend) return; // 没开「允许发送」就不自动发
+    if (!cfg.ready || svc.busy) return;
     final key = (groupId ?? src).toUpperCase();
     if (!svc.autoReplyAllowed(key, now)) return;
     if (!mounted) return;
 
     final s = S.of(context);
-
-    // ① 消息触发的任务：每条指令依次跑一轮（串行，避免把对话搅乱）。
-    final triggers = [
-      for (final t in svc.tasks)
-        if (t.enabled && t.trigger == AgentTaskTrigger.message) t
-    ];
-    for (var i = 0; i < triggers.length; i++) {
-      if (!mounted || svc.busy) break;
-      final tr = triggers[i];
-      final reply = await _runChat(
-        s,
-        s.agentMessageTaskRunPrompt(i + 1, tr.prompt, src, text),
-        background: true,
-      );
-      if (!mounted) return;
-      await svc.recordTaskRun(
-        tr.id,
-        tr.prompt,
-        reply != null,
-        'Message from $src: ${reply ?? 'no reply'}',
-      );
-    }
-    if (!mounted) return;
-
-    // ② 自动回复：让模型「起草一条回复」，再由本地直接发送。
     String target = src;
     if (groupId != null) {
-      final g = widget.state.chatGroups.where((g) => g.id == groupId).firstOrNull;
+      final g =
+          widget.state.chatGroups.where((g) => g.id == groupId).firstOrNull;
       if (g == null) return;
       target = g.groupCall;
     }
@@ -734,8 +978,23 @@ class _AgentOverlayState extends State<AgentOverlay> {
         // 未开启智能体模式：这一层不显示、也不吃手势（SizedBox 无子节点不吸收点击）。
         if (!cfg.enabled) return const SizedBox.shrink();
         if (_minimized) {
+          final pos = _bubblePos == null
+              ? null
+              : _clampBubble(_bubblePos!, MediaQuery.of(context).size);
           return Stack(children: [
-            Positioned(right: 16, bottom: 96, child: _bubble()),
+            if (pos == null)
+              Positioned(right: 16, bottom: 96, child: _bubble())
+            // 拖动中跟手（不平滑，避免拖起来发飘）；松手吸附时用动画收一下。
+            else if (_bubbleDragging)
+              Positioned(left: pos.dx, top: pos.dy, child: _bubble())
+            else
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOut,
+                left: pos.dx,
+                top: pos.dy,
+                child: _bubble(),
+              ),
           ]);
         }
         return Stack(children: [
@@ -758,9 +1017,30 @@ class _AgentOverlayState extends State<AgentOverlay> {
   Widget _bubble() {
     return GestureDetector(
       onTap: () {
+        // 拖过之后松手的那一下不要误触成「展开」
+        if (_bubbleDragged) {
+          _bubbleDragged = false;
+          return;
+        }
         setState(() => _minimized = false);
         // 展开后滚到最新消息处（用户上次可能没看完就收起了）。
         _scrollToBottom();
+      },
+      onPanStart: (_) {
+        _bubbleDragged = false;
+        _bubbleDragging = true;
+        // 首次拖动时用当前实际位置（默认右下角位）作为起点
+        final screen = MediaQuery.of(context).size;
+        _bubblePos ??= Offset(screen.width - 16 - 52, screen.height - 96 - 52);
+      },
+      onPanUpdate: (d) {
+        _bubbleDragged = true;
+        final screen = MediaQuery.of(context).size;
+        setState(() => _bubblePos = _clampBubble(_bubblePos! + d.delta, screen));
+      },
+      onPanEnd: (_) {
+        setState(() => _bubbleDragging = false);
+        _snapBubble();
       },
       child: MaterialSurface(
         radius: 999,
@@ -1230,13 +1510,17 @@ class _AgentOverlayState extends State<AgentOverlay> {
     try {
       await svc.send(
         text,
-        tools: agentToolSchemas(allowSend: cfg.allowSend),
+        tools: agentToolSchemas(
+          allowSend: cfg.allowSend,
+          allowNetwork: cfg.allowNetwork,
+        ),
         execute: (name, args) => executeAgentTool(
           widget.state,
           name,
           args,
           allowedSend: cfg.allowSend,
           allowedSettings: cfg.allowSettings,
+          allowedNetwork: cfg.allowNetwork,
         ),
         confirm: background ? _denyBackground : _confirm,
         needsConfirm: agentNeedsConfirm,
@@ -1320,6 +1604,14 @@ extension AgentToolLabel on AppLocalizations {
         return agentTool_create_group;
       case 'set_task_enabled':
         return agentTool_set_task_enabled;
+      case 'http_request':
+        return agentTool_http_request;
+      case 'save_memory':
+        return agentTool_save_memory;
+      case 'list_memories':
+        return agentTool_list_memories;
+      case 'forget_memory':
+        return agentTool_forget_memory;
       default:
         return agentTool_unknown;
     }

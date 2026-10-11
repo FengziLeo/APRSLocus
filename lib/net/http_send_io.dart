@@ -16,12 +16,13 @@ Future<String> httpSend(
 }) async {
   final client = HttpClient()..connectionTimeout = timeout;
   try {
-    final req = method == 'GET'
-        ? await client.getUrl(uri)
-        : await client.postUrl(uri);
-    req.headers.set(HttpHeaders.userAgentHeader, 'APRSlocus');
+    // 支持任意方法（智能体的「联网」能力要发 POST / PUT / DELETE 等，
+    // 不只是 GET/POST）。未识别的方法按 POST 兜底。
+    final m = method.toUpperCase();
+    final req = await client.openUrl(m, uri);
+    req.headers.set(HttpHeaders.userAgentHeader, 'APRSLocus');
     headers?.forEach((k, v) => req.headers.set(k, v));
-    if (body != null && method != 'GET') {
+    if (body != null && m != 'GET' && m != 'HEAD') {
       final bytes = utf8.encode(body);
       req.headers.contentLength = bytes.length;
       req.add(bytes);

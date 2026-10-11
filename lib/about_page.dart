@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'terms_version.dart';
 
@@ -24,7 +25,7 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   /// 分享通道：Android 调用系统分享面板（ACTION_SEND）
   static const _shareChannel = MethodChannel('com.aprslocus/share');
 
@@ -226,6 +227,56 @@ class _AboutPageState extends State<AboutPage>
   /// Hero 底图视差量（0~240，随滚动量变化）
   final ValueNotifier<double> _heroScroll = ValueNotifier<double>(0);
 
+  // ─── 封面彩蛋：长按抖动 → 5 秒后翻面 ───
+  // 抖动（damped 正弦）与翻牌各占一个控制值；`_flipped` 是逻辑上的「已翻面」。
+  // 翻牌过程因为要按角度换内容（正面/背面），所以自己 setState，不用 AnimatedBuilder。
+  late final AnimationController _shakeCtrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 700),
+  );
+  late final AnimationController _flipCtrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 640),
+  );
+  bool _flipped = false;
+  Timer? _flipTimer;
+  Offset _eggPos = Offset.zero;
+
+  /// 5 秒内再长按一次就取消翻面（给用户的后悔键）。
+  void _toggleHeroEgg() {
+    if (_flipped) return;
+    if (_flipTimer?.isActive ?? false) {
+      _flipTimer!.cancel();
+      _flipTimer = null;
+      HapticFeedback.selectionClick();
+      return;
+    }
+    final box = context.findRenderObject() as RenderBox?;
+    if (box != null) _eggPos = box.size.center(Offset.zero);
+    HapticFeedback.mediumImpact();
+    _shakeCtrl.forward(from: 0);
+    _flipTimer = Timer(const Duration(seconds: 5), () {
+      if (!mounted) return;
+      _flipped = true;
+      _fireParticles(_eggPos);
+      HapticFeedback.heavyImpact();
+      _flipCtrl.forward(from: 0);
+    });
+  }
+
+  void _unflipHeroEgg() {
+    HapticFeedback.selectionClick();
+    _flipCtrl.reverse().then((_) {
+      if (mounted) setState(() => _flipped = false);
+    });
+  }
+
+  /// 抖动位移：0→6px 的正弦衰减，只在长按后的 0.7 秒里跑。
+  static double _shakeOffset(double t) {
+    if (t <= 0) return 0;
+    return sin(t * pi * 9) * 6.0 * (1 - t);
+  }
+
   // ─── 粒子动画 ───
   AnimationController? _ctrl;
   final List<_Particle> _particles = [];
@@ -324,9 +375,12 @@ class _AboutPageState extends State<AboutPage>
 
   @override
   void dispose() {
+    _flipTimer?.cancel();
     _particleOverlay?.remove();
     _particleOverlay = null;
     _ctrl?.dispose();
+    _shakeCtrl.dispose();
+    _flipCtrl.dispose();
     _heroScroll.dispose();
     super.dispose();
   }
@@ -707,11 +761,151 @@ class _AboutPageState extends State<AboutPage>
     );
   }
 
-  /// Hero 封面：实景照片 + 玻璃质感标题。
+  /// 封面：常态是 [_heroFront]，长按触发彩蛋后翻到背面 [_heroBack]。
+  ///
+  /// 翻牌用透视 + 绕 Y 轴旋转；转过 90° 时把内容换成背面并再做一次水平镜像，
+  /// 背面的文字才不会左右反着显示。抖动只作用在最外层位移上，不影响旋转。
+  Widget _heroCard(BuildContext context) {
+    return LayoutBuilder(
+      builder: (ctx, cons) {
+        final h = _heroHeightFor(cons.maxWidth);
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onLongPress: _toggleHeroEgg,
+          // 翻到背面后，点一下即可翻回正面
+          onTap: _flipped ? _unflipHeroEgg : null,
+          child: SizedBox(
+            height: h,
+            width: double.infinity,
+            child: AnimatedBuilder(
+              animation: Listenable.merge([_shakeCtrl, _flipCtrl]),
+              builder: (_, _) {
+                final angle = _flipCtrl.value * pi;
+                final showBack = angle > pi / 2;
+                final content = showBack
+                    ? _heroBack(context)
+                    : _heroFront(context);
+                return Transform.translate(
+                  offset: Offset(_shakeOffset(_shakeCtrl.value), 0),
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.0012)
+                      ..rotateY(angle),
+                    child: showBack
+                        ? Transform(
+                            alignment: Alignment.center,
+                            transform: Matrix4.rotationY(pi),
+                            child: content,
+                          )
+                        : content,
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// 封面背面（彩蛋）：深色卡片 + 一句「保持好奇心」。
+  Widget _heroBack(BuildContext context) {
+    final t = S.of(context);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(26),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1B2440), Color(0xFF2B2A55), Color(0xFF3A2350)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: C.ink.withValues(alpha: 0.24),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
+        child: Stack(
+          children: [
+            // 两团柔光，给纯深色底一点层次（不引新 token，用白低透明度）
+            Positioned(
+              top: -50,
+              right: -40,
+              child: _heroGlow(140, 0.10),
+            ),
+            Positioned(
+              bottom: -60,
+              left: -30,
+              child: _heroGlow(160, 0.07),
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const AppLogo(size: 44),
+                    const SizedBox(height: 18),
+                    Text(
+                      t.eggCuriosityWorld,
+                      textAlign: TextAlign.center,
+                      style: ts(
+                        20,
+                        w: FontWeight.w800,
+                        ls: 0.2,
+                        c: Colors.white,
+                        h: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'APRSlocus',
+                      style: ts(
+                        11,
+                        c: Colors.white.withValues(alpha: 0.55),
+                        ls: 2.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // 提示可以点回正面（不给文案，省一个 l10n 键）
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 14,
+              child: Icon(
+                Icons.touch_app_rounded,
+                size: 17,
+                color: Colors.white.withValues(alpha: 0.45),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _heroGlow(double size, double alpha) => Container(
+    width: size,
+    height: size,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: Colors.white.withValues(alpha: alpha),
+    ),
+  );
+
+  /// 封面正面：实景照片 + 玻璃质感标题（[_heroCard] 未翻转时显示）。
   ///
   /// 高度随宽度走（[_heroHeightFor]）：底图是 3:2，固定高度在桌面宽屏下会被
   /// `cover` 裁得只剩中间一条，山峰就切出去了。
-  Widget _heroCard(BuildContext context) {
+  Widget _heroFront(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
       duration: const Duration(milliseconds: 520),

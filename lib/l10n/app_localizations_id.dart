@@ -1608,6 +1608,48 @@ class AppLocalizationsId extends AppLocalizations {
   String get agentTool_unknown => 'Jalankan tindakan';
 
   @override
+  String get agentMessageTasks => 'Pemicu pesan';
+
+  @override
+  String get agentMessageTasksDesc =>
+      'Jalankan instruksi saat pesan baru masuk';
+
+  @override
+  String get agentMessageTasksEmpty => 'Belum ada pemicu pesan';
+
+  @override
+  String get agentMessageTaskNew => 'Pemicu pesan baru';
+
+  @override
+  String get agentMessageTaskPromptHint => 'mis. catat lokasi pada pesan ini';
+
+  @override
+  String get agentMessageTaskEvery => 'Saat pesan masuk';
+
+  @override
+  String agentMessageTaskRunPrompt(
+    int n,
+    String task,
+    String from,
+    String text,
+  ) {
+    return '[Pemicu pesan] Tugas pemicu pesan ke-$n aktif.\nInstruksi tugas: $task\nPesan masuk dari $from: $text\nJalankan instruksi tugas dan keluarkan hanya hasil atau kesimpulannya, bukan pemberitahuan ini.';
+  }
+
+  @override
+  String get agentNoticeTitle => 'Pemberitahuan agen AI';
+
+  @override
+  String get agentNoticeAccept => 'Setuju dan aktifkan';
+
+  @override
+  String get agentNoticeDecline => 'Nanti saja';
+
+  @override
+  String get agentNoticeBody =>
+      'Agen mengirim percakapanmu dan data lokal yang dibacanya (stasiun, lokasi, pesan, setelan, …) ke layanan model pihak ketiga yang kamu konfigurasi (mis. OpenAI, DeepSeek, endpoint sendiri) untuk diproses. Jangan bagikan rahasia negara, rahasia dagang, privasi pribadi, atau lokasi sensitif di obrolan.\n\nKamu bertanggung jawab memastikan layanan model yang kamu pilih sah dan patuh aturan, serta menanggung konsekuensi dari transfer data lintas negara atau pemrosesan data pribadi. Kami tidak mengoperasikan layanan tersebut dan tidak memiliki afiliasi, keagenan, atau kemitraan dengannya.\n\nSecara bawaan agen hanya bisa membaca data; tindakan berdampak (mengirim pesan, mengubah setelan) butuh izin terpisah darimu dan konfirmasi tiap kali, dan kamu bisa menonaktifkan agen kapan saja.\n\nDengan menekan \"Setuju dan aktifkan\", kamu menyatakan telah membaca, memahami, dan menerima hal di atas.';
+
+  @override
   String get codeContributionTranslation => 'Terjemahan';
 
   @override
@@ -4514,6 +4556,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get eggBg7lzq => 'Eh, kamu ngapain~';
+
+  @override
+  String get eggCuriosityWorld =>
+      'Pertahankan rasa ingin tahumu, terus jelajahi dunia.';
 
   @override
   String get eggBg7pgw => 'Serius?';
@@ -8982,37 +9028,4 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit mono)';
-  @override
-  String get agentMessageTasks => "Pemicu pesan";
-
-  @override
-  String get agentMessageTasksDesc => "Jalankan instruksi saat pesan baru masuk";
-
-  @override
-  String get agentMessageTasksEmpty => "Belum ada pemicu pesan";
-
-  @override
-  String get agentMessageTaskNew => "Pemicu pesan baru";
-
-  @override
-  String get agentMessageTaskPromptHint => "mis. catat lokasi pada pesan ini";
-
-  @override
-  String get agentMessageTaskEvery => "Saat pesan masuk";
-
-  @override
-  String agentMessageTaskRunPrompt(int n, String task, String from, String text) => "[Pemicu pesan] Tugas pemicu pesan ke-$n aktif.\nInstruksi tugas: $task\nPesan masuk dari $from: $text\nJalankan instruksi tugas dan keluarkan hanya hasil atau kesimpulannya, bukan pemberitahuan ini.";
-
-  @override
-  String get agentNoticeTitle => "Pemberitahuan agen AI";
-
-  @override
-  String get agentNoticeAccept => "Setuju dan aktifkan";
-
-  @override
-  String get agentNoticeDecline => "Nanti saja";
-
-  @override
-  String get agentNoticeBody => "Agen mengirim percakapanmu dan data lokal yang dibacanya (stasiun, lokasi, pesan, setelan, …) ke layanan model pihak ketiga yang kamu konfigurasi (mis. OpenAI, DeepSeek, endpoint sendiri) untuk diproses. Jangan bagikan rahasia negara, rahasia dagang, privasi pribadi, atau lokasi sensitif di obrolan.\n\nKamu bertanggung jawab memastikan layanan model yang kamu pilih sah dan patuh aturan, serta menanggung konsekuensi dari transfer data lintas negara atau pemrosesan data pribadi. Kami tidak mengoperasikan layanan tersebut dan tidak memiliki afiliasi, keagenan, atau kemitraan dengannya.\n\nSecara bawaan agen hanya bisa membaca data; tindakan berdampak (mengirim pesan, mengubah setelan) butuh izin terpisah darimu dan konfirmasi tiap kali, dan kamu bisa menonaktifkan agen kapan saja.\n\nDengan menekan \"Setuju dan aktifkan\", kamu menyatakan telah membaca, memahami, dan menerima hal di atas.";
-
 }

@@ -3129,6 +3129,77 @@ abstract class AppLocalizations {
   /// **'执行操作'**
   String get agentTool_unknown;
 
+  /// No description provided for @agentMessageTasks.
+  ///
+  /// In zh, this message translates to:
+  /// **'消息触发'**
+  String get agentMessageTasks;
+
+  /// No description provided for @agentMessageTasksDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'收到新消息时让智能体跑一段指令'**
+  String get agentMessageTasksDesc;
+
+  /// No description provided for @agentMessageTasksEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无消息触发任务'**
+  String get agentMessageTasksEmpty;
+
+  /// No description provided for @agentMessageTaskNew.
+  ///
+  /// In zh, this message translates to:
+  /// **'新建消息触发任务'**
+  String get agentMessageTaskNew;
+
+  /// No description provided for @agentMessageTaskPromptHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'例如：把这条消息里的位置记下来'**
+  String get agentMessageTaskPromptHint;
+
+  /// No description provided for @agentMessageTaskEvery.
+  ///
+  /// In zh, this message translates to:
+  /// **'收到消息时'**
+  String get agentMessageTaskEvery;
+
+  /// No description provided for @agentMessageTaskRunPrompt.
+  ///
+  /// In zh, this message translates to:
+  /// **'【消息触发】已启用你的第 {n} 条消息触发任务。\n任务指令：{task}\n本条新消息来自 {from}：{text}\n请执行该任务指令，只输出执行结果或结论本身，不要输出这句说明。'**
+  String agentMessageTaskRunPrompt(
+    int n,
+    String task,
+    String from,
+    String text,
+  );
+
+  /// No description provided for @agentNoticeTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能体使用告知'**
+  String get agentNoticeTitle;
+
+  /// No description provided for @agentNoticeAccept.
+  ///
+  /// In zh, this message translates to:
+  /// **'同意并启用'**
+  String get agentNoticeAccept;
+
+  /// No description provided for @agentNoticeDecline.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂不启用'**
+  String get agentNoticeDecline;
+
+  /// No description provided for @agentNoticeBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能体会把你与它的对话内容，以及它读取到的本机数据（如台站、位置、消息、设置等），发送给你所配置的第三方大模型服务（如 OpenAI、DeepSeek、自建接口等）进行处理。请勿在对话中提供国家秘密、商业秘密、个人隐私或敏感位置信息。\n\n请自行确认你所选择的模型服务合法合规，并自行承担因数据出境、个人信息处理等产生的责任。我们不运营任何上述服务，与其也不存在隶属、代理或合作关系。\n\n智能体默认只能读取数据；发送消息、修改设置等有副作用的操作需要你在聊天框内单独授权并逐次确认，你也可以随时关闭智能体。\n\n点击「同意并启用」表示你已阅读、理解并接受上述内容（详见《用户协议》智能体相关条款）。'**
+  String get agentNoticeBody;
+
   /// No description provided for @codeContributionTranslation.
   ///
   /// In zh, this message translates to:
@@ -8072,6 +8143,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'哎呦你干嘛~'**
   String get eggBg7lzq;
+
+  /// No description provided for @eggCuriosityWorld.
+  ///
+  /// In zh, this message translates to:
+  /// **'请保持你的好奇心探索世界。'**
+  String get eggCuriosityWorld;
 
   /// No description provided for @eggBg7pgw.
   ///
@@ -15608,72 +15685,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'12000 Hz (LPCM 16-bit 单声道)'**
   String get icomAudioFmtValue;
-  /// No description provided for @agentMessageTasks.
-  ///
-  /// In zh, this message translates to:
-  /// **'消息触发'**
-  String get agentMessageTasks;
-
-  /// No description provided for @agentMessageTasksDesc.
-  ///
-  /// In zh, this message translates to:
-  /// **'收到新消息时让智能体跑一段指令'**
-  String get agentMessageTasksDesc;
-
-  /// No description provided for @agentMessageTasksEmpty.
-  ///
-  /// In zh, this message translates to:
-  /// **'暂无消息触发任务'**
-  String get agentMessageTasksEmpty;
-
-  /// No description provided for @agentMessageTaskNew.
-  ///
-  /// In zh, this message translates to:
-  /// **'新建消息触发任务'**
-  String get agentMessageTaskNew;
-
-  /// No description provided for @agentMessageTaskPromptHint.
-  ///
-  /// In zh, this message translates to:
-  /// **'例如：把这条消息里的位置记下来'**
-  String get agentMessageTaskPromptHint;
-
-  /// No description provided for @agentMessageTaskEvery.
-  ///
-  /// In zh, this message translates to:
-  /// **'收到消息时'**
-  String get agentMessageTaskEvery;
-
-  /// No description provided for @agentMessageTaskRunPrompt.
-  ///
-  /// In zh, this message translates to:
-  /// **'【消息触发】已启用你的第 {n} 条消息触发任务。 任务指令：{task} 本条新消息来自 {from}：{text} 请执行该任务指令，只输出执行结果或结论本身，不要输出这句说明。'**
-  String agentMessageTaskRunPrompt(int n, String task, String from, String text);
-
-  /// No description provided for @agentNoticeTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'智能体使用告知'**
-  String get agentNoticeTitle;
-
-  /// No description provided for @agentNoticeAccept.
-  ///
-  /// In zh, this message translates to:
-  /// **'同意并启用'**
-  String get agentNoticeAccept;
-
-  /// No description provided for @agentNoticeDecline.
-  ///
-  /// In zh, this message translates to:
-  /// **'暂不启用'**
-  String get agentNoticeDecline;
-
-  /// No description provided for @agentNoticeBody.
-  ///
-  /// In zh, this message translates to:
-  /// **'智能体会把你与它的对话内容，以及它读取到的本机数据（如台站、位置、消息、设置等），发送给你所配置的第三方大模型服务（如 OpenAI、DeepSeek、自建接口等）进行处理。请勿在对话中提供国家秘密、商业秘密、个人隐私或敏感位置信息。  请自行确认你所选择的模型服务合法合规，并自行承担因数据出境、个人信息处理等产生的责任。我们不运营任何上述服务，与其也不存在隶属、代理或合作关系。  智能体默认只能读取数据；发送消息、修改设置等有副作用的操作需要你在聊天框内单独授权并逐次确认，你也可以随时关闭智能体。  点击「同意并启用」表示你已阅读、理解并接受上述内容（详见《用户协议》智能体相关条款）。'**
-  String get agentNoticeBody;
-
 }
 
 class _AppLocalizationsDelegate

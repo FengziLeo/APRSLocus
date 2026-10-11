@@ -1,0 +1,35 @@
+APRSLocus Agent Feature — Letter of Commitment
+
+Please read this fully and fill it in truthfully. Send the completed letter to:
+mc081208@163.com
+
+1. Applicant information
+   Call sign (required; must match the app settings): ______________
+   Name / nickname: ________________________________
+   Email: ________________________________
+   Device / OS (Android / iOS / macOS, etc.): ______________
+
+2. I understand and confirm
+   1. The Agent is a restricted feature. It is not open to ordinary users and
+      requires authorization.
+   2. The Agent sends my conversations and part of the context to a third-party
+      LLM service of my choosing, and can read data on this device. Once
+      authorized, it can also change settings and send APRS messages.
+   3. I bear the consequences of the above data and actions myself, including but
+      not limited to cost, privacy, and any transmission or setting changes
+      caused by misoperation.
+   4. I will comply with local laws and radio regulations, and will not use the
+      Agent for any illegal, harmful, or harassing activity, nor for automated
+      packet flooding, spamming, or interfering with the network.
+   5. I will not resell, redistribute, or bypass authorization to let others use
+      the Agent.
+
+3. My commitment
+   I promise to use this feature lawfully and responsibly, and accept that
+   authorization may be revoked upon violation.
+
+   Signature (handwritten or electronic): ______________
+   Date: ______________
+
+4. Notes (optional)
+   Reason / intended use: ______________________________________

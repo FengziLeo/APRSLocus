@@ -1,5 +1,45 @@
 # 更新日志
 
+## [2.0.63] - 2026-10-11
+
+### 新增：智能体改为「需授权」才能使用
+
+- 智能体不再对普通用户开放：签署「智能体使用告知」后，还需本机呼号在官网
+  **授权名单**（`assets/agent_allow.json`）内才能启用 —— 与远程封禁名单同一套
+  架构（从官网拉取、本地缓存、6 小时节流），方向相反：封禁名单「命中就拦」，
+  授权名单「命中才放」。
+- 未授权时会弹出授权页：下载并填写**承诺书**，发送到 mc081208@163.com，
+  审核通过后点「重新检查授权」即可启用；名单里的呼号可在呼号粒度上授权
+  （写裸呼号 = 授权该呼号及其所有 SSID）。
+- 授权名单拉不到时按「未授权」处理（与封禁名单的「失败放行」方向相反）：
+  锁没拿到钥匙就不开；但只要**曾经**拉到过名单，离线仍按缓存判定，授权用户
+  断网也能用。已随备份/旧版本开启的智能体，一旦确认未授权会被强制关闭。
+- 初始授权名单已加入 `BG7LZQ`。
+
+---
+
+## [2.0.63] - 2026-10-11 (English)
+
+### New: the Agent now requires authorization
+
+- The Agent is no longer open to ordinary users: after signing the agent notice,
+  this device's call sign must be on the official **authorization list**
+  (`assets/agent_allow.json`) to enable it — the same architecture as the remote
+  blocklist (pulled from the official site, cached locally, 6-hour throttle), but
+  reversed: the blocklist blocks on a hit, the allowlist allows only on a hit.
+- When unauthorized, an authorization page opens: download and fill in the
+  **letter of commitment**, send it to mc081208@163.com, and once approved tap
+  "Check authorization again". Entries grant at call-sign granularity (a bare
+  call sign covers it and all its SSIDs).
+- If the list cannot be fetched it counts as **unauthorized** (the opposite of the
+  blocklist's fail-open): no key, no unlock. But once a list has ever been fetched,
+  offline is judged from the cache, so authorized users keep working offline. An
+  Agent enabled via a backup or an older version is force-disabled once confirmed
+  unauthorized.
+- The initial authorization list includes `BG7LZQ`.
+
+---
+
 ## [2.0.62] - 2026-10-11
 
 ### 新增：智能体长期记忆与对话压缩

@@ -214,10 +214,11 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
         children: [
           SettingsSwitch(s.agentEnabled,
               value: cfg.enabled, color: C.purple, onChanged: (v) async {
-            // 开启需先签「智能体使用告知」：未签时 setAgentEnabled 会改为弹告知页。
+            // 开启需先签「智能体使用告知」，再获授权：未签弹告知页，未授权弹授权/申请页。
             widget.state.setAgentEnabled(v);
             if (mounted) setState(() {});
           }),
+          if (!widget.state.agentAllowed) SettingsHint(s.agentAuthHint),
           SettingsHint(s.agentApiKeyTip),
         ],
       ),

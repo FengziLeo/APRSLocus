@@ -2947,6 +2947,73 @@ class AppLocalizationsId extends AppLocalizations {
   String get blTitle => 'Perangkat ini telah dibatasi';
 
   @override
+  String get agentAuthTitle => 'Agen memerlukan otorisasi';
+
+  @override
+  String get agentAuthBody =>
+      'Agen tidak terbuka untuk pengguna umum. Unduh dan isi surat pernyataan, lalu kirim ke alamat surel di bawah. Setelah disetujui, callsign Anda ditambahkan ke daftar otorisasi, yang diambil aplikasi dari situs resmi.';
+
+  @override
+  String get agentAuthCallLabel => 'Callsign perangkat ini';
+
+  @override
+  String get agentAuthStep1Title => 'Unduh surat pernyataan';
+
+  @override
+  String get agentAuthStep1Desc =>
+      'Ketuk \"Unduh surat pernyataan\" di bawah untuk membuka surat resmi di peramban.';
+
+  @override
+  String get agentAuthStep2Title => 'Isi dan kirim';
+
+  @override
+  String get agentAuthStep2Desc =>
+      'Setelah mengisinya dengan benar, kirim surel ke:';
+
+  @override
+  String get agentAuthStep3Title => 'Tunggu peninjauan, lalu periksa lagi';
+
+  @override
+  String get agentAuthStep3Desc =>
+      'Setelah disetujui, ketuk \"Periksa lagi\" untuk mengaktifkan. Daftar ini memakai arsitektur yang sama dengan daftar blokir dan diambil dari situs resmi.';
+
+  @override
+  String get agentAuthDownload => 'Unduh surat pernyataan';
+
+  @override
+  String get agentAuthEmail => 'Kirim lewat surel';
+
+  @override
+  String get agentAuthMailTo => 'Ajukan ke:';
+
+  @override
+  String get agentAuthMailSubject => 'Permohonan otorisasi agen';
+
+  @override
+  String get agentAuthMailBody =>
+      'Halo, saya ingin menggunakan fitur Agen APRSLocus. Saya telah mengisi surat pernyataan dengan benar dan menyetujui ketentuannya. Callsign saya:';
+
+  @override
+  String get agentAuthRecheck => 'Periksa otorisasi lagi';
+
+  @override
+  String get agentAuthChecking => 'Memeriksa…';
+
+  @override
+  String get agentAuthBack => 'Nanti saja';
+
+  @override
+  String get agentAuthGranted => 'Otorisasi terkonfirmasi - Agen kini aktif';
+
+  @override
+  String get agentAuthStillPending =>
+      'Otorisasi belum ditemukan; permohonan Anda mungkin masih ditinjau';
+
+  @override
+  String get agentAuthHint =>
+      'Fitur Agen memerlukan otorisasi; callsign ini tidak ada dalam daftar otorisasi.';
+
+  @override
   String get blBody =>
       'Menurut Pasal 8.2 Ketentuan Penggunaan, kami dapat membatasi, menangguhkan, atau menghentikan penggunaan oleh pihak yang melanggar. Perangkat ini (callsign atau ID instalasi) ada dalam daftar pembatasan, sehingga aplikasi tidak dapat digunakan lagi.';
 

@@ -2861,6 +2861,69 @@ class AppLocalizationsJa extends AppLocalizations {
   String get blTitle => 'この端末は利用を制限されています';
 
   @override
+  String get agentAuthTitle => 'エージェントには認可が必要です';
+
+  @override
+  String get agentAuthBody =>
+      'エージェントは一般ユーザーには公開されていません。承諾書をダウンロードして記入し、下記のメールアドレスへ送信してください。承認されると、あなたのコールサインが認可リストに追加され、アプリが公式サイトから取得します。';
+
+  @override
+  String get agentAuthCallLabel => 'この端末のコールサイン';
+
+  @override
+  String get agentAuthStep1Title => '承諾書をダウンロード';
+
+  @override
+  String get agentAuthStep1Desc => '下の「承諾書をダウンロード」をタップすると、ブラウザで承諾書全文が開きます。';
+
+  @override
+  String get agentAuthStep2Title => '記入して送信';
+
+  @override
+  String get agentAuthStep2Desc => '承諾書に記入のうえ、次の宛先へ送信してください：';
+
+  @override
+  String get agentAuthStep3Title => '審査後に再確認';
+
+  @override
+  String get agentAuthStep3Desc =>
+      '承認後「再確認」をタップすると有効になります。リストはブロックリストと同じ仕組みで、公式サイトから取得します。';
+
+  @override
+  String get agentAuthDownload => '承諾書をダウンロード';
+
+  @override
+  String get agentAuthEmail => 'メールで送信';
+
+  @override
+  String get agentAuthMailTo => '申請先：';
+
+  @override
+  String get agentAuthMailSubject => 'エージェント認可申請';
+
+  @override
+  String get agentAuthMailBody =>
+      'こんにちは。APRSLocus のエージェント機能の利用を申請します。承諾書の内容を正確に記入し、遵守することを約束します。私のコールサインは次のとおりです：';
+
+  @override
+  String get agentAuthRecheck => '認可を再確認';
+
+  @override
+  String get agentAuthChecking => '確認中…';
+
+  @override
+  String get agentAuthBack => '今はしない';
+
+  @override
+  String get agentAuthGranted => '認可を確認しました。エージェントを有効にしました';
+
+  @override
+  String get agentAuthStillPending => 'まだ認可を確認できません。審査中かもしれません';
+
+  @override
+  String get agentAuthHint => 'エージェント機能の利用には認可が必要です。このコールサインは認可リストにありません。';
+
+  @override
   String get blBody =>
       '利用規約 8.2 に基づき、規約に違反する方の利用を制限・停止・終了できるものとします。この端末（コールサインまたはインストール識別子）は制限リストに含まれているため、本ソフトは利用できません。';
 

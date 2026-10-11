@@ -2964,6 +2964,74 @@ class AppLocalizationsEs extends AppLocalizations {
   String get blTitle => 'Este dispositivo ha sido bloqueado';
 
   @override
+  String get agentAuthTitle => 'El agente requiere autorización';
+
+  @override
+  String get agentAuthBody =>
+      'El agente no está abierto a usuarios comunes. Descarga y completa la carta de compromiso y envíala a la dirección de abajo. Una vez aprobada, tu indicativo se añade a la lista de autorización, que la app obtiene del sitio oficial.';
+
+  @override
+  String get agentAuthCallLabel => 'Indicativo de este dispositivo';
+
+  @override
+  String get agentAuthStep1Title => 'Descarga la carta';
+
+  @override
+  String get agentAuthStep1Desc =>
+      'Toca \"Descargar la carta\" abajo para abrir la carta oficial en el navegador.';
+
+  @override
+  String get agentAuthStep2Title => 'Completa y envía';
+
+  @override
+  String get agentAuthStep2Desc =>
+      'Tras completarla con veracidad, envíala por correo a:';
+
+  @override
+  String get agentAuthStep3Title => 'Espera la revisión y vuelve a comprobar';
+
+  @override
+  String get agentAuthStep3Desc =>
+      'Una vez aprobada, toca \"Comprobar de nuevo\" para activarlo. La lista usa la misma arquitectura que la lista de bloqueo y se obtiene del sitio oficial.';
+
+  @override
+  String get agentAuthDownload => 'Descargar la carta';
+
+  @override
+  String get agentAuthEmail => 'Enviar por correo';
+
+  @override
+  String get agentAuthMailTo => 'Solicitar a:';
+
+  @override
+  String get agentAuthMailSubject => 'Solicitud de autorización del agente';
+
+  @override
+  String get agentAuthMailBody =>
+      'Hola, quiero usar la función de agente de APRSLocus. He completado la carta de compromiso con veracidad y acepto sus términos. Mi indicativo:';
+
+  @override
+  String get agentAuthRecheck => 'Comprobar autorización de nuevo';
+
+  @override
+  String get agentAuthChecking => 'Comprobando…';
+
+  @override
+  String get agentAuthBack => 'Ahora no';
+
+  @override
+  String get agentAuthGranted =>
+      'Autorización confirmada: el agente ya está activado';
+
+  @override
+  String get agentAuthStillPending =>
+      'Aún no se encuentra autorización; tu solicitud puede seguir en revisión';
+
+  @override
+  String get agentAuthHint =>
+      'La función de agente requiere autorización; este indicativo no está en la lista de autorización.';
+
+  @override
   String get blBody =>
       'Según la sección 8.2 de los Términos de uso, podemos restringir, suspender o terminar el uso de quien incumpla el acuerdo. Este dispositivo (indicativo o ID de instalación) figura en la lista de restricción, por lo que la app ya no puede utilizarse.';
 

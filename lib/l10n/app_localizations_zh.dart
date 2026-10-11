@@ -2837,6 +2837,68 @@ class AppLocalizationsZh extends AppLocalizations {
   String get blTitle => '本设备已被限制使用';
 
   @override
+  String get agentAuthTitle => '智能体需要授权';
+
+  @override
+  String get agentAuthBody =>
+      '智能体不对普通用户开放。请下载并填写承诺书，发送到下方邮箱；审核通过后，你的呼号会被加入授权名单，软件会从官网自动拉取。';
+
+  @override
+  String get agentAuthCallLabel => '本机呼号';
+
+  @override
+  String get agentAuthStep1Title => '下载承诺书';
+
+  @override
+  String get agentAuthStep1Desc => '点下方「下载承诺书」，用浏览器打开官方承诺书全文。';
+
+  @override
+  String get agentAuthStep2Title => '填写并发送';
+
+  @override
+  String get agentAuthStep2Desc => '如实填写承诺书后，把邮件发送到：';
+
+  @override
+  String get agentAuthStep3Title => '等待审核并重新检查';
+
+  @override
+  String get agentAuthStep3Desc => '审核通过后点「重新检查」即可启用；名单与封禁名单同一套架构，从官网拉取。';
+
+  @override
+  String get agentAuthDownload => '下载承诺书';
+
+  @override
+  String get agentAuthEmail => '用邮件发送';
+
+  @override
+  String get agentAuthMailTo => '申请邮箱：';
+
+  @override
+  String get agentAuthMailSubject => '智能体授权申请';
+
+  @override
+  String get agentAuthMailBody =>
+      '你好，我申请使用 APRSLocus 智能体功能，并已按承诺书内容如实填写、承诺遵守相关约定。我的呼号如下：';
+
+  @override
+  String get agentAuthRecheck => '重新检查授权';
+
+  @override
+  String get agentAuthChecking => '正在检查…';
+
+  @override
+  String get agentAuthBack => '暂不启用';
+
+  @override
+  String get agentAuthGranted => '已获授权，智能体已启用';
+
+  @override
+  String get agentAuthStillPending => '暂未查到授权，可能仍在审核中';
+
+  @override
+  String get agentAuthHint => '智能体功能需要授权后才能使用，本机呼号不在授权名单中。';
+
+  @override
   String get blBody =>
       '依据《用户协议》第 8.2 条，我们有权限制、暂停或终止违反协议者的使用。本设备（呼号或安装标识）已被列入限制名单，因此无法继续使用本软件。';
 
@@ -11604,6 +11666,68 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get blTitle => '本裝置已被限制使用';
+
+  @override
+  String get agentAuthTitle => '智慧體需要授權';
+
+  @override
+  String get agentAuthBody =>
+      '智慧體不對一般使用者開放。請下載並填寫承諾書，寄到下方信箱；審核通過後，你的呼號會被加入授權名單，軟體會從官網自動取得。';
+
+  @override
+  String get agentAuthCallLabel => '本機呼號';
+
+  @override
+  String get agentAuthStep1Title => '下載承諾書';
+
+  @override
+  String get agentAuthStep1Desc => '點下方「下載承諾書」，用瀏覽器開啟官方承諾書全文。';
+
+  @override
+  String get agentAuthStep2Title => '填寫並寄送';
+
+  @override
+  String get agentAuthStep2Desc => '如實填寫承諾書後，把郵件寄到：';
+
+  @override
+  String get agentAuthStep3Title => '等待審核並重新檢查';
+
+  @override
+  String get agentAuthStep3Desc => '審核通過後點「重新檢查」即可啟用；名單與封禁名單同一套架構，從官網取得。';
+
+  @override
+  String get agentAuthDownload => '下載承諾書';
+
+  @override
+  String get agentAuthEmail => '用郵件寄送';
+
+  @override
+  String get agentAuthMailTo => '申請信箱：';
+
+  @override
+  String get agentAuthMailSubject => '智慧體授權申請';
+
+  @override
+  String get agentAuthMailBody =>
+      '你好，我申請使用 APRSLocus 智慧體功能，並已依承諾書內容如實填寫、承諾遵守相關約定。我的呼號如下：';
+
+  @override
+  String get agentAuthRecheck => '重新檢查授權';
+
+  @override
+  String get agentAuthChecking => '檢查中…';
+
+  @override
+  String get agentAuthBack => '暫不啟用';
+
+  @override
+  String get agentAuthGranted => '已獲授權，智慧體已啟用';
+
+  @override
+  String get agentAuthStillPending => '暫未查到授權，可能仍在審核中';
+
+  @override
+  String get agentAuthHint => '智慧體功能需要授權後才能使用，本機呼號不在授權名單中。';
 
   @override
   String get blBody =>

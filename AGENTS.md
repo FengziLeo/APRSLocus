@@ -53,3 +53,27 @@ flutter test $(grep -oE 'flutter test [^ ]+\.dart' .github/workflows/ci-test.yml
   （`widget_test.dart`/`unread_badge_test.dart`/`station_filter_test.dart` 等，
   部分因生成物不同步或测试落后于实现）。判断回归时，先 `git stash` 对比基线，
   别把这些算到自己的改动头上。
+
+## 远程名单：封禁（黑）与授权（白）
+
+两个名单是**同一套架构、方向相反**，改一个时对照另一个：
+
+|  | 封禁 `lib/blacklist.dart` | 授权 `lib/agent_allow.dart` |
+|---|---|---|
+| 数据 | `docs/assets/blacklist.json` | `docs/assets/agent_allow.json` |
+| 方向 | 命中**就拦** | 命中**才放** |
+| 拉不到 | 失败**放行**（安全底线：不误封） | 默认**拒绝**（安全底线：不误开） |
+| 键 | `blacklistCacheJson` / `…CheckedAt` | `agentAllowCacheJson` / `…CheckedAt` |
+
+- 两端都往 `https://aprslocus.theez.top/assets/…` 取，本地缓存 + 6 小时节流；
+  **只要曾成功拉到过名单，断网仍按缓存判定**（否则离线会把已授权/正常用户误伤）。
+- 白名单条目 `call` 必须含**至少一个非通配符字符**，否则整条作废（防手滑写 `*`
+  把智能体对所有人开放）；裸呼号 = 授权该人及其所有 SSID。
+- 申请：下载承诺书（`docs/assets/agent_commitment_{zh,en}.txt`）→ 发送到
+  `mc081208@163.com`（写在 `AgentAllow.kApplyEmail`）→ 审核后加入 JSON。
+- 静态检查：`tool/check_blacklist.py` 与 `tool/check_agent_allow.py`（后者额外核对
+  取址、申请邮箱、"默认拒绝"说明）。名单新键须加进 `tool/check_backup_keys.py`
+  的 EXCLUDE（缓存不该随备份搬走）。
+- 智能开关的两道闸：先签 `agent_notice`（`pendingAgentNotice`），再查授权
+  （`pendingAgentAuth` → `AgentAuthPage`）。授权页在 `AppState.recheckAgentAllow`
+  确认未授权后会**强制关闭**已开的智能体（防备份/旧版本绕过）。

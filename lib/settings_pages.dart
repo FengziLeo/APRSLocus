@@ -4758,10 +4758,11 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
             SettingsSwitch(S.of(context).agentMode,
                 value: AgentService.instance.config.enabled, color: C.purple,
                 onChanged: (v) async {
-              // 开启需先签「智能体使用告知」：未签时弹告知页，签完才真正开启。
+              // 开启需先签「智能体使用告知」，再获授权：未签弹告知页，未授权弹授权/申请页。
               st.setAgentEnabled(v);
               if (mounted) setState(() {});
             }),
+            if (!st.agentAllowed) SettingsHint(S.of(context).agentAuthHint),
             SettingsHint(S.of(context).agentModeDesc),
             SettingsNavRow(
               title: S.of(context).agentSettings,

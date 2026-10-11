@@ -963,6 +963,7 @@ Future<AgentToolOutcome> executeAgentTool(
           'allow_send': AgentService.instance.config.allowSend,
           'allow_settings': AgentService.instance.config.allowSettings,
           'agent_notice_accepted': st.agentNoticeAccepted,
+          'agent_authorized': st.agentAllowed,
           'data_notice_accepted': st.dataNoticeAccepted,
         },
         'connections': {

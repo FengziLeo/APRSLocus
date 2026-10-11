@@ -89,6 +89,12 @@ jobs:
       - name: Check blacklist
         run: python3 tool/check_blacklist.py
 
+      # 智能体授权名单（白名单）与限制名单对称、方向相反：写坏的后果是**授权过的人
+      # 被挡在门外**，或 `call` 手滑成 `*` 把智能体对**所有人**开放。这两种在应用里
+      # 都不会报错，所以同样钉在这里，连"应用从哪取这份文件 / 申请邮箱"一起核对。
+      - name: Check agent allowlist
+        run: python3 tool/check_agent_allow.py
+
       # 打点质量层的**接线**检查：算法写好了但忘了在某条路径上调用，
       # 编译与 analyze 都不会报错 —— 功能只是悄悄不生效。
       - name: Check position quality wiring
@@ -312,6 +318,16 @@ jobs:
       # 6 语言文案完整性。只有主动搜索才触发，编译与分析都拦不住这类漏翻/漏注入。
       - name: Test Huangyan Island easter egg
         run: flutter test test/huangyan_island_test.dart
+
+      # 智能体授权名单（白名单）：解析/命中/通配符边界。这份逻辑"命中才放"，
+      # 写坏不会报错、只会静默拒绝（或放行所有人），所以用测试钉住。
+      - name: Test agent allowlist
+        run: flutter test test/agent_allow_test.dart
+
+      # 智能体「需授权」这道闸在 AppState 上的行为：点开关未授权不许真开、拉不到
+      # 名单判未授权、备份/旧版本带进来的 enabled=true 要兜底关掉。驱动真实方法。
+      - name: Test agent authorization gate
+        run: flutter test test/agent_auth_state_test.dart
 
       - name: Analyze (tolerate known vector_map false positive)
         shell: bash

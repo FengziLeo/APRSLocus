@@ -2950,6 +2950,74 @@ class AppLocalizationsEn extends AppLocalizations {
   String get blTitle => 'This device has been blocked';
 
   @override
+  String get agentAuthTitle => 'The Agent needs authorization';
+
+  @override
+  String get agentAuthBody =>
+      'The Agent is not open to ordinary users. Download and fill in the letter of commitment, then email it to the address below. Once approved, your call sign is added to the authorization list, which the app pulls from the official site.';
+
+  @override
+  String get agentAuthCallLabel => 'This device call sign';
+
+  @override
+  String get agentAuthStep1Title => 'Download the letter';
+
+  @override
+  String get agentAuthStep1Desc =>
+      'Tap \"Download the letter\" below to open the official letter in your browser.';
+
+  @override
+  String get agentAuthStep2Title => 'Fill in and send';
+
+  @override
+  String get agentAuthStep2Desc =>
+      'After filling it in truthfully, email it to:';
+
+  @override
+  String get agentAuthStep3Title => 'Wait for review, then check again';
+
+  @override
+  String get agentAuthStep3Desc =>
+      'Once approved, tap \"Check again\" to enable it. The list uses the same architecture as the blocklist and is pulled from the official site.';
+
+  @override
+  String get agentAuthDownload => 'Download the letter';
+
+  @override
+  String get agentAuthEmail => 'Send by email';
+
+  @override
+  String get agentAuthMailTo => 'Apply to:';
+
+  @override
+  String get agentAuthMailSubject => 'Agent authorization request';
+
+  @override
+  String get agentAuthMailBody =>
+      'Hello, I would like to use the APRSLocus Agent feature. I have filled in the letter of commitment truthfully and agree to its terms. My call sign:';
+
+  @override
+  String get agentAuthRecheck => 'Check authorization again';
+
+  @override
+  String get agentAuthChecking => 'Checking…';
+
+  @override
+  String get agentAuthBack => 'Not now';
+
+  @override
+  String get agentAuthGranted =>
+      'Authorization confirmed - the Agent is now enabled';
+
+  @override
+  String get agentAuthStillPending =>
+      'No authorization found yet; your request may still be under review';
+
+  @override
+  String get agentAuthHint =>
+      'The Agent feature requires authorization; this call sign is not on the authorization list.';
+
+  @override
   String get blBody =>
       'Under section 8.2 of the Terms of Use we may restrict, suspend, or terminate use by anyone who violates the agreement. This device (callsign or install ID) is on the restriction list, so the app can no longer be used.';
 

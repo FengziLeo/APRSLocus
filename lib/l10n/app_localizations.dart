@@ -5348,6 +5348,126 @@ abstract class AppLocalizations {
   /// **'本设备已被限制使用'**
   String get blTitle;
 
+  /// No description provided for @agentAuthTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能体需要授权'**
+  String get agentAuthTitle;
+
+  /// No description provided for @agentAuthBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能体不对普通用户开放。请下载并填写承诺书，发送到下方邮箱；审核通过后，你的呼号会被加入授权名单，软件会从官网自动拉取。'**
+  String get agentAuthBody;
+
+  /// No description provided for @agentAuthCallLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'本机呼号'**
+  String get agentAuthCallLabel;
+
+  /// No description provided for @agentAuthStep1Title.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载承诺书'**
+  String get agentAuthStep1Title;
+
+  /// No description provided for @agentAuthStep1Desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'点下方「下载承诺书」，用浏览器打开官方承诺书全文。'**
+  String get agentAuthStep1Desc;
+
+  /// No description provided for @agentAuthStep2Title.
+  ///
+  /// In zh, this message translates to:
+  /// **'填写并发送'**
+  String get agentAuthStep2Title;
+
+  /// No description provided for @agentAuthStep2Desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'如实填写承诺书后，把邮件发送到：'**
+  String get agentAuthStep2Desc;
+
+  /// No description provided for @agentAuthStep3Title.
+  ///
+  /// In zh, this message translates to:
+  /// **'等待审核并重新检查'**
+  String get agentAuthStep3Title;
+
+  /// No description provided for @agentAuthStep3Desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'审核通过后点「重新检查」即可启用；名单与封禁名单同一套架构，从官网拉取。'**
+  String get agentAuthStep3Desc;
+
+  /// No description provided for @agentAuthDownload.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载承诺书'**
+  String get agentAuthDownload;
+
+  /// No description provided for @agentAuthEmail.
+  ///
+  /// In zh, this message translates to:
+  /// **'用邮件发送'**
+  String get agentAuthEmail;
+
+  /// No description provided for @agentAuthMailTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'申请邮箱：'**
+  String get agentAuthMailTo;
+
+  /// No description provided for @agentAuthMailSubject.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能体授权申请'**
+  String get agentAuthMailSubject;
+
+  /// No description provided for @agentAuthMailBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'你好，我申请使用 APRSLocus 智能体功能，并已按承诺书内容如实填写、承诺遵守相关约定。我的呼号如下：'**
+  String get agentAuthMailBody;
+
+  /// No description provided for @agentAuthRecheck.
+  ///
+  /// In zh, this message translates to:
+  /// **'重新检查授权'**
+  String get agentAuthRecheck;
+
+  /// No description provided for @agentAuthChecking.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在检查…'**
+  String get agentAuthChecking;
+
+  /// No description provided for @agentAuthBack.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂不启用'**
+  String get agentAuthBack;
+
+  /// No description provided for @agentAuthGranted.
+  ///
+  /// In zh, this message translates to:
+  /// **'已获授权，智能体已启用'**
+  String get agentAuthGranted;
+
+  /// No description provided for @agentAuthStillPending.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂未查到授权，可能仍在审核中'**
+  String get agentAuthStillPending;
+
+  /// No description provided for @agentAuthHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能体功能需要授权后才能使用，本机呼号不在授权名单中。'**
+  String get agentAuthHint;
+
   /// No description provided for @blBody.
   ///
   /// In zh, this message translates to:

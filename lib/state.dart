@@ -48,6 +48,7 @@ import 'theme_store.dart';
 import 'tile_cache.dart';
 import 'ble_hr.dart';
 import 'blacklist.dart';
+import 'agent_allow.dart';
 import 'garmin.dart';
 import 'share_in.dart';
 import 'turn_dot.dart';
@@ -2215,14 +2216,13 @@ class AppState extends ChangeNotifier {
   /// 用户打开智能体开关、但还没签告知 → 弹告知页（见 app.dart）。
   bool pendingAgentNotice = false;
 
-  /// 签署「智能体使用告知」并启用智能体。
+  /// 签署「智能体使用告知」，然后接着走**授权判定**（见 [setAgentEnabled]）：
+  /// 签告知 ≠ 获授权，未授权时一样弹授权/申请页。
   void acceptAgentNotice() {
     agentNoticeAccepted = true;
     pendingAgentNotice = false;
-    AgentService.instance.config.enabled = true;
-    unawaited(AgentService.instance.saveConfig());
     persist();
-    _notify();
+    setAgentEnabled(true);
   }
 
   /// 拒绝告知（不启用智能体）。
@@ -2231,12 +2231,120 @@ class AppState extends ChangeNotifier {
     _notify();
   }
 
+  /// ── 智能体授权（白名单）──
+  ///
+  /// 智能体**不对普通用户开放**：先签「智能体使用告知」，再要求本机呼号在官网
+  /// 的授权名单（`AgentAllow`）里。名单结构与远程限制名单对称，但方向相反 ——
+  /// 那边命中就拦，这边命中才放。
+  ///
+  /// - [agentAllow] = 名单里**是否包含**本机呼号（null = 还没查到 / 拉不到）。
+  /// - [agentAllowed] = 当前是否**确认**已授权。存缓存，离线也能用。
+  ///
+  /// 判定沿用 `blacklist.dart` 的"失败策略"，但因为它是把门锁，方向相反：
+  /// **拉不到不放行**（从没拉到过 → 视为未授权）；**曾拉到过就认缓存**（离线也算数）。
+  bool? agentAllow;
+  bool agentAllowed = false;
+
+  /// 让用户主动"重新检查授权"（申请批下来后，不用等 6 小时节流）。
+  bool agentAuthChecking = false;
+
+  /// 用户点了智能体开关、但还没授权 → 弹授权/申请页（见 app.dart）。
+  bool pendingAgentAuth = false;
+
+  /// 本会话是否已经**成功**拉到过授权名单（与 [_blacklistFetched] 同理）。
+  bool _agentAllowFetched = false;
+
+  /// 下一次廉价检查的时刻（真正的拉取在 [recheckAgentAllow] 里按 6 小时节流）。
+  DateTime? _agentAllowNext;
+
+  /// 查一次远程授权名单（白名单）。
+  ///
+  /// 时机：启动后一次 + 每 [AgentAllow.kRefresh] 一次；`force` 供"重新检查"按钮用。
+  ///
+  /// 与 [recheckBlacklist] 的**唯一实质性差别**：没有缓存（从没成功拉到过）时
+  /// 判为**未授权**（默认拒绝），而不是放行 —— 见 [AgentAllow] 的类注释。
+  Future<void> recheckAgentAllow({bool force = false}) async {
+    try {
+      final cached = await AgentAllow.cached();
+      var al = cached;
+      final last = await AgentAllow.lastChecked();
+      final due = force ||
+          !_agentAllowFetched ||
+          last == null ||
+          DateTime.now().difference(last) > AgentAllow.kRefresh;
+      if (due) {
+        final fresh = await AgentAllow.fetch();
+        if (fresh != null) {
+          al = fresh;
+          _agentAllowFetched = true;
+        }
+        // 拉取失败 → 沿用缓存（有就认）；不置位，留给下次再试
+      }
+      final ok = al?.allows(myFullCall) ?? false;
+      agentAllow = al == null ? null : ok;
+      final changed = ok != agentAllowed;
+      agentAllowed = ok;
+      if (changed) {
+        _log(LogLevel.info, '智能体',
+            ok ? '本机已获智能体授权' : '本机未获智能体授权（呼号不在白名单）');
+        _notify();
+      }
+      // 兜底强制关闭：配置可能来自备份/旧版本（那时还没这道闸），一旦确认未授权
+      // 就把智能体关掉 —— 授权是使用它的前提，不能靠"当初是怎么开的"绕过。
+      if (!ok && AgentService.instance.config.enabled) {
+        AgentService.instance.config.enabled = false;
+        unawaited(AgentService.instance.saveConfig());
+        _notify();
+      }
+    } catch (_) {
+      // 任何异常都当"未查到"（未授权）—— 白名单是那把锁，出错时不该自动开
+    }
+  }
+
+  /// 提交授权申请（用户点了"重新检查授权"）：拉一次名单并重判。
+  /// 返回**重判后是否已授权**：已授权则顺手关闭本页并启用智能体。
+  /// 申请通常需人工审核，所以没查到时调用方应如实提示"可能仍在审核"。
+  Future<bool> submitAgentAuthApplication() async {
+    agentAuthChecking = true;
+    _notify();
+    await recheckAgentAllow(force: true);
+    agentAuthChecking = false;
+    final ok = agentAllowed;
+    if (ok) {
+      pendingAgentAuth = false;
+      setAgentEnabled(true);   // 两道闸都已过，这里真正启用
+    }
+    _notify();
+    return ok;
+  }
+
+  /// 关闭授权/申请页（不启用智能体，留在原地）。
+  void dismissAgentAuth() {
+    pendingAgentAuth = false;
+    _notify();
+  }
+
   /// 切换智能体开启状态。开启入口有两处（实验设置、智能体设置页），都走这里，
-  /// 闸门只此一个口子：未签告知时改为弹告知页，签完 [acceptAgentNotice] 才真正启用。
+  /// 闸门只此一个口子，且**两道**：
+  ///   1. 未签「智能体使用告知」→ 弹告知页，签完 [acceptAgentNotice] 继续；
+  ///   2. 未获授权（不在官网白名单）→ 弹授权/申请页，授权后才真正启用。
   void setAgentEnabled(bool v) {
     if (v && !agentNoticeAccepted) {
       pendingAgentNotice = true;
       _notify();
+      return;
+    }
+    if (v && !agentAllowed) {
+      pendingAgentAuth = true;
+      _notify();
+      // 顺手后台再查一次名单：可能刚被加进白名单（或本地缓存还旧）。若这次查到
+      // 已授权，就自动关页并启用 —— 免得用户明明已授权还停在申请页上。
+      unawaited(recheckAgentAllow(force: true).then((_) {
+        if (agentAllowed && pendingAgentAuth) {
+          pendingAgentAuth = false;
+          setAgentEnabled(true);
+        }
+      }));
       return;
     }
     AgentService.instance.config.enabled = v;
@@ -3472,6 +3580,10 @@ class AppState extends ChangeNotifier {
     pendingDataNotice = false;
     agentNoticeAccepted = false;
     pendingAgentNotice = false;
+    pendingAgentAuth = false;
+    agentAuthChecking = false;
+    agentAllowed = false;
+    agentAllow = null;
     beaconInterval = 60;
     beaconNetInterval = 300;
     smartBeaconEnabled = false;
@@ -3947,6 +4059,9 @@ class AppState extends ChangeNotifier {
       // 离线也拦"的语义也不受影响。
       await recheckBlacklist()
           .timeout(const Duration(milliseconds: 400), onTimeout: () {});
+      // 智能体授权名单：同样启动就查一次，也用 400ms 上限（联网请求会后台跑完）。
+      await recheckAgentAllow()
+          .timeout(const Duration(milliseconds: 400), onTimeout: () {});
       final savedLat = p.getDouble('myLat');
       final savedLng = p.getDouble('myLng');
       if (savedLat != null && savedLng != null) {
@@ -4245,7 +4360,11 @@ class AppState extends ChangeNotifier {
     // 消息页可能在用户还没进设置前就要用它（自动翻译）。
     unawaited(TranslateService.instance.load());
     // 智能体配置与聊天历史同样在启动时载入：用户可能一进界面就用它。
-    unawaited(AgentService.instance.load());
+    // 载入后**再查一次授权**：load 是异步的，若配置里 enabled=true 而本机未授权，
+    // 上面的兜底强制关闭会等这次检查落地（否则可能被"配置晚到"绕过）。
+    unawaited(AgentService.instance.load().then((_) {
+      if (!_disposed) unawaited(recheckAgentAllow());
+    }));
     // 翻译的「我的语言」默认跟随界面语言（见 TranslateService.uiLocale）
     TranslateService.instance.setUiLocale(locale);
     unawaited(ensureMembersLoaded());
@@ -4372,6 +4491,11 @@ class AppState extends ChangeNotifier {
       if (_blacklistNext == null || DateTime.now().isAfter(_blacklistNext!)) {
         _blacklistNext = DateTime.now().add(const Duration(minutes: 30));
         unawaited(recheckBlacklist());
+      }
+      // 智能体授权名单：同一个节拍（30 分钟一次"到点了没"，真正的拉取按 6 小时节流）。
+      if (_agentAllowNext == null || DateTime.now().isAfter(_agentAllowNext!)) {
+        _agentAllowNext = DateTime.now().add(const Duration(minutes: 30));
+        unawaited(recheckAgentAllow());
       }
       // 手机电量：与定位解耦，自己按时间刷（30 秒一次，见 _refreshBattery）。
       // 盒子那边的「APRSLOCUS」页显示它，所以必须保证这个数**不是几小时前的**。

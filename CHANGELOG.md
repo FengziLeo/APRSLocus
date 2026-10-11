@@ -1,5 +1,75 @@
 # 更新日志
 
+## [2.0.58] - 2026-10-11
+
+### 新增：智能体可以自己连接服务器 / 建立电台连接
+
+智能体新增一组连接工具：`set_connection_server`（改 APRS-IS 服务器地址与端口）、
+`set_connection_source`（启用/停用某条链路：APRS-IS / TNC / 音频 / PKWDWPL）、
+`connect`（按当前启用来源拉起连接）与 `disconnect`（断开）。现在可以直接对智能体说
+「连上服务器」「断开电台」，它会先读状态、按需改配置，再发起连接。为安全起见：
+
+- 这些操作和其他改设置的工具有副作用的操作一样，执行前会在聊天框内联弹出确认条；
+- 未签署「数据与网络使用告知」时 `connect` 会被拒绝，并提示你先在应用里手动同意；
+- 服务器地址只使用你明确给出的值，智能体不会自行编造或推荐任何服务器。
+
+`get_app_state` 也新增了 `connections` 字段（连接状态、当前服务器、各来源开关、
+是否已签署告知），方便智能体判断。
+
+### 修复：智能体页面聊天消息下方的「下划线」
+
+聊天里的工具气泡、确认条与「始终允许」列表此前直接显示 `send_beacon_now` 这类
+**带下划线的原始标识符**；同时在窄屏或长译文下，确认条/清空条那一排按钮会横向溢出，
+画出 Flutter 的**黄黑条纹溢出报错标志**（就是那堆「下划线」）。现在：
+
+- 工具名统一走本地化标签（6 种语言），不再把下划线标识符怼到用户脸上；
+- 确认条 / 清空条的按钮改为 `Wrap` 自动换行，杜绝溢出条纹。
+
+### 其他
+
+- 版本号提升至 2.0.58。
+
+---
+
+## [2.0.58] - 2026-10-11 (English)
+
+### New: the agent can connect to the server / establish a radio connection itself
+
+The agent gained a set of connection tools: `set_connection_server` (change the
+APRS-IS server host/port), `set_connection_source` (enable/disable a link:
+APRS-IS / TNC / audio / PKWDWPL), `connect` (bring up the currently enabled
+sources) and `disconnect` (tear the link down). You can now just tell the agent
+"connect to the server" or "disconnect the radio" and it will read state, adjust
+config as needed, then connect. For safety:
+
+- Like other mutating tools, these require an inline confirmation in the chat
+  box before they run;
+- `connect` is refused if the data & network usage notice has not been accepted,
+  and the agent will ask you to accept it in the app first;
+- The agent only uses a server address you explicitly gave it -- it will not
+  invent or recommend any server.
+
+`get_app_state` also gained a `connections` field (link status, current server,
+per-source switches, whether the notice is accepted) to help the agent decide.
+
+### Fix: the "underlines" under agent chat messages
+
+Tool bubbles, the confirmation bar and the "always allow" list displayed raw
+**underscore identifiers** such as `send_beacon_now`; and on narrow screens or
+with long translations the confirm/clear button rows overflowed horizontally,
+painting Flutter's **yellow-black striped overflow error marker** (the "piles of
+underlines"). Now:
+
+- Tool names go through localized labels (six languages) instead of raw
+  underscore identifiers;
+- The confirm / clear button rows use `Wrap` so they wrap instead of overflowing.
+
+### Other
+
+- Version bumped to 2.0.58.
+
+---
+
 ## [2.0.57] - 2026-10-10
 
 ### 新增实验功能：内置智能体（自带 OpenAI 兼容 API Key）

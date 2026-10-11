@@ -125,6 +125,30 @@ class AgentConfig {
   /// 允许智能体修改设置（关闭后只能查看）
   bool allowSettings;
 
+  /// 免确认白名单：这些工具被执行时不再逐次弹确认（用户点过「始终允许」）。
+  ///
+  /// 与 [allowSettings] 的分工：后者是「能不能做」，这里只是「要不要每次问」。
+  /// 敏感工具（发消息）默认不进这个名单，需要用户显式点「始终允许」才会加。
+  Set<String> alwaysAllow;
+
+  /// 收到别人发来的消息时，自动让智能体代拟一条回复（默认关，属实验能力）。
+  ///
+  /// 安全阀：只回复**私聊**（[replyGroups] 打开才含群聊）、受安静时段与冷却限制、
+  /// 且仅当用户在最近一段时间内活跃过（避免后台无人值守时乱回复）。
+  bool autoReply;
+
+  /// 自动回复是否也覆盖群聊（默认关：群里自动说话风险更大）。
+  bool replyGroups;
+
+  /// 自动回复冷却：同一会话在这么多秒内不重复自动回复（防止双方机器人互刷）。
+  int autoReplyCooldownSec;
+
+  /// 安静时段，格式 `HH:MM-HH:MM`（可为空 = 不限）。跨零点（如 23:00-07:00）也支持。
+  String quietHours;
+
+  /// 允许智能体创建 / 管理定时任务
+  bool allowTasks;
+
   AgentConfig({
     this.enabled = false,
     this.baseUrl = 'https://api.openai.com/v1',
@@ -133,7 +157,13 @@ class AgentConfig {
     this.systemPrompt = '',
     this.allowSend = false,
     this.allowSettings = false,
-  });
+    Set<String>? alwaysAllow,
+    this.autoReply = false,
+    this.replyGroups = false,
+    this.autoReplyCooldownSec = 60,
+    this.quietHours = '',
+    this.allowTasks = false,
+  }) : alwaysAllow = alwaysAllow ?? <String>{};
 
   /// 配置是否已填写到「可发起请求」的程度
   bool get ready =>
@@ -160,6 +190,12 @@ class AgentConfig {
         'systemPrompt': systemPrompt,
         'allowSend': allowSend,
         'allowSettings': allowSettings,
+        'alwaysAllow': alwaysAllow.toList(),
+        'autoReply': autoReply,
+        'replyGroups': replyGroups,
+        'autoReplyCooldownSec': autoReplyCooldownSec,
+        'quietHours': quietHours,
+        'allowTasks': allowTasks,
       };
 
   static AgentConfig fromJson(Object? j) {
@@ -174,6 +210,79 @@ class AgentConfig {
       systemPrompt: s('systemPrompt', c.systemPrompt),
       allowSend: j['allowSend'] == true,
       allowSettings: j['allowSettings'] == true,
+      alwaysAllow: {
+        for (final v in (j['alwaysAllow'] as List? ?? const [])) '$v',
+      },
+      autoReply: j['autoReply'] == true,
+      replyGroups: j['replyGroups'] == true,
+      autoReplyCooldownSec:
+          int.tryParse('${j['autoReplyCooldownSec']}') ?? c.autoReplyCooldownSec,
+      quietHours: s('quietHours', c.quietHours),
+      allowTasks: j['allowTasks'] == true,
+    );
+  }
+}
+
+/// 一个定时任务：到点后以 [prompt] 作为用户指令跑一轮智能体。
+///
+/// 设计上**只存「做什么」不存「怎么发」**：真正执行走的是和手动聊天完全相同的
+/// [AgentService.send] 路径（因此权限闸门、确认、工具链全部一致），定时器只负责
+/// 到点触发。这样「改了一处」不会出现「手动能用、定时不能用」的分叉。
+class AgentTask {
+  final String id;
+  String prompt;
+  final DateTime createdAt;
+  DateTime? lastRun;
+
+  /// 循环间隔（分钟）。0 = 只跑一次。
+  int intervalMinutes;
+
+  bool enabled;
+
+  AgentTask({
+    required this.id,
+    required this.prompt,
+    DateTime? createdAt,
+    this.lastRun,
+    this.intervalMinutes = 0,
+    this.enabled = true,
+  }) : createdAt = createdAt ?? DateTime.now();
+
+  bool get recurring => intervalMinutes > 0;
+
+  /// 下一次该跑的时刻（只跑一次的任务跑完即视为不再触发）。
+  DateTime? get nextRun {
+    if (!enabled) return null;
+    if (!recurring) {
+      return lastRun == null ? createdAt : null;
+    }
+    final base = lastRun ?? createdAt;
+    return base.add(Duration(minutes: intervalMinutes));
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'prompt': prompt,
+        'createdAt': createdAt.toIso8601String(),
+        'lastRun': lastRun?.toIso8601String(),
+        'intervalMinutes': intervalMinutes,
+        'enabled': enabled,
+      };
+
+  static AgentTask? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final prompt = '${j['prompt'] ?? ''}'.trim();
+    if (prompt.isEmpty) return null;
+    DateTime? dt(Object? v) =>
+        v == null ? null : DateTime.tryParse('$v');
+    return AgentTask(
+      id: '${j['id'] ?? ''}',
+      prompt: prompt,
+      createdAt: dt(j['createdAt']),
+      lastRun: dt(j['lastRun']),
+      intervalMinutes:
+          int.tryParse('${j['intervalMinutes']}') ?? 0,
+      enabled: j['enabled'] != false,
     );
   }
 }
@@ -197,6 +306,20 @@ Rules:
   a tool result; if you did not read it, say you do not know.
 - Tools that change settings or send messages require the user's confirmation;
   explain briefly what you are about to do before calling them.
+- Use `read_messages` to read the user's conversations and `list_stations` /
+  `search_stations` / `station_detail` to inspect what is on the air. These are
+  read-only and never need confirmation.
+- You can schedule work with `create_task` (interval_minutes = 0 runs once).
+  A scheduled run happens WITHOUT the user watching: only use it for things that
+  are already permitted (e.g. reading and reporting), never for a one-off action
+  that still needs a confirmation — that will just be denied. List existing tasks
+  before creating one so you do not duplicate it.
+- You can help with connectivity: `set_connection_server` changes the APRS-IS
+  server, `set_connection_source` enables/disables a link, and `connect` /
+  `disconnect` bring the link up or down. Setting a server does NOT connect by
+  itself. Only use a server address the user actually gave you — never make one
+  up. If the user has not accepted the data & network usage notice, `connect`
+  is refused; tell them to accept it in the app first.
 - Keep answers short and concrete.
 ''';
 
@@ -223,9 +346,15 @@ class AgentToolOutcome {
 typedef AgentToolExecutor = Future<AgentToolOutcome> Function(
     String name, Map<String, dynamic> args);
 
-/// 有副作用的工具执行前的确认。返回 false 表示用户拒绝。
-typedef AgentToolConfirmer = Future<bool> Function(
+/// 有副作用的工具执行前的确认结果。
+enum AgentConfirmResult { deny, allowOnce, allowAlways }
+
+/// 有副作用的工具执行前的确认。返回 [AgentConfirmResult]（deny / 仅此次 / 始终允许）。
+typedef AgentToolConfirmer = Future<AgentConfirmResult> Function(
     String name, Map<String, dynamic> args);
+
+/// 判断某个工具是否需要用户确认（由上层依据工具表决定，agent.dart 不认识工具表）。
+typedef AgentNeedsConfirm = bool Function(String name);
 
 /// 智能体服务：配置、历史与 LLM 调用循环（单例）
 class AgentService extends ChangeNotifier {
@@ -234,6 +363,7 @@ class AgentService extends ChangeNotifier {
 
   static const _kConfig = 'agentConfigJson';
   static const _kHistory = 'agentChatHistoryJson';
+  static const _kTasks = 'agentTasksJson';
 
   /// 单轮对话里工具调用的最大往返次数（防止模型死循环）
   static const int maxToolRounds = 6;
@@ -241,8 +371,14 @@ class AgentService extends ChangeNotifier {
   final AgentConfig config = AgentConfig();
   final List<AgentMessage> messages = [];
 
+  /// 定时任务（内存 + 磁盘）。
+  final List<AgentTask> tasks = [];
+
   bool loaded = false;
   bool busy = false;
+
+  /// 自动回复冷却：会话 key（呼号/群）→ 上次自动回复时刻。
+  final Map<String, DateTime> _autoReplyAt = {};
 
   /// 取消令牌：自增即让进行中的 [send] 在下一个检查点退出
   int _epoch = 0;
@@ -265,6 +401,16 @@ class AgentService extends ChangeNotifier {
           }
         }
       }
+      final tk = p.getString(_kTasks);
+      if (tk != null && tk.isNotEmpty) {
+        final list = jsonDecode(tk);
+        if (list is List) {
+          for (final t in list) {
+            final task = AgentTask.fromJson(t);
+            if (task != null) tasks.add(task);
+          }
+        }
+      }
     } catch (_) {}
     notifyListeners();
   }
@@ -277,7 +423,13 @@ class AgentService extends ChangeNotifier {
       ..model = from.model
       ..systemPrompt = from.systemPrompt
       ..allowSend = from.allowSend
-      ..allowSettings = from.allowSettings;
+      ..allowSettings = from.allowSettings
+      ..alwaysAllow = {...from.alwaysAllow}
+      ..autoReply = from.autoReply
+      ..replyGroups = from.replyGroups
+      ..autoReplyCooldownSec = from.autoReplyCooldownSec
+      ..quietHours = from.quietHours
+      ..allowTasks = from.allowTasks;
   }
 
   Future<void> saveConfig() async {
@@ -287,6 +439,53 @@ class AgentService extends ChangeNotifier {
     } catch (_) {}
     notifyListeners();
   }
+
+  Future<void> saveTasks() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString(
+          _kTasks, jsonEncode(tasks.map((t) => t.toJson()).toList()));
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  /// 新增一个定时任务并落盘，返回它。
+  Future<AgentTask> addTask(String prompt, {int intervalMinutes = 0}) async {
+    final t = AgentTask(
+      id: 't${DateTime.now().microsecondsSinceEpoch}',
+      prompt: prompt.trim(),
+      intervalMinutes: intervalMinutes < 0 ? 0 : intervalMinutes,
+    );
+    tasks.add(t);
+    await saveTasks();
+    return t;
+  }
+
+  Future<void> removeTask(String id) async {
+    tasks.removeWhere((t) => t.id == id);
+    await saveTasks();
+  }
+
+  Future<void> setTaskEnabled(String id, bool on) async {
+    final t = tasks.where((t) => t.id == id).firstOrNull;
+    if (t == null) return;
+    t.enabled = on;
+    await saveTasks();
+  }
+
+  /// 标一个任务已跑过（循环任务据此顺延下一次）。
+  Future<void> markTaskRun(String id) async {
+    final t = tasks.where((t) => t.id == id).firstOrNull;
+    if (t == null) return;
+    t.lastRun = DateTime.now();
+    // 只跑一次的任务跑完即停用（不再触发），但保留列表让用户看到它跑过。
+    if (!t.recurring) t.enabled = false;
+    await saveTasks();
+  }
+
+  /// 到点该跑的任务（在 [now] 之前应触发且仍启用）。
+  List<AgentTask> dueTasks(DateTime now) =>
+      [for (final t in tasks) if (t.nextRun != null && !t.nextRun!.isAfter(now)) t];
 
   Future<void> saveHistory() async {
     try {
@@ -314,7 +513,46 @@ class AgentService extends ChangeNotifier {
   void resetToDefaults() {
     _copy(AgentConfig(), config);
     messages.clear();
+    tasks.clear();
+    _autoReplyAt.clear();
     busy = false;
+  }
+
+  /// 自动回复是否可用（权限 + 开关 + 不在安静时段）。
+  bool canAutoReply(DateTime now) =>
+      config.enabled && config.autoReply && !inQuietHours(now);
+
+  /// [now] 是否落在 [AgentConfig.quietHours] 指定的安静时段内。
+  bool inQuietHours(DateTime now) {
+    final r = _parseQuiet(config.quietHours);
+    if (r == null) return false;
+    final m = now.hour * 60 + now.minute;
+    final (a, b) = r;
+    return a <= b ? (m >= a && m < b) : (m >= a || m < b); // 后者=跨零点
+  }
+
+  /// 解析 `HH:MM-HH:MM` → (起始分钟, 结束分钟)；非法返回 null。
+  static (int, int)? _parseQuiet(String s) {
+    final m =
+        RegExp(r'^\s*(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})\s*$').firstMatch(s);
+    if (m == null) return null;
+    int h(int i) => int.parse(m.group(i)!);
+    int mi(int i) => int.parse(m.group(i + 1)!);
+    final a = h(1) * 60 + mi(1);
+    final b = h(3) * 60 + mi(3);
+    if (a >= 1440 || b > 1440) return null;
+    return (a, b);
+  }
+
+  /// 记录一次自动回复并判断是否已过冷却。
+  bool autoReplyAllowed(String convoKey, DateTime now) {
+    final last = _autoReplyAt[convoKey];
+    if (last != null &&
+        now.difference(last).inSeconds < config.autoReplyCooldownSec) {
+      return false;
+    }
+    _autoReplyAt[convoKey] = now;
+    return true;
   }
 
   /// 中止进行中的对话
@@ -334,6 +572,7 @@ class AgentService extends ChangeNotifier {
     required List<Map<String, dynamic>> tools,
     required AgentToolExecutor execute,
     required AgentToolConfirmer confirm,
+    required AgentNeedsConfirm needsConfirm,
     required String needConfigText,
     required String Function(String raw) formatError,
   }) async {
@@ -372,9 +611,22 @@ class AgentService extends ChangeNotifier {
             continue;
           }
           var result = '';
-          final needsConfirm = _needsConfirm(call.name);
-          if (needsConfirm && !await confirm(call.name, call.arguments)) {
-            result = 'User denied this action.';
+          // 免确认判定交给上层（它知道工具表）：只读工具、navigate，或用户已在
+          // 「始终允许」名单里放行的工具，都直接执行。
+          final needsAsk =
+              needsConfirm(call.name) && !config.alwaysAllow.contains(call.name);
+          if (needsAsk) {
+            final decision = await confirm(call.name, call.arguments);
+            if (decision == AgentConfirmResult.deny) {
+              result = 'User denied this action.';
+            } else {
+              if (decision == AgentConfirmResult.allowAlways) {
+                config.alwaysAllow.add(call.name);
+                unawaited(saveConfig());
+              }
+              final outcome = await execute(call.name, call.arguments);
+              result = outcome.text;
+            }
           } else {
             final outcome = await execute(call.name, call.arguments);
             result = outcome.text;
@@ -400,11 +652,6 @@ class AgentService extends ChangeNotifier {
       unawaited(saveHistory());
     }
   }
-
-  /// 这些工具会改设置 / 发消息 → 执行前必须用户确认
-  static bool _needsConfirm(String name) => name != 'get_app_state' &&
-      name != 'search_stations' &&
-      name != 'list_groups';
 
   /// 组装发给模型的消息数组
   List<Map<String, dynamic>> _wireMessages() {

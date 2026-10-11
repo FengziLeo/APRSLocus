@@ -8540,4 +8540,157 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit モノラル)';
+  @override
+  String get agentTabConnection => "接続";
+
+  @override
+  String get agentTabPermissions => "権限";
+
+  @override
+  String get agentTabAutomation => "自動化";
+
+  @override
+  String get agentSystemPromptHint => "空欄なら内蔵プロンプトを使用";
+
+  @override
+  String get agentAllowTasks => "スケジュールタスクを許可";
+
+  @override
+  String get agentAllowTasksDesc => "エージェントにスケジュールタスクの作成・一覧・取消を許可";
+
+  @override
+  String get agentAlwaysAllow => "常に許可";
+
+  @override
+  String get agentAlwaysAllowDesc => "許可済みのツールは確認なしで実行されます。確認バーの「常に許可」で追加できます。";
+
+  @override
+  String get agentAlwaysAllowEmpty => "まだありません。確認バーの「常に許可」で追加できます。";
+
+  @override
+  String get agentAlwaysAllowClear => "すべて消去";
+
+  @override
+  String get agentAutoReply => "自動返信";
+
+  @override
+  String get agentAutoReplyDesc => "新着メッセージにエージェントが自動返信します（実験的）";
+
+  @override
+  String get agentAutoReplyOn => "自動返信を有効化";
+
+  @override
+  String get agentAutoReplyHint => "DM のみ。静音時間とクールダウンの対象。メッセージ送信の許可が必要です。";
+
+  @override
+  String get agentReplyGroups => "グループにも返信";
+
+  @override
+  String get agentReplyGroupsDesc => "グループでの自動発言はリスクが高いため既定でオフ";
+
+  @override
+  String get agentQuietHours => "静音時間";
+
+  @override
+  String get agentQuietHoursDesc => "例 23:00-07:00。空欄＝制限なし。この時間帯は自動返信しません。";
+
+  @override
+  String get agentTasks => "スケジュールタスク";
+
+  @override
+  String get agentTasksDesc => "指定時刻にエージェントが指示を自動実行します（「スケジュールタスクを許可」が必要）";
+
+  @override
+  String get agentTasksEmpty => "スケジュールタスクはありません";
+
+  @override
+  String get agentTaskNew => "スケジュールタスクを追加";
+
+  @override
+  String get agentTaskPrompt => "指示";
+
+  @override
+  String get agentTaskPromptHint => "例：直近1時間に受信した局を要約";
+
+  @override
+  String get agentTaskInterval => "間隔（分）";
+
+  @override
+  String get agentTaskIntervalHint => "0 = 1 回のみ。繰り返しは最短 5 分";
+
+  @override
+  String get agentTaskCreate => "作成";
+
+  @override
+  String get agentTaskDelete => "削除";
+
+  @override
+  String agentTaskEvery(int n) => "$n 分ごと";
+
+  @override
+  String get agentTaskOnce => "1 回のみ";
+
+  @override
+  String agentAutoReplyPrompt(String from, String text) => "【自動返信】$from からのメッセージ：$text\n返信する一文だけを出力してください（説明もツール呼び出しもしない）。";
+
+  @override
+  String get agentTool_get_app_state => "アプリ状態を取得";
+
+  @override
+  String get agentTool_list_groups => "グループ一覧";
+
+  @override
+  String get agentTool_search_stations => "局を検索";
+
+  @override
+  String get agentTool_list_stations => "局を一覧";
+
+  @override
+  String get agentTool_station_detail => "局の詳細";
+
+  @override
+  String get agentTool_read_messages => "メッセージを読む";
+
+  @override
+  String get agentTool_send_message => "メッセージ送信";
+
+  @override
+  String get agentTool_send_beacon_now => "今すぐビーコン送信";
+
+  @override
+  String get agentTool_set_preferences => "環境設定を変更";
+
+  @override
+  String get agentTool_set_station_filters => "局フィルタを変更";
+
+  @override
+  String get agentTool_set_nickname => "コールサイン情報を変更";
+
+  @override
+  String get agentTool_navigate => "画面を切り替え";
+
+  @override
+  String get agentTool_create_task => "スケジュールタスク作成";
+
+  @override
+  String get agentTool_list_tasks => "スケジュールタスク一覧";
+
+  @override
+  String get agentTool_cancel_task => "スケジュールタスク取消";
+
+  @override
+  String get agentTool_unknown => "操作を実行";
+
+  @override
+  String get agentTool_set_connection_server => "サーバーを変更";
+
+  @override
+  String get agentTool_set_connection_source => "接続方法を変更";
+
+  @override
+  String get agentTool_connect => "接続";
+
+  @override
+  String get agentTool_disconnect => "切断";
+
 }

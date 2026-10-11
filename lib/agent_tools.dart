@@ -18,6 +18,7 @@ import 'dart:convert';
 
 import 'agent.dart';
 import 'map_math.dart';
+import 'models.dart';
 import 'state.dart';
 
 /// 工具定义：名称、说明（给模型看）、参数 schema、是否有副作用。
@@ -77,8 +78,60 @@ final List<AgentToolSpec> kAgentTools = [
           'type': 'string',
           'description': 'Callsign or substring to search for.',
         },
+        'limit': {
+          'type': 'integer',
+          'description': 'Max results (default 20, max 50).',
+        },
       },
       'required': ['query'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'list_stations',
+    description:
+        'List the most recently heard APRS stations (no query). Use this to get '
+        'an overview of what is on the air.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'limit': {
+          'type': 'integer',
+          'description': 'Max results (default 20, max 50).',
+        },
+      },
+    },
+  ),
+  const AgentToolSpec(
+    name: 'station_detail',
+    description:
+        'Get full detail for one station by exact callsign (or nearest match): '
+        'position, symbol, comment, last heard, and how many track points.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'call': {'type': 'string', 'description': 'Station callsign.'},
+      },
+      'required': ['call'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'read_messages',
+    description:
+        'Read recent chat messages (private and group). Optionally filter by a '
+        'peer callsign or a group call. Never send anything: this is read-only. '
+        'Use it to summarize conversations or answer "did anyone message me".',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'with': {
+          'type': 'string',
+          'description': 'Only messages to/from this callsign or group call.',
+        },
+        'limit': {
+          'type': 'integer',
+          'description': 'Max messages (default 20, max 50).',
+        },
+      },
     },
   ),
   const AgentToolSpec(
@@ -213,6 +266,108 @@ final List<AgentToolSpec> kAgentTools = [
       },
     },
   ),
+  const AgentToolSpec(
+    name: 'create_task',
+    description:
+        'Schedule a task that runs later without the user present. "prompt" is '
+        'what to do (written as if the user said it); "interval_minutes" > 0 '
+        'repeats it every N minutes, 0 runs it once. Requires the "scheduled '
+        'tasks" permission. Use "list_tasks" to show existing ones first to '
+        'avoid duplicates.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'prompt': {
+          'type': 'string',
+          'description': 'The instruction to run at that time.',
+        },
+        'interval_minutes': {
+          'type': 'integer',
+          'description': '0 = once, otherwise repeat every N minutes (min 5).',
+        },
+      },
+      'required': ['prompt'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'list_tasks',
+    description: 'List the currently scheduled agent tasks.',
+    parameters: {'type': 'object', 'properties': {}},
+  ),
+  const AgentToolSpec(
+    name: 'cancel_task',
+    description: 'Cancel a scheduled task by its id (see "list_tasks").',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'id': {'type': 'string', 'description': 'Task id from list_tasks.'},
+      },
+      'required': ['id'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'set_connection_server',
+    description:
+        'Change the APRS-IS server used for the internet link. Only the '
+        'provided fields are changed. Setting a server does NOT connect — call '
+        '"connect" afterwards if the user wants to go online. NOTE: the app '
+        'does not provide or recommend any server; only use an address the user '
+        'explicitly gave you.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'server': {
+          'type': 'string',
+          'description': 'Hostname, e.g. "rotate.aprs2.net".',
+        },
+        'port': {'type': 'integer', 'description': 'TCP port, usually 14580.'},
+      },
+    },
+  ),
+  const AgentToolSpec(
+    name: 'set_connection_source',
+    description:
+        'Enable or disable a data link source. "source" is one of: aprsis '
+        '(internet), tnc, audio, pkwdwpl. Enabling a source makes it eligible; '
+        'call "connect" to actually bring links up. Use get_app_state to see the '
+        'current "sources" map.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'source': {
+          'type': 'string',
+          'description': 'aprsis, tnc, audio or pkwdwpl.',
+        },
+        'enabled': {
+          'type': 'boolean',
+          'description': 'true = enable this source, false = disable it.',
+        },
+      },
+      'required': ['source', 'enabled'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'connect',
+    description:
+        'Bring up the connection to the APRS-IS server and/or the radio link '
+        '(all currently enabled sources). Requires that the user has accepted '
+        'the data & network usage notice; if not, this returns an error asking '
+        'the user to accept it manually first.',
+    mutating: true,
+    parameters: {'type': 'object', 'properties': {}},
+  ),
+  const AgentToolSpec(
+    name: 'disconnect',
+    description:
+        'Tear down the current connection and stop automatic reconnects until '
+        'the next explicit connect.',
+    mutating: true,
+    parameters: {'type': 'object', 'properties': {}},
+  ),
 ];
 
 /// 名称 → spec
@@ -236,11 +391,32 @@ const Map<String, int> _screens = {
 /// 发给模型的 schema 列表。
 ///
 /// 未开启发送权限时连 `send_*` 的 schema 都不给 —— 既有明确的权限边界，
-/// 也避免模型反复尝试一个注定被拒的操作。
-List<Map<String, dynamic>> agentToolSchemas({required bool allowSend}) => [
+/// 也避免模型反复尝试一个注定被拒的操作。定时任务同理。
+List<Map<String, dynamic>> agentToolSchemas({
+  required bool allowSend,
+  bool allowTasks = false,
+}) =>
+    [
       for (final t in kAgentTools)
-        if (allowSend || !t.name.startsWith('send_')) t.toSchema(),
+        if (allowSend || !t.name.startsWith('send_'))
+          if (allowTasks || !_isTaskTool(t.name)) t.toSchema(),
     ];
+
+bool _isTaskTool(String name) =>
+    name == 'create_task' || name == 'cancel_task' || name == 'list_tasks';
+
+/// 免确认白名单：这些工具无副作用，执行前不问用户。
+///
+/// 关键修正（旧版硬编码漏了 `list_groups` 之外的只读工具、且把 navigate 也算成
+/// 需要确认）：现在按 [AgentToolSpec.mutating] 判断 —— 只读工具一律免确认，
+/// 有副作用的工具默认要确认，`navigate` 只切页面故豁免。新增工具时不必再改这里，
+/// 只要正确标注 [AgentToolSpec.mutating] 即可。
+bool agentNeedsConfirm(String name) {
+  final spec = _byName[name];
+  if (spec == null) return true; // 未知工具宁可先问
+  if (!spec.mutating) return false;
+  return name != 'navigate';
+}
 
 String _val(Map<String, dynamic> a, String k) {
   final v = a[k];
@@ -296,13 +472,17 @@ Future<AgentToolOutcome> executeAgentTool(
   Map<String, dynamic> args, {
   required bool allowedSend,
   required bool allowedSettings,
+  bool allowedTasks = false,
 }) async {
   final spec = _byName[name];
   if (spec == null) return _err('Unknown tool: $name');
 
-  // 权限闸门（schema 层已隐藏 send_*，但模型仍可能凭空调用）
+  // 权限闸门（schema 层已隐藏 send_* / 任务工具，但模型仍可能凭空调用）
   if (name.startsWith('send_') && !allowedSend) {
     return _err('Permission denied: sending messages is disabled in settings.');
+  }
+  if (_isTaskTool(name) && name != 'list_tasks' && !allowedTasks) {
+    return _err('Permission denied: scheduled tasks are disabled in settings.');
   }
   if (spec.mutating && name != 'navigate' && !allowedSettings) {
     return _err('Permission denied: changing settings is disabled.');
@@ -316,9 +496,24 @@ Future<AgentToolOutcome> executeAgentTool(
         'my_comment': st.myComment,
         'connected': st.connected,
         'using_rf': st.usingRf,
+        'connections': {
+          'connected': st.anyLinkUp,
+          'user_disconnected': st.userDisconnected,
+          'server': st.aprs.server,
+          'port': st.aprs.port,
+          'sources': {
+            'aprsis': st.aprsIsOn,
+            'tnc': st.tncOn,
+            'audio': st.audioOn,
+            'pkwdwpl': st.pkwdwplOn,
+          },
+          'data_notice_accepted': st.dataNoticeAccepted,
+        },
         'stations': st.stations.length,
         'messages': st.messages.length,
+        'unread_messages': st.unreadMessages,
         'groups': st.chatGroups.length,
+        'scheduled_tasks': AgentService.instance.tasks.length,
         'tracking': {
           'beacon_enabled': st.beaconEnabled,
           'beacon_interval_sec': st.beaconInterval,
@@ -357,20 +552,80 @@ Future<AgentToolOutcome> executeAgentTool(
       {
         final q = _val(args, 'query').trim().toUpperCase();
         if (q.isEmpty) return _err('query is required');
-        final hits =
-            st.stations.where((s) => s.call.toUpperCase().contains(q)).take(20);
+        final lim = _limit(args['limit']);
+        final hits = st.stations
+            .where((s) => s.call.toUpperCase().contains(q))
+            .take(lim);
+        final list = [for (final s in hits) _stationBrief(s)];
+        return AgentToolOutcome(jsonEncode(list),
+            note: 'search_stations "$q" → ${list.length}');
+      }
+
+    case 'list_stations':
+      {
+        final lim = _limit(args['limit']);
+        final sorted = [...st.stations]
+          ..sort((a, b) => b.lastHeard.compareTo(a.lastHeard));
+        final list = [for (final s in sorted.take(lim)) _stationBrief(s)];
+        return AgentToolOutcome(jsonEncode(list),
+            note: 'list_stations → ${list.length}');
+      }
+
+    case 'station_detail':
+      {
+        final q = _val(args, 'call').trim().toUpperCase();
+        if (q.isEmpty) return _err('call is required');
+        final s = st.stations
+                .where((x) => x.call.toUpperCase() == q)
+                .firstOrNull ??
+            st.stations
+                .where((x) => x.call.toUpperCase().contains(q))
+                .firstOrNull;
+        if (s == null) return _err('Station $q not found.');
+        return AgentToolOutcome(
+          jsonEncode({
+            ..._stationBrief(s),
+            'symbol': s.symbol,
+            'alt_m': s.alt,
+            'speed_kmh': s.speed,
+            'course': s.course,
+            'status_text': s.statusText,
+            'device': s.deviceName,
+            'path': s.path,
+            'track_points': s.track.length,
+          }),
+          note: 'station_detail ${s.call}',
+        );
+      }
+
+    case 'read_messages':
+      {
+        final who = _val(args, 'with').trim().toUpperCase();
+        final lim = _limit(args['limit']);
+        final groupCalls = st.chatGroups.map((g) => g.groupCall.toUpperCase());
+        // st.messages 是倒序（最新在前）：过滤后取最新 lim 条，再翻回时间正序给模型。
+        final filtered = st.messages.where((m) {
+          if (who.isEmpty) return true;
+          final from = m.from.toUpperCase();
+          final to = m.to.toUpperCase();
+          return from.contains(who) ||
+              to.contains(who) ||
+              groupCalls.contains(to);
+        }).take(lim).toList().reversed;
         final list = [
-          for (final s in hits)
+          for (final m in filtered)
             {
-              'call': s.call,
-              'lat': s.lat,
-              'lng': s.lng,
-              'comment': s.comment,
-              'heard_min_ago': DateTime.now().difference(s.lastHeard).inMinutes,
+              'time': m.time.toIso8601String(),
+              'from': m.from,
+              'to': m.to,
+              'text': m.text,
+              'sent': m.sent,
+              'group': m.groupId != null,
+              'system': m.system,
             },
         ];
         return AgentToolOutcome(jsonEncode(list),
-            note: 'search_stations "$q" → ${list.length}');
+            note: 'read_messages${who.isEmpty ? '' : ' "$who"'} → ${list.length}');
       }
 
     case 'send_message':
@@ -627,6 +882,134 @@ Future<AgentToolOutcome> executeAgentTool(
         return AgentToolOutcome('Switched to $screen screen.',
             note: 'navigate → $screen');
       }
+
+    case 'create_task':
+      {
+        final prompt = _val(args, 'prompt').trim();
+        if (prompt.isEmpty) return _err('prompt is required');
+        var mins = _asInt(args['interval_minutes']) ?? 0;
+        if (mins < 0) mins = 0;
+        // 循环任务最短 5 分钟：再短就会不断烧 API 配额、也不停打扰用户。
+        if (mins > 0 && mins < 5) {
+          return _err('interval_minutes must be 0 (once) or >= 5.');
+        }
+        final t = await AgentService.instance.addTask(prompt, intervalMinutes: mins);
+        return AgentToolOutcome(
+          'Task ${t.id} scheduled '
+          '(${mins == 0 ? 'once' : 'every $mins min'}): $prompt',
+          note: 'create_task ${t.id}',
+        );
+      }
+
+    case 'list_tasks':
+      {
+        final list = [
+          for (final t in AgentService.instance.tasks)
+            {
+              'id': t.id,
+              'prompt': t.prompt,
+              'every_min': t.intervalMinutes,
+              'enabled': t.enabled,
+              'next_run': t.nextRun?.toIso8601String(),
+              'last_run': t.lastRun?.toIso8601String(),
+            },
+        ];
+        return AgentToolOutcome(jsonEncode(list), note: 'list_tasks → ${list.length}');
+      }
+
+    case 'cancel_task':
+      {
+        final id = _val(args, 'id').trim();
+        if (id.isEmpty) return _err('id is required');
+        final hit = AgentService.instance.tasks.where((t) => t.id == id).toList();
+        if (hit.isEmpty) return _err('No task with id $id.');
+        await AgentService.instance.removeTask(id);
+        return AgentToolOutcome('Task $id canceled.', note: 'cancel_task $id');
+      }
+
+    case 'set_connection_server':
+      {
+        final server = _val(args, 'server').trim();
+        final port = _asInt(args['port']);
+        if (server.isEmpty && port == null) {
+          return _err('Provide "server" and/or "port".');
+        }
+        if (server.isNotEmpty) st.aprs.server = server;
+        if (port != null) {
+          if (port < 1 || port > 65535) {
+            return _err('port must be between 1 and 65535.');
+          }
+          st.aprs.port = port;
+        }
+        st.persist();
+        return AgentToolOutcome(
+          'Server set to ${st.aprs.server}:${st.aprs.port} (not connected yet).',
+          note: 'set_connection_server ${st.aprs.server}:${st.aprs.port}',
+        );
+      }
+
+    case 'set_connection_source':
+      {
+        final src = _val(args, 'source').trim().toLowerCase();
+        final on = _asBool(args['enabled']);
+        if (on == null) return _err('"enabled" must be true or false.');
+        const valid = {'aprsis', 'tnc', 'audio', 'pkwdwpl'};
+        if (!valid.contains(src)) {
+          return _err('source must be one of ${valid.join(', ')}.');
+        }
+        if (!on && st.enabledSources.length <= 1 &&
+            st.enabledSources.contains(src)) {
+          return _err('At least one data source must stay enabled.');
+        }
+        await st.toggleSource(src, on);
+        return AgentToolOutcome(
+          '$src source ${on ? 'enabled' : 'disabled'}.',
+          note: 'set_connection_source $src=$on',
+        );
+      }
+
+    case 'connect':
+      {
+        if (st.anyLinkUp) {
+          return AgentToolOutcome('Already connected.',
+              note: 'connect (already up)');
+        }
+        if (!st.dataNoticeAccepted) {
+          return _err(
+              'The data & network usage notice has not been accepted; ask the '
+              'user to accept it in the app before connecting.');
+        }
+        await st.toggleConnect();
+        return AgentToolOutcome(
+          st.anyLinkUp ? 'Connecting…' : 'Connection attempt started.',
+          note: 'connect',
+        );
+      }
+
+    case 'disconnect':
+      {
+        if (!st.anyLinkUp) {
+          return AgentToolOutcome('Already disconnected.',
+              note: 'disconnect (already down)');
+        }
+        await st.toggleConnect();
+        return AgentToolOutcome('Disconnected.', note: 'disconnect');
+      }
   }
   return _err('Unhandled tool: $name');
 }
+
+/// limit 参数归一：默认 20，夹在 1..50。
+int _limit(Object? v) {
+  final n = _asInt(v) ?? 20;
+  return n.clamp(1, 50);
+}
+
+/// 台站摘要（多个只读工具共用，避免各写一份字段集）。
+Map<String, dynamic> _stationBrief(Station s) => {
+      'call': s.call,
+      'lat': s.lat,
+      'lng': s.lng,
+      'comment': s.comment,
+      'heard_min_ago': DateTime.now().difference(s.lastHeard).inMinutes,
+    };

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 
 import 'agent.dart';
 import 'agent_tools.dart';
+import 'l10n/app_localizations.dart';
 import 'material.dart';
 import 'settings_widgets.dart';
 import 'state.dart';
@@ -51,6 +52,8 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
   late final TextEditingController _model;
   late final TextEditingController _systemPrompt;
 
+  late final TextEditingController _quiet;
+
   bool _testing = false;
   String _testResult = '';
   bool _testOk = false;
@@ -64,11 +67,12 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
     _apiKey = TextEditingController(text: cfg.apiKey);
     _model = TextEditingController(text: cfg.model);
     _systemPrompt = TextEditingController(text: cfg.systemPrompt);
+    _quiet = TextEditingController(text: cfg.quietHours);
   }
 
   @override
   void dispose() {
-    for (final c in [_baseUrl, _apiKey, _model, _systemPrompt]) {
+    for (final c in [_baseUrl, _apiKey, _model, _systemPrompt, _quiet]) {
       c.dispose();
     }
     super.dispose();
@@ -79,7 +83,8 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
       ..baseUrl = _baseUrl.text.trim()
       ..apiKey = _apiKey.text.trim()
       ..model = _model.text.trim()
-      ..systemPrompt = _systemPrompt.text.trim();
+      ..systemPrompt = _systemPrompt.text.trim()
+      ..quietHours = _quiet.text.trim();
     await AgentService.instance.saveConfig();
   }
 
@@ -128,6 +133,9 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
     }
   }
 
+  /// 当前分页：0 连接 / 1 权限 / 2 自动化
+  int _tab = 0;
+
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
@@ -138,129 +146,355 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
         subtitle: s.agentSettingsDesc,
         icon: Icons.smart_toy_rounded,
         color: C.purple,
-        body: Column(children: [
-          SettingsFold(
-            title: s.agentMode,
-            subtitle: s.agentModeDesc,
-            icon: Icons.smart_toy_rounded,
-            color: C.purple,
-            open: true,
-            onToggle: () {},
-            children: [
-              SettingsSwitch(s.agentEnabled, value: cfg.enabled, color: C.purple,
-                  onChanged: (v) async {
-                cfg.enabled = v;
-                await AgentService.instance.saveConfig();
-                if (mounted) setState(() {});
-              }),
-              SettingsHint(s.agentApiKeyTip),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SettingsFold(
-            title: s.agentInterfaceSection,
-            subtitle: '',
-            icon: Icons.key_rounded,
-            color: C.blue,
-            open: true,
-            onToggle: () {},
-            children: [
-              // 预设：一键把 Base URL / 模型填成常见值
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
-                child: Wrap(spacing: 8, runSpacing: 8, children: [
-                  for (final p in _presets)
-                    GestureDetector(
-                      onTap: () {
-                        _baseUrl.text = p.baseUrl;
-                        _model.text = p.model;
-                        _collect();
-                        setState(() {});
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: C.bgSoft,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: C.border),
-                        ),
-                        child: Text(p.label,
-                            style: ts(11, c: C.slate, w: FontWeight.w600)),
-                      ),
-                    ),
-                ]),
-              ),
-              SettingsInput(s.agentBaseUrl, _baseUrl,
-                  hint: 'https://api.openai.com/v1'),
-              SettingsInput(s.agentApiKey, _apiKey,
-                  hint: 'sk-...'),
-              SettingsInput(s.agentModel, _model, hint: 'gpt-4o-mini'),
-              SettingsInput(s.agentSystemPrompt, _systemPrompt),
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _testing ? null : _test,
-                      icon: Icon(Icons.wifi_tethering_rounded, size: 16),
-                      label: Text(_testing ? s.agentTesting : s.agentTest),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: C.blue,
-                        side: BorderSide(color: C.blue.withValues(alpha: 0.5)),
-                        padding: const EdgeInsets.symmetric(vertical: 9),
-                        textStyle: ts(12, w: FontWeight.w600),
-                      ),
-                    ),
-                  ),
-                ]),
-              ),
-              if (_testResult.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: _testOk ? C.greenBg : C.redBg,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(_testResult,
-                        style: ts(11,
-                            c: _testOk ? C.green : C.red,
-                            w: FontWeight.w600)),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SettingsFold(
-            title: s.agentPermissions,
-            subtitle: '',
-            icon: Icons.published_with_changes_rounded,
-            color: C.orange,
-            open: true,
-            onToggle: () {},
-            children: [
-              SettingsSwitch(s.agentAllowSend, value: cfg.allowSend,
-                  color: C.orange, onChanged: (v) async {
-                cfg.allowSend = v;
-                await AgentService.instance.saveConfig();
-                if (mounted) setState(() {});
-              }),
-              SettingsHint(s.agentAllowSendDesc),
-              SettingsSwitch(s.agentAllowSettings, value: cfg.allowSettings,
-                  color: C.orange, onChanged: (v) async {
-                cfg.allowSettings = v;
-                await AgentService.instance.saveConfig();
-                if (mounted) setState(() {});
-              }),
-              SettingsHint(s.agentAllowSettingsDesc),
-            ],
-          ),
+        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _segmented(s),
+          const SizedBox(height: 14),
+          if (_tab == 0) _connectionTab(s),
+          if (_tab == 1) _permissionsTab(s),
+          if (_tab == 2) _automationTab(s),
         ]),
       ),
     );
+  }
+
+  /// 顶部分段选择：把原来一长条的功能折成三页，少滚动、少干扰。
+  Widget _segmented(S s) {
+    final tabs = [s.agentTabConnection, s.agentTabPermissions, s.agentTabAutomation];
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: C.bgSoft,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: C.border),
+      ),
+      child: Row(children: [
+        for (var i = 0; i < tabs.length; i++)
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _tab = i),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(vertical: 9),
+                decoration: BoxDecoration(
+                  color: _tab == i ? C.purple : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(tabs[i],
+                    textAlign: TextAlign.center,
+                    style: ts(12,
+                        c: _tab == i ? Colors.white : C.slate,
+                        w: FontWeight.w700)),
+              ),
+            ),
+          ),
+      ]),
+    );
+  }
+
+  Widget _connectionTab(S s) {
+    return Column(children: [
+      SettingsFold(
+        title: s.agentMode,
+        subtitle: s.agentModeDesc,
+        icon: Icons.smart_toy_rounded,
+        color: C.purple,
+        open: true,
+        onToggle: () {},
+        children: [
+          SettingsSwitch(s.agentEnabled,
+              value: cfg.enabled, color: C.purple, onChanged: (v) async {
+            cfg.enabled = v;
+            await AgentService.instance.saveConfig();
+            if (mounted) setState(() {});
+          }),
+          SettingsHint(s.agentApiKeyTip),
+        ],
+      ),
+      const SizedBox(height: 16),
+      SettingsFold(
+        title: s.agentInterfaceSection,
+        subtitle: s.agentPresetHint,
+        icon: Icons.key_rounded,
+        color: C.blue,
+        open: true,
+        onToggle: () {},
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+            child: Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final p in _presets)
+                GestureDetector(
+                  onTap: () {
+                    _baseUrl.text = p.baseUrl;
+                    _model.text = p.model;
+                    _collect();
+                    setState(() {});
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: C.bgSoft,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: C.border),
+                    ),
+                    child: Text(p.label,
+                        style: ts(11, c: C.slate, w: FontWeight.w600)),
+                  ),
+                ),
+            ]),
+          ),
+          SettingsInput(s.agentBaseUrl, _baseUrl,
+              hint: 'https://api.openai.com/v1'),
+          SettingsInput(s.agentApiKey, _apiKey,
+              hint: 'sk-...', tip: s.agentApiKeyTip),
+          SettingsInput(s.agentModel, _model, hint: 'gpt-4o-mini'),
+          SettingsInput(s.agentSystemPrompt, _systemPrompt,
+              hint: s.agentSystemPromptHint),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _testing ? null : _test,
+                  icon: const Icon(Icons.wifi_tethering_rounded, size: 16),
+                  label: Text(_testing ? s.agentTesting : s.agentTest),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: C.blue,
+                    side: BorderSide(color: C.blue.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    textStyle: ts(12, w: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+          if (_testResult.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: _testOk ? C.greenBg : C.redBg,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(_testResult,
+                    style: ts(11,
+                        c: _testOk ? C.green : C.red,
+                        w: FontWeight.w600)),
+              ),
+            ),
+        ],
+      ),
+    ]);
+  }
+
+  Widget _permissionsTab(S s) {
+    final always = cfg.alwaysAllow.toList()..sort();
+    return Column(children: [
+      SettingsFold(
+        title: s.agentPermissions,
+        subtitle: '',
+        icon: Icons.published_with_changes_rounded,
+        color: C.orange,
+        open: true,
+        onToggle: () {},
+        children: [
+          SettingsSwitch(s.agentAllowSend,
+              value: cfg.allowSend, color: C.orange, onChanged: (v) async {
+            cfg.allowSend = v;
+            await AgentService.instance.saveConfig();
+            if (mounted) setState(() {});
+          }),
+          SettingsHint(s.agentAllowSendDesc),
+          SettingsSwitch(s.agentAllowSettings,
+              value: cfg.allowSettings, color: C.orange, onChanged: (v) async {
+            cfg.allowSettings = v;
+            await AgentService.instance.saveConfig();
+            if (mounted) setState(() {});
+          }),
+          SettingsHint(s.agentAllowSettingsDesc),
+          SettingsSwitch(s.agentAllowTasks,
+              value: cfg.allowTasks, color: C.orange, onChanged: (v) async {
+            cfg.allowTasks = v;
+            await AgentService.instance.saveConfig();
+            if (mounted) setState(() {});
+          }),
+          SettingsHint(s.agentAllowTasksDesc),
+        ],
+      ),
+      const SizedBox(height: 16),
+      SettingsFold(
+        title: s.agentAlwaysAllow,
+        subtitle: s.agentAlwaysAllowDesc,
+        icon: Icons.verified_user_rounded,
+        color: C.green,
+        open: true,
+        onToggle: () {},
+        children: [
+          if (always.isEmpty)
+            SettingsHint(s.agentAlwaysAllowEmpty)
+          else
+            for (final n in always)
+              SettingsRow2(s.agentToolLabel(n), '✓', valueColor: C.green),
+          if (always.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  cfg.alwaysAllow.clear();
+                  await AgentService.instance.saveConfig();
+                  if (mounted) setState(() {});
+                },
+                icon: const Icon(Icons.delete_sweep_rounded, size: 16),
+                label: Text(s.agentAlwaysAllowClear),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: C.red,
+                  side: BorderSide(color: C.red.withValues(alpha: 0.5)),
+                  padding: const EdgeInsets.symmetric(vertical: 9),
+                  textStyle: ts(12, w: FontWeight.w600),
+                ),
+              ),
+            ),
+        ],
+      ),
+    ]);
+  }
+
+  Widget _automationTab(S s) {
+    return Column(children: [
+      SettingsFold(
+        title: s.agentAutoReply,
+        subtitle: s.agentAutoReplyDesc,
+        icon: Icons.reply_rounded,
+        color: C.cyan,
+        open: true,
+        onToggle: () {},
+        children: [
+          SettingsSwitch(s.agentAutoReplyOn,
+              value: cfg.autoReply, color: C.cyan, onChanged: (v) async {
+            cfg.autoReply = v;
+            await AgentService.instance.saveConfig();
+            if (mounted) setState(() {});
+          }),
+          SettingsHint(s.agentAutoReplyHint),
+          SettingsSwitch(s.agentReplyGroups,
+              value: cfg.replyGroups, color: C.cyan, onChanged: (v) async {
+            cfg.replyGroups = v;
+            await AgentService.instance.saveConfig();
+            if (mounted) setState(() {});
+          }),
+          SettingsHint(s.agentReplyGroupsDesc),
+          SettingsInput(s.agentQuietHours, _quiet,
+              hint: '23:00-07:00',
+              onEditingComplete: () {
+                _collect();
+                setState(() {});
+              }),
+          SettingsHint(s.agentQuietHoursDesc),
+        ],
+      ),
+      const SizedBox(height: 16),
+      SettingsFold(
+        title: s.agentTasks,
+        subtitle: s.agentTasksDesc,
+        icon: Icons.schedule_rounded,
+        color: C.purple,
+        open: true,
+        onToggle: () {},
+        children: [
+          if (AgentService.instance.tasks.isEmpty)
+            SettingsHint(s.agentTasksEmpty)
+          else
+            for (final t in AgentService.instance.tasks)
+              _TaskRow(
+                task: t,
+                onToggle: (v) async {
+                  await AgentService.instance.setTaskEnabled(t.id, v);
+                  if (mounted) setState(() {});
+                },
+                onDelete: () async {
+                  await AgentService.instance.removeTask(t.id);
+                  if (mounted) setState(() {});
+                },
+              ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _newTask,
+                  icon: const Icon(Icons.add_rounded, size: 16),
+                  label: Text(s.agentTaskNew),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: C.purple,
+                    side: BorderSide(color: C.purple.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    textStyle: ts(12, w: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        ],
+      ),
+    ]);
+  }
+
+  /// 手动新建一个定时任务（也让用户不靠模型就能用上这个能力）。
+  Future<void> _newTask() async {
+    final s = S.of(context);
+    final prompt = TextEditingController();
+    final interval = TextEditingController(text: '0');
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(s.agentTaskNew),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextField(
+            controller: prompt,
+            minLines: 1,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelText: s.agentTaskPrompt,
+              hintText: s.agentTaskPromptHint,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: interval,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: s.agentTaskInterval,
+              helperText: s.agentTaskIntervalHint,
+            ),
+          ),
+        ]),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(s.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(s.agentTaskCreate),
+          ),
+        ],
+      ),
+    );
+    final p = prompt.text.trim();
+    if (ok != true || p.isEmpty) {
+      prompt.dispose();
+      interval.dispose();
+      return;
+    }
+    final mins = int.tryParse(interval.text.trim()) ?? 0;
+    await AgentService.instance
+        .addTask(p, intervalMinutes: mins < 0 ? 0 : mins);
+    prompt.dispose();
+    interval.dispose();
+    if (mounted) setState(() {});
   }
 }
 
@@ -284,7 +518,7 @@ class _AgentOverlayState extends State<AgentOverlay> {
 
   /// 待确认的工具调用（有副作用的操作执行前，面板内联询问用户）
   AgentToolCall? _pendingCall;
-  Completer<bool>? _pendingCompleter;
+  Completer<AgentConfirmResult>? _pendingCompleter;
 
   /// 待确认的「清空对话」
   bool _clearPending = false;
@@ -296,6 +530,67 @@ class _AgentOverlayState extends State<AgentOverlay> {
   void initState() {
     super.initState();
     if (!svc.loaded) svc.load();
+    // 定时任务到点轮询。60 秒粒度足够（最短循环 5 分钟），且不必为每个任务各起
+    // 一个 timer —— 任务在磁盘里可随时增删，单一轮询器最容易保持一致。
+    _taskTimer = Timer.periodic(const Duration(seconds: 60), (_) => _runDueTasks());
+    // 接收消息激活：收到别人发来的消息时可自动回复（默认关，见配置页）。
+    widget.state.onNewMessage = _onIncoming;
+  }
+
+  Timer? _taskTimer;
+
+  @override
+  void dispose() {
+    _taskTimer?.cancel();
+    super.dispose();
+  }
+
+  /// 定时任务到点：逐个跑（串行，避免并发占用把对话搅乱）。
+  Future<void> _runDueTasks() async {
+    if (!mounted || !cfg.enabled || svc.busy) return;
+    if (!svc.loaded) return;
+    final due = svc.dueTasks(DateTime.now());
+    for (final t in due) {
+      if (!mounted) return;
+      // 先标记已跑：即便这一轮因未配置好而失败，也不会 60 秒后立刻重试刷屏。
+      await svc.markTaskRun(t.id);
+      if (!mounted) return;
+      if (!cfg.ready) continue;
+      final s = S.of(context);
+      await _runChat(s, t.prompt, background: true);
+      if (!mounted) return;
+    }
+  }
+
+  /// 收到新消息：若开启了自动回复，则让模型「起草一条回复」（纯文本，不带工具），
+  /// 再由本地直接发送 —— 不在后台执行工具，避免无人确认时挂起。
+  Future<void> _onIncoming(String src, String text, String? groupId) async {
+    final now = DateTime.now();
+    if (!svc.canAutoReply(now)) return;
+    if (groupId != null && !cfg.replyGroups) return;
+    if (!cfg.allowSend) return; // 没开「允许发送」就不自动发
+    if (!cfg.ready || svc.busy) return;
+    // 只回复看起来像人发的消息（跳过系统 / 位置点提示）。
+    if (text.trim().isEmpty || src == '系统') return;
+    final key = (groupId ?? src).toUpperCase();
+    if (!svc.autoReplyAllowed(key, now)) return;
+    if (!mounted) return;
+
+    // 目标：群 → 群呼号；私聊 → 对方呼号。
+    String target = src;
+    if (groupId != null) {
+      final g = widget.state.chatGroups.where((g) => g.id == groupId).firstOrNull;
+      if (g == null) return;
+      target = g.groupCall;
+    }
+    final s = S.of(context);
+    final draft = await _runChat(
+      s,
+      s.agentAutoReplyPrompt(src, text),
+      background: true,
+    );
+    if (draft == null || draft.isEmpty || !mounted) return;
+    widget.state.sendMessage(target, draft);
   }
 
   @override
@@ -432,7 +727,9 @@ class _AgentOverlayState extends State<AgentOverlay> {
           tooltip: s.agentMinimize,
           onPressed: () {
             // 收起前把待确认的操作按「拒绝」结掉，否则对话会一直卡在等待里。
-            if (_pendingCompleter != null) _resolveConfirm(false);
+            if (_pendingCompleter != null) {
+              _resolveConfirm(AgentConfirmResult.deny);
+            }
             setState(() => _minimized = true);
           },
           icon: Icon(Icons.close_fullscreen_rounded, size: 18, color: C.grey),
@@ -507,7 +804,7 @@ class _AgentOverlayState extends State<AgentOverlay> {
           const SizedBox(width: 6),
           Flexible(
             child: Text(
-              '${s.agentExecuted} · $name',
+              '${s.agentExecuted} · ${s.agentToolLabel(name)}',
               style: ts(10, c: C.grey),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -596,7 +893,9 @@ class _AgentOverlayState extends State<AgentOverlay> {
               ? OutlinedButton(
                   onPressed: () {
                     // 若正卡在「等待确认」，先按拒绝结掉，再取消本轮对话。
-                    if (_pendingCompleter != null) _resolveConfirm(false);
+                    if (_pendingCompleter != null) {
+                      _resolveConfirm(AgentConfirmResult.deny);
+                    }
                     svc.cancel();
                   },
                   style: OutlinedButton.styleFrom(
@@ -624,38 +923,40 @@ class _AgentOverlayState extends State<AgentOverlay> {
 
   final TextEditingController _controller = TextEditingController();
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   /// 清空对话的确认条（内联，避免对话框被置顶面板遮挡）
   Widget _clearBar(S s) {
     return Container(
       width: double.infinity,
       color: C.redBg,
       padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
-      child: Row(children: [
-        Expanded(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        Align(
+          alignment: Alignment.centerLeft,
           child: Text(s.agentClearConfirm,
               style: ts(11, c: C.red, w: FontWeight.w600)),
         ),
-        TextButton(
-          onPressed: () => setState(() => _clearPending = false),
-          child: Text(s.cancel, style: ts(12, c: C.grey)),
-        ),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: C.red,
-            visualDensity: VisualDensity.compact,
-          ),
-          onPressed: () {
-            svc.clearHistory();
-            setState(() => _clearPending = false);
-          },
-          child: Text(s.agentClear,
-              style: ts(12, c: Colors.white, w: FontWeight.w700)),
+        // 同确认条：按钮排成 Wrap，避免窄屏 / 长译文时横向溢出（黄黑条纹）。
+        Wrap(
+          alignment: WrapAlignment.end,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () => setState(() => _clearPending = false),
+              child: Text(s.cancel, style: ts(12, c: C.grey)),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: C.red,
+                visualDensity: VisualDensity.compact,
+              ),
+              onPressed: () {
+                svc.clearHistory();
+                setState(() => _clearPending = false);
+              },
+              child: Text(s.agentClear,
+                  style: ts(12, c: Colors.white, w: FontWeight.w700)),
+            ),
+          ],
         ),
       ]),
     );
@@ -667,62 +968,87 @@ class _AgentOverlayState extends State<AgentOverlay> {
   /// 而对话框挂在 Navigator 的 Overlay 里 —— 面板永远盖在对话框上面，
   /// 用户会看不到确认框。内联则万无一失，也少一次跨层。
   Widget _confirmBar(S s, AgentToolCall call) {
-    final detail = const _ArgsFormat().convert(call.arguments);
+    final detail = _humanArgs(call.arguments);
     return Container(
       width: double.infinity,
       color: C.purpleBg,
       padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(s.agentConfirmTitle,
+        Text('${s.agentConfirmTitle}：${s.agentToolLabel(call.name)}',
             style: ts(11, c: C.purple, w: FontWeight.w700)),
-        const SizedBox(height: 4),
-        Row(children: [
-          Expanded(
-            child: Text(
-              detail.isEmpty ? call.name : '${call.name}  $detail',
-              style: mono(10, c: C.slate),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+        if (detail.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            detail,
+            style: ts(10, c: C.slate),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+        const SizedBox(height: 2),
+        // 用 Wrap 而不是 Row：三种按钮在多语言下（如西语「Permitir siempre」）
+        // 叠加起来很容易超过面板宽度，Row 会直接溢出并画出黄黑条纹（就是用户
+        // 说的「下划线」，其实是 Flutter 的 RenderFlex 溢出报错标志）。Wrap 让
+        // 按钮必要时换行，既不会溢出，窄屏也仍可用。
+        Wrap(
+          alignment: WrapAlignment.end,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () => _resolveConfirm(AgentConfirmResult.deny),
+              child: Text(s.agentConfirmDeny, style: ts(12, c: C.grey)),
             ),
-          ),
-          TextButton(
-            onPressed: () => _resolveConfirm(false),
-            child: Text(s.agentConfirmDeny, style: ts(12, c: C.grey)),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: C.purple,
-              visualDensity: VisualDensity.compact,
+            TextButton(
+              // 「始终允许」把该工具加入免确认名单，之后同类操作不再打断对话。
+              onPressed: () => _resolveConfirm(AgentConfirmResult.allowAlways),
+              child: Text(s.agentAlwaysAllow,
+                  style: ts(12, c: C.purple, w: FontWeight.w600)),
             ),
-            onPressed: () => _resolveConfirm(true),
-            child: Text(s.agentConfirmRun,
-                style: ts(12, c: Colors.white, w: FontWeight.w700)),
-          ),
-        ]),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: C.purple,
+                visualDensity: VisualDensity.compact,
+              ),
+              onPressed: () => _resolveConfirm(AgentConfirmResult.allowOnce),
+              child: Text(s.agentConfirmRun,
+                  style: ts(12, c: Colors.white, w: FontWeight.w700)),
+            ),
+          ],
+        ),
       ]),
     );
   }
 
   /// 回填确认结果（由 [AgentService.send] 的 confirm 回调 await）
-  void _resolveConfirm(bool ok) {
+  void _resolveConfirm(AgentConfirmResult r) {
     final c = _pendingCompleter;
     setState(() {
       _pendingCall = null;
       _pendingCompleter = null;
     });
-    if (c != null && !c.isCompleted) c.complete(ok);
+    if (c != null && !c.isCompleted) c.complete(r);
   }
 
   /// 有副作用的工具执行前，内联弹确认条并等待用户选择
-  Future<bool> _confirm(String name, Map<String, dynamic> args) async {
-    if (!mounted) return false;
-    final completer = Completer<bool>();
+  Future<AgentConfirmResult> _confirm(
+      String name, Map<String, dynamic> args) async {
+    if (!mounted) return AgentConfirmResult.deny;
+    final completer = Completer<AgentConfirmResult>();
     setState(() {
       _pendingCall = AgentToolCall(id: '', name: name, arguments: args);
       _pendingCompleter = completer;
+      _minimized = false; // 需要用户决策：把面板亮出来，别藏在气泡后
     });
     return completer.future;
   }
+
+  /// 后台（定时任务）执行时的确认：用户不在场，一律拒绝未预先放行的工具。
+  ///
+  /// 「预先放行」指用户在界面上对某工具点过「始终允许」——由 [AgentService.send]
+  /// 在调用本回调之前就短路掉，所以走到这里的一律拒绝。
+  Future<AgentConfirmResult> _denyBackground(
+          String name, Map<String, dynamic> args) async =>
+      AgentConfirmResult.deny;
 
   Future<void> _send() async {
     final text = _controller.text;
@@ -730,44 +1056,169 @@ class _AgentOverlayState extends State<AgentOverlay> {
     final s = S.of(context);
     _controller.clear();
     setState(() {});
+    await _runChat(s, text, background: false);
+  }
+
+  /// 跑一轮对话。[background] = true 时用于定时任务 / 自动回复：有副作用的工具
+  /// 不再弹确认（无人可确认），只有用户预先「始终允许」过的工具才会执行。
+  /// 返回本轮最后一条助手文本（自动回复用它作为要发送的内容）。
+  Future<String?> _runChat(S s, String text, {required bool background}) async {
+    final before = svc.messages.length;
     try {
       await svc.send(
         text,
-        tools: agentToolSchemas(allowSend: cfg.allowSend),
+        tools: agentToolSchemas(
+          allowSend: cfg.allowSend,
+          allowTasks: cfg.allowTasks,
+        ),
         execute: (name, args) => executeAgentTool(
           widget.state,
           name,
           args,
           allowedSend: cfg.allowSend,
           allowedSettings: cfg.allowSettings,
+          allowedTasks: cfg.allowTasks,
         ),
-        confirm: _confirm,
+        confirm: background ? _denyBackground : _confirm,
+        needsConfirm: agentNeedsConfirm,
         needConfigText: s.agentNeedConfig,
         formatError: (raw) => s.agentError(raw),
       );
     } on AgentException catch (e) {
-      if (mounted) {
+      if (!background && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(e.message),
           behavior: SnackBarBehavior.floating,
           backgroundColor: C.orange,
         ));
       }
+      return null;
+    }
+    for (var i = svc.messages.length - 1; i >= before; i--) {
+      final m = svc.messages[i];
+      if (m.role == 'assistant' && m.content.trim().isNotEmpty) {
+        return m.content.trim();
+      }
+    }
+    return null;
+  }
+}
+
+/// 工具名 → 人类可读称呼。
+///
+/// 界面上**不直接显示** `get_app_state` / `create_task` 这种带下划线的标识符：
+/// 对用户来说那是内部实现（用户反馈「智能体页面一堆下划线」）。这里映射到 l10n
+/// 文案；连接/断开/重启这类没有专用文案的（理论上不会出现在工具表里）兜底成
+/// 「执行操作」。新增工具时记得在 add_agent_v2_l10n.py 里补一条。
+extension AgentToolLabel on AppLocalizations {
+  String agentToolLabel(String name) {
+    switch (name) {
+      case 'get_app_state':
+        return agentTool_get_app_state;
+      case 'list_groups':
+        return agentTool_list_groups;
+      case 'search_stations':
+        return agentTool_search_stations;
+      case 'list_stations':
+        return agentTool_list_stations;
+      case 'station_detail':
+        return agentTool_station_detail;
+      case 'read_messages':
+        return agentTool_read_messages;
+      case 'send_message':
+        return agentTool_send_message;
+      case 'send_beacon_now':
+        return agentTool_send_beacon_now;
+      case 'set_preferences':
+        return agentTool_set_preferences;
+      case 'set_station_filters':
+        return agentTool_set_station_filters;
+      case 'set_nickname':
+        return agentTool_set_nickname;
+      case 'navigate':
+        return agentTool_navigate;
+      case 'create_task':
+        return agentTool_create_task;
+      case 'list_tasks':
+        return agentTool_list_tasks;
+      case 'cancel_task':
+        return agentTool_cancel_task;
+      case 'set_connection_server':
+        return agentTool_set_connection_server;
+      case 'set_connection_source':
+        return agentTool_set_connection_source;
+      case 'connect':
+        return agentTool_connect;
+      case 'disconnect':
+        return agentTool_disconnect;
+      default:
+        return agentTool_unknown;
     }
   }
 }
 
-/// args → 可读文本（用于确认框里的参数展示）
-class _ArgsFormat {
-  const _ArgsFormat();
-  String convert(Object? v) {
-    if (v == null) return 'null';
-    if (v is Map) {
-      return v.entries
-          .map((e) => '${e.key}: ${convert(e.value)}')
-          .join('\n');
-    }
-    if (v is List) return v.map(convert).join(', ');
-    return '$v';
+/// 定时任务行：开关 / 内容 / 间隔 / 删除。
+class _TaskRow extends StatelessWidget {
+  final AgentTask task;
+  final ValueChanged<bool> onToggle;
+  final VoidCallback onDelete;
+  const _TaskRow(
+      {required this.task, required this.onToggle, required this.onDelete});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final every = task.recurring
+        ? s.agentTaskEvery(task.intervalMinutes)
+        : s.agentTaskOnce;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+      decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: C.border, width: 0.4))),
+      child: Row(children: [
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(task.prompt,
+                style: ts(12, w: FontWeight.w600),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 2),
+            Text(every,
+                style: ts(10, c: task.enabled ? C.purple : C.greyLight)),
+          ]),
+        ),
+        Switch(
+          value: task.enabled,
+          onChanged: onToggle,
+          activeThumbColor: C.purple,
+        ),
+        IconButton(
+          tooltip: s.agentTaskDelete,
+          onPressed: onDelete,
+          icon: Icon(Icons.delete_outline_rounded, size: 18, color: C.grey),
+          visualDensity: VisualDensity.compact,
+        ),
+      ]),
+    );
   }
+}
+
+/// 工具参数 → 人类可读摘要（确认条用）。
+///
+/// 旧的 `_ArgsFormat` 直接把 JSON 键名（`beacon_interval` 这类）连同下划线怼到
+/// 用户脸上，还把 `null` 显示成字符串 "null"。这里只取每对「键：值」，键名去掉
+/// 下划线，值超过 60 字就截断——确认条是一句「要做什么」的摘要，不是调试面板。
+String _humanArgs(Map<String, dynamic> args) {
+  if (args.isEmpty) return '';
+  final parts = <String>[];
+  for (final e in args.entries) {
+    if (e.value == null) continue;
+    final v = e.value;
+    var val = v is List ? v.join('、') : '$v';
+    val = val.replaceAll('\n', ' ');
+    if (val.length > 60) val = '${val.substring(0, 60)}…';
+    parts.add('${e.key.replaceAll('_', ' ')}：$val');
+    if (parts.length >= 4) break;
+  }
+  return parts.join('；');
 }

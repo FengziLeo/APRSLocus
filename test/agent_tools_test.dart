@@ -27,9 +27,12 @@ void main() {
     Map<String, dynamic> args, {
     bool allowSend = true,
     bool allowSettings = true,
+    bool allowTasks = false,
   }) =>
       executeAgentTool(st, name, args,
-          allowedSend: allowSend, allowedSettings: allowSettings);
+          allowedSend: allowSend,
+          allowedSettings: allowSettings,
+          allowedTasks: allowTasks);
 
   group('schema', () {
     test('未授权发送时，send_* 工具不出现在 schema 里', () {
@@ -181,6 +184,255 @@ void main() {
       final r = await run(st, 'search_stations', {'query': 'bg7'});
       expect(r.text, contains('BG7LZQ-9'));
     });
+
+    test('list_stations 按最近听到排序（最新在前）', () async {
+      final st = AppState();
+      final now = DateTime.now();
+      st.stations.add(Station(
+          call: 'OLD', symbol: '>', lat: 0, lng: 0,
+          lastHeard: now.subtract(const Duration(hours: 2))));
+      st.stations.add(Station(
+          call: 'NEW', symbol: '>', lat: 0, lng: 0,
+          lastHeard: now));
+      final list = jsonDecodeSafe(
+              (await run(st, 'list_stations', {'limit': 10})).text) as List;
+      expect(list.first['call'], 'NEW');
+    });
+
+    test('station_detail 取到更全字段；未知呼号报错', () async {
+      final st = AppState();
+      st.stations.add(Station(
+          call: 'BG7LZQ-9', symbol: '>', lat: 1, lng: 2,
+          lastHeard: DateTime.now()));
+      final ok = jsonDecodeSafe(
+              (await run(st, 'station_detail', {'call': 'bg7lzq-9'})).text) as Map;
+      expect(ok['call'], 'BG7LZQ-9');
+      expect(ok.containsKey('track_points'), isTrue);
+      final bad = await run(st, 'station_detail', {'call': 'NOPE'});
+      expect(bad.text, contains('ERROR'));
+    });
+
+    test('read_messages 返回消息且不含 "null" 字面量', () async {
+      final st = AppState();
+      st.messages.insert(0,
+          AprsMsg('BG7LZQ', st.myFullCall, 'hello there', DateTime.now()));
+      final r = await run(st, 'read_messages', {'limit': 10});
+      expect(r.text, isNot(contains('ERROR')));
+      final list = jsonDecodeSafe(r.text) as List;
+      expect(list, isNotEmpty);
+      expect(list.first['text'], 'hello there');
+    });
+  });
+
+  group('定时任务工具', () {
+    test('未授权时 create_task / cancel_task 被拒（list_tasks 不受限）', () async {
+      final st = AppState();
+      final r = await run(st, 'create_task', {'prompt': 'ping'},
+          allowTasks: false);
+      expect(r.text, contains('Permission denied'));
+      final l = await run(st, 'list_tasks', {}, allowTasks: false);
+      expect(l.text, isNot(contains('Permission denied')));
+    });
+
+    test('授权后能建、列、取消；间隔过短被拒', () async {
+      final st = AppState();
+      final short = await run(
+          st, 'create_task', {'prompt': 'x', 'interval_minutes': 1},
+          allowTasks: true);
+      expect(short.text, contains('ERROR'));
+
+      final created = await run(
+          st, 'create_task', {'prompt': 'summarize', 'interval_minutes': 30},
+          allowTasks: true);
+      expect(created.text, isNot(contains('ERROR')));
+      expect(AgentService.instance.tasks.length, 1);
+
+      final listed = jsonDecodeSafe(
+          (await run(st, 'list_tasks', {}, allowTasks: true)).text) as List;
+      expect(listed.single['prompt'], 'summarize');
+      expect(listed.single['every_min'], 30);
+
+      final id = listed.single['id'] as String;
+      final canceled =
+          await run(st, 'cancel_task', {'id': id}, allowTasks: true);
+      expect(canceled.text, isNot(contains('ERROR')));
+      expect(AgentService.instance.tasks, isEmpty);
+    });
+  });
+
+  group('免确认判定（agentNeedsConfirm）', () {
+    test('只读工具免确认，写工具要确认，navigate 豁免', () {
+      for (final name in [
+        'get_app_state',
+        'list_groups',
+        'list_stations',
+        'search_stations',
+        'station_detail',
+        'read_messages',
+        'list_tasks',
+      ]) {
+        expect(agentNeedsConfirm(name), isFalse, reason: name);
+      }
+      for (final name in [
+        'send_message',
+        'set_preferences',
+        'create_task',
+        'cancel_task',
+      ]) {
+        expect(agentNeedsConfirm(name), isTrue, reason: name);
+      }
+      expect(agentNeedsConfirm('navigate'), isFalse);
+    });
+
+    test('任务工具的 schema 仅在授权后出现', () {
+      final off = agentToolSchemas(allowSend: false, allowTasks: false)
+          .map((t) => t['function']['name'])
+          .toSet();
+      expect(off, isNot(contains('create_task')));
+      expect(off, isNot(contains('list_tasks')));
+      final on = agentToolSchemas(allowSend: false, allowTasks: true)
+          .map((t) => t['function']['name'])
+          .toSet();
+      expect(on, contains('create_task'));
+      expect(on, contains('list_tasks'));
+    });
+  });
+
+  group('配置与任务持久化（round-trip）', () {
+    test('AgentConfig 序列化含 alwaysAllow / 自动回复 / 任务权限', () {
+      final c = AgentConfig()
+        ..autoReply = true
+        ..replyGroups = true
+        ..autoReplyCooldownSec = 120
+        ..quietHours = '23:00-07:00'
+        ..allowTasks = true
+        ..alwaysAllow.addAll({'navigate', 'set_preferences'});
+      final back = AgentConfig.fromJson(jsonDecode(jsonEncode(c.toJson())));
+      expect(back.autoReply, isTrue);
+      expect(back.replyGroups, isTrue);
+      expect(back.autoReplyCooldownSec, 120);
+      expect(back.quietHours, '23:00-07:00');
+      expect(back.allowTasks, isTrue);
+      expect(back.alwaysAllow, containsAll(['navigate', 'set_preferences']));
+    });
+
+    test('AgentTask 序列化保留 id / 间隔 / 上次运行', () {
+      final t = AgentTask(
+        id: 't1',
+        prompt: 'ping',
+        intervalMinutes: 15,
+        lastRun: DateTime.parse('2026-01-01T00:00:00Z'),
+      );
+      final back = AgentTask.fromJson(jsonDecode(jsonEncode(t.toJson())))!;
+      expect(back.id, 't1');
+      expect(back.prompt, 'ping');
+      expect(back.intervalMinutes, 15);
+      expect(back.lastRun, t.lastRun);
+      // 空 prompt 的任务被丢弃（避免历史脏数据造出空转任务）。
+      expect(AgentTask.fromJson({'id': 'x', 'prompt': '  '}), isNull);
+    });
+
+    test('quietHours 跨零点判断', () {
+      final svc = AgentService.instance;
+      svc.config.quietHours = '23:00-07:00';
+      expect(svc.inQuietHours(DateTime(2026, 1, 1, 23, 30)), isTrue);
+      expect(svc.inQuietHours(DateTime(2026, 1, 1, 3, 0)), isTrue);
+      expect(svc.inQuietHours(DateTime(2026, 1, 1, 12, 0)), isFalse);
+      svc.config.quietHours = '09:00-17:00';
+      expect(svc.inQuietHours(DateTime(2026, 1, 1, 10, 0)), isTrue);
+      expect(svc.inQuietHours(DateTime(2026, 1, 1, 18, 0)), isFalse);
+      // 非法格式 → 不视为安静时段（宁可不拦，也不要误拦）。
+      svc.config.quietHours = 'nonsense';
+      expect(svc.inQuietHours(DateTime(2026, 1, 1, 10, 0)), isFalse);
+      svc.config.quietHours = '';
+    });
+
+    test('循环任务的 nextRun 与 dueTasks', () {
+      final t = AgentTask(
+        id: 't1',
+        prompt: 'ping',
+        intervalMinutes: 10,
+        createdAt: DateTime(2026, 1, 1, 0, 0),
+      );
+      expect(t.nextRun, DateTime(2026, 1, 1, 0, 10));
+      expect(t.dueTasksProbe(DateTime(2026, 1, 1, 0, 5)), isFalse);
+      expect(t.dueTasksProbe(DateTime(2026, 1, 1, 0, 11)), isTrue);
+      // 只跑一次的任务：跑过 lastRun 后不再触发。
+      final once = AgentTask(
+        id: 't2',
+        prompt: 'ping',
+        createdAt: DateTime(2026, 1, 1, 0, 0),
+      );
+      expect(once.nextRun, DateTime(2026, 1, 1, 0, 0));
+      once.lastRun = DateTime(2026, 1, 1, 0, 0);
+      expect(once.nextRun, isNull);
+    });
+  });
+
+  group('连接工具', () {
+    test('set_connection_server 改地址与端口；端口越界被拒', () async {
+      final st = AppState();
+      final r = await run(st, 'set_connection_server',
+          {'server': 'test.aprs.net', 'port': 14580});
+      expect(r.text, contains('test.aprs.net'));
+      expect(st.aprs.server, 'test.aprs.net');
+      expect(st.aprs.port, 14580);
+
+      final bad = await run(st, 'set_connection_server', {'port': 70000});
+      expect(bad.text, contains('port'));
+      expect(st.aprs.port, 14580); // 越界不写入
+    });
+
+    test('set_connection_source 启停来源；不允许关掉最后一个', () async {
+      final st = AppState();
+      await run(st, 'set_connection_source', {'source': 'tnc', 'enabled': true});
+      expect(st.tncOn, isTrue);
+
+      await run(st, 'set_connection_source',
+          {'source': 'aprsis', 'enabled': false});
+      expect(st.aprsIsOn, isFalse);
+
+      // tnc 是仅剩的来源，不能再关
+      final last = await run(st, 'set_connection_source',
+          {'source': 'tnc', 'enabled': false});
+      expect(last.text, contains('At least one'));
+      expect(st.tncOn, isTrue);
+
+      final bogus = await run(st, 'set_connection_source',
+          {'source': 'bogus', 'enabled': true});
+      expect(bogus.text, contains('source must be'));
+    });
+
+    test('未签署告知时 connect 被拒（不发起网络连接）', () async {
+      final st = AppState();
+      expect(st.dataNoticeAccepted, isFalse);
+      final r = await run(st, 'connect', {});
+      expect(r.text, contains('notice'));
+    });
+
+    test('disconnect 在未连接时返回已断开', () async {
+      final st = AppState();
+      final r = await run(st, 'disconnect', {});
+      expect(r.text, contains('Already disconnected'));
+    });
+
+    test('get_app_state 暴露连接信息', () async {
+      final st = AppState();
+      st.aprs.server = 'x.example';
+      final r = await run(st, 'get_app_state', {});
+      final m = jsonDecodeSafe(r.text) as Map<String, dynamic>;
+      final c = m['connections'] as Map<String, dynamic>;
+      expect(c['server'], 'x.example');
+      expect((c['sources'] as Map)['aprsis'], isTrue);
+    });
+
+    test('连接类工具受「修改设置」权限约束', () async {
+      final st = AppState();
+      final r = await run(st, 'set_connection_server', {'server': 'a.b'},
+          allowSettings: false);
+      expect(r.text, contains('Permission denied'));
+      expect(st.aprs.server, isNot('a.b'));
+    });
   });
 }
 
@@ -191,4 +443,9 @@ Object? jsonDecodeSafe(String s) {
   } catch (_) {
     return null;
   }
+}
+
+extension on AgentTask {
+  bool dueTasksProbe(DateTime now) =>
+      nextRun != null && !nextRun!.isAfter(now);
 }

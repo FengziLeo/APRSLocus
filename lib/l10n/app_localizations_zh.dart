@@ -8442,6 +8442,159 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit 单声道)';
+  @override
+  String get agentTabConnection => "连接";
+
+  @override
+  String get agentTabPermissions => "权限";
+
+  @override
+  String get agentTabAutomation => "自动化";
+
+  @override
+  String get agentSystemPromptHint => "留空则使用内置提示";
+
+  @override
+  String get agentAllowTasks => "允许定时任务";
+
+  @override
+  String get agentAllowTasksDesc => "允许智能体创建、查看与取消定时任务";
+
+  @override
+  String get agentAlwaysAllow => "始终允许";
+
+  @override
+  String get agentAlwaysAllowDesc => "已放行的工具，执行时不再询问。在确认条上点「始终允许」可加入此列表。";
+
+  @override
+  String get agentAlwaysAllowEmpty => "暂无。在操作确认条上点「始终允许」即可添加。";
+
+  @override
+  String get agentAlwaysAllowClear => "清除全部放行";
+
+  @override
+  String get agentAutoReply => "自动回复";
+
+  @override
+  String get agentAutoReplyDesc => "收到新消息时让智能体自动回一条（实验）";
+
+  @override
+  String get agentAutoReplyOn => "启用自动回复";
+
+  @override
+  String get agentAutoReplyHint => "仅回复私聊；受安静时段与冷却限制；需开启「允许发送消息」。";
+
+  @override
+  String get agentReplyGroups => "也回复群聊";
+
+  @override
+  String get agentReplyGroupsDesc => "群里自动说话风险更大，默认关闭";
+
+  @override
+  String get agentQuietHours => "安静时段";
+
+  @override
+  String get agentQuietHoursDesc => "形如 23:00-07:00；留空=不限。此时间段内不自动回复。";
+
+  @override
+  String get agentTasks => "定时任务";
+
+  @override
+  String get agentTasksDesc => "到点让智能体自动跑一段指令（需开启「允许定时任务」）";
+
+  @override
+  String get agentTasksEmpty => "暂无定时任务";
+
+  @override
+  String get agentTaskNew => "新建定时任务";
+
+  @override
+  String get agentTaskPrompt => "指令";
+
+  @override
+  String get agentTaskPromptHint => "例如：总结最近一小时的台站";
+
+  @override
+  String get agentTaskInterval => "间隔（分钟）";
+
+  @override
+  String get agentTaskIntervalHint => "0 = 只跑一次，循环最短 5 分钟";
+
+  @override
+  String get agentTaskCreate => "创建";
+
+  @override
+  String get agentTaskDelete => "删除";
+
+  @override
+  String agentTaskEvery(int n) => "每 $n 分钟";
+
+  @override
+  String get agentTaskOnce => "只跑一次";
+
+  @override
+  String agentAutoReplyPrompt(String from, String text) => "【自动回复】$from 发来消息：$text\n请只输出你要回复给对方的那一句话（不要解释、不要调用任何工具）。";
+
+  @override
+  String get agentTool_get_app_state => "读取应用状态";
+
+  @override
+  String get agentTool_list_groups => "列出群组";
+
+  @override
+  String get agentTool_search_stations => "搜索台站";
+
+  @override
+  String get agentTool_list_stations => "列出台站";
+
+  @override
+  String get agentTool_station_detail => "台站详情";
+
+  @override
+  String get agentTool_read_messages => "读取消息";
+
+  @override
+  String get agentTool_send_message => "发送消息";
+
+  @override
+  String get agentTool_send_beacon_now => "立即发送信标";
+
+  @override
+  String get agentTool_set_preferences => "修改偏好设置";
+
+  @override
+  String get agentTool_set_station_filters => "修改台站过滤";
+
+  @override
+  String get agentTool_set_nickname => "修改呼号信息";
+
+  @override
+  String get agentTool_navigate => "切换页面";
+
+  @override
+  String get agentTool_create_task => "新建定时任务";
+
+  @override
+  String get agentTool_list_tasks => "列出定时任务";
+
+  @override
+  String get agentTool_cancel_task => "取消定时任务";
+
+  @override
+  String get agentTool_unknown => "执行操作";
+
+  @override
+  String get agentTool_set_connection_server => "修改服务器地址";
+
+  @override
+  String get agentTool_set_connection_source => "修改连接方式";
+
+  @override
+  String get agentTool_connect => "连接";
+
+  @override
+  String get agentTool_disconnect => "断开连接";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -16881,4 +17034,157 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit 單聲道)';
+  @override
+  String get agentTabConnection => "連線";
+
+  @override
+  String get agentTabPermissions => "權限";
+
+  @override
+  String get agentTabAutomation => "自動化";
+
+  @override
+  String get agentSystemPromptHint => "留空則使用內建提示";
+
+  @override
+  String get agentAllowTasks => "允許定時任務";
+
+  @override
+  String get agentAllowTasksDesc => "允許智慧代理建立、檢視與取消定時任務";
+
+  @override
+  String get agentAlwaysAllow => "一律允許";
+
+  @override
+  String get agentAlwaysAllowDesc => "已放行的工具，執行時不再詢問。在確認條上點「一律允許」可加入此清單。";
+
+  @override
+  String get agentAlwaysAllowEmpty => "暫無。在操作確認條上點「一律允許」即可加入。";
+
+  @override
+  String get agentAlwaysAllowClear => "清除全部放行";
+
+  @override
+  String get agentAutoReply => "自動回覆";
+
+  @override
+  String get agentAutoReplyDesc => "收到新訊息時讓智慧代理自動回一條（實驗）";
+
+  @override
+  String get agentAutoReplyOn => "啟用自動回覆";
+
+  @override
+  String get agentAutoReplyHint => "僅回覆私聊；受安靜時段與冷卻限制；需開啟「允許傳送訊息」。";
+
+  @override
+  String get agentReplyGroups => "也回覆群聊";
+
+  @override
+  String get agentReplyGroupsDesc => "群裡自動說話風險較大，預設關閉";
+
+  @override
+  String get agentQuietHours => "安靜時段";
+
+  @override
+  String get agentQuietHoursDesc => "形如 23:00-07:00；留空=不限。此時段內不自動回覆。";
+
+  @override
+  String get agentTasks => "定時任務";
+
+  @override
+  String get agentTasksDesc => "到點讓智慧代理自動跑一段指令（需開啟「允許定時任務」）";
+
+  @override
+  String get agentTasksEmpty => "暫無定時任務";
+
+  @override
+  String get agentTaskNew => "新建定時任務";
+
+  @override
+  String get agentTaskPrompt => "指令";
+
+  @override
+  String get agentTaskPromptHint => "例如：總結最近一小時的台站";
+
+  @override
+  String get agentTaskInterval => "間隔（分鐘）";
+
+  @override
+  String get agentTaskIntervalHint => "0 = 只跑一次，循環最短 5 分鐘";
+
+  @override
+  String get agentTaskCreate => "建立";
+
+  @override
+  String get agentTaskDelete => "刪除";
+
+  @override
+  String agentTaskEvery(int n) => "每 $n 分鐘";
+
+  @override
+  String get agentTaskOnce => "只跑一次";
+
+  @override
+  String agentAutoReplyPrompt(String from, String text) => "【自動回覆】$from 傳來訊息：$text\n請只輸出你要回覆給對方的那一句話（不要解釋、不要呼叫任何工具）。";
+
+  @override
+  String get agentTool_get_app_state => "讀取應用狀態";
+
+  @override
+  String get agentTool_list_groups => "列出群組";
+
+  @override
+  String get agentTool_search_stations => "搜尋台站";
+
+  @override
+  String get agentTool_list_stations => "列出台站";
+
+  @override
+  String get agentTool_station_detail => "台站詳情";
+
+  @override
+  String get agentTool_read_messages => "讀取訊息";
+
+  @override
+  String get agentTool_send_message => "傳送訊息";
+
+  @override
+  String get agentTool_send_beacon_now => "立即傳送信標";
+
+  @override
+  String get agentTool_set_preferences => "修改偏好設定";
+
+  @override
+  String get agentTool_set_station_filters => "修改台站過濾";
+
+  @override
+  String get agentTool_set_nickname => "修改呼號資訊";
+
+  @override
+  String get agentTool_navigate => "切換頁面";
+
+  @override
+  String get agentTool_create_task => "新建定時任務";
+
+  @override
+  String get agentTool_list_tasks => "列出定時任務";
+
+  @override
+  String get agentTool_cancel_task => "取消定時任務";
+
+  @override
+  String get agentTool_unknown => "執行操作";
+
+  @override
+  String get agentTool_set_connection_server => "修改伺服器位址";
+
+  @override
+  String get agentTool_set_connection_source => "修改連線方式";
+
+  @override
+  String get agentTool_connect => "連線";
+
+  @override
+  String get agentTool_disconnect => "中斷連線";
+
 }

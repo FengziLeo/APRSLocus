@@ -8810,4 +8810,157 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit mono)';
+  @override
+  String get agentTabConnection => "Koneksi";
+
+  @override
+  String get agentTabPermissions => "Izin";
+
+  @override
+  String get agentTabAutomation => "Otomatisasi";
+
+  @override
+  String get agentSystemPromptHint => "Kosongkan untuk prompt bawaan";
+
+  @override
+  String get agentAllowTasks => "Izinkan tugas terjadwal";
+
+  @override
+  String get agentAllowTasksDesc => "Izinkan agen membuat, melihat, dan membatalkan tugas terjadwal";
+
+  @override
+  String get agentAlwaysAllow => "Selalu izinkan";
+
+  @override
+  String get agentAlwaysAllowDesc => "Alat ini berjalan tanpa bertanya. Ketuk \"Selalu izinkan\" pada bilah konfirmasi untuk menambah.";
+
+  @override
+  String get agentAlwaysAllowEmpty => "Belum ada. Ketuk \"Selalu izinkan\" pada bilah konfirmasi.";
+
+  @override
+  String get agentAlwaysAllowClear => "Hapus semua";
+
+  @override
+  String get agentAutoReply => "Balasan otomatis";
+
+  @override
+  String get agentAutoReplyDesc => "Agen membalas pesan baru secara otomatis (eksperimental)";
+
+  @override
+  String get agentAutoReplyOn => "Aktifkan balasan otomatis";
+
+  @override
+  String get agentAutoReplyHint => "Hanya pesan langsung; dibatasi jam tenang dan jeda; perlu \"Izinkan mengirim pesan\".";
+
+  @override
+  String get agentReplyGroups => "Balas juga di grup";
+
+  @override
+  String get agentReplyGroupsDesc => "Bicara otomatis di grup lebih berisiko; mati secara bawaan";
+
+  @override
+  String get agentQuietHours => "Jam tenang";
+
+  @override
+  String get agentQuietHoursDesc => "mis. 23:00-07:00; kosong = tanpa batas. Tidak membalas di rentang ini.";
+
+  @override
+  String get agentTasks => "Tugas terjadwal";
+
+  @override
+  String get agentTasksDesc => "Jalankan instruksi nanti secara otomatis (perlu \"Izinkan tugas terjadwal\")";
+
+  @override
+  String get agentTasksEmpty => "Belum ada tugas terjadwal";
+
+  @override
+  String get agentTaskNew => "Tugas terjadwal baru";
+
+  @override
+  String get agentTaskPrompt => "Instruksi";
+
+  @override
+  String get agentTaskPromptHint => "mis. ringkas stasiun satu jam terakhir";
+
+  @override
+  String get agentTaskInterval => "Interval (menit)";
+
+  @override
+  String get agentTaskIntervalHint => "0 = sekali; ulang min 5 menit";
+
+  @override
+  String get agentTaskCreate => "Buat";
+
+  @override
+  String get agentTaskDelete => "Hapus";
+
+  @override
+  String agentTaskEvery(int n) => "Setiap $n menit";
+
+  @override
+  String get agentTaskOnce => "Sekali";
+
+  @override
+  String agentAutoReplyPrompt(String from, String text) => "[Balasan otomatis] $from mengirim: $text\nKeluarkan hanya pesan balasan (tanpa penjelasan, tanpa memanggil alat).";
+
+  @override
+  String get agentTool_get_app_state => "Baca status aplikasi";
+
+  @override
+  String get agentTool_list_groups => "Daftar grup";
+
+  @override
+  String get agentTool_search_stations => "Cari stasiun";
+
+  @override
+  String get agentTool_list_stations => "Daftar stasiun";
+
+  @override
+  String get agentTool_station_detail => "Detail stasiun";
+
+  @override
+  String get agentTool_read_messages => "Baca pesan";
+
+  @override
+  String get agentTool_send_message => "Kirim pesan";
+
+  @override
+  String get agentTool_send_beacon_now => "Kirim beacon sekarang";
+
+  @override
+  String get agentTool_set_preferences => "Ubah preferensi";
+
+  @override
+  String get agentTool_set_station_filters => "Ubah filter stasiun";
+
+  @override
+  String get agentTool_set_nickname => "Ubah info callsign";
+
+  @override
+  String get agentTool_navigate => "Ganti layar";
+
+  @override
+  String get agentTool_create_task => "Buat tugas terjadwal";
+
+  @override
+  String get agentTool_list_tasks => "Daftar tugas terjadwal";
+
+  @override
+  String get agentTool_cancel_task => "Batalkan tugas terjadwal";
+
+  @override
+  String get agentTool_unknown => "Jalankan tindakan";
+
+  @override
+  String get agentTool_set_connection_server => "Ubah alamat server";
+
+  @override
+  String get agentTool_set_connection_source => "Ubah sumber koneksi";
+
+  @override
+  String get agentTool_connect => "Hubungkan";
+
+  @override
+  String get agentTool_disconnect => "Putuskan";
+
 }

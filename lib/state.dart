@@ -116,7 +116,7 @@ class SmartBeaconTier {
 
 class AppState extends ChangeNotifier {
   /// 应用版本（用于信标备注、APRSlocus 识别）
-  static const appVersion = '2.0.57';
+  static const appVersion = '2.0.58';
   // 我的电台
   String myCall = 'BV2AAA';
   int mySsid = 0; // 0 = 无后缀, 1-15 = -1 到 -15
@@ -3216,6 +3216,9 @@ class AppState extends ChangeNotifier {
   Timer? _keepaliveTimer;
   Timer? _reconnectTimer;
   bool _userDisconnected = false;
+
+  /// 用户（或智能体）是否主动断开过 —— 为 true 时自动重连不会把链路拉起来。
+  bool get userDisconnected => _userDisconnected;
 
   /// 最近一帧**自定义状态报文**是否没能写进链路（socket 抖动 / 半开）。
   ///

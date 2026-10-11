@@ -15284,6 +15284,312 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'12000 Hz (LPCM 16-bit 单声道)'**
   String get icomAudioFmtValue;
+  /// No description provided for @agentTabConnection.
+  ///
+  /// In zh, this message translates to:
+  /// **'连接'**
+  String get agentTabConnection;
+
+  /// No description provided for @agentTabPermissions.
+  ///
+  /// In zh, this message translates to:
+  /// **'权限'**
+  String get agentTabPermissions;
+
+  /// No description provided for @agentTabAutomation.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动化'**
+  String get agentTabAutomation;
+
+  /// No description provided for @agentSystemPromptHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'留空则使用内置提示'**
+  String get agentSystemPromptHint;
+
+  /// No description provided for @agentAllowTasks.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许定时任务'**
+  String get agentAllowTasks;
+
+  /// No description provided for @agentAllowTasksDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许智能体创建、查看与取消定时任务'**
+  String get agentAllowTasksDesc;
+
+  /// No description provided for @agentAlwaysAllow.
+  ///
+  /// In zh, this message translates to:
+  /// **'始终允许'**
+  String get agentAlwaysAllow;
+
+  /// No description provided for @agentAlwaysAllowDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'已放行的工具，执行时不再询问。在确认条上点「始终允许」可加入此列表。'**
+  String get agentAlwaysAllowDesc;
+
+  /// No description provided for @agentAlwaysAllowEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无。在操作确认条上点「始终允许」即可添加。'**
+  String get agentAlwaysAllowEmpty;
+
+  /// No description provided for @agentAlwaysAllowClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除全部放行'**
+  String get agentAlwaysAllowClear;
+
+  /// No description provided for @agentAutoReply.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动回复'**
+  String get agentAutoReply;
+
+  /// No description provided for @agentAutoReplyDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'收到新消息时让智能体自动回一条（实验）'**
+  String get agentAutoReplyDesc;
+
+  /// No description provided for @agentAutoReplyOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'启用自动回复'**
+  String get agentAutoReplyOn;
+
+  /// No description provided for @agentAutoReplyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅回复私聊；受安静时段与冷却限制；需开启「允许发送消息」。'**
+  String get agentAutoReplyHint;
+
+  /// No description provided for @agentReplyGroups.
+  ///
+  /// In zh, this message translates to:
+  /// **'也回复群聊'**
+  String get agentReplyGroups;
+
+  /// No description provided for @agentReplyGroupsDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'群里自动说话风险更大，默认关闭'**
+  String get agentReplyGroupsDesc;
+
+  /// No description provided for @agentQuietHours.
+  ///
+  /// In zh, this message translates to:
+  /// **'安静时段'**
+  String get agentQuietHours;
+
+  /// No description provided for @agentQuietHoursDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'形如 23:00-07:00；留空=不限。此时间段内不自动回复。'**
+  String get agentQuietHoursDesc;
+
+  /// No description provided for @agentTasks.
+  ///
+  /// In zh, this message translates to:
+  /// **'定时任务'**
+  String get agentTasks;
+
+  /// No description provided for @agentTasksDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'到点让智能体自动跑一段指令（需开启「允许定时任务」）'**
+  String get agentTasksDesc;
+
+  /// No description provided for @agentTasksEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无定时任务'**
+  String get agentTasksEmpty;
+
+  /// No description provided for @agentTaskNew.
+  ///
+  /// In zh, this message translates to:
+  /// **'新建定时任务'**
+  String get agentTaskNew;
+
+  /// No description provided for @agentTaskPrompt.
+  ///
+  /// In zh, this message translates to:
+  /// **'指令'**
+  String get agentTaskPrompt;
+
+  /// No description provided for @agentTaskPromptHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'例如：总结最近一小时的台站'**
+  String get agentTaskPromptHint;
+
+  /// No description provided for @agentTaskInterval.
+  ///
+  /// In zh, this message translates to:
+  /// **'间隔（分钟）'**
+  String get agentTaskInterval;
+
+  /// No description provided for @agentTaskIntervalHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'0 = 只跑一次，循环最短 5 分钟'**
+  String get agentTaskIntervalHint;
+
+  /// No description provided for @agentTaskCreate.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建'**
+  String get agentTaskCreate;
+
+  /// No description provided for @agentTaskDelete.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get agentTaskDelete;
+
+  /// No description provided for @agentTaskEvery.
+  ///
+  /// In zh, this message translates to:
+  /// **'每 {n} 分钟'**
+  String agentTaskEvery(int n);
+
+  /// No description provided for @agentTaskOnce.
+  ///
+  /// In zh, this message translates to:
+  /// **'只跑一次'**
+  String get agentTaskOnce;
+
+  /// No description provided for @agentAutoReplyPrompt.
+  ///
+  /// In zh, this message translates to:
+  /// **'【自动回复】{from} 发来消息：{text} 请只输出你要回复给对方的那一句话（不要解释、不要调用任何工具）。'**
+  String agentAutoReplyPrompt(String from, String text);
+
+  /// No description provided for @agentTool_get_app_state.
+  ///
+  /// In zh, this message translates to:
+  /// **'读取应用状态'**
+  String get agentTool_get_app_state;
+
+  /// No description provided for @agentTool_list_groups.
+  ///
+  /// In zh, this message translates to:
+  /// **'列出群组'**
+  String get agentTool_list_groups;
+
+  /// No description provided for @agentTool_search_stations.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索台站'**
+  String get agentTool_search_stations;
+
+  /// No description provided for @agentTool_list_stations.
+  ///
+  /// In zh, this message translates to:
+  /// **'列出台站'**
+  String get agentTool_list_stations;
+
+  /// No description provided for @agentTool_station_detail.
+  ///
+  /// In zh, this message translates to:
+  /// **'台站详情'**
+  String get agentTool_station_detail;
+
+  /// No description provided for @agentTool_read_messages.
+  ///
+  /// In zh, this message translates to:
+  /// **'读取消息'**
+  String get agentTool_read_messages;
+
+  /// No description provided for @agentTool_send_message.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送消息'**
+  String get agentTool_send_message;
+
+  /// No description provided for @agentTool_send_beacon_now.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即发送信标'**
+  String get agentTool_send_beacon_now;
+
+  /// No description provided for @agentTool_set_preferences.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改偏好设置'**
+  String get agentTool_set_preferences;
+
+  /// No description provided for @agentTool_set_station_filters.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改台站过滤'**
+  String get agentTool_set_station_filters;
+
+  /// No description provided for @agentTool_set_nickname.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改呼号信息'**
+  String get agentTool_set_nickname;
+
+  /// No description provided for @agentTool_navigate.
+  ///
+  /// In zh, this message translates to:
+  /// **'切换页面'**
+  String get agentTool_navigate;
+
+  /// No description provided for @agentTool_create_task.
+  ///
+  /// In zh, this message translates to:
+  /// **'新建定时任务'**
+  String get agentTool_create_task;
+
+  /// No description provided for @agentTool_list_tasks.
+  ///
+  /// In zh, this message translates to:
+  /// **'列出定时任务'**
+  String get agentTool_list_tasks;
+
+  /// No description provided for @agentTool_cancel_task.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消定时任务'**
+  String get agentTool_cancel_task;
+
+  /// No description provided for @agentTool_unknown.
+  ///
+  /// In zh, this message translates to:
+  /// **'执行操作'**
+  String get agentTool_unknown;
+
+  /// No description provided for @agentTool_set_connection_server.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改服务器地址'**
+  String get agentTool_set_connection_server;
+
+  /// No description provided for @agentTool_set_connection_source.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改连接方式'**
+  String get agentTool_set_connection_source;
+
+  /// No description provided for @agentTool_connect.
+  ///
+  /// In zh, this message translates to:
+  /// **'连接'**
+  String get agentTool_connect;
+
+  /// No description provided for @agentTool_disconnect.
+  ///
+  /// In zh, this message translates to:
+  /// **'断开连接'**
+  String get agentTool_disconnect;
+
 }
 
 class _AppLocalizationsDelegate

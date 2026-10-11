@@ -116,7 +116,7 @@ class SmartBeaconTier {
 
 class AppState extends ChangeNotifier {
   /// 应用版本（用于信标备注、APRSlocus 识别）
-  static const appVersion = '2.0.59';
+  static const appVersion = '2.0.60';
   // 我的电台
   String myCall = 'BV2AAA';
   int mySsid = 0; // 0 = 无后缀, 1-15 = -1 到 -15
@@ -236,6 +236,15 @@ class AppState extends ChangeNotifier {
   /// null = 还没有过读数（此时**不发** HR=，而不是发一个 0）。
   int? myHr;
 
+  /// 最近一次定位的时刻（无论来源）。首次修复后一直为 null 表示从没定位过。
+  /// 供智能体判断「坐标新不新鲜」——[myLat] 即使过期也会保留旧值（启动即回填缓存），
+  /// 只看坐标无法区分「刚刚定位」和「拿着半小时前的旧点」。
+  DateTime? myFixAt;
+
+  /// 最近一次心率读数的时刻（null = 从没读到过）。心跳带断开时 [myHr] 会被清空，
+  /// 但 [myHrAt] 保留最后时刻，供智能体判断读数是实时还是陈旧的。
+  DateTime? myHrAt;
+
   /// 蓝牙心率带服务（扫描/连接/订阅标准心率服务 0x180D）。
   final BleHrService bleHr = BleHrService.instance;
 
@@ -312,6 +321,7 @@ class AppState extends ChangeNotifier {
     myLat = p.lat;
     myLng = p.lng;
     myHasFix = true;
+    myFixAt = DateTime.now();
     _pendingSavedPos = false; // 手表给的是真实点，可以上报
     myFixCoarse = false; // 手表 GPS，不是粗定位
     myAccuracy = 0; // 佳明页面不给精度 → 0 = 未知（不画精度圈）
@@ -319,6 +329,7 @@ class AppState extends ChangeNotifier {
     if (p.speedMps != null) mySpeed = p.speedMps! * 3.6;
     if (p.hr != null && p.hr! > 0) {
       myHr = p.hr;
+      myHrAt = DateTime.now();
       _checkHrAlarm();
     }
     _checkCrash();
@@ -441,6 +452,7 @@ class AppState extends ChangeNotifier {
     myLng = lng;
     myAlt = alt;
     myHasFix = true;
+    myFixAt = DateTime.now(); // 手动选点也是「刚刚的」位置
     useSimLocation = true;
     // 之前在真正定位（GPS/网络）就停掉它 —— 模拟位置由手动坐标供位。
     // 已经在保活模式时**不要**停：stop() 会把前台服务一并关掉。
@@ -1098,6 +1110,12 @@ class AppState extends ChangeNotifier {
   DateTime _lastMileageSave = DateTime.fromMillisecondsSinceEpoch(0);
 
   int _battery = -1; // 电量百分比（-1 未知）
+
+  /// 手机电量（%）；-1 = 未知（没权限 / 还没读到）。
+  int get battery => _battery;
+
+  /// 电量的读取时刻（null = 从没读到过）。
+  DateTime? get batteryAt => _batteryAt;
 
   /// 最近一次读到电量的时刻。
   ///
@@ -3529,6 +3547,9 @@ class AppState extends ChangeNotifier {
     myLng = null;
     myHasFix = false;
     myHr = null;
+    myFixAt = null;
+    myHrAt = null;
+    ignoredStations.clear();
     _resetSelfFix();
     _bumpStationsVersion();
     _reconnectAttempt = 0;
@@ -3979,6 +4000,10 @@ class AppState extends ChangeNotifier {
         } catch (_) {}
       }
       _recalcUnread();
+      // 加载本地屏蔽台站
+      ignoredStations
+        ..clear()
+        ..addAll(p.getStringList('ignoredStations') ?? const []);
       // 加载收藏/手动联系人
       _loadStations(p);
       // 数据维护：若用户开启了「台站保留天数」，启动时顺带清一次过时台站
@@ -4243,6 +4268,7 @@ class AppState extends ChangeNotifier {
       final b = bleHr.bpm;
       if (b != null && b > 0) {
         myHr = b;
+        myHrAt = DateTime.now();
       } else if (!bleHr.connected && !(garmin.on && garmin.fresh)) {
         myHr = null;
       }
@@ -5888,6 +5914,8 @@ class AppState extends ChangeNotifier {
     myLng = outLng;
     myAlt = alt;
     myHasFix = true;
+    // 缓存点（lastKnown）不算「刚定位」，只更新真实点的时间，避免「拿旧点当新定位」。
+    if (!lastKnown) myFixAt = DateTime.now();
     // 收到**本轮的**定位（含用户显式选用的网络定位）→ 上报闸打开。
     // ⚠ `lastKnown` 是系统缓存点，不算「重新获取到的位置」：它只让标记有东西
     // 可显示，绝不能据此上报（见 [myPositionReportable] 与用户报的
@@ -7071,6 +7099,9 @@ class AppState extends ChangeNotifier {
   /// 若将来想重做这一层，请先回答“它能省下多少帧”再动手。
   void _upsertStation(String call, ParsedPos p,
       {String? raw, String? path, String? toCall}) {
+    // 本地屏蔽：被屏蔽的台站不上图、不进台站列表（原始数据包仍落在 packets 里，
+    // 数据包页照常可见）。这是**展示层**过滤，不是接收闸门。
+    if (isStationIgnored(call)) return;
     // 国家/地区接收筛选：未选择国家时不限制；
     // 开启「其他台站」时放行特殊类型（中继/气象/FMO/APRSlocus）；
     // 否则仅保留匹配国家前缀的台站（收藏/手动台站除外）
@@ -7413,6 +7444,52 @@ class AppState extends ChangeNotifier {
       _notify();
       _saveStations();
     }
+  }
+
+  /// 设置收藏状态（幂等）。`on=true` 时若无该台站则手动补一条（同 [addManualStation]）。
+  /// 供智能体「关注/取消关注」用：比 [toggleFavorite] 更适合「我要它变成 X」的语义。
+  void setFavorite(String call, bool on) {
+    final c = call.trim().toUpperCase();
+    if (c.isEmpty) return;
+    final idx = stations.indexWhere((s) => s.call == c);
+    if (idx >= 0) {
+      if (stations[idx].favorite == on) return;
+      stations[idx].favorite = on;
+      _bumpStationsVersion();
+      _notify();
+      _saveStations();
+      return;
+    }
+    if (on) addManualStation(c);
+  }
+
+  // ─── 台站屏蔽（本地不上图，包仍接收）───
+  //
+  // 为什么需要：此前只有 [receiveOthers] 这个**全局**收发闸门，要么全看要么全不看。
+  // 被某个台站刷屏时，用户想要的是「只看不画这一个」，而不是关掉全世界。
+  // 屏蔽表只影响展示与地图，不影响数据包接收（数据包页仍能看到它的原文）。
+  final Set<String> ignoredStations = {};
+
+  bool isStationIgnored(String call) =>
+      ignoredStations.contains(call.toUpperCase());
+
+  void setStationIgnored(String call, bool ignored) {
+    final c = call.trim().toUpperCase();
+    if (c.isEmpty) return;
+    if (ignored) {
+      ignoredStations.add(c);
+    } else {
+      ignoredStations.remove(c);
+    }
+    _bumpStationsVersion();
+    _notify();
+    _saveIgnored();
+  }
+
+  void _saveIgnored() {
+    unawaited(SharedPreferences.getInstance()
+        .then((p) => p.setStringList('ignoredStations', ignoredStations.toList()))
+        .catchError((_) {}));
   }
 
   /// 手动添加联系人（无需等待 APRS 数据包）
@@ -8172,7 +8249,8 @@ class AppState extends ChangeNotifier {
   }
 
   /// 更新群聊
-  void updateGroup(String groupId, {String? name, Set<String>? members}) {
+  void updateGroup(String groupId,
+      {String? name, Set<String>? members, Set<String>? remove}) {
     final g = chatGroups.where((g) => g.id == groupId).firstOrNull;
     if (g == null) return;
     if (name != null) g.name = name;
@@ -8185,8 +8263,42 @@ class AppState extends ChangeNotifier {
         );
       }
     }
+    if (remove != null) {
+      for (final m in remove) {
+        final who = m.toUpperCase();
+        g.memberStatus.remove(who);
+        g.activeMembers.remove(who);
+      }
+    }
     _saveChatGroups();
     _notify();
+  }
+
+  /// 按群名或群呼号查群（大小写不敏感）。找不到返回 null。
+  ChatGroup? findGroup(String query) {
+    final q = query.trim().toUpperCase();
+    if (q.isEmpty) return null;
+    return chatGroups
+        .where((g) =>
+            g.groupCall.toUpperCase() == q || g.name.toUpperCase() == q)
+        .firstOrNull;
+  }
+
+  /// 设置自己在某个群里的成员状态（加入 / 退出）。返回群名，找不到返回 null。
+  String? setMyGroupMembership(String groupId, bool joined) {
+    final g = chatGroups.where((g) => g.id == groupId).firstOrNull;
+    if (g == null) return null;
+    final me = myCall.toUpperCase();
+    if (joined) {
+      g.memberStatus[me] = GroupMemberStatus.joined;
+      g.activeMembers.add(me);
+    } else {
+      g.memberStatus[me] = GroupMemberStatus.left;
+      g.activeMembers.remove(me);
+    }
+    _saveChatGroups();
+    _notify();
+    return g.name;
   }
 
   void deleteGroup(String groupId) {

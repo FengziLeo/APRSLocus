@@ -650,10 +650,19 @@ class _AgentOverlayState extends State<AgentOverlay> {
       // 先标记已跑：即便这一轮因未配置好而失败，也不会 60 秒后立刻重试刷屏。
       await svc.markTaskRun(t.id);
       if (!mounted) return;
-      if (!cfg.ready) continue;
+      if (!cfg.ready) {
+        await svc.recordTaskRun(t.id, t.prompt, false, 'Agent not configured');
+        continue;
+      }
       final s = S.of(context);
-      await _runChat(s, t.prompt, background: true);
+      final reply = await _runChat(s, t.prompt, background: true);
       if (!mounted) return;
+      await svc.recordTaskRun(
+        t.id,
+        t.prompt,
+        reply != null,
+        reply == null ? 'No reply (see chat)' : reply,
+      );
     }
   }
 
@@ -685,12 +694,19 @@ class _AgentOverlayState extends State<AgentOverlay> {
     ];
     for (var i = 0; i < triggers.length; i++) {
       if (!mounted || svc.busy) break;
-      await _runChat(
+      final tr = triggers[i];
+      final reply = await _runChat(
         s,
-        s.agentMessageTaskRunPrompt(i + 1, triggers[i].prompt, src, text),
+        s.agentMessageTaskRunPrompt(i + 1, tr.prompt, src, text),
         background: true,
       );
       if (!mounted) return;
+      await svc.recordTaskRun(
+        tr.id,
+        tr.prompt,
+        reply != null,
+        'Message from $src: ${reply ?? 'no reply'}',
+      );
     }
     if (!mounted) return;
 

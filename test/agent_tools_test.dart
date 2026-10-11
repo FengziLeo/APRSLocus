@@ -219,9 +219,33 @@ void main() {
           AprsMsg('BG7LZQ', st.myFullCall, 'hello there', DateTime.now()));
       final r = await run(st, 'read_messages', {'limit': 10});
       expect(r.text, isNot(contains('ERROR')));
-      final list = jsonDecodeSafe(r.text) as List;
+      final obj = jsonDecodeSafe(r.text) as Map;
+      final list = obj['messages'] as List;
       expect(list, isNotEmpty);
       expect(list.first['text'], 'hello there');
+    });
+
+    test('read_messages 支持关键字与时间过滤，并如实报告是否标记已读', () async {
+      final st = AppState();
+      final now = DateTime.now();
+      st.messages.insert(
+          0, AprsMsg('BG7LZQ', st.myFullCall, 'alpha one', now));
+      st.messages.insert(
+          0,
+          AprsMsg('BG7LZQ', st.myFullCall, 'beta two',
+              now.subtract(const Duration(hours: 2))));
+
+      final kw = jsonDecodeSafe(
+              (await run(st, 'read_messages', {'query': 'alpha'})).text)
+          as Map;
+      expect((kw['messages'] as List).length, 1);
+      // 关键字过滤不代表「读完了」，不能顺手清未读。
+      expect(kw['marked_read'], isFalse);
+
+      final time = jsonDecodeSafe((await run(st, 'read_messages', {
+        'since': now.subtract(const Duration(hours: 1)).millisecondsSinceEpoch,
+      })).text) as Map;
+      expect((time['messages'] as List).length, 1);
     });
   });
 
@@ -520,6 +544,231 @@ void main() {
           allowSettings: false);
       expect(r.text, contains('Permission denied'));
       expect(st.aprs.server, isNot('a.b'));
+    });
+  });
+
+  group('任务编辑与执行记录', () {
+    test('update_task 就地改提示词与间隔', () async {
+      final st = AppState();
+      await run(st, 'create_task', {'prompt': 'old', 'interval_minutes': 30});
+      final id = AgentService.instance.tasks.single.id;
+      final r = await run(st, 'update_task',
+          {'id': id, 'prompt': 'new', 'interval_minutes': 5});
+      expect(r.text, isNot(contains('ERROR')));
+      final t = AgentService.instance.tasks.single;
+      expect(t.prompt, 'new');
+      expect(t.intervalMinutes, 5);
+    });
+
+    test('update_task 支持绝对时刻 run_at（只跑一次）', () async {
+      final st = AppState();
+      await run(st, 'create_task', {'prompt': 'x', 'interval_minutes': 30});
+      final id = AgentService.instance.tasks.single.id;
+      final when = DateTime(2030, 1, 2, 3, 4);
+      final r = await run(st, 'update_task', {'id': id, 'run_at': when.toIso8601String()});
+      expect(r.text, isNot(contains('ERROR')));
+      final t = AgentService.instance.tasks.single;
+      expect(t.runAt, when);
+      expect(t.recurring, isFalse);
+      // 还没到点，不应被当作到期任务。
+      expect(AgentService.instance.dueTasks(DateTime(2029)), isEmpty);
+    });
+
+    test('update_task 未知 id 报错', () async {
+      final st = AppState();
+      final r = await run(st, 'update_task', {'id': 'nope', 'prompt': 'x'});
+      expect(r.text, contains('ERROR'));
+    });
+
+    test('recordTaskRun / list_task_runs 记录并可清空', () async {
+      final st = AppState();
+      await AgentService.instance.recordTaskRun('t1', 'p', true, 'done');
+      final listed = jsonDecodeSafe((await run(st, 'list_task_runs', {})).text) as List;
+      expect(listed.single['task_id'], 't1');
+      expect(listed.single['ok'], isTrue);
+      await run(st, 'clear_task_runs', {});
+      final after = jsonDecodeSafe((await run(st, 'list_task_runs', {})).text) as List;
+      expect(after, isEmpty);
+    });
+
+    test('AgentTaskRun 序列化保留字段', () {
+      final r = AgentTaskRun(
+          taskId: 't9', prompt: 'p', at: DateTime(2026), ok: false, summary: 's');
+      final back = AgentTaskRun.fromJson(r.toJson())!;
+      expect(back.taskId, 't9');
+      expect(back.ok, isFalse);
+      expect(back.summary, 's');
+    });
+  });
+
+  group('群管理工具', () {
+    test('list_groups 现在带成员', () async {
+      final st = AppState();
+      st.createGroup('Team', {'BG1AAA', 'BG2BBB'});
+      final list = jsonDecodeSafe((await run(st, 'list_groups', {})).text) as List;
+      final g = list.single as Map;
+      expect(g['owner'], st.myCall);
+      expect(g['is_owner'], isTrue);
+      final members = g['members'] as List;
+      expect(members.length, 3); // 群主 + 两位成员
+    });
+
+    test('update_group 改名并加/删成员', () async {
+      final st = AppState();
+      final g = st.createGroup('Team', {'BG1AAA'});
+      final r = await run(st, 'update_group', {
+        'group': 'Team',
+        'name': 'Renamed',
+        'add': ['BG2BBB'],
+        'remove': ['BG1AAA'],
+      });
+      expect(r.text, isNot(contains('ERROR')));
+      final grp = st.chatGroups.single;
+      expect(grp.name, 'Renamed');
+      expect(grp.allMemberCalls, contains('BG2BBB'));
+      expect(grp.allMemberCalls, isNot(contains('BG1AAA')));
+      // 自己不应被移除
+      expect(grp.recipients, contains(st.myCall.toUpperCase()));
+      expect(g.id, grp.id);
+    });
+
+    test('leave_group / join_group 改变自身成员状态', () async {
+      final st = AppState();
+      st.createGroup('Team', {'BG1AAA'});
+      final left = await run(st, 'leave_group', {'group': 'Team'});
+      expect(left.text, isNot(contains('ERROR')));
+      expect(st.chatGroups.single.recipients, isNot(contains(st.myCall.toUpperCase())));
+      final joined = await run(st, 'join_group', {'group': 'Team'});
+      expect(joined.text, isNot(contains('ERROR')));
+      expect(st.chatGroups.single.recipients, contains(st.myCall.toUpperCase()));
+    });
+
+    test('dismiss_group 删除群', () async {
+      final st = AppState();
+      st.createGroup('Team', {'BG1AAA'});
+      final r = await run(st, 'dismiss_group', {'group': 'Team'});
+      expect(r.text, isNot(contains('ERROR')));
+      expect(st.chatGroups, isEmpty);
+    });
+  });
+
+  group('台站：收藏 / 屏蔽 / 数据', () {
+    test('set_favorite 关注不存在的呼号会补一条手动台站', () async {
+      final st = AppState();
+      final r = await run(st, 'set_favorite', {'call': 'bg9zzz', 'favorite': true});
+      expect(r.text, isNot(contains('ERROR')));
+      expect(st.stations.where((s) => s.call == 'BG9ZZZ').single.favorite, isTrue);
+      final contacts = jsonDecodeSafe((await run(st, 'list_contacts', {})).text) as List;
+      expect(contacts.single['call'], 'BG9ZZZ');
+    });
+
+    test('set_station_ignored 隐藏台站（upsert 被跳过）', () async {
+      final st = AppState();
+      st.setStationIgnored('BAD', true);
+      expect(st.isStationIgnored('bad'), isTrue);
+      final r = await run(st, 'set_station_ignored', {'call': 'BAD', 'ignored': false});
+      expect(r.text, isNot(contains('ERROR')));
+      expect(st.isStationIgnored('BAD'), isFalse);
+    });
+
+    test('get_station_packets 返回原始帧', () async {
+      final st = AppState();
+      st.packets.insert(0,
+          Packet('BG1>APRS:x', 'BG1', 'APRS', 'message', DateTime.now()));
+      final list = jsonDecodeSafe(
+              (await run(st, 'get_station_packets', {'call': 'BG1'})).text) as List;
+      expect(list.single['raw'], 'BG1>APRS:x');
+    });
+
+    test('get_track / export_track_gpx 走自身轨迹', () async {
+      final st = AppState();
+      st.myTrack.add(TrackPt(1, 2, DateTime(2026)));
+      final js = jsonDecodeSafe((await run(st, 'get_track', {'call': 'me'})).text) as List;
+      expect(js.single['lat'], 1);
+      final gpx = await run(st, 'export_track_gpx', {'call': 'me'});
+      expect(gpx.text, contains('<gpx'));
+      expect(gpx.text, contains('lat="1.0"'));
+    });
+
+    test('distance_between 计算距离与方位', () async {
+      final st = AppState();
+      st.setMyPosition(0, 0);
+      st.stations.add(Station(
+          call: 'FAR', symbol: '>', lat: 0, lng: 1, lastHeard: DateTime.now()));
+      final m = jsonDecodeSafe(
+              (await run(st, 'distance_between', {'from': 'me', 'to': 'FAR'})).text)
+          as Map;
+      expect(m['distance_m'], greaterThan(110000));
+      expect(m['distance_m'], lessThan(112000));
+      expect(m['initial_bearing_deg'], 90); // 正东
+    });
+  });
+
+  group('传感器 / 位置 / 状态 / 群发', () {
+    test('get_sensors 无数据时字段为 null 而非 "null"', () async {
+      final st = AppState();
+      final r = await run(st, 'get_sensors', {});
+      expect(r.text, isNot(contains('ERROR')));
+      final m = jsonDecodeSafe(r.text) as Map;
+      expect(m.containsKey('heart_rate_bpm'), isTrue);
+      expect(m['heart_rate_bpm'], isNull);
+      expect(m['steps_today'], 0);
+    });
+
+    test('set_status_text 写入状态文本', () async {
+      final st = AppState();
+      final r = await run(st, 'set_status_text', {'text': 'On the air'});
+      expect(r.text, isNot(contains('ERROR')));
+      expect(st.aprsStatusText, 'On the air');
+    });
+
+    test('broadcast_message 逐个收件人入队，受发送权限约束', () async {
+      final st = AppState();
+      final ok = await run(st, 'broadcast_message', {
+        'to': ['BG1', 'BG2'],
+        'text': 'hi all',
+      });
+      expect(ok.text, isNot(contains('ERROR')));
+      expect(st.messages.where((m) => m.sent).length, 2);
+
+      final denied = await run(st, 'broadcast_message', {
+        'to': ['BG3'],
+        'text': 'x',
+      }, allowSend: false);
+      expect(denied.text, contains('Permission denied'));
+    });
+
+    test('set_my_position 需要已签数据告知；clear 复位', () async {
+      final st = AppState();
+      final denied = await run(st, 'set_my_position', {'lat': 1, 'lng': 2});
+      expect(denied.text, contains('ERROR'));
+      st.dataNoticeAccepted = true;
+      final ok = await run(st, 'set_my_position', {'lat': 1, 'lng': 2});
+      expect(ok.text, isNot(contains('ERROR')));
+      expect(st.myLat, 1);
+      expect(st.useSimLocation, isTrue);
+      final cleared = await run(st, 'clear_my_position', {});
+      expect(cleared.text, isNot(contains('ERROR')));
+      expect(st.useSimLocation, isFalse);
+    });
+
+    test('越界坐标被拒', () async {
+      final st = AppState();
+      st.dataNoticeAccepted = true;
+      final r = await run(st, 'set_my_position', {'lat': 200, 'lng': 0});
+      expect(r.text, contains('ERROR'));
+    });
+  });
+
+  group('权限可见性', () {
+    test('get_app_state 暴露 permissions 与自身位置时间', () async {
+      final st = AppState();
+      final m = jsonDecodeSafe((await run(st, 'get_app_state', {})).text)
+          as Map<String, dynamic>;
+      final p = m['permissions'] as Map;
+      expect(p.containsKey('allow_send'), isTrue);
+      expect(p.containsKey('allow_settings'), isTrue);
+      expect(m.containsKey('my_fix_min_ago'), isTrue);
     });
   });
 }

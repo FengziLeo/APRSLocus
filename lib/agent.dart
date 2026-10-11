@@ -237,8 +237,12 @@ class AgentTask {
   /// 触发源。默认定时（兼容旧数据）。
   AgentTaskTrigger trigger;
 
-  /// 循环间隔（分钟）。0 = 只跑一次。[trigger] 为 message 时不使用。
+  /// 循环间隔（分钟）。0 = 只跑一次。[trigger] 为 message 或设置了 [runAt] 时不使用。
   int intervalMinutes;
+
+  /// 绝对时刻（只跑一次）。设置了它就以它为准（「今晚 8 点」不必再自己算分钟）。
+  /// 跑过之后 [nextRun] 返回 null，不再触发。
+  DateTime? runAt;
 
   bool enabled;
 
@@ -249,10 +253,11 @@ class AgentTask {
     this.lastRun,
     this.trigger = AgentTaskTrigger.timer,
     this.intervalMinutes = 0,
+    this.runAt,
     this.enabled = true,
   }) : createdAt = createdAt ?? DateTime.now();
 
-  bool get recurring => intervalMinutes > 0;
+  bool get recurring => intervalMinutes > 0 && runAt == null;
 
   /// 下一次该跑的时刻（只跑一次的任务跑完即视为不再触发）。
   ///
@@ -261,6 +266,8 @@ class AgentTask {
   DateTime? get nextRun {
     if (!enabled) return null;
     if (trigger == AgentTaskTrigger.message) return null;
+    // 绝对时刻：只在「还没跑过」时到点触发。
+    if (runAt != null) return lastRun == null ? runAt : null;
     if (!recurring) {
       return lastRun == null ? createdAt : null;
     }
@@ -275,6 +282,7 @@ class AgentTask {
         'lastRun': lastRun?.toIso8601String(),
         'trigger': trigger.name,
         'intervalMinutes': intervalMinutes,
+        if (runAt != null) 'runAt': runAt!.toIso8601String(),
         'enabled': enabled,
       };
 
@@ -294,7 +302,49 @@ class AgentTask {
           : AgentTaskTrigger.timer,
       intervalMinutes:
           int.tryParse('${j['intervalMinutes']}') ?? 0,
+      runAt: dt(j['runAt']),
       enabled: j['enabled'] != false,
+    );
+  }
+}
+
+/// 一条任务执行记录（供 `list_task_runs` 与排查「任务跑没跑成」）。
+///
+/// 此前任务只留 `lastRun` 一个时刻，跑成没跑成、结果是什么都查不到。这里存
+/// 最近若干次的「什么时候、哪条任务、成没成、结果摘要」。
+class AgentTaskRun {
+  final String taskId;
+  final String prompt;
+  final DateTime at;
+  final bool ok;
+  final String summary;
+
+  AgentTaskRun({
+    required this.taskId,
+    required this.prompt,
+    required this.at,
+    required this.ok,
+    required this.summary,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'taskId': taskId,
+        'prompt': prompt,
+        'at': at.toIso8601String(),
+        'ok': ok,
+        'summary': summary,
+      };
+
+  static AgentTaskRun? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final at = DateTime.tryParse('${j['at'] ?? ''}');
+    if (at == null) return null;
+    return AgentTaskRun(
+      taskId: '${j['taskId'] ?? ''}',
+      prompt: '${j['prompt'] ?? ''}',
+      at: at,
+      ok: j['ok'] == true,
+      summary: '${j['summary'] ?? ''}',
     );
   }
 }
@@ -333,11 +383,31 @@ Rules:
   the user's confirmation.
 - You can create work that runs without the user watching, with `create_task`.
   `trigger` = "timer" (default) runs on a schedule (interval_minutes = 0 runs
-  once); `trigger` = "message" runs the instruction each time a new APRS message
-  arrives. A background run happens WITHOUT the user watching: only use it for
-  things that are already permitted (e.g. reading and reporting), never for a
-  one-off action that still needs a confirmation — that will just be denied.
-  List existing tasks before creating one so you do not duplicate it.
+  once, or pass `run_at` for an absolute ISO-8601 time); `trigger` = "message"
+  runs the instruction each time a new APRS message arrives. A background run
+  happens WITHOUT the user watching: only use it for things that are already
+  permitted (e.g. reading and reporting), never for a one-off action that still
+  needs a confirmation — that will just be denied. List existing tasks before
+  creating one so you do not duplicate it. `update_task` edits one in place
+  (prompt / trigger / schedule), `set_task_enabled` pauses or resumes it, and
+  `list_task_runs` shows what actually ran.
+- Groups, beyond listing: `update_group` renames a group or adds/removes members
+  (`list_groups` shows the members and who is active), `join_group` /
+  `leave_group` change your own membership, and `dismiss_group` deletes a group
+  you own.
+- Stations and data: `list_contacts` shows the user's followed stations,
+  `set_favorite` follows/unfollows, and `set_station_ignored` hides a station
+  from the map without stopping reception. `get_station_packets` returns recent
+  raw frames (with the digipeater path), `get_track` / `export_track_gpx` give a
+  station's track, and `distance_between` computes range/bearing between two
+  stations or "me".
+- Sensors and position: `get_sensors` reads heart rate, steps, battery, speed,
+  course and mileage; `set_my_position` / `clear_my_position` set or clear a
+  simulated position. `set_status_text` changes the station status text.
+  `broadcast_message` sends the same message to several callsigns at once.
+- Permission awareness: `get_app_state` reports the current permissions
+  (`allow_send`, `allow_settings`, notice acceptance). If a tool is refused for
+  lack of permission, tell the user which switch to enable.
 - You can help with connectivity: `set_connection_server` changes the APRS-IS
   server, `set_connection_source` enables/disables a link, and `connect` /
   `disconnect` bring the link up or down. Setting a server does NOT connect by
@@ -388,6 +458,7 @@ class AgentService extends ChangeNotifier {
   static const _kConfig = 'agentConfigJson';
   static const _kHistory = 'agentChatHistoryJson';
   static const _kTasks = 'agentTasksJson';
+  static const _kTaskRuns = 'agentTaskRunsJson';
 
   /// 单轮对话里工具调用的最大往返次数（防止模型死循环）
   static const int maxToolRounds = 6;
@@ -397,6 +468,10 @@ class AgentService extends ChangeNotifier {
 
   /// 定时任务（内存 + 磁盘）。
   final List<AgentTask> tasks = [];
+
+  /// 任务执行记录（最新在前，最多 [_kMaxTaskRuns] 条）。
+  final List<AgentTaskRun> taskRuns = [];
+  static const int _kMaxTaskRuns = 100;
 
   bool loaded = false;
   bool busy = false;
@@ -432,6 +507,16 @@ class AgentService extends ChangeNotifier {
           for (final t in list) {
             final task = AgentTask.fromJson(t);
             if (task != null) tasks.add(task);
+          }
+        }
+      }
+      final tr = p.getString(_kTaskRuns);
+      if (tr != null && tr.isNotEmpty) {
+        final list = jsonDecode(tr);
+        if (list is List) {
+          for (final r in list) {
+            final run = AgentTaskRun.fromJson(r);
+            if (run != null) taskRuns.add(run);
           }
         }
       }
@@ -494,6 +579,82 @@ class AgentService extends ChangeNotifier {
     await saveTasks();
   }
 
+  /// 就地修改一个任务（只改传入的字段）。返回是否找到该任务。
+  Future<bool> updateTask(
+    String id, {
+    String? prompt,
+    AgentTaskTrigger? trigger,
+    int? intervalMinutes,
+    DateTime? runAt,
+    bool clearRunAt = false,
+  }) async {
+    final t = tasks.where((t) => t.id == id).firstOrNull;
+    if (t == null) return false;
+    if (prompt != null && prompt.trim().isNotEmpty) t.prompt = prompt.trim();
+    if (trigger != null) t.trigger = trigger;
+    if (runAt != null) {
+      t.runAt = runAt;
+      // 绝对时刻优先于循环间隔：设了 run_at 就当作「只跑一次」。
+      t.intervalMinutes = 0;
+    } else if (clearRunAt) {
+      t.runAt = null;
+    }
+    if (intervalMinutes != null) {
+      t.intervalMinutes = intervalMinutes < 0 ? 0 : intervalMinutes;
+      t.runAt = null; // 设了间隔就以间隔为准
+    }
+    // 改完触发方式/时间后，让「下一次」从头算：否则旧的 lastRun 会让循环
+    // 任务在新间隔下等一个已经过去的点，或只跑一次的任务误判为已跑过。
+    t.lastRun = null;
+    t.enabled = true;
+    await saveTasks();
+    return true;
+  }
+
+  /// 记一条任务执行结果（保留最近 [_kMaxTaskRuns] 条，最新在前）。
+  Future<void> recordTaskRun(
+      String taskId, String prompt, bool ok, String summary) async {
+    taskRuns.insert(
+      0,
+      AgentTaskRun(
+        taskId: taskId,
+        prompt: prompt,
+        at: DateTime.now(),
+        ok: ok,
+        summary: summary,
+      ),
+    );
+    if (taskRuns.length > _kMaxTaskRuns) {
+      taskRuns.removeRange(_kMaxTaskRuns, taskRuns.length);
+    }
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString(
+          _kTaskRuns, jsonEncode(taskRuns.map((r) => r.toJson()).toList()));
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  /// 某个任务的执行记录（最新在前）。[taskId] 为空时返回全部。
+  List<AgentTaskRun> taskRunsFor(String taskId) => taskId.isEmpty
+      ? List.unmodifiable(taskRuns)
+      : [for (final r in taskRuns) if (r.taskId == taskId) r];
+
+  /// 清除某个任务（或全部）的执行记录。
+  Future<void> clearTaskRuns(String taskId) async {
+    if (taskId.isEmpty) {
+      taskRuns.clear();
+    } else {
+      taskRuns.removeWhere((r) => r.taskId == taskId);
+    }
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString(
+          _kTaskRuns, jsonEncode(taskRuns.map((r) => r.toJson()).toList()));
+    } catch (_) {}
+    notifyListeners();
+  }
+
   Future<void> setTaskEnabled(String id, bool on) async {
     final t = tasks.where((t) => t.id == id).firstOrNull;
     if (t == null) return;
@@ -542,6 +703,7 @@ class AgentService extends ChangeNotifier {
     _copy(AgentConfig(), config);
     messages.clear();
     tasks.clear();
+    taskRuns.clear();
     _autoReplyAt.clear();
     busy = false;
   }

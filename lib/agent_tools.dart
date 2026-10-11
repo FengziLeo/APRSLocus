@@ -17,6 +17,8 @@ library;
 import 'dart:convert';
 
 import 'agent.dart';
+import 'garmin.dart';
+import 'group_chat.dart';
 import 'map_math.dart';
 import 'models.dart';
 import 'state.dart';
@@ -464,6 +466,279 @@ final List<AgentToolSpec> kAgentTools = [
       'required': ['id', 'enabled'],
     },
   ),
+  const AgentToolSpec(
+    name: 'update_task',
+    description:
+        'Edit an existing task in place (see "list_tasks"). Only the provided '
+        'fields change; use this instead of cancel + create. Changing "trigger" '
+        'resets the schedule.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'id': {'type': 'string', 'description': 'Task id from list_tasks.'},
+        'prompt': {'type': 'string', 'description': 'New instruction text.'},
+        'trigger': {
+          'type': 'string',
+          'enum': ['timer', 'message'],
+          'description': 'timer = on a schedule; message = on each new message.',
+        },
+        'interval_minutes': {
+          'type': 'integer',
+          'description': 'timer trigger: 0 = once, otherwise every N min.',
+        },
+        'run_at': {
+          'type': 'string',
+          'description':
+              'timer trigger: run once at an absolute time (ISO-8601, e.g. '
+              '2026-10-03T20:00 local). Overrides interval_minutes.',
+        },
+      },
+      'required': ['id'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'list_task_runs',
+    description:
+        'Recent execution history of scheduled/message tasks: when each ran and '
+        'what happened. Read-only.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'id': {'type': 'string', 'description': 'Task id; omit for all tasks.'},
+        'limit': {'type': 'integer', 'description': 'Max rows (default 20).'},
+      },
+    },
+  ),
+  const AgentToolSpec(
+    name: 'clear_task_runs',
+    description: 'Clear task execution history (one task, or all when id is omitted).',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'id': {'type': 'string', 'description': 'Task id; omit to clear all.'},
+      },
+    },
+  ),
+  const AgentToolSpec(
+    name: 'list_contacts',
+    description:
+        'List the user\'s contacts / favourite stations (callsigns kept on the '
+        'map even when they go quiet). Read-only.',
+    parameters: {'type': 'object', 'properties': {}},
+  ),
+  const AgentToolSpec(
+    name: 'update_group',
+    description:
+        'Change an existing group: rename it and/or add or remove members. '
+        'A group is found by name or group call.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group name or group call.'},
+        'name': {'type': 'string', 'description': 'New display name.'},
+        'add': {
+          'type': 'array',
+          'items': {'type': 'string'},
+          'description': 'Callsigns to add as members.',
+        },
+        'remove': {
+          'type': 'array',
+          'items': {'type': 'string'},
+          'description': 'Callsigns to remove from the member list.',
+        },
+      },
+      'required': ['group'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'join_group',
+    description:
+        'Join a group chat by its group call (or a group already in the list).',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group call or name.'},
+      },
+      'required': ['group'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'leave_group',
+    description: 'Leave a group chat (the group stays in the list, you stop taking part).',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group name or group call.'},
+      },
+      'required': ['group'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'dismiss_group',
+    description:
+        'Delete a group chat you own. This removes it from this device.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group name or group call.'},
+      },
+      'required': ['group'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'set_favorite',
+    description:
+        'Follow or unfollow a station. Followed stations are kept on the map. '
+        'Adding a call that is not heard yet creates a manual contact.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'call': {'type': 'string', 'description': 'Callsign.'},
+        'favorite': {'type': 'boolean', 'description': 'true = follow, false = unfollow.'},
+      },
+      'required': ['call', 'favorite'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'set_station_ignored',
+    description:
+        'Block or unblock a station from the map/station list. Packets are '
+        'still received and shown on the packets page; this only hides it.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'call': {'type': 'string', 'description': 'Callsign.'},
+        'ignored': {'type': 'boolean', 'description': 'true = hide, false = show again.'},
+      },
+      'required': ['call', 'ignored'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'set_status_text',
+    description:
+        'Set the station status text (the APRS "status" report, separate from '
+        'the position comment). Stored only; it is sent with the next status '
+        'report, not immediately.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'text': {'type': 'string', 'description': 'New status text (may be empty).'},
+      },
+      'required': ['text'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'broadcast_message',
+    description:
+        'Send the same message to several callsigns at once (one APRS message '
+        'per recipient). Radio mode limits each message to 67 characters.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'to': {
+          'type': 'array',
+          'items': {'type': 'string'},
+          'description': 'Recipient callsigns.',
+        },
+        'text': {'type': 'string', 'description': 'Message body.'},
+      },
+      'required': ['to', 'text'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'get_sensors',
+    description:
+        'Read the current on-device sensor values: heart rate, steps today, '
+        'battery, speed, course, and trip/total mileage. Read-only.',
+    parameters: {'type': 'object', 'properties': {}},
+  ),
+  const AgentToolSpec(
+    name: 'get_station_packets',
+    description:
+        'Recent raw APRS packets, optionally only those from one callsign. '
+        'Includes the raw frame and the digipeater path. Read-only.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'call': {'type': 'string', 'description': 'Optional callsign filter.'},
+        'limit': {'type': 'integer', 'description': 'Max rows (default 20, max 50).'},
+      },
+    },
+  ),
+  const AgentToolSpec(
+    name: 'get_track',
+    description:
+        'The position track of a station (or of yourself with "my call" / '
+        'callsign). Read-only. Use "export_track_gpx" to get it as GPX.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'call': {'type': 'string', 'description': 'Callsign, or "me".'},
+        'limit': {'type': 'integer', 'description': 'Max points from the newest end.'},
+      },
+      'required': ['call'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'export_track_gpx',
+    description:
+        'Export a station track as a GPX document (returned as text; nothing '
+        'is written to disk). Read-only.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'call': {'type': 'string', 'description': 'Callsign, or "me".'},
+      },
+      'required': ['call'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'distance_between',
+    description:
+        'Great-circle distance and initial bearing between two stations (or '
+        'points). Use "me" for the user\'s own position. Read-only.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'from': {'type': 'string', 'description': 'Callsign or "me".'},
+        'to': {'type': 'string', 'description': 'Callsign or "me".'},
+      },
+      'required': ['from', 'to'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'set_my_position',
+    description:
+        'Set the user\'s position manually (simulated position), e.g. for '
+        'testing or when there is no location service. Overrides real GPS until '
+        'cleared. Requires the data notice to be accepted.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'lat': {'type': 'number', 'description': '-90..90'},
+        'lng': {'type': 'number', 'description': '-180..180'},
+        'alt': {'type': 'number', 'description': 'Optional altitude in metres.'},
+      },
+      'required': ['lat', 'lng'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'clear_my_position',
+    description: 'Stop using a manually set position and go back to real GPS.',
+    mutating: true,
+    parameters: {'type': 'object', 'properties': {}},
+  ),
 ];
 
 /// 名称 → spec
@@ -496,9 +771,12 @@ List<Map<String, dynamic>> agentToolSchemas({required bool allowSend}) => [
     ];
 
 /// 会发出 APRS 消息的工具（受「允许发送」开关约束）。
-/// `reply_message` 不以 `send_` 开头，但同样是发送，必须一并纳入。
+/// `reply_message` 不以 `send_` 开头，但同样是发送，必须一并纳入；
+/// `broadcast_message` 发多条单播，同样受此闸门约束。
 bool _isSendingTool(String name) =>
-    name.startsWith('send_') || name == 'reply_message';
+    name.startsWith('send_') ||
+    name == 'reply_message' ||
+    name == 'broadcast_message';
 
 /// 免确认白名单：这些工具无副作用，执行前不问用户。
 ///
@@ -585,8 +863,26 @@ Future<AgentToolOutcome> executeAgentTool(
         'my_callsign': st.myFullCall,
         'my_symbol': st.mySymbol,
         'my_comment': st.myComment,
+        'my_status_text': st.aprsStatusText,
+        // 自身位置：以前只给「有多少台站」，坐标反而拿不到 —— 但后台明明有
+        // （nearby_stations 就靠它算距离）。这里如实给出，并带上「新不新鲜」。
+        'my_lat': st.myLat,
+        'my_lng': st.myLng,
+        'my_alt_m': st.myAlt,
+        'my_has_fix': st.myHasFix,
+        'my_position_reportable': st.myPositionReportable,
+        'my_fix_min_ago':
+            st.myFixAt == null ? null : DateTime.now().difference(st.myFixAt!).inMinutes,
         'connected': st.connected,
         'using_rf': st.usingRf,
+        // 权限可见性：模型不必再「撞错才知道」。只读，供其判断能做什么。
+        'permissions': {
+          'agent_enabled': AgentService.instance.config.enabled,
+          'allow_send': AgentService.instance.config.allowSend,
+          'allow_settings': AgentService.instance.config.allowSettings,
+          'agent_notice_accepted': st.agentNoticeAccepted,
+          'data_notice_accepted': st.dataNoticeAccepted,
+        },
         'connections': {
           'connected': st.anyLinkUp,
           'user_disconnected': st.userDisconnected,
@@ -636,7 +932,30 @@ Future<AgentToolOutcome> executeAgentTool(
 
     case 'list_groups':
       return AgentToolOutcome(jsonEncode([
-        for (final g in st.chatGroups) {'name': g.name, 'call': g.groupCall},
+        for (final g in st.chatGroups)
+          {
+            'name': g.name,
+            'call': g.groupCall,
+            'owner': g.owner,
+            'is_owner': g.isOwner(st.myFullCall),
+            // 以前只给群名 + 群呼，模型连「群里都有谁」都看不到，没法做任何成员运维。
+            'members': [
+              for (final m in g.allMemberCalls.toList()..sort())
+                {
+                  'call': m,
+                  'status': g.activeMembers.contains(m)
+                      ? 'active'
+                      : (g.memberStatus[m.toUpperCase()]?.name ?? 'unknown'),
+                  'blocked': g.blockedMembers.contains(m),
+                },
+            ],
+          },
+      ]));
+
+    case 'list_contacts':
+      return AgentToolOutcome(jsonEncode([
+        for (final s in st.stations.where((s) => s.favorite || s.manual))
+          {..._stationBrief(s), 'manual': s.manual},
       ]));
 
     case 'search_stations':
@@ -707,10 +1026,20 @@ Future<AgentToolOutcome> executeAgentTool(
     case 'read_messages':
       {
         final who = _val(args, 'with').trim().toUpperCase();
-        final lim = _limit(args['limit']);
+        final kw = _val(args, 'query').trim().toLowerCase();
+        final since = _asEpoch(args['since']);
+        final until = _asEpoch(args['until']);
+        final lim = (() {
+          final n = _asInt(args['limit']) ?? 20;
+          return n.clamp(1, 200);
+        })();
         final groupCalls = st.chatGroups.map((g) => g.groupCall.toUpperCase());
         // st.messages 是倒序（最新在前）：过滤后取最新 lim 条，再翻回时间正序给模型。
+        // 注意 take(lim) 必须在 reversed 前 —— 否则截的是最旧的 lim 条。
         final filtered = st.messages.where((m) {
+          if (since != null && m.time.isBefore(since)) return false;
+          if (until != null && m.time.isAfter(until)) return false;
+          if (kw.isNotEmpty && !m.text.toLowerCase().contains(kw)) return false;
           if (who.isEmpty) return true;
           final from = m.from.toUpperCase();
           final to = m.to.toUpperCase();
@@ -726,12 +1055,33 @@ Future<AgentToolOutcome> executeAgentTool(
               'to': m.to,
               'text': m.text,
               'sent': m.sent,
+              // 送达回执：只有本机发出的单播才有 ack 语义（群发刻意不做 ack，见
+              // sendGroupMessage 的注释）。null = 不适用，false = 已发未确认。
+              'acked': m.sent && m.id != null ? m.acked : null,
               'group': m.groupId != null,
               'system': m.system,
             },
         ];
-        return AgentToolOutcome(jsonEncode(list),
-            note: 'read_messages${who.isEmpty ? '' : ' "$who"'} → ${list.length}');
+        // 只有「完整读某个会话」时才顺带标记已读；关键字/时间过滤只关心结果，
+        // 不代表该会话已看完 —— 不能因此清掉未读小红点。
+        var markedRead = false;
+        if (who.isNotEmpty &&
+            kw.isEmpty &&
+            since == null &&
+            until == null &&
+            list.isNotEmpty) {
+          final g = st.findGroup(who);
+          if (g != null) {
+            st.markGroupRead(g.id);
+          } else {
+            st.markConversationRead(who);
+          }
+          markedRead = true;
+        }
+        return AgentToolOutcome(jsonEncode({
+          'messages': list,
+          'marked_read': markedRead,
+        }), note: 'read_messages${who.isEmpty ? '' : ' "$who"'} → ${list.length}');
       }
 
     case 'send_message':
@@ -1120,6 +1470,326 @@ Future<AgentToolOutcome> executeAgentTool(
             note: 'set_task_enabled $id → $on');
       }
 
+    case 'update_task':
+      {
+        final id = _val(args, 'id').trim();
+        if (id.isEmpty) return _err('id is required');
+        final svc = AgentService.instance;
+        if (svc.tasks.where((t) => t.id == id).isEmpty) {
+          return _err('No task with id $id.');
+        }
+        AgentTaskTrigger? trigger;
+        if (args.containsKey('trigger')) {
+          final v = _val(args, 'trigger').trim().toLowerCase();
+          if (v != 'timer' && v != 'message') {
+            return _err('trigger must be "timer" or "message".');
+          }
+          trigger = v == 'message' ? AgentTaskTrigger.message : AgentTaskTrigger.timer;
+        }
+        DateTime? runAt;
+        if (args.containsKey('run_at') && _val(args, 'run_at').trim().isNotEmpty) {
+          runAt = DateTime.tryParse(_val(args, 'run_at').trim());
+          if (runAt == null) {
+            return _err('run_at must be an ISO-8601 date/time.');
+          }
+        }
+        int? interval;
+        if (args.containsKey('interval_minutes')) {
+          interval = _asInt(args['interval_minutes']);
+          if (interval == null || interval < 0) {
+            return _err('interval_minutes must be >= 0.');
+          }
+        }
+        if (_val(args, 'prompt').trim().isEmpty &&
+            trigger == null &&
+            runAt == null &&
+            interval == null) {
+          return _err('Nothing to update: give prompt, trigger, run_at or '
+              'interval_minutes.');
+        }
+        final ok = await svc.updateTask(
+          id,
+          prompt: _val(args, 'prompt').trim().isEmpty ? null : _val(args, 'prompt'),
+          trigger: trigger,
+          runAt: runAt,
+          intervalMinutes: interval,
+          clearRunAt: trigger == AgentTaskTrigger.message,
+        );
+        if (!ok) return _err('No task with id $id.');
+        final t = svc.tasks.where((t) => t.id == id).first;
+        return AgentToolOutcome(
+            'Task $id updated (trigger=${t.trigger.name}, '
+            'every=${t.intervalMinutes} min, run_at=${t.runAt?.toIso8601String()}).',
+            note: 'update_task $id');
+      }
+
+    case 'list_task_runs':
+      {
+        final id = _val(args, 'id').trim();
+        final lim = (() {
+          final n = _asInt(args['limit']) ?? 20;
+          return n.clamp(1, 100);
+        })();
+        final runs = AgentService.instance.taskRunsFor(id).take(lim);
+        final list = [
+          for (final r in runs)
+            {
+              'task_id': r.taskId,
+              'at': r.at.toIso8601String(),
+              'ok': r.ok,
+              'summary': r.summary,
+            },
+        ];
+        return AgentToolOutcome(jsonEncode(list),
+            note: 'list_task_runs${id.isEmpty ? '' : ' $id'} → ${list.length}');
+      }
+
+    case 'clear_task_runs':
+      {
+        final id = _val(args, 'id').trim();
+        await AgentService.instance.clearTaskRuns(id);
+        return AgentToolOutcome(
+            id.isEmpty ? 'Cleared all task run history.' : 'Cleared runs for $id.',
+            note: 'clear_task_runs${id.isEmpty ? '' : ' $id'}');
+      }
+
+    // ─── 群管理（成员运维 / 加入 / 退出 / 解散）───
+
+    case 'update_group':
+      {
+        final q = _val(args, 'group').trim();
+        if (q.isEmpty) return _err('group is required');
+        final g = st.findGroup(q);
+        if (g == null) return _err('No group named "$q".');
+        final name = _val(args, 'name').trim();
+        if (name.isNotEmpty && GroupProto.validateName(name) != null) {
+          return _err('Invalid group name.');
+        }
+        final add = _strSet(args['add']);
+        final remove = _strSet(args['remove']);
+        if (name.isEmpty && add.isEmpty && remove.isEmpty) {
+          return _err('Nothing to update: give name, add or remove.');
+        }
+        // 自己不能被从成员表里踢掉（否则群聊收件人里就没自己了）。
+        remove.remove(st.myCall.toUpperCase());
+        st.updateGroup(
+          g.id,
+          name: name.isEmpty ? null : name,
+          members: add.isEmpty ? null : add,
+          remove: remove.isEmpty ? null : remove,
+        );
+        return AgentToolOutcome(
+            'Updated ${g.name}: ${[
+              if (name.isNotEmpty) 'renamed to $name',
+              if (add.isNotEmpty) 'added ${add.join(', ')}',
+              if (remove.isNotEmpty) 'removed ${remove.join(', ')}',
+            ].join('; ')}.',
+            note: 'update_group ${g.name}');
+      }
+
+    case 'join_group':
+      {
+        final q = _val(args, 'group').trim();
+        if (q.isEmpty) return _err('group is required');
+        final g = st.findGroup(q);
+        if (g == null) return _err('No group named "$q".');
+        final name = st.setMyGroupMembership(g.id, true);
+        return AgentToolOutcome('Joined ${name ?? g.name}.',
+            note: 'join_group ${g.name}');
+      }
+
+    case 'leave_group':
+      {
+        final q = _val(args, 'group').trim();
+        if (q.isEmpty) return _err('group is required');
+        final g = st.findGroup(q);
+        if (g == null) return _err('No group named "$q".');
+        final name = st.setMyGroupMembership(g.id, false);
+        return AgentToolOutcome('Left ${name ?? g.name}.',
+            note: 'leave_group ${g.name}');
+      }
+
+    case 'dismiss_group':
+      {
+        final q = _val(args, 'group').trim();
+        if (q.isEmpty) return _err('group is required');
+        final g = st.findGroup(q);
+        if (g == null) return _err('No group named "$q".');
+        st.deleteGroup(g.id);
+        return AgentToolOutcome('Dismissed ${g.name} (${g.groupCall}).',
+            note: 'dismiss_group ${g.name}');
+      }
+
+    // ─── 台站：收藏 / 屏蔽 ───
+
+    case 'set_favorite':
+      {
+        final call = _val(args, 'call').trim().toUpperCase();
+        final fav = _asBool(args['favorite']);
+        if (call.isEmpty) return _err('call is required');
+        if (fav == null) return _err('"favorite" must be true or false.');
+        st.setFavorite(call, fav);
+        return AgentToolOutcome(
+            fav ? 'Following $call.' : 'Unfollowed $call.',
+            note: 'set_favorite $call → $fav');
+      }
+
+    case 'set_station_ignored':
+      {
+        final call = _val(args, 'call').trim().toUpperCase();
+        final ign = _asBool(args['ignored']);
+        if (call.isEmpty) return _err('call is required');
+        if (ign == null) return _err('"ignored" must be true or false.');
+        st.setStationIgnored(call, ign);
+        return AgentToolOutcome(
+            ign
+                ? '$call is now hidden from the map (packets still received).'
+                : '$call is shown again.',
+            note: 'set_station_ignored $call → $ign');
+      }
+
+    // ─── 发送：状态文本 / 群发 ───
+
+    case 'set_status_text':
+      {
+        if (!args.containsKey('text')) return _err('text is required');
+        final v = _val(args, 'text').trim();
+        st.setAprsStatusText(v);
+        return AgentToolOutcome(
+            v.isEmpty
+                ? 'Status text cleared.'
+                : 'Status text set to "$v" (sent with the next status report).',
+            note: 'set_status_text');
+      }
+
+    case 'broadcast_message':
+      {
+        final raw = args['to'];
+        final text = _val(args, 'text').trim();
+        if (text.isEmpty) return _err('text is required');
+        final dests = <String>{};
+        if (raw is List) {
+          for (final m in raw) {
+            final s = _val({'x': m}, 'x').trim().toUpperCase();
+            if (s.isNotEmpty) dests.add(s);
+          }
+        }
+        if (dests.isEmpty) return _err('"to" needs at least one callsign.');
+        if (st.usingRf && text.length > 67) {
+          return _err('Radio mode limits a message to 67 characters.');
+        }
+        for (final d in dests) {
+          st.sendMessage(d, text);
+        }
+        return AgentToolOutcome(
+            'Sent to ${dests.length} recipient(s): ${dests.join(', ')}.',
+            note: 'broadcast_message → ${dests.length}');
+      }
+
+    // ─── 传感器 / 台站数据 / 轨迹 / 距离 ───
+
+    case 'get_sensors':
+      return AgentToolOutcome(jsonEncode({
+        'heart_rate_bpm': st.myHr,
+        'heart_rate_min_ago': st.myHrAt == null
+            ? null
+            : DateTime.now().difference(st.myHrAt!).inMinutes,
+        'steps_today': st.stepsToday,
+        'steps_status': st.stepsStatus.name,
+        'battery_percent': st.battery < 0 ? null : st.battery,
+        'battery_min_ago': st.batteryAt == null
+            ? null
+            : DateTime.now().difference(st.batteryAt!).inMinutes,
+        'speed_kmh': st.mySpeed,
+        'course_deg': st.myCourse,
+        'trip_km': st.tripMileageKm,
+        'total_km': st.totalMileageKm,
+      }));
+
+    case 'get_station_packets':
+      {
+        final call = _val(args, 'call').trim().toUpperCase();
+        final lim = (() {
+          final n = _asInt(args['limit']) ?? 20;
+          return n.clamp(1, 50);
+        })();
+        final filtered = st.packets
+            .where((p) =>
+                call.isEmpty ||
+                p.src.toUpperCase().contains(call) ||
+                p.dest.toUpperCase().contains(call))
+            .take(lim)
+            .toList();
+        final list = [
+          for (final p in filtered)
+            {
+              'time': p.time.toIso8601String(),
+              'from': p.src,
+              'to': p.dest,
+              'type': p.type,
+              'source': p.source,
+              'raw': p.raw,
+            },
+        ];
+        return AgentToolOutcome(jsonEncode(list),
+            note: 'get_station_packets${call.isEmpty ? '' : ' "$call"'} → ${list.length}');
+      }
+
+    case 'get_track':
+      return _trackOutcome(st, _val(args, 'call'), asGpx: false,
+          limit: _asInt(args['limit']));
+
+    case 'export_track_gpx':
+      return _trackOutcome(st, _val(args, 'call'), asGpx: true, limit: null);
+
+    case 'distance_between':
+      {
+        final a = _pointOf(st, _val(args, 'from'));
+        if (a == null) return _err('"from" is neither "me" nor a known station.');
+        final b = _pointOf(st, _val(args, 'to'));
+        if (b == null) return _err('"to" is neither "me" nor a known station.');
+        final m = haversine(a.$1, a.$2, b.$1, b.$2) * 1000;
+        final brg = bearingDeg(a.$1, a.$2, b.$1, b.$2);
+        return AgentToolOutcome(jsonEncode({
+          'from': {'lat': a.$1, 'lng': a.$2},
+          'to': {'lat': b.$1, 'lng': b.$2},
+          'distance_m': m.round(),
+          'distance_km': double.parse((m / 1000).toStringAsFixed(3)),
+          'initial_bearing_deg': brg == null ? null : brg.round(),
+        }), note: 'distance_between');
+      }
+
+    case 'set_my_position':
+      {
+        if (!st.dataNoticeAccepted) {
+          return _err('The data & network usage notice must be accepted first.');
+        }
+        final lat = _asDouble(args['lat']);
+        final lng = _asDouble(args['lng']);
+        if (lat == null || lng == null) {
+          return _err('lat and lng are required numbers.');
+        }
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+          return _err('lat must be -90..90, lng -180..180.');
+        }
+        final alt = _asDouble(args['alt']);
+        st.setMyPosition(lat, lng, alt: alt);
+        return AgentToolOutcome('Position set to $lat, $lng (simulated).',
+            note: 'set_my_position');
+      }
+
+    case 'clear_my_position':
+      {
+        if (!st.useSimLocation) {
+          return AgentToolOutcome('No simulated position is set.',
+              note: 'clear_my_position (none)');
+        }
+        st.setUseSimLocation(false);
+        return AgentToolOutcome(
+            'Simulated position cleared; back to real location.',
+            note: 'clear_my_position');
+      }
+
     case 'set_connection_server':
       {
         final server = _val(args, 'server').trim();
@@ -1197,6 +1867,109 @@ int _limit(Object? v) {
   final n = _asInt(v) ?? 20;
   return n.clamp(1, 50);
 }
+
+/// 把 JSON 数组参数归一成大写呼号集合（忽略非字符串/空值）。
+Set<String> _strSet(Object? v) {
+  final out = <String>{};
+  if (v is List) {
+    for (final m in v) {
+      final s = _val({'x': m}, 'x').trim().toUpperCase();
+      if (s.isNotEmpty) out.add(s);
+    }
+  }
+  return out;
+}
+
+/// 把时间参数（ISO-8601 字符串或 epoch 毫秒/秒）归一成 [DateTime]。
+/// 解析失败返回 null（调用方视作「未提供」）。
+DateTime? _asEpoch(Object? v) {
+  if (v == null) return null;
+  if (v is int) {
+    // 10 位当秒、13 位当毫秒（13 位是 Flutter 的惯例）。
+    return DateTime.fromMillisecondsSinceEpoch(v < 100000000000 ? v * 1000 : v);
+  }
+  final s = '$v'.trim();
+  if (s.isEmpty) return null;
+  final n = int.tryParse(s);
+  if (n != null) {
+    return DateTime.fromMillisecondsSinceEpoch(n < 100000000000 ? n * 1000 : n);
+  }
+  return DateTime.tryParse(s);
+}
+
+/// 把 "me"/"我" 或某个呼号解析成坐标。找不到返回 null。
+(double, double)? _pointOf(AppState st, String who) {
+  final q = who.trim().toUpperCase();
+  if (q.isEmpty) return null;
+  if (q == 'ME' || q == '我' || q == st.myFullCall.toUpperCase()) {
+    final la = st.myLat, ln = st.myLng;
+    return (la == null || ln == null) ? null : (la, ln);
+  }
+  final s = st.stations
+      .where((s) => s.call.toUpperCase() == q)
+      .firstOrNull;
+  if (s == null) return null;
+  return (s.lat, s.lng);
+}
+
+/// 轨迹取点：`me` = 自身轨迹，否则查台站。返回 GPX 文本或 JSON 列表。
+AgentToolOutcome _trackOutcome(AppState st, String who,
+    {required bool asGpx, int? limit}) {
+  final q = who.trim().toUpperCase();
+  if (q.isEmpty) {
+    return AgentToolOutcome('"call" is required (use "me" for your own track).');
+  }
+  final isMe = q == 'ME' || q == '我' || q == st.myFullCall.toUpperCase();
+  final List<TrackPt> pts;
+  final String label;
+  if (isMe) {
+    pts = st.myTrack;
+    label = 'my track';
+  } else {
+    final s = st.stations.where((s) => s.call.toUpperCase() == q).firstOrNull;
+    if (s == null) return AgentToolOutcome('Station $q not found.');
+    pts = s.track;
+    label = q;
+  }
+  if (pts.isEmpty) {
+    return AgentToolOutcome('No track points for $label.');
+  }
+  // limit：从**最新**一端取（跟用户问「最近走过哪」的直觉一致）。
+  final sel = (limit != null && limit > 0 && pts.length > limit)
+      ? pts.sublist(pts.length - limit)
+      : pts;
+  if (asGpx) {
+    final b = StringBuffer()
+      ..writeln('<?xml version="1.0" encoding="UTF-8"?>')
+      ..writeln('<gpx version="1.1" creator="APRSLocus">')
+      ..writeln('  <trk><name>${_xmlEscape(label)}</name><trkseg>');
+    for (final p in sel) {
+      b.write('    <trkpt lat="${p.lat}" lon="${p.lng}">');
+      b.write('<time>${p.time.toUtc().toIso8601String()}</time>');
+      b.writeln('</trkpt>');
+    }
+    b
+      ..writeln('  </trkseg></trk>')
+      ..writeln('</gpx>');
+    return AgentToolOutcome(b.toString(), note: 'export_track_gpx $label');
+  }
+  final list = [
+    for (final p in sel)
+      {
+        'time': p.time.toIso8601String(),
+        'lat': p.lat,
+        'lng': p.lng,
+      },
+  ];
+  return AgentToolOutcome(jsonEncode(list),
+      note: 'get_track $label → ${list.length}');
+}
+
+String _xmlEscape(String s) => s
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 
 /// 台站摘要（多个只读工具共用，避免各写一份字段集）。
 Map<String, dynamic> _stationBrief(Station s) => {

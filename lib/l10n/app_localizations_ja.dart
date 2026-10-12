@@ -2798,6 +2798,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dataSourceSwitchHint => 'データソースを切り替えると現在の接続は切断されます';
 
   @override
+  String get icomLanHotspotRoutingHint => '無線機のホットスポットに接続すると、無線機の通信は Wi-Fi に、APRS-IS はモバイルデータに振り分けられます。システムがこのホットスポットを既定のインターネット経路にした場合は、その Wi-Fi の詳細設定で「自動ネットワーク切り替え」をオフにしてください。';
+
+  @override
   String get honorResetRow => '既読の名誉を消去';
 
   @override

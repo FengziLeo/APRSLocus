@@ -67,6 +67,25 @@ void main() {
     });
 
     test(
+        'bindsToSourceAddressSoRadioTrafficUsesThatInterface (issue #35)',
+        () async {
+      // 电台 Wi-Fi 的本地 IPv4 非 0.0.0.0 时，绑定后 socket 的本地地址就是它 ——
+      // 这正是「电台流量走 Wi-Fi、APRS-IS 走移动数据」的底层保证。
+      final loopback = InternetAddress.loopbackIPv4;
+      final channel = IcomLanUdpChannel(
+        role: IcomLanChannelRole.control,
+        localAddress: IcomLanSocketAddress(loopback, 0),
+        onDatagram: (_) {},
+      );
+      try {
+        await channel.open();
+        expect(channel.boundLocalAddress, equals(loopback));
+      } finally {
+        await channel.close();
+      }
+    });
+
+    test(
         'unconnectedDiscoveryAcceptsUnicastReplyBeforeLockingItsSource',
         () async {
       final loopback = InternetAddress.loopbackIPv4;

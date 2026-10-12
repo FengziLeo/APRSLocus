@@ -27,9 +27,14 @@ class IcomLanAndroidNetworkInfo {
 
 /// Android 专属网络选择与适配工具（对应 mod 的 `android/Ic705AndroidNetwork.kt`）。
 ///
-/// 当 IC-705 作为热点时，由于其无法访问互联网，Android 往往会将默认网络保持为
-/// 移动数据蜂窝网络。本类通过原生平台通道查找附着的 Wi-Fi 网络及其分配到的 IPv4 地址，
-/// 从而使 UDP 套接字能够精准绑定到电台所在的局域网接口。
+/// ## 为什么需要它（issue #35）
+///
+/// IC-705 热点没有外网。若把它当默认上网通道，Android 会暂停移动数据，
+/// APRS-IS 就断了。修法：Android 10+ 向系统申请一条**不含 INTERNET 能力**的
+/// Wi-Fi 网络（本地网络，不抢默认路由），并把电台 UDP 套接字绑定到这条网络的
+/// IPv4 上 —— 电台流量走 Wi-Fi，APRS-IS 走移动数据，两条路互不干扰。
+///
+/// 低版本（API < 29）没有这套语义，退回「从已连接网络里挑 Wi-Fi」。
 class IcomLanAndroidNetwork {
   IcomLanAndroidNetwork._();
 
@@ -55,4 +60,37 @@ class IcomLanAndroidNetwork {
       return null;
     }
   }
+
+  /// 向系统申请一条「只连本地、不抢默认路由」的 Wi-Fi 网络（Android 10+）。
+  ///
+  /// 连接电台**之前**调用。它不会立刻返回可用网络（系统授权/选择可能要一会儿），
+  /// 调用方随后用 [findRadioNetwork] 轮询即可。低版本是空操作。
+  static Future<void> requestRadioNetwork({MethodChannel? overrideChannel}) async {
+    final activeChannel = overrideChannel ?? channel;
+    if (!Platform.isAndroid && overrideChannel == null) return;
+    try {
+      await activeChannel.invokeMethod('requestRadioNetwork');
+    } catch (_) {}
+  }
+
+  /// 释放上面申请到的本地 Wi-Fi 网络（断开电台后调用，别一直占着）。
+  static Future<void> releaseRadioNetwork({MethodChannel? overrideChannel}) async {
+    final activeChannel = overrideChannel ?? channel;
+    if (!Platform.isAndroid && overrideChannel == null) return;
+    try {
+      await activeChannel.invokeMethod('releaseRadioNetwork');
+    } catch (_) {}
+  }
+
+  /// 诊断：电台 Wi-Fi 是否在抢默认网络（用于验证 issue #35 是否真修好）。
+  static Future<Map<String, dynamic>?> status({MethodChannel? overrideChannel}) async {
+    final activeChannel = overrideChannel ?? channel;
+    if (!Platform.isAndroid && overrideChannel == null) return null;
+    try {
+      return await activeChannel.invokeMapMethod<String, dynamic>('status');
+    } catch (_) {
+      return null;
+    }
+  }
 }
+

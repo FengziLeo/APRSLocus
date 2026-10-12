@@ -77,3 +77,24 @@ flutter test $(grep -oE 'flutter test [^ ]+\.dart' .github/workflows/ci-test.yml
 - 智能开关的两道闸：先签 `agent_notice`（`pendingAgentNotice`），再查授权
   （`pendingAgentAuth` → `AgentAuthPage`）。授权页在 `AppState.recheckAgentAllow`
   确认未授权后会**强制关闭**已开的智能体（防备份/旧版本绕过）。
+
+## WLAN 电台热点不抢默认路由（issue #35）
+
+连上 IC-705 等电台的 Wi-Fi 热点后，若系统把这条**无外网**的热点当成默认上网
+通道，会暂停移动数据 → APRS-IS 断线（表现为「一连电台，APRS-IS 就掉」）。修法：
+
+- `Ic705NetworkManager.kt`：Android 10+ 用 `ConnectivityManager.requestNetwork`
+  申请一条**不含 `NET_CAPABILITY_INTERNET`** 的 Wi-Fi 网络（`WifiNetworkRequest`
+  思路），系统便不把它当默认路由；个别机型仍抢默认时，兜底把**本进程**绑到一条
+  有外网的网络（`bindProcessToNetwork`）保证 APRS-IS。低版本（API<29）退回
+  「从已连接网络里挑 Wi-Fi」。
+- Dart：`IcomLanAndroidNetwork.requestRadioNetwork/findRadioNetwork/…`；
+  `IcomLanLinkIo.startCapture` 先解析电台 Wi-Fi 的 IPv4，再交给
+  `IcomLanRxSession(bindLocalAddress:)`，由 `IcomLanUdpChannel` 在
+  `RawDatagramSocket.bind` 时**按该地址绑定** → 电台流量走 Wi-Fi、APRS-IS 走
+  移动数据。`_teardown` 里 `releaseRadioNetwork`。
+- 通道方法：`findRadioNetwork` / `requestRadioNetwork` / `releaseRadioNetwork` /
+  `status`（诊断 `defaultIsWifi`/`defaultHasInternet`/`splitRouting`）。
+- 测试 `test/icom_lan_android_network_test.dart` + `test/icom_lan_udp_channel_test.dart`
+  已进 CI（真机才暴露，编译/analyze 全绿）。
+

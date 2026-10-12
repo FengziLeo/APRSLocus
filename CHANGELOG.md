@@ -1,5 +1,40 @@
 # 更新日志
 
+## [2.0.64] - 2026-10-11
+
+### 修复：连接电台热点后移动数据被「抢走」、APRS-IS 断线（#35）
+
+- 现象：手机连上 IC-705 等电台发出的 Wi-Fi 热点后，系统把这条**没有外网的**
+  Wi-Fi 当成默认上网通道，于是暂停移动数据 —— 可电台热点上不了 APRS-IS，
+  表现为「一连电台，APRS-IS 就掉线」。
+- 修法：Android 10+ 改为向系统申请一条**不含 INTERNET 能力**的本地 Wi-Fi 网络
+  （`WifiNetworkRequest` 思路），系统便不再为它让出默认路由，移动数据仍是上网
+  通道；同时把电台的 UDP 套接字**按这条 Wi-Fi 的 IPv4 绑定**，电台流量走 Wi-Fi、
+  APRS-IS 走移动数据，两条路各走各的。个别机型仍抢默认时，兜底把本进程绑到
+  有外网的网络上，保证 APRS-IS 可用。
+- 低版本（Android 7–9）没有这套语义，退回「从已连接网络里挑 Wi-Fi」，套接字绑定
+  仍然生效；电台设置页新增一条路由说明提示。
+
+---
+
+## [2.0.64] - 2026-10-11 (English)
+
+### Fix: mobile data hijacked after joining the radio hotspot, APRS-IS drops (#35)
+
+- Symptom: after the phone joins the Wi-Fi hotspot hosted by an IC-705 (or similar),
+  the system treats this **internet-less** Wi-Fi as the default route and pauses
+  mobile data — but the hotspot has no APRS-IS, so "connect the radio, APRS-IS drops".
+- Fix: on Android 10+ we now request a **non-INTERNET local Wi-Fi network** (the
+  `WifiNetworkRequest` idea), so the system no longer hands over the default route
+  and mobile data stays the internet path; the radio's UDP sockets are then **bound
+  to that Wi-Fi's IPv4**, sending radio traffic over Wi-Fi and APRS-IS over mobile
+  data. If a particular device still steals the default, we bind the process to an
+  internet-capable network as a fallback so APRS-IS keeps working.
+- Older Android (7–9) lacks this mechanism and falls back to picking the connected
+  Wi-Fi; socket binding still applies. The radio settings page now shows a routing hint.
+
+---
+
 ## [2.0.63] - 2026-10-11
 
 ### 新增：智能体改为「需授权」才能使用

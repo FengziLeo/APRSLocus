@@ -311,6 +311,9 @@ html{overflow-x:hidden}
     </header>
 
     <div class="announce-body">
+      <p>在过去的日子里，我们不断迭代更新，现在用户数量已经突破420+，覆盖地区也达到了5+。接下来，我们想邀请您，听听您的声音，期待您的参与！🤗</p>
+      <p>调查问卷</p>
+      <p><a href="https://ccncqe00x1e4.feishu.cn/share/base/form/shrcnWcCKNxzSMvlGP54DCrnAZg" target="_blank" rel="noopener">点击进入</a></p>
       <p>欢迎大家加入官方 QQ 群</p>
       <p><a href="https://qun.qq.com/universal-share/share?ac=1&amp;authKey=tqe%2BI6lZzakmEoIBwnSVV9%2BT8Zg36F4%2FejuSGAfEIYiDhj5sGyQUOx%2B3YCU68G05&amp;busi_data=eyJncm91cENvZGUiOiI5MjUwMjU4MzQiLCJ0b2tlbiI6ImxiMTMrTm55MEoxU1o2aFV1V1hLUDRKQkZBR21nTEdNemJFOUM0aE1jOWJLU2lNZUtZaGpOa1dicnlYSk15V0YiLCJ1aW4iOiIzNDIxMDE2MTUwIn0%3D&amp;data=nW_8Q1gX2ft-4C0n9p83Ukel3sHzCwlFOSMnOU0HZ8sCtWkwY3hmqlwVFAZm5ipk2W3hIDPxc6Rl0HoW-nMf8Q&amp;svctype=4&amp;tempid=h5_group_info" target="_blank" rel="noopener">点击加入925025834</a></p>
       <p>从 <b>东方红一号</b> 到 <b>天宫</b>，</p>
@@ -650,6 +653,15 @@ html{overflow-x:hidden}
 
   <div class="changelog-list">
 <!-- site-sync:changelog -->
+    <div class="cl-version reveal">
+      <div class="cl-head">
+        <span class="cl-tag">v2.0.64</span>
+        <span class="cl-date">2026-10-11</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot fix"></span><b>修复连电台热点后 APRS-IS 断线</b>：连上 IC-705 等电台发出的 Wi-Fi 热点后，系统把它当成默认上网通道、暂停移动数据 —— 于是电台连上了，APRS-IS 反而掉了。现在改为向系统申请一条<b>本地 Wi-Fi 网络</b>并把电台的 UDP 流量<b>绑定到 Wi-Fi</b>，APRS-IS 仍走移动数据，两条路各走各的；低版本 Android 退回原有方式。</div>
+      </div>
+    </div>
     <div class="cl-version reveal">
       <div class="cl-head">
         <span class="cl-tag">v2.0.55</span>

@@ -5227,6 +5227,11 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'切换数据来源会断开当前连接'**
   String get dataSourceSwitchHint;
+  /// No description provided for @icomLanHotspotRoutingHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'连上电台热点后，电台数据会绑定到 Wi-Fi 局域网，移动数据仍用于 APRS-IS 上网；若系统把这条热点当成了默认上网通道，请在该 Wi-Fi 的高级设置里关闭「自动切换网络」。'**
+  String get icomLanHotspotRoutingHint;
 
   /// No description provided for @honorResetRow.
   ///

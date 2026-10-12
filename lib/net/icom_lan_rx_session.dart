@@ -79,10 +79,12 @@ class IcomLanRxSession implements IcomLanRadioSession {
     this._callbacks = const IcomLanCallbacks(),
     IcomLanRxSessionTiming? timing,
     Future<IcomLanDatagramSocket> Function(int localPort)? socketFactory,
+    InternetAddress? bindLocalAddress,
     Random? random,
     int Function()? monotonicMillis,
   })  : _timing = timing ?? IcomLanRxSessionTiming(),
         _legacySocketFactory = socketFactory,
+        _localBindAddress = bindLocalAddress,
         _random = random ?? Random(),
         _monotonicMillis = monotonicMillis ??
             (() => DateTime.now().microsecondsSinceEpoch ~/ 1000) {
@@ -102,6 +104,10 @@ class IcomLanRxSession implements IcomLanRadioSession {
   final IcomLanRxSessionTiming _timing;
   final Future<IcomLanDatagramSocket> Function(int localPort)?
       _legacySocketFactory;
+
+  /// 电台 Wi-Fi 的本地 IPv4（issue #35）：非空时把所有 UDP 套接字**按此地址
+  /// 绑定**，使电台流量从 Wi-Fi 出去。默认 null = 绑 `0.0.0.0`（旧行为）。
+  final InternetAddress? _localBindAddress;
   final Random _random;
   final int Function() _monotonicMillis;
 
@@ -272,8 +278,12 @@ class IcomLanRxSession implements IcomLanRadioSession {
         } else {
           final channel = IcomLanUdpChannel(
             role: role,
-            localAddress:
-                IcomLanSocketAddress(InternetAddress.anyIPv4, port),
+            // issue #35：电台 Wi-Fi 的本地 IPv4 非空时按它绑定，让电台报文
+            // 从 Wi-Fi 出去、不与默认上网通道（移动数据）抢路由。
+            localAddress: IcomLanSocketAddress(
+              _localBindAddress ?? InternetAddress.anyIPv4,
+              port,
+            ),
             onDatagram: (d) => _onDatagram(role, d),
             onError: (err) => _log('$role UDP channel error: $err'),
           );

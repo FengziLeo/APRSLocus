@@ -4062,5 +4062,6 @@
   "updateChannelAliyunHint": "⚠️ Dibayar oleh tim pengembang -- mohon gunakan seperlunya 🙏",
   "connectingAliyun": "Memeriksa pembaruan via Aliyun OSS ☁️",
   "icomAudioSampleRate": "Laju sampel audio",
-  "icomAudioFmtValue": "12000 Hz (LPCM 16-bit mono)"
+  "icomAudioFmtValue": "12000 Hz (LPCM 16-bit mono)",
+  "icomLanHotspotRoutingHint": "Setelah terhubung ke hotspot radio, lalu lintas radio diikat ke Wi-Fi tersebut sementara data seluler tetap untuk APRS-IS. Jika sistem menjadikan hotspot ini rute internet default, matikan \"ganti jaringan otomatis\" di pengaturan lanjutan Wi-Fi itu."
 }

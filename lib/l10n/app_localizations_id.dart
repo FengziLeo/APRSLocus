@@ -2882,6 +2882,9 @@ class AppLocalizationsId extends AppLocalizations {
       'Mengganti sumber data akan memutus koneksi saat ini';
 
   @override
+  String get icomLanHotspotRoutingHint => 'Setelah terhubung ke hotspot radio, lalu lintas radio diikat ke Wi-Fi tersebut sementara data seluler tetap untuk APRS-IS. Jika sistem menjadikan hotspot ini rute internet default, matikan "ganti jaringan otomatis" di pengaturan lanjutan Wi-Fi itu.';
+
+  @override
   String get honorResetRow => 'Hapus kehormatan yang dibaca';
 
   @override

@@ -68,5 +68,43 @@ void main() {
       );
       expect(info, isNull);
     });
+
+    test('requestRadioNetwork / releaseRadioNetwork issue the right calls',
+        () async {
+      final calls = <String>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+        calls.add(call.method);
+        return null;
+      });
+
+      await IcomLanAndroidNetwork.requestRadioNetwork(overrideChannel: channel);
+      await IcomLanAndroidNetwork.releaseRadioNetwork(overrideChannel: channel);
+
+      expect(calls, equals(['requestRadioNetwork', 'releaseRadioNetwork']));
+    });
+
+    test('status parses split-routing diagnostics (issue #35)', () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+        if (call.method == 'status') {
+          return {
+            'radioAvailable': true,
+            'radioIpv4': '192.168.249.2',
+            'defaultIsWifi': false,
+            'defaultHasInternet': true,
+            'splitRouting': true,
+            'sdkInt': 34,
+          };
+        }
+        return null;
+      });
+
+      final s = await IcomLanAndroidNetwork.status(overrideChannel: channel);
+      expect(s, isNotNull);
+      expect(s!['splitRouting'], isTrue);
+      expect(s['defaultIsWifi'], isFalse);
+      expect(s['radioIpv4'], '192.168.249.2');
+    });
   });
 }

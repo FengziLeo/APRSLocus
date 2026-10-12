@@ -4062,5 +4062,6 @@
   "updateChannelAliyunHint": "⚠️ Lo paga el equipo de desarrollo: úsalo con moderación 🙏",
   "connectingAliyun": "Buscando actualizaciones vía Aliyun OSS ☁️",
   "icomAudioSampleRate": "Frecuencia de muestreo de audio",
-  "icomAudioFmtValue": "12000 Hz (LPCM 16 bits mono)"
+  "icomAudioFmtValue": "12000 Hz (LPCM 16 bits mono)",
+  "icomLanHotspotRoutingHint": "Al unirte al punto de acceso de la radio, el tráfico de la radio se ata a esa Wi-Fi y los datos móviles siguen para APRS-IS. Si el sistema toma el punto de acceso como ruta de internet predeterminada, desactiva \"cambio automático de red\" en los ajustes avanzados de esa Wi-Fi."
 }

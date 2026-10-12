@@ -576,6 +576,15 @@
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.64</span>
+        <span class="cl-date">2026-10-11</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot fix"></span><b>Fix: APRS-IS dropping after joining the radio hotspot</b>. After the phone joins the Wi-Fi hotspot hosted by an IC-705 (or similar), the system treated it as the default route and paused mobile data -- so the radio connected but APRS-IS dropped. The app now requests a <b>local-only Wi-Fi network</b> and <b>binds the radio's UDP traffic to Wi-Fi</b>, keeping APRS-IS on mobile data so the two paths no longer interfere. Older Android falls back to the previous behaviour.</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.55</span>
         <span class="cl-date">2026-10-10</span>
       </div>

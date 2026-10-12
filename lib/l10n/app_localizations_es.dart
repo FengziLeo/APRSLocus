@@ -2899,6 +2899,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Cambiar la fuente de datos desconecta el enlace actual';
 
   @override
+  String get icomLanHotspotRoutingHint => 'Al unirte al punto de acceso de la radio, el tráfico de la radio se ata a esa Wi-Fi y los datos móviles siguen para APRS-IS. Si el sistema toma el punto de acceso como ruta de internet predeterminada, desactiva "cambio automático de red" en los ajustes avanzados de esa Wi-Fi.';
+
+  @override
   String get honorResetRow => 'Borrar distinciones leídas';
 
   @override

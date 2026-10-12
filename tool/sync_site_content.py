@@ -204,6 +204,29 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.0.64', 'date': '2026-10-11',
+        'items': [
+            ('fix',
+             T('**修复连电台热点后 APRS-IS 断线**：连上 IC-705 等电台发出的 '
+               'Wi-Fi 热点后，系统把它当成默认上网通道、暂停移动数据 —— 于是'
+               '电台连上了，APRS-IS 反而掉了。现在改为向系统申请一条**本地 '
+               'Wi-Fi 网络**并把电台的 UDP 流量**绑定到 Wi-Fi**，APRS-IS 仍走移动'
+               '数据，两条路各走各的；低版本 Android 退回原有方式。',
+               '**修復連電台熱點後 APRS-IS 斷線**：連上 IC-705 等電台發出的 '
+               'Wi-Fi 熱點後，系統把它當成預設上網通道、暫停行動數據 —— 於是'
+               '電台連上了，APRS-IS 反而斷了。現在改為向系統申請一條**本機 '
+               'Wi-Fi 網路**並把電台的 UDP 流量**綁定到 Wi-Fi**，APRS-IS 仍走行動'
+               '數據，兩條路各走各的；舊版 Android 退回原有方式。',
+               '**Fix: APRS-IS dropping after joining the radio hotspot**. After the '
+               'phone joins the Wi-Fi hotspot hosted by an IC-705 (or similar), the '
+               'system treated it as the default route and paused mobile data -- so the '
+               'radio connected but APRS-IS dropped. The app now requests a **local-only '
+               'Wi-Fi network** and **binds the radio\'s UDP traffic to Wi-Fi**, keeping '
+               'APRS-IS on mobile data so the two paths no longer interfere. Older '
+               'Android falls back to the previous behaviour.')),
+        ],
+    },
+    {
         'ver': 'v2.0.55', 'date': '2026-10-10',
         'items': [
             ('new',

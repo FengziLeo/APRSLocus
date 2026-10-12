@@ -2776,6 +2776,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dataSourceSwitchHint => '切换数据来源会断开当前连接';
 
   @override
+  String get icomLanHotspotRoutingHint => '连上电台热点后，电台数据会绑定到 Wi-Fi 局域网，移动数据仍用于 APRS-IS 上网；若系统把这条热点当成了默认上网通道，请在该 Wi-Fi 的高级设置里关闭「自动切换网络」。';
+
+  @override
   String get honorResetRow => '清除已阅读荣誉';
 
   @override
@@ -11605,6 +11608,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get dataSourceSwitchHint => '切換資料來源會中斷目前連線';
+
+  @override
+  String get icomLanHotspotRoutingHint => '連上電台熱點後，電台資料會綁定到 Wi-Fi 區域網路，行動數據仍用於 APRS-IS 上網；若系統把這條熱點當成預設上網通道，請在該 Wi-Fi 的進階設定裡關閉「自動切換網路」。';
 
   @override
   String get honorResetRow => '清除已閱讀榮譽';

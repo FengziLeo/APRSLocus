@@ -581,6 +581,15 @@
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.64</span>
+        <span class="cl-date">2026-10-11</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot fix"></span><b>修復連電台熱點後 APRS-IS 斷線</b>：連上 IC-705 等電台發出的 Wi-Fi 熱點後，系統把它當成預設上網通道、暫停行動數據 —— 於是電台連上了，APRS-IS 反而斷了。現在改為向系統申請一條<b>本機 Wi-Fi 網路</b>並把電台的 UDP 流量<b>綁定到 Wi-Fi</b>，APRS-IS 仍走行動數據，兩條路各走各的；舊版 Android 退回原有方式。</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.55</span>
         <span class="cl-date">2026-10-10</span>
       </div>

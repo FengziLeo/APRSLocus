@@ -329,6 +329,12 @@ jobs:
       - name: Test agent authorization gate
         run: flutter test test/agent_auth_state_test.dart
 
+      # 电台热点路由（issue #35）：Android 网络通道的解析/请求/释放/诊断，以及
+      # UDP 套接字按 Wi-Fi IPv4 绑定。这些只有在真机连电台热点时才看得出，
+      # 编译与 analyze 全绿，所以把通道契约与绑定行为钉在 CI。
+      - name: Test IC-705 hotspot network routing
+        run: flutter test test/icom_lan_android_network_test.dart test/icom_lan_udp_channel_test.dart
+
       - name: Analyze (tolerate known vector_map false positive)
         shell: bash
         run: |

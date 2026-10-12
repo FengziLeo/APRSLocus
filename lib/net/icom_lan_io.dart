@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'icom_lan_android_network.dart';
 import 'icom_lan_base.dart';
 import 'icom_lan_protocol.dart' show IcomLanAudioCodec;
 import 'icom_lan_rx_session.dart';
@@ -83,8 +85,13 @@ class IcomLanLinkIo implements IcomLanLink {
     if (_session != null) return null;
 
     _ready = Completer<void>();
+    // issue #35：Android 上先申请一条「只连本地、不抢默认路由」的 Wi-Fi 网络
+    // 并取到它的 IPv4，再把 UDP 套接字绑到这个地址 —— 否则连上电台热点后
+    // 移动数据会被抢走，APRS-IS 就断了。非 Android / 取不到时退回 0.0.0.0。
+    final bindAddress = await _resolveRadioBindAddress();
     final session = IcomLanRxSession(
       config: config,
+      bindLocalAddress: bindAddress,
       callbacks: IcomLanCallbacks(
         onLog: _addLog,
         onPcm: (pcm) => onPcm?.call(pcm),
@@ -180,6 +187,30 @@ class IcomLanLinkIo implements IcomLanLink {
   @override
   Future<List<AudioDevice>> listInputDevices() async => const [];
 
+  /// 解析电台 Wi-Fi 的本地 IPv4（issue #35；仅 Android 有意义）。
+  ///
+  /// 先向系统申请一条本地 Wi-Fi 网络，再轮询它的 IPv4 —— 系统授权/选择可能要
+  /// 一两秒。取不到就返回 null（退回 0.0.0.0，即旧行为），绝不阻断连接。
+  Future<InternetAddress?> _resolveRadioBindAddress() async {
+    if (!Platform.isAndroid) return null;
+    try {
+      await IcomLanAndroidNetwork.requestRadioNetwork();
+      for (var i = 0; i < 10; i++) {
+        final info = await IcomLanAndroidNetwork.findRadioNetwork();
+        final ip = info?.ipv4Address;
+        if (info != null && info.isAvailable && ip != null && ip.isNotEmpty) {
+          final addr = InternetAddress.tryParse(ip);
+          if (addr != null) {
+            _addLog('电台 Wi-Fi 本地地址 $ip：电台 UDP 将绑定此地址');
+            return addr;
+          }
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+      }
+    } catch (_) {}
+    return null;
+  }
+
   Future<void> _teardown({bool notifyClosed = false}) async {
     final session = _session;
     _session = null;
@@ -192,6 +223,10 @@ class IcomLanLinkIo implements IcomLanLink {
         const Duration(milliseconds: 500),
         onTimeout: () {},
       );
+    }
+    // 释放之前申请的本地 Wi-Fi 网络（issue #35），别一直占着系统资源。
+    if (Platform.isAndroid) {
+      unawaited(IcomLanAndroidNetwork.releaseRadioNetwork());
     }
     _phaseLabel = '未连接';
     _playing = false;

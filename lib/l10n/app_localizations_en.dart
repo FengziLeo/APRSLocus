@@ -2885,6 +2885,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Switching the data source disconnects the current link';
 
   @override
+  String get icomLanHotspotRoutingHint => 'After joining the radio hotspot, radio traffic is bound to that Wi-Fi LAN while mobile data stays on APRS-IS. If the system treats the hotspot as the default internet route, turn off "auto-switch network" in that Wi-Fi\'s advanced settings.';
+
+  @override
   String get honorResetRow => 'Clear read honors';
 
   @override

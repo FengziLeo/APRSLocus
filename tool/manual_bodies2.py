@@ -79,11 +79,11 @@ SETTINGS_INTRO = {
         'and the TX self-test.'),
     'WLAN 电台直连': T(
         '局域网直连 Icom 电台（IC-705 / IC-9700 / IC-7610 / IC-905 等）：电台 IP/控制端口、'
-        'Network User 认证、CI-V 地址与导前延时（TX Delay）、收发 12 kHz PCM 音频。',
+        'Network User 认证、CI-V 地址与导前延时（TX Delay）、射频中继路径（如 WIDE1-1,WIDE2-1）、收发 12 kHz PCM 音频。',
         '區域網路直連 Icom 電台（IC-705 / IC-9700 / IC-7610 / IC-905 等）：電台 IP/控制埠、'
-        'Network User 認證、CI-V 位址與導前延時（TX Delay）、收發 12 kHz PCM 音訊。',
+        'Network User 認證、CI-V 位址與導前延時（TX Delay）、射頻中繼路徑（如 WIDE1-1,WIDE2-1）、收發 12 kHz PCM 音訊。',
         'Direct LAN link to Icom radios (IC-705 / IC-9700 / IC-7610 / IC-905 etc.): radio IP/control port, '
-        'Network User auth, CI-V address and TX Delay, 12 kHz PCM audio streaming.'),
+        'Network User auth, CI-V address and TX Delay, RF digipeater path (e.g. WIDE1-1,WIDE2-1), 12 kHz PCM audio streaming.'),
     '音频（声卡 TNC）': T(
         '把声卡当 TNC：采样率/比特率/音调、发射电平与 CSMA 等待、WAV 文件模式（离线解码录音）。',
         '把音效卡當 TNC：取樣率/鮑率/音調、發射電平與 CSMA 等待、WAV 檔案模式（離線解碼錄音）。',

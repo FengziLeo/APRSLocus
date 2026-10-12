@@ -204,6 +204,28 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.0.65', 'date': '2026-10-12',
+        'items': [
+            ('fix',
+             T('**修复 WLAN 电台直连无法更改射频中继路径**：「WLAN 电台直连」'
+               '（IC-705 / IC-9700 / IC-7610 / IC-905）子页原本没有中继路径入口，'
+               '想改 `WIDE1-1,WIDE2-1` 之类的射频路线无处可填。现在该页补上'
+               '「射频中继路径」输入框，与 TNC / 音频页同一个键、同一个语义'
+               '（留空 = 不指定中继），改完立即生效。',
+               '**修復 WLAN 電台直連無法更改射頻中繼路徑**：「WLAN 電台直連」'
+               '（IC-705 / IC-9700 / IC-7610 / IC-905）子頁原本沒有中繼路徑入口，'
+               '想改 `WIDE1-1,WIDE2-1` 之類的射頻路線無處可填。現在該頁補上'
+               '「射頻中繼路徑」輸入框，與 TNC / 音訊頁同一個鍵、同一個語意'
+               '（留空 = 不指定中繼），改完立即生效。',
+               '**Fix: the WLAN radio link could not change its RF digipeater path**. '
+               'The “WLAN radio direct” sub-page (IC-705 / IC-9700 / IC-7610 / IC-905) '
+               'had no digipeater-path field, so there was nowhere to set an RF route '
+               'such as `WIDE1-1,WIDE2-1`. The page now has an “RF digipeater path” '
+               'input, sharing the same key and semantics as the TNC/audio pages '
+               '(empty = no digipeater); changes take effect immediately.')),
+        ],
+    },
+    {
         'ver': 'v2.0.64', 'date': '2026-10-11',
         'items': [
             ('fix',

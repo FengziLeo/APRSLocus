@@ -98,3 +98,21 @@ flutter test $(grep -oE 'flutter test [^ ]+\.dart' .github/workflows/ci-test.yml
 - 测试 `test/icom_lan_android_network_test.dart` + `test/icom_lan_udp_channel_test.dart`
   已进 CI（真机才暴露，编译/analyze 全绿）。
 
+## WLAN 直连的射频中继路径（issue #35 的另一半）
+
+「WLAN 电台直连」子页（`lib/ic705_device_page.dart`）**没有**独立的中继路径配置：
+WLAN 直连本身就是**音频来源**的一个变体（`audio.config.source == AudioSource.icomLan`），
+发射路径来自共享的 `audio.config.path`（见 `AppState.rfPathOf` / `txPath`）。
+因此改中继路径 = 改 `audio.config.path`，与声卡音频页**同一个键**。
+
+- 页面上的输入框「射频中继路径」用现成 l10n 键 `s.kissRfPath` / `s.kissRfPathTip`
+  （语义通用，TNC 页 / 音频页同款），无需新增 ARB。
+- 存回 `c.path`（`_saveConfig`），失焦/回车落定（`_focuses` 里已含 `_pathFocus`）。
+- 回归测试 `test/beacon_format_test.dart`「音频/WLAN 来源：txPath 跟随 audio.config.path」。
+- 手册 `tool/manual_bodies2.py` 的 SETTINGS_INTRO['WLAN 电台直连'] 与
+  `docs/{,zh-TW/,en/}manual/settings.html` 已同步该设置项。
+  ⚠️ 不要直接跑 `gen_manual_pages.py` 全量重生成：脚本产出的资源版本仍是
+  `?v=6`，而仓库要求 `?v=7`（check_site 会拦），会连带回退一堆无关改动；
+  手改对应的 settings.html 段落后用 `python3 tool/check_site.py` 校验即可。
+
+

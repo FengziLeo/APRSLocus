@@ -552,7 +552,7 @@
     <h2 id="g9">WLAN Radio Direct Link<a class="hdr-anchor" href="#g9" aria-label="Permalink to this section" title="Permalink to this section">#</a></h2>
       <h3 id="g9">WLAN Radio Direct Link<a class="hdr-anchor" href="#g9" aria-label="Permalink to this section" title="Permalink to this section">#</a></h3>
       <p class="m-grp-sub">局域网直连 Icom 电台（IC-705 / IC-9700 / IC-7610 / IC-905），收发 12 kHz PCM 音频与 CI-V 控制</p>
-      <p>Direct LAN link to Icom radios (IC-705 / IC-9700 / IC-7610 / IC-905 etc.): radio IP/control port, Network User auth, CI-V address and TX Delay, 12 kHz PCM audio streaming.</p>
+      <p>Direct LAN link to Icom radios (IC-705 / IC-9700 / IC-7610 / IC-905 etc.): radio IP/control port, Network User auth, CI-V address and TX Delay, RF digipeater path (e.g. WIDE1-1,WIDE2-1), 12 kHz PCM audio streaming.</p>
       <div class="m-sub">
         <h4>电台链路状态</h4>
         <div class="doc-table-wrap"><table class="doc-table set-table"><thead><tr><th>Setting</th><th>Control</th><th>Default</th><th>Description</th></tr></thead><tbody>
@@ -579,6 +579,7 @@
 <tr><td><b>发射前导延迟 (TX Delay, ms)</b> <code class="m-field">txDelayMs</code></td><td><span class="m-kind">Text input</span></td><td class="m-def"><code>300</code></td><td></td></tr>
 <tr><td><b>电台 CI-V 地址 (十六进制)</b></td><td><span class="m-kind">Text input</span></td><td class="m-def">—</td><td></td></tr>
 <tr><td><b>控制器地址</b></td><td><span class="m-kind">Read-only</span></td><td class="m-def">—</td><td></td></tr>
+<tr><td><b>RF digipeater path</b> <code class="m-field">path</code></td><td><span class="m-kind">Text input</span></td><td class="m-def"><code>WIDE1-1,WIDE2-1</code></td><td>Digipeaters used on air, e.g. WIDE1-1,WIDE2-1; leave empty for none</td></tr>
 </tbody></table></div>
       </div>
       <div class="m-sub">

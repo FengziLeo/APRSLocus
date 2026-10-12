@@ -1,5 +1,37 @@
 # 更新日志
 
+## [2.0.65] - 2026-10-12
+
+### 修复：WLAN 电台直连无法更改射频中继路径（#35）
+
+- 现象：「WLAN 电台直连」（IC-705 / IC-9700 / IC-7610 / IC-905）子页里没有
+  「射频中继路径」入口，用户想改中继（如 `WIDE1-1,WIDE2-1`）无处可填，
+  反馈「wlan 链接无法更改射频路线」。
+- 原因：WLAN 直连走的就是音频来源那条射频通道（`audio.config.path`），
+  但此前只有 TNC 页 / 音频页暴露了这个输入框，WLAN 页漏了。
+- 修法：在 WLAN 电台页的「CI-V 控制与发射设置」里补上「射频中继路径」输入框，
+  与 TNC / 音频页同一个键、同一个语义（留空 = 不指定中继）；改完立即生效。
+- 说明书「WLAN 电台直连」一节同步补上该设置项与说明（简 / 繁 / 英）。
+
+---
+
+## [2.0.65] - 2026-10-12 (English)
+
+### Fix: the WLAN radio link could not change its RF digipeater path (#35)
+
+- Symptom: the “WLAN radio direct” sub-page (IC-705 / IC-9700 / IC-7610 / IC-905)
+  had no “RF digipeater path” field, so users had nowhere to set the relay path
+  (e.g. `WIDE1-1,WIDE2-1`) — reported as “the WLAN link cannot change its RF route”.
+- Cause: the WLAN link uses the same RF channel as the audio source
+  (`audio.config.path`), but only the TNC and audio pages exposed that field;
+  the WLAN page was missing it.
+- Fix: added the “RF digipeater path” input to the WLAN page's CI-V control section,
+  sharing the same key and semantics as the TNC/audio pages (empty = no digipeater);
+  changes take effect immediately.
+- The manual's “WLAN radio direct” section now documents this setting too (zh/zh-TW/en).
+
+---
+
 ## [2.0.64] - 2026-10-11
 
 ### 修复：连接电台热点后移动数据被「抢走」、APRS-IS 断线（#35）

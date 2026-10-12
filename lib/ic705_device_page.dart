@@ -34,6 +34,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
   late final TextEditingController _pass;
   late final TextEditingController _civAddr;
   late final TextEditingController _txDelay;
+  late final TextEditingController _rfPath;
 
   /// 失焦提交用的焦点节点（`onEditingComplete` 只在回车时触发，见 [_onBlur]）。
   late final FocusNode _hostFocus;
@@ -42,6 +43,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
   late final FocusNode _passFocus;
   late final FocusNode _civFocus;
   late final FocusNode _delayFocus;
+  late final FocusNode _pathFocus;
 
   late WlanRadioModel _selectedModel;
   bool _busy = false;
@@ -63,12 +65,16 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
       text: '0x${c.icomLan.radioCivAddress.toRadixString(16).toUpperCase()}',
     );
     _txDelay = TextEditingController(text: '${c.afsk.txDelayMs}');
+    // issue #35：WLAN 直连也走射频（audio.config.path 即中继路径），
+    // 此前只有 TNC 页 / 音频页能改，这页没有入口 —— 用户抱怨「改了不生效」。
+    _rfPath = TextEditingController(text: c.path);
     _hostFocus = FocusNode();
     _portFocus = FocusNode();
     _userFocus = FocusNode();
     _passFocus = FocusNode();
     _civFocus = FocusNode();
     _delayFocus = FocusNode();
+    _pathFocus = FocusNode();
     // 失焦即落定：`onEditingComplete` 只在按键盘「完成/回车」时触发，
     // **失焦不触发** —— 只挂它的话「填完随手点别处」等于什么都没存
     // （issue #22-1 心率阈值同款，本页此前全部输入框都是这个毛病）。
@@ -80,7 +86,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
   /// 本页全部输入框的焦点：失焦落定与 dispose 都靠它遍历。
   List<FocusNode> get _focuses => [
         _hostFocus, _portFocus, _userFocus,
-        _passFocus, _civFocus, _delayFocus,
+        _passFocus, _civFocus, _delayFocus, _pathFocus,
       ];
 
   /// 整组都不再持有焦点时落定一次（组内转移焦点不提交，避免打断输入）。
@@ -97,6 +103,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
     _pass.dispose();
     _civAddr.dispose();
     _txDelay.dispose();
+    _rfPath.dispose();
     for (final f in _focuses) {
       f.dispose();
     }
@@ -141,6 +148,8 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
     );
 
     c.afsk = c.afsk.copyWith(txDelayMs: delay);
+    // issue #35：中继路径存回共享的音频配置 —— WLAN 与声卡音频同源（audio.config.path）。
+    c.path = _rfPath.text.trim();
 
     if (enabled != null) {
       if (enabled) {
@@ -487,6 +496,17 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
           _civAddr,
           hint: _selectedModel.defaultCivHex,
           focusNode: _civFocus,
+          onEditingComplete: () => unawaited(_saveConfig()),
+        ),
+        // issue #35：WLAN 直连的射频中继路径（如 WIDE1-1,WIDE2-1）。
+        // 与 TNC / 音频页同一个键（audio.config.path），留空 = 不指定中继。
+        SettingsInput(
+          s.kissRfPath,
+          _rfPath,
+          hint: 'WIDE1-1,WIDE2-1',
+          tip: s.kissRfPathTip,
+          focusNode: _pathFocus,
+          onChanged: (_) => unawaited(_saveConfig()),
           onEditingComplete: () => unawaited(_saveConfig()),
         ),
         SettingsRow2(s.icomControllerAddr, s.icomControllerAddrValue),

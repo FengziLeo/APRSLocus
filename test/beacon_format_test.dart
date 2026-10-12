@@ -132,6 +132,24 @@ void main() {
           reason: '射频路径不能带 IP 网关才有的 TCPIP*');
     });
 
+    // issue #35 回归：WLAN 电台直连属于「音频」来源（source == icomLan），
+    // 它的射频中继路径与声卡音频共用 audio.config.path。此前「WLAN 电台
+    // 直连」子页没有这个输入框，用户抱怨「改了中继路径不生效」。
+    // 这里把「音频来源的 txPath 由 audio.config.path 决定」钉死：只要
+    // 页面把输入写进 c.path，发射路径就必须跟着变。
+    test('音频/WLAN 来源：txPath 跟随 audio.config.path（中继路径可改）', () {
+      final st = AppState()..dataSource = AppState.srcAudio;
+      st.audio.config.path = 'WIDE1-1,WIDE2-1';
+      expect(st.txPath, 'APALOC,WIDE1-1,WIDE2-1');
+      // 用户在 WLAN 页把中继路径改成别的（或清空）
+      st.audio.config.path = 'WIDE2-2';
+      expect(st.txPath, 'APALOC,WIDE2-2',
+          reason: 'WLAN 直连与声卡音频同源，改 audio.config.path 必须改变发射路径');
+      st.audio.config.path = '';
+      expect(st.txPath, 'APALOC',
+          reason: '留空 = 不指定中继（不应出现 APALOC, 或 APALOC,,）');
+    });
+
     // ─── 「倒计时走了但没发射」回归（v1.6.105）───────────────────────────
     //
     // 事故：射频来源（TNC / 音频）的自动发射被 canAutoBeacon 门控在

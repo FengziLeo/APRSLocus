@@ -655,6 +655,15 @@ html{overflow-x:hidden}
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.65</span>
+        <span class="cl-date">2026-10-12</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot fix"></span><b>修复 WLAN 电台直连无法更改射频中继路径</b>：「WLAN 电台直连」（IC-705 / IC-9700 / IC-7610 / IC-905）子页原本没有中继路径入口，想改 <code>WIDE1-1,WIDE2-1</code> 之类的射频路线无处可填。现在该页补上「射频中继路径」输入框，与 TNC / 音频页同一个键、同一个语义（留空 = 不指定中继），改完立即生效。</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.64</span>
         <span class="cl-date">2026-10-11</span>
       </div>

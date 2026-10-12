@@ -576,6 +576,15 @@
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.65</span>
+        <span class="cl-date">2026-10-12</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot fix"></span><b>Fix: the WLAN radio link could not change its RF digipeater path</b>. The “WLAN radio direct” sub-page (IC-705 / IC-9700 / IC-7610 / IC-905) had no digipeater-path field, so there was nowhere to set an RF route such as <code>WIDE1-1,WIDE2-1</code>. The page now has an “RF digipeater path” input, sharing the same key and semantics as the TNC/audio pages (empty = no digipeater); changes take effect immediately.</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.64</span>
         <span class="cl-date">2026-10-11</span>
       </div>

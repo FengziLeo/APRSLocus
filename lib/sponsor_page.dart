@@ -166,6 +166,16 @@ class _SponsorPageState extends State<SponsorPage> {
       },
     ),
     (
+      kind: 'jade',
+      name: 'BH2WIX',
+      names: const {},
+      desc: '赠我以琼琚 · 琼琚有价，清音无价',
+      descs: const {
+        'zh-TW': '贈我以瓊琚 · 瓊琚有價，清音無價',
+        'en': 'Gifted with jade — jade has a price, but a clear tone is priceless.',
+      },
+    ),
+    (
       kind: 'api',
       name: 'BH7NOR',
       names: const {},

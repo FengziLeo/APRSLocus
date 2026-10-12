@@ -435,6 +435,7 @@ void _seedDefaults() {
     'BG4LZY': ['earlyMember'],
     'BA3RZL': ['earlyMember', 'mostBrain', 'jadeGift'],
     'BA7NFI': ['sower'],
+    'BH2WIX': ['jadeGift'],
   };
   _primariesCache = {
     'BG7LZQ': 'kaishan',
@@ -452,6 +453,7 @@ void _seedDefaults() {
     'BG4LZY': 'earlyMember',
     'BA3RZL': 'earlyMember',
     'BA7NFI': 'sower',
+    'BH2WIX': 'jadeGift',
   };
 }
 

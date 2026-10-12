@@ -306,6 +306,14 @@ let PEOPLE=[
  {call:"BD4TYW",who:{zh:"BD4TYW","zh-TW":"BD4TYW",en:"BD4TYW"},
   role:{zh:"赞助支持","zh-TW":"贊助支持",en:"Sponsorship support"},
   brief:{zh:"以琼琚相赠，为这束电波添一分续航。","zh-TW":"以瓊琚相贈，為這束電波添一分續航。",en:"Gifted with jade, adding a little more range to this signal."},
+  honors:["jadeGift"],primary:"jadeGift",c:"#0EA5B7",grp:"support"},
+ /* BH2WIX：赠我以琼琚（与 members.json v62 对齐；本名单是「取不到 JSON」时的兜底，
+    因此只列精选成员，不是全量）。
+    ⚠️ `honors` 必须显式写出 —— 只给 grp:"support" 会被上面 honorDefsOf 的
+    兜底映射成 [earlyMember, mostBrain]（那是 BA3RZL 的组合），离线时徽章就错了。 */
+ {call:"BH2WIX",who:{zh:"BH2WIX","zh-TW":"BH2WIX",en:"BH2WIX"},
+  role:{zh:"赞助支持","zh-TW":"贊助支持",en:"Sponsorship support"},
+  brief:{zh:"以琼琚寄意，愿这束电波抵达更远的天际。","zh-TW":"以瓊琚寄意，願這束電波抵達更遠的天際。",en:"Sending jade with good will — may this signal reach farther horizons."},
   honors:["jadeGift"],primary:"jadeGift",c:"#0EA5B7",grp:"support"}
 ];
 /* 团体/赞助项（无呼号） */

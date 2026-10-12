@@ -1,6 +1,6 @@
 {
-  "version": 61,
-  "updated": "2026-10-09",
+  "version": 62,
+  "updated": "2026-10-12",
   "developers": [
     {
       "call": "BG7LZQ",
@@ -1748,6 +1748,54 @@
         "zh": "投我琼琚，报以长波。",
         "zh-TW": "投我瓊琚，報以長波。",
         "en": "You gave jade; I answer with the long wave."
+      },
+      "tags": {
+        "zh": [
+          "馈赠支持",
+          "赞助"
+        ],
+        "zh-TW": [
+          "饋贈支持",
+          "贊助"
+        ],
+        "en": [
+          "Gift support",
+          "Sponsorship"
+        ]
+      },
+      "c": "#0EA5B7",
+      "grp": "support",
+      "honors": [
+        "jadeGift"
+      ],
+      "primary": "jadeGift"
+    },
+    {
+      "call": "BH2WIX",
+      "who": {
+        "zh": "BH2WIX",
+        "zh-TW": "BH2WIX",
+        "en": "BH2WIX"
+      },
+      "role": {
+        "zh": "赞助支持",
+        "zh-TW": "贊助支持",
+        "en": "Sponsorship support"
+      },
+      "brief": {
+        "zh": "以琼琚寄意，愿这束电波抵达更远的天际。",
+        "zh-TW": "以瓊琚寄意，願這束電波抵達更遠的天際。",
+        "en": "Sending jade with good will — may this signal reach farther horizons."
+      },
+      "contrib": {
+        "zh": "以一份馈赠支持 APRSlocus 的持续开发与运营 —— 让每一次信标都有回应，每一段电波都有回声。",
+        "zh-TW": "以一份饋贈支持 APRSlocus 的持續開發與營運 —— 讓每一次信標都有回應，每一段電波都有回聲。",
+        "en": "Gifted support for APRSlocus's ongoing development and operation — so every beacon gets an answer and every signal an echo."
+      },
+      "quote": {
+        "zh": "琼琚有价，清音无价；愿以长波，报君雅意。",
+        "zh-TW": "瓊琚有價，清音無價；願以長波，報君雅意。",
+        "en": "Jade has a price; a clear tone does not. May the long wave answer your kindness."
       },
       "tags": {
         "zh": [

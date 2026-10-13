@@ -14,6 +14,7 @@ import 'state.dart';
 import 'blacklist.dart';
 import 'sponsor_page.dart';
 import 'terms_page.dart';
+import 'story_page.dart';
 import 'material.dart';
 
 /// 彩蛋呼号 → 台词
@@ -227,7 +228,7 @@ class _AboutPageState extends State<AboutPage>
   /// Hero 底图视差量（0~240，随滚动量变化）
   final ValueNotifier<double> _heroScroll = ValueNotifier<double>(0);
 
-  // ─── 封面彩蛋：点一下抖一下 → 5 秒后翻面 ───
+  // ─── 封面彩蛋：点一下抖一下 → 翻面 → 把那一页故事递过来 ───
   // 抖动（damped 正弦）与翻牌各占一个控制值；`_flipped` 是逻辑上的「已翻面」。
   // 翻牌过程因为要按角度换内容（正面/背面），所以自己 setState，不用 AnimatedBuilder。
   late final AnimationController _shakeCtrl = AnimationController(
@@ -239,11 +240,14 @@ class _AboutPageState extends State<AboutPage>
     duration: const Duration(milliseconds: 640),
   );
   bool _flipped = false;
-  Timer? _flipTimer;
+  Timer? _storyTimer;
   Offset _eggPos = Offset.zero;
 
-  /// 点击封面：每点一次抖一次；第一次点击后开始 5 秒倒计时，到点翻面。
-  /// （连续点击只是在反复「抖」，不会重置倒计时。）
+  /// 点击封面：**一次点击就是一次激活** —— 抖一下，翻过面，接着把那一页故事
+  /// 递过去（[_activateHeroEgg]）。
+  ///
+  /// 这里原本是「点一下，等 5 秒再翻面」。等待只会让人以为点坏了：那 5 秒里
+  /// 屏幕一动不动，谁也看不出这是彩蛋还是卡住了。现在翻牌动画一走完就走。
   void _heroTapped() {
     if (_flipped) {
       _unflipHeroEgg();
@@ -251,19 +255,34 @@ class _AboutPageState extends State<AboutPage>
     }
     HapticFeedback.mediumImpact();
     _shakeCtrl.forward(from: 0);
-    _flipTimer ??= Timer(const Duration(seconds: 5), () {
-      _flipTimer = null;
+    _activateHeroEgg();
+  }
+
+  /// 翻到背面 → 等翻牌动画走完 → 打开那一页故事（[openStory]：有内置就应用内
+  /// 打开，没有就交给浏览器）。
+  ///
+  /// 为什么还留着这 0.72 秒：先让人看见「翻过来了」，再把故事递过去；一点就走
+  /// 的话，抖动与翻面这两下就白做了。这期间再点一次（[_unflipHeroEgg]）会把
+  /// 这次打开取消掉。
+  void _activateHeroEgg() {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box != null) _eggPos = box.size.center(Offset.zero);
+    _flipped = true;
+    _fireParticles(_eggPos);
+    HapticFeedback.heavyImpact();
+    _flipCtrl.forward(from: 0);
+    _storyTimer?.cancel();
+    _storyTimer = Timer(const Duration(milliseconds: 720), () {
+      _storyTimer = null;
       if (!mounted) return;
-      final box = context.findRenderObject() as RenderBox?;
-      if (box != null) _eggPos = box.size.center(Offset.zero);
-      _flipped = true;
-      _fireParticles(_eggPos);
-      HapticFeedback.heavyImpact();
-      _flipCtrl.forward(from: 0);
+      openStory(context);
     });
   }
 
   void _unflipHeroEgg() {
+    // 翻回正面 = 放弃这次彩蛋，顺带取消还没打开的那一页
+    _storyTimer?.cancel();
+    _storyTimer = null;
     HapticFeedback.selectionClick();
     _flipCtrl.reverse().then((_) {
       if (mounted) setState(() => _flipped = false);
@@ -374,7 +393,7 @@ class _AboutPageState extends State<AboutPage>
 
   @override
   void dispose() {
-    _flipTimer?.cancel();
+    _storyTimer?.cancel();
     _particleOverlay?.remove();
     _particleOverlay = null;
     _ctrl?.dispose();
@@ -770,7 +789,7 @@ class _AboutPageState extends State<AboutPage>
         final h = _heroHeightFor(cons.maxWidth);
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
-          // 点一次抖一次；5 秒后自动翻面；翻到背面后再点一下翻回正面
+          // 点一次抖一次、翻面，然后打开那一页故事；翻到背面后再点一下翻回正面
           onTap: _heroTapped,
           child: SizedBox(
             height: h,

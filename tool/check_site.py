@@ -118,6 +118,39 @@ def main():
             "localStorage.getItem('theme')" in s and 'rel="canonical"' in s)
         chk('faq entry link', 'href="faq.html"' in s)
 
+    print('[home parity x3]')
+    # 三语首页必须**同构**：section 序列与导航项逐项一致。
+    #
+    # 背景：中文页曾经独自多出「2.0 界面」section（连同导航里的「界面」），
+    # 繁体 / 英文页没有；而当时的判据只看卡片数与更新日志，两页少一整段也照样全绿。
+    # 这是「检查器只数个数、不点名」的第三次翻车（前两次见上面卡片与设置页），
+    # 所以这里换成**逐项相等**并且两个方向都报：
+    #   * zh-TW / en 缺的（别人有的你没有）
+    #   * zh-TW / en 多的（你有别人没有）
+    # 只比较 zh 与另两语，**不以某一页为“正确”**——谁多谁少都是漂移。
+    NAV = re.compile(r'<nav class="nav-links" id="navLinks">(.*?)</nav>', re.S)
+    SEC = re.compile(r'<section[^>]*\bid="([^"]+)"')
+    home = {}
+    for lang, f in (('zh', 'docs/index.html'),
+                    ('zh-TW', 'docs/zh-TW/index.html'),
+                    ('en', 'docs/en/index.html')):
+        s = read(f)
+        m = NAV.search(s)
+        # 语言切换组的相对路径天然各页不同（./ 与 ../ 混用），不参与比较；
+        # 主题按钮没有 href，也进不来。
+        inner = m.group(1).split('<span class="lang-switch-group">')[0] if m else ''
+        nav = [h.replace('../', '') for h in re.findall(r'href="([^"]+)"', inner)]
+        home[lang] = (SEC.findall(s), nav)
+    ref_sec, ref_nav = home['zh']
+    for lang in ('zh-TW', 'en'):
+        sec, nav = home[lang]
+        chk('首页 section 同构 %s vs zh' % lang, sec == ref_sec,
+            '缺=%s 多=%s' % ([x for x in ref_sec if x not in sec],
+                            [x for x in sec if x not in ref_sec]))
+        chk('首页导航同构 %s vs zh' % lang, nav == ref_nav,
+            '缺=%s 多=%s' % ([x for x in ref_nav if x not in nav],
+                            [x for x in nav if x not in ref_nav]))
+
     print('[help center x3]')
     for f in ['docs/faq.html', 'docs/zh-TW/faq.html', 'docs/en/faq.html']:
         s = read(f)
@@ -230,6 +263,21 @@ def main():
         sum(1 for l in locs if '/manual/' in l))
     chk('robots -> sitemap',
         'Sitemap: https://aprslocus.theez.top/sitemap.xml' in read('docs/robots.txt'))
+    # sitemap 里不得出现「自己声明 noindex」的页面：
+    # guide.html（视频画面稿）写着 `noindex, follow`，却同时挂在 sitemap 里 ——
+    # 这会让搜索控制台报「已提交的网址被 noindex 排除」，白提交还被判错。
+    # 两者只能选一边：要么撤回 noindex，要么从 sitemap 拿掉（现在是后者）。
+    noidx = []
+    for l in locs:
+        rel = l.replace('https://aprslocus.theez.top/', '') or 'index.html'
+        if rel.endswith('/'):
+            rel += 'index.html'
+        p = os.path.join(ROOT, 'docs', rel)
+        if os.path.exists(p) and re.search(
+                r'<meta[^>]+name="robots"[^>]+noindex',
+                io.open(p, encoding='utf-8').read()):
+            noidx.append(rel)
+    chk('sitemap 无 noindex 页', not noidx, noidx)
 
     print('[sponsors]')
     # 赞助名单的**唯一真源**是 docs/sponsors.json，展示面按语言分三处走：

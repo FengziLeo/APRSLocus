@@ -36,6 +36,15 @@
 .story-text p { color: var(--text-dim); font-size: 16.5px; line-height: 1.85; margin: 0 0 16px; }
 .story-text p:last-child { margin-bottom: 0; }
 .story-text b { color: var(--text); }
+/* BGM 播放器：网易云的对外播放器，固定在右下角跟着整篇故事走（只有这页有 BGM）。
+   330×86 是那个播放器自己的尺寸；窄屏放不下就让它铺满减去两侧留白。
+   右侧留白与上面那颗 .hero-toggle 用同一个式子，两者在同一列上。 */
+.story-bgm {
+  position: fixed; right: clamp(20px, 6vw, 96px); bottom: 18px; z-index: 90;
+  width: 330px; max-width: calc(100vw - 40px);
+}
+.story-bgm iframe { display: block; width: 100%; height: 86px; border: 0; }
+@media (max-width: 520px) { .story-bgm { left: 12px; right: 12px; bottom: 12px; width: auto; } }
 </style>
 </head>
 <body>
@@ -159,6 +168,15 @@
 </section>
 
 </main>
+
+<!-- ═══════════ BGM ═══════════
+     整页只有这一个外链 iframe（网易云音乐的对外播放器），挂在右下角跟着故事走。
+     auto=1 只是「请求自动播放」—— 浏览器通常要等到一次用户交互才肯出声，
+     所以这个播放器自己就是那颗播放键：点一下就唱，不点就一直安静。
+     title 是给读屏用的：iframe 没有可见文案，不给名字就是一个无名区块。 -->
+<div class="story-bgm">
+  <iframe title="背景音乐播放器（网易云音乐）" frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&id=1903408779&auto=1&height=66"></iframe>
+</div>
 
 <!-- 与首页同一份脚本：main.js 负责 body.loaded / 显形 / 主题 / 首屏粒子，
      planet-3d.js 负责星球与那个会跳的数字。两个 ?v= 与三语首页保持一致。 -->

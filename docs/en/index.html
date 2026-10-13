@@ -59,6 +59,7 @@
 <link rel="stylesheet" href="../css/hero-3d.css?v=9">
 <link rel="stylesheet" href="../css/motion.css?v=1">
 <link rel="stylesheet" href="../css/nav.css?v=1">
+<link rel="stylesheet" href="../css/features.css?v=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -297,122 +298,173 @@ html{overflow-x:hidden}
     <p>Position tracking, beacon reporting, messaging, group chat — all the APRS essentials, built to be straightforward.</p>
   </div>
 
-  <div class="cards">
-    <article class="card reveal card-wide">
-      <div class="card-icon c1"><i class="fa-solid fa-location-dot"></i></div>
-      <h3>Real-time Map Tracking</h3>
-      <p>Many tile sources: AMap tiles, AMap satellite, Vector, Carto (light/dark/voyager), OSM (standard/humanitarian), OpenTopo, and Esri. One marker per station (clustering removed in v1.6.149), with trail playback support; the heatmap shows density when zoomed out.</p>
-      <ul class="card-tags"><li>GCJ-02 / WGS-84</li><li>Heatmap</li><li>Trail Display</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c2"><i class="fa-solid fa-tower-broadcast"></i></div>
-      <h3>Position Beacon</h3>
-      <p>One-tap position reporting in standard APRS 1.0 format. Auto-includes altitude, speed, heading, and battery level. Report interval is configurable.</p>
-      <ul class="card-tags"><li>Standard Format</li><li>Auto Attachments</li><li>Demo Mode</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c3"><i class="fa-solid fa-message"></i></div>
-      <h3>Messaging</h3>
-      <p>Private and group chat in a unified conversation list with ACK confirmation. Supports group invites, member management, unread badges, and Chinese text.</p>
-      <ul class="card-tags"><li>ACK Confirmation</li><li>Group Chat</li><li>Chinese Compatible</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c4"><i class="fa-solid fa-shield"></i></div>
-      <h3>Station Recognition &amp; Filter</h3>
-      <p>Recognizes station devices via the official aprs.org database (tocalls): vendor + model + device class (rig / HT / tracker / app / gateway…). Filter by status, type, device class or exact model; jump to QRZ callsign DB or aprs.fi for tracks from the details page.</p>
-      <ul class="card-tags"><li>Official Device ID</li><li>Class / Model Filter</li><li>QRZ / aprs.fi</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c5"><i class="fa-solid fa-file-lines"></i></div>
-      <h3>Packet &amp; Log Viewer</h3>
-      <p>Raw packets displayed in monospace with long-press copy. Parsed results sorted by type: position, message, weather, status. Built-in hierarchical logs for debugging.</p>
-      <ul class="card-tags"><li>Raw Packet View</li><li>Type Filtering</li><li>Debug Logs</li></ul>
-    </article>
-
-    <article class="card reveal card-wide">
-      <div class="card-icon c6"><i class="fa-solid fa-wifi"></i></div>
-      <h3>Connectivity &amp; Background</h3>
-      <p>Auto-connects to APRS-IS public servers over TCP or WebSocket. Progressive reconnect: 8 → 16 → 32 → 60 seconds. Android uses a foreground service to stay online.</p>
-      <ul class="card-tags"><li>Auto Reconnect</li><li>Foreground Service</li><li>System Notifications</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c7"><i class="fa-solid fa-arrows-rotate"></i></div>
-      <h3>Auto Updates</h3>
-      <p>In-app update checker with two channels (GitHub / GitCode). Platform-aware download routing and historical version access.</p>
-      <ul class="card-tags"><li>Dual Channels</li><li>Platform Routing</li><li>Historical Versions</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c8"><i class="fa-solid fa-palette"></i></div>
-      <h3>Personalization</h3>
-      <p>Simplified Chinese / Traditional Chinese / English / Japanese / Indonesian / Spanish UI, dark mode, custom accent colors, scalable UI (85%–130%). Six-step onboarding wizard on first launch.</p>
-      <ul class="card-tags"><li>Six Languages</li><li>Dark Mode</li><li>OOBE Wizard</li></ul>
-    </article>
+  <div class="feat-list">
 <!-- site-sync:features -->
-    <article class="card reveal card-wide">
-      <div class="card-icon c9"><i class="fa-solid fa-tower-cell"></i></div>
-      <h3>Five Data Sources</h3>
-      <p>Internet (APRS-IS), Bluetooth / serial TNC (KISS), sound-card AFSK 1200 (Bell 202 software TNC), Kenwood <code>$PKWDWPL</code> waypoints (receive-only), and WLAN radio direct link (supporting IC-705 / IC-9700 / IC-7610 / IC-905 over Wi-Fi / Ethernet with CI-V and LAN audio). Multiple links can receive simultaneously, while the transmit link is picked separately.</p>
-      <ul class="card-tags"><li>APRS-IS</li><li>TNC</li><li>Audio</li><li>PKWDWPL</li><li>WLAN Radio</li></ul>
+    <p class="feat-group">Maps & tracking</p>
+    <article class="feat reveal">
+      <span class="feat-no">01</span>
+      <span class="feat-ico"><i class="fa-solid fa-location-dot"></i></span>
+      <div class="feat-main">
+        <h3>Real-time Map Tracking</h3>
+        <p>Many tile sources: AMap tiles, AMap satellite, Vector, Carto (light/dark/voyager), OSM (standard/humanitarian), OpenTopo, and Esri. One marker per station (clustering removed in v1.6.149), with trail playback support; the heatmap shows density when zoomed out.</p>
+      </div>
+      <ul class="feat-tags"><li>GCJ-02 / WGS-84</li><li>Heatmap</li><li>Trail Display</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c10"><i class="fa-solid fa-right-left"></i></div>
-      <h3>Gateway (iGate)</h3>
-      <p>Relays RF packets into APRS-IS, tagging them with <code>qAr</code> / <code>qAR</code>; loop protection is built in (packets already carrying <code>TCPIP*</code> or a q-construct are never echoed back), and the same frame is injected once per 30 seconds. Optional two-way mode sends messages to stations recently heard on RF.</p>
-      <ul class="card-tags"><li>RF→IS</li><li>Loop-safe</li><li>De-duplication</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">02</span>
+      <span class="feat-ico"><i class="fa-solid fa-compass"></i></span>
+      <div class="feat-main">
+        <h3>Immersive Drive View</h3>
+        <p>A navigation-style page built for glancing at while driving: large heading / distance / speed readouts, a nearby-stations panel, and the target station centred.</p>
+      </div>
+      <ul class="feat-tags"><li>Navigation style</li><li>Nearby stations</li><li>Large type</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c11"><i class="fa-solid fa-language"></i></div>
-      <h3>Two-way Chat Translation</h3>
-      <p>Built-in multi-engine translation that works out of the box on a free endpoint, <b>no API key required</b>. Translate both incoming and outgoing messages, compare against the original, or translate your text into the other station's language before sending.</p>
-      <ul class="card-tags"><li>No API key</li><li>Side-by-side</li><li>Pre-send</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">03</span>
+      <span class="feat-ico"><i class="fa-solid fa-map-location-dot"></i></span>
+      <div class="feat-main">
+        <h3>Offline Maps</h3>
+        <p>Download the tiles of the current view to the device (resumable, 200k tiles per region) and keep the map with no network at all; a four-step fallback keeps it readable and clickable.</p>
+      </div>
+      <ul class="feat-tags"><li>Download view</li><li>Resumable</li><li>4-step fallback</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c12"><i class="fa-solid fa-compass"></i></div>
-      <h3>Immersive Drive View</h3>
-      <p>A navigation-style page built for glancing at while driving: large heading / distance / speed readouts, a nearby-stations panel, and the target station centred.</p>
-      <ul class="card-tags"><li>Navigation style</li><li>Nearby stations</li><li>Large type</li></ul>
+    <p class="feat-group">Messaging & gateway</p>
+    <article class="feat reveal">
+      <span class="feat-no">04</span>
+      <span class="feat-ico"><i class="fa-solid fa-tower-broadcast"></i></span>
+      <div class="feat-main">
+        <h3>Position Beacon</h3>
+        <p>One-tap position reporting in standard APRS 1.0 format. Auto-includes altitude, speed, heading, and battery level. Report interval is configurable.</p>
+      </div>
+      <ul class="feat-tags"><li>Standard Format</li><li>Auto Attachments</li><li>Demo Mode</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c13"><i class="fa-solid fa-chart-line"></i></div>
-      <h3>Weather · Statistics · Honors</h3>
-      <p>A weather panel whose dynamic background follows the actual conditions, station statistics (latest spot, farthest distance, packet rate), and an honors wall.</p>
-      <ul class="card-tags"><li>Weather</li><li>Statistics</li><li>Honors</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">05</span>
+      <span class="feat-ico"><i class="fa-solid fa-message"></i></span>
+      <div class="feat-main">
+        <h3>Messaging</h3>
+        <p>Private and group chat in a unified conversation list with ACK confirmation. Supports group invites, member management, unread badges, and Chinese text.</p>
+      </div>
+      <ul class="feat-tags"><li>ACK Confirmation</li><li>Group Chat</li><li>Chinese Compatible</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c14"><i class="fa-solid fa-file-export"></i></div>
-      <h3>Data Export</h3>
-      <p>One-tap ADIF export — the standard amateur-radio log interchange format — with a configurable frequency, ready to import into other logging software.</p>
-      <ul class="card-tags"><li>ADIF</li><li>Custom frequency</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">06</span>
+      <span class="feat-ico"><i class="fa-solid fa-language"></i></span>
+      <div class="feat-main">
+        <h3>Two-way Chat Translation</h3>
+        <p>Built-in multi-engine translation that works out of the box on a free endpoint, <b>no API key required</b>. Translate both incoming and outgoing messages, compare against the original, or translate your text into the other station's language before sending.</p>
+      </div>
+      <ul class="feat-tags"><li>No API key</li><li>Side-by-side</li><li>Pre-send</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c15"><i class="fa-solid fa-table-cells-large"></i></div>
-      <h3>Home-screen Widgets</h3>
-      <p>Android home-screen widgets: weather (four adaptive sizes), HF propagation and system status. The widgets never open a connection themselves — the app pushes a snapshot to them, which keeps them cheap on battery.</p>
-      <ul class="card-tags"><li>Android</li><li>4 adaptive sizes</li><li>No direct network</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">07</span>
+      <span class="feat-ico"><i class="fa-solid fa-right-left"></i></span>
+      <div class="feat-main">
+        <h3>Gateway (iGate)</h3>
+        <p>Relays RF packets into APRS-IS, tagging them with <code>qAr</code> / <code>qAR</code>; loop protection is built in (packets already carrying <code>TCPIP*</code> or a q-construct are never echoed back), and the same frame is injected once per 30 seconds. Optional two-way mode sends messages to stations recently heard on RF.</p>
+      </div>
+      <ul class="feat-tags"><li>RF→IS</li><li>Loop-safe</li><li>De-duplication</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c16"><i class="fa-solid fa-satellite-dish"></i></div>
-      <h3>HF & Ionospheric Propagation</h3>
-      <p>An HF panel plus a standalone widget: SFI / Kp / A index, sunspots, X-rays, solar wind, and day/night conditions for four band pairs at a glance. Data comes from hamqsl.com (N0NBH) with a 30-minute cache.</p>
-      <ul class="card-tags"><li>SFI / Kp / A</li><li>Day / night</li><li>30-min cache</li></ul>
+    <p class="feat-group">Stations & data</p>
+    <article class="feat reveal">
+      <span class="feat-no">08</span>
+      <span class="feat-ico"><i class="fa-solid fa-shield"></i></span>
+      <div class="feat-main">
+        <h3>Station Recognition &amp; Filter</h3>
+        <p>Recognizes station devices via the official aprs.org database (tocalls): vendor + model + device class (rig / HT / tracker / app / gateway…). Filter by status, type, device class or exact model; jump to QRZ callsign DB or aprs.fi for tracks from the details page.</p>
+      </div>
+      <ul class="feat-tags"><li>Official Device ID</li><li>Class / Model Filter</li><li>QRZ / aprs.fi</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c17"><i class="fa-solid fa-map-location-dot"></i></div>
-      <h3>Offline Maps</h3>
-      <p>Download the tiles of the current view to the device (resumable, 200k tiles per region) and keep the map with no network at all; a four-step fallback keeps it readable and clickable.</p>
-      <ul class="card-tags"><li>Download view</li><li>Resumable</li><li>4-step fallback</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">09</span>
+      <span class="feat-ico"><i class="fa-solid fa-file-lines"></i></span>
+      <div class="feat-main">
+        <h3>Packet &amp; Log Viewer</h3>
+        <p>Raw packets displayed in monospace with long-press copy. Parsed results sorted by type: position, message, weather, status. Built-in hierarchical logs for debugging.</p>
+      </div>
+      <ul class="feat-tags"><li>Raw Packet View</li><li>Type Filtering</li><li>Debug Logs</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c18"><i class="fa-solid fa-paintbrush"></i></div>
-      <h3>Themes & Backup</h3>
-      <p>Themes go beyond colour: icons, text and your own background image (17 colour tokens), exported as JSON to share; settings and data back up as one file for a one-tap restore.</p>
-      <ul class="card-tags"><li>17 tokens</li><li>JSON export</li><li>One-tap backup</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">10</span>
+      <span class="feat-ico"><i class="fa-solid fa-tower-cell"></i></span>
+      <div class="feat-main">
+        <h3>Five Data Sources</h3>
+        <p>Internet (APRS-IS), Bluetooth / serial TNC (KISS), sound-card AFSK 1200 (Bell 202 software TNC), Kenwood <code>$PKWDWPL</code> waypoints (receive-only), and WLAN radio direct link (supporting IC-705 / IC-9700 / IC-7610 / IC-905 over Wi-Fi / Ethernet with CI-V and LAN audio). Multiple links can receive simultaneously, while the transmit link is picked separately.</p>
+      </div>
+      <ul class="feat-tags"><li>APRS-IS</li><li>TNC</li><li>Audio</li><li>PKWDWPL</li><li>WLAN Radio</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">11</span>
+      <span class="feat-ico"><i class="fa-solid fa-chart-line"></i></span>
+      <div class="feat-main">
+        <h3>Weather · Statistics · Honors</h3>
+        <p>A weather panel whose dynamic background follows the actual conditions, station statistics (latest spot, farthest distance, packet rate), and an honors wall.</p>
+      </div>
+      <ul class="feat-tags"><li>Weather</li><li>Statistics</li><li>Honors</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">12</span>
+      <span class="feat-ico"><i class="fa-solid fa-file-export"></i></span>
+      <div class="feat-main">
+        <h3>Data Export</h3>
+        <p>One-tap ADIF export — the standard amateur-radio log interchange format — with a configurable frequency, ready to import into other logging software.</p>
+      </div>
+      <ul class="feat-tags"><li>ADIF</li><li>Custom frequency</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">13</span>
+      <span class="feat-ico"><i class="fa-solid fa-satellite-dish"></i></span>
+      <div class="feat-main">
+        <h3>HF & Ionospheric Propagation</h3>
+        <p>An HF panel plus a standalone widget: SFI / Kp / A index, sunspots, X-rays, solar wind, and day/night conditions for four band pairs at a glance. Data comes from hamqsl.com (N0NBH) with a 30-minute cache.</p>
+      </div>
+      <ul class="feat-tags"><li>SFI / Kp / A</li><li>Day / night</li><li>30-min cache</li></ul>
+    </article>
+    <p class="feat-group">System & experience</p>
+    <article class="feat reveal">
+      <span class="feat-no">14</span>
+      <span class="feat-ico"><i class="fa-solid fa-wifi"></i></span>
+      <div class="feat-main">
+        <h3>Connectivity &amp; Background</h3>
+        <p>Auto-connects to APRS-IS public servers over TCP or WebSocket. Progressive reconnect: 8 → 16 → 32 → 60 seconds. Android uses a foreground service to stay online.</p>
+      </div>
+      <ul class="feat-tags"><li>Auto Reconnect</li><li>Foreground Service</li><li>System Notifications</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">15</span>
+      <span class="feat-ico"><i class="fa-solid fa-arrows-rotate"></i></span>
+      <div class="feat-main">
+        <h3>Auto Updates</h3>
+        <p>In-app update checker with two channels (GitHub / GitCode). Platform-aware download routing and historical version access.</p>
+      </div>
+      <ul class="feat-tags"><li>Dual Channels</li><li>Platform Routing</li><li>Historical Versions</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">16</span>
+      <span class="feat-ico"><i class="fa-solid fa-palette"></i></span>
+      <div class="feat-main">
+        <h3>Personalization</h3>
+        <p>Simplified Chinese / Traditional Chinese / English / Japanese / Indonesian / Spanish UI, dark mode, custom accent colors, scalable UI (85%–130%). Six-step onboarding wizard on first launch.</p>
+      </div>
+      <ul class="feat-tags"><li>Six Languages</li><li>Dark Mode</li><li>OOBE Wizard</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">17</span>
+      <span class="feat-ico"><i class="fa-solid fa-table-cells-large"></i></span>
+      <div class="feat-main">
+        <h3>Home-screen Widgets</h3>
+        <p>Android home-screen widgets: weather (four adaptive sizes), HF propagation and system status. The widgets never open a connection themselves — the app pushes a snapshot to them, which keeps them cheap on battery.</p>
+      </div>
+      <ul class="feat-tags"><li>Android</li><li>4 adaptive sizes</li><li>No direct network</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">18</span>
+      <span class="feat-ico"><i class="fa-solid fa-paintbrush"></i></span>
+      <div class="feat-main">
+        <h3>Themes & Backup</h3>
+        <p>Themes go beyond colour: icons, text and your own background image (17 colour tokens), exported as JSON to share; settings and data back up as one file for a one-tap restore.</p>
+      </div>
+      <ul class="feat-tags"><li>17 tokens</li><li>JSON export</li><li>One-tap backup</li></ul>
     </article>
   <!-- /site-sync:features -->
   </div>

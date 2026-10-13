@@ -60,6 +60,7 @@
 <link rel="stylesheet" href="css/hero-3d.css?v=9">
 <link rel="stylesheet" href="css/motion.css?v=1">
 <link rel="stylesheet" href="css/nav.css?v=1">
+<link rel="stylesheet" href="css/features.css?v=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -303,134 +304,174 @@ html{overflow-x:hidden}
     <h2>它能干什么</h2>
     <p>不止是「看台站」——地图、消息、射频、传播与天气，火腿用得上的都在这。</p>
   </div>
-  <style>
-    #features .cards{grid-template-columns:repeat(3,1fr);gap:24px}
-    #features .card{padding:30px 28px;border-radius:20px;display:flex;flex-direction:column}
-    #features .card-icon{width:56px;height:56px;border-radius:16px;margin-bottom:20px;box-shadow:0 12px 26px rgba(45,70,120,.22)}
-    #features .card h3{font-size:20px;font-weight:800;margin-bottom:12px;letter-spacing:-.01em}
-    #features .card p{font-size:14.5px;line-height:1.75;color:var(--text-dim)}
-    #features .card-tags{margin-top:auto;padding-top:18px}
-    #features .card-tags li{font-size:12px}
-    @media(max-width:1024px){#features .cards{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:640px){#features .cards{grid-template-columns:1fr}}
-  </style>
 
-  <div class="cards">
-    <article class="card reveal card-wide">
-      <div class="card-icon c1"><i class="fa-solid fa-location-dot"></i></div>
-      <h3>实时地图追踪</h3>
-      <p>高德瓦片 / 高德卫星 / 矢量 / Carto（浅色·深色·航行者）/ OSM（标准·人道）/ OpenTopo / Esri 十多种底图可切。一台站一个标记（v1.6.149 起去掉聚合），也能看轨迹回放，低缩放密度看热力图。</p>
-      <ul class="card-tags"><li>GCJ-02 / WGS-84</li><li>热力图</li><li>轨迹显示</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c2"><i class="fa-solid fa-tower-broadcast"></i></div>
-      <h3>位置信标</h3>
-      <p>一键上报位置，按 APRS 1.0 标准格式发送，自动带上高度、速度、航向和电量，上报间隔可调。</p>
-      <ul class="card-tags"><li>标准格式</li><li>自动附带信息</li><li>演示模式</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c3"><i class="fa-solid fa-message"></i></div>
-      <h3>消息通信</h3>
-      <p>单聊、群聊统一在会话列表里，带 ACK 确认。支持群聊邀请、成员管理、未读角标，中文消息也没问题。</p>
-      <ul class="card-tags"><li>ACK 确认</li><li>群聊管理</li><li>中文兼容</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c4"><i class="fa-solid fa-shield"></i></div>
-      <h3>台站识别与筛选</h3>
-      <p>接入 aprs.org 官方设备库，从报文目的呼号识别台站所用设备（厂商 + 型号 + 车台 / 手台 / 跟踪器 / App / 网关…）。列表可筛状态、类型、设备类别与具体型号；详情页可跳 QRZ 呼号库与 aprs.fi 看轨迹。</p>
-      <ul class="card-tags"><li>官方设备识别</li><li>类别 / 型号筛选</li><li>QRZ / aprs.fi</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c5"><i class="fa-solid fa-file-lines"></i></div>
-      <h3>数据包与日志</h3>
-      <p>原始报文用等宽字体展示，长按可复制；解析结果按位置 / 消息 / 气象 / 状态分类。内置分级日志方便排查问题。</p>
-      <ul class="card-tags"><li>原始报文</li><li>类型筛选</li><li>调试日志</li></ul>
-    </article>
-
-    <article class="card reveal card-wide">
-      <div class="card-icon c6"><i class="fa-solid fa-wifi"></i></div>
-      <h3>连接与后台</h3>
-      <p>自动连 APRS-IS 公共服务器，TCP / WebSocket 都支持，断线按 8 → 16 → 32 → 60 秒渐进重连。Android 用前台服务保持在线。</p>
-      <ul class="card-tags"><li>自动重连</li><li>前台服务</li><li>系统通知</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c7"><i class="fa-solid fa-arrows-rotate"></i></div>
-      <h3>自动更新</h3>
-      <p>应用内检查更新，GitHub / GitCode 两个渠道可切，按平台分流下载，也能装历史版本。</p>
-      <ul class="card-tags"><li>双渠道</li><li>按平台分流</li><li>历史版本</li></ul>
-    </article>
-
-    <article class="card reveal">
-      <div class="card-icon c8"><i class="fa-solid fa-palette"></i></div>
-      <h3>个性化体验</h3>
-      <p>简体中文 / 繁體中文 / English / 日本語 / Indonesia / Español 可切换，支持深色模式和自定义主题色，界面可缩放 85% ~ 130%。首次启动有六步引导。</p>
-      <ul class="card-tags"><li>六种语言</li><li>深色模式</li><li>OOBE 引导</li></ul>
-    </article>
+  <div class="feat-list">
 <!-- site-sync:features -->
-    <article class="card reveal card-wide">
-      <div class="card-icon c9"><i class="fa-solid fa-tower-cell"></i></div>
-      <h3>五种数据来源</h3>
-      <p>互联网（APRS-IS）、蓝牙 / 串口 TNC（KISS）、声卡音频 AFSK 1200（Bell 202 软 TNC）、Kenwood 航点 <code>$PKWDWPL</code>（只收不发），以及 WLAN 电台直连（支持 IC-705 / IC-9700 / IC-7610 / IC-905 等 Wi-Fi / 以太网型号，CI-V 控制与局域网音频）。多条链路可以同时收报文，发射来源单独指定一条。</p>
-      <ul class="card-tags"><li>APRS-IS</li><li>TNC</li><li>音频</li><li>PKWDWPL</li><li>WLAN 电台</li></ul>
+    <p class="feat-group">地图与追踪</p>
+    <article class="feat reveal">
+      <span class="feat-no">01</span>
+      <span class="feat-ico"><i class="fa-solid fa-location-dot"></i></span>
+      <div class="feat-main">
+        <h3>实时地图追踪</h3>
+        <p>高德瓦片 / 高德卫星 / 矢量 / Carto（浅色·深色·航行者）/ OSM（标准·人道）/ OpenTopo / Esri 十多种底图可切。一台站一个标记（v1.6.149 起去掉聚合），也能看轨迹回放，低缩放密度看热力图。</p>
+      </div>
+      <ul class="feat-tags"><li>GCJ-02 / WGS-84</li><li>热力图</li><li>轨迹显示</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c10"><i class="fa-solid fa-right-left"></i></div>
-      <h3>网关（iGate）</h3>
-      <p>把射频收到的报文转到 APRS-IS，自动带 <code>qAr</code> / <code>qAR</code> 来路标识；带环路防护（含 <code>TCPIP*</code> 或已有 q 构造的报文绝不送回），同一帧 30 秒内只注入一次。可选双向模式会把网络侧发给「刚在射频上听到过」的台站的消息送到射频。</p>
-      <ul class="card-tags"><li>RF→IS</li><li>防环</li><li>去重</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">02</span>
+      <span class="feat-ico"><i class="fa-solid fa-compass"></i></span>
+      <div class="feat-main">
+        <h3>沉浸地图（导航风格）</h3>
+        <p>专为「边开车边看」设计的导航风格页面：大字号方向 / 距离 / 速度，左侧「附近台站」面板，目标台站居中，Android 与 Windows 都能用。</p>
+      </div>
+      <ul class="feat-tags"><li>导航风格</li><li>附近台站</li><li>大字号</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c11"><i class="fa-solid fa-language"></i></div>
-      <h3>双向聊天翻译</h3>
-      <p>内置多引擎翻译，默认走免费接口、<b>无需任何密钥</b>。收到的和发出的消息都能译，可对照原文，也能在发送前先把自己的输入译成对方的语言。</p>
-      <ul class="card-tags"><li>免密钥</li><li>对照翻译</li><li>发送前翻译</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">03</span>
+      <span class="feat-ico"><i class="fa-solid fa-map-location-dot"></i></span>
+      <div class="feat-main">
+        <h3>离线地图</h3>
+        <p>把当前视图整片瓦片下到本机（断点续传、单区域上限 20 万张），断网、无信号也能看；四级降级保证地图始终可看可点。</p>
+      </div>
+      <ul class="feat-tags"><li>按视图下载</li><li>断点续传</li><li>四级降级</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c12"><i class="fa-solid fa-compass"></i></div>
-      <h3>沉浸地图（导航风格）</h3>
-      <p>专为「边开车边看」设计的导航风格页面：大字号方向 / 距离 / 速度，左侧「附近台站」面板，目标台站居中，Android 与 Windows 都能用。</p>
-      <ul class="card-tags"><li>导航风格</li><li>附近台站</li><li>大字号</li></ul>
+    <p class="feat-group">通信与网关</p>
+    <article class="feat reveal">
+      <span class="feat-no">04</span>
+      <span class="feat-ico"><i class="fa-solid fa-tower-broadcast"></i></span>
+      <div class="feat-main">
+        <h3>位置信标</h3>
+        <p>一键上报位置，按 APRS 1.0 标准格式发送，自动带上高度、速度、航向和电量，上报间隔可调。</p>
+      </div>
+      <ul class="feat-tags"><li>标准格式</li><li>自动附带信息</li><li>演示模式</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c13"><i class="fa-solid fa-chart-line"></i></div>
-      <h3>天气 · 统计 · 荣誉</h3>
-      <p>天气面板（动态背景跟随实时天气强度变化）、台站统计面板（最近上报 / 最远距离 / 报文速率），以及荣誉墙。</p>
-      <ul class="card-tags"><li>天气面板</li><li>统计面板</li><li>荣誉墙</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">05</span>
+      <span class="feat-ico"><i class="fa-solid fa-message"></i></span>
+      <div class="feat-main">
+        <h3>消息通信</h3>
+        <p>单聊、群聊统一在会话列表里，带 ACK 确认。支持群聊邀请、成员管理、未读角标，中文消息也没问题。</p>
+      </div>
+      <ul class="feat-tags"><li>ACK 确认</li><li>群聊管理</li><li>中文兼容</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c14"><i class="fa-solid fa-file-export"></i></div>
-      <h3>数据导出</h3>
-      <p>一键导出 ADIF —— 业余无线电通用的日志交换格式，频率可自定义，导出后可直接导入其它日志软件。</p>
-      <ul class="card-tags"><li>ADIF</li><li>频率自定义</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">06</span>
+      <span class="feat-ico"><i class="fa-solid fa-language"></i></span>
+      <div class="feat-main">
+        <h3>双向聊天翻译</h3>
+        <p>内置多引擎翻译，默认走免费接口、<b>无需任何密钥</b>。收到的和发出的消息都能译，可对照原文，也能在发送前先把自己的输入译成对方的语言。</p>
+      </div>
+      <ul class="feat-tags"><li>免密钥</li><li>对照翻译</li><li>发送前翻译</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c15"><i class="fa-solid fa-table-cells-large"></i></div>
-      <h3>桌面小组件</h3>
-      <p>Android 桌面小组件：天气（4 档自适应尺寸）、短波传播、系统状态三套；组件不自己联网，由应用单向推送快照，省电可控。</p>
-      <ul class="card-tags"><li>Android</li><li>4 档自适应</li><li>不自行联网</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">07</span>
+      <span class="feat-ico"><i class="fa-solid fa-right-left"></i></span>
+      <div class="feat-main">
+        <h3>网关（iGate）</h3>
+        <p>把射频收到的报文转到 APRS-IS，自动带 <code>qAr</code> / <code>qAR</code> 来路标识；带环路防护（含 <code>TCPIP*</code> 或已有 q 构造的报文绝不送回），同一帧 30 秒内只注入一次。可选双向模式会把网络侧发给「刚在射频上听到过」的台站的消息送到射频。</p>
+      </div>
+      <ul class="feat-tags"><li>RF→IS</li><li>防环</li><li>去重</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c16"><i class="fa-solid fa-satellite-dish"></i></div>
-      <h3>短波与电离层传播</h3>
-      <p>短波面板与独立组件：SFI / Kp / A 指数、黑子、X 射线、太阳风，四个波段对的「日 / 夜」条件一眼看清；数据来自 hamqsl.com（N0NBH），30 分钟缓存。</p>
-      <ul class="card-tags"><li>SFI / Kp / A</li><li>日 · 夜</li><li>30 分钟缓存</li></ul>
+    <p class="feat-group">台站与数据</p>
+    <article class="feat reveal">
+      <span class="feat-no">08</span>
+      <span class="feat-ico"><i class="fa-solid fa-shield"></i></span>
+      <div class="feat-main">
+        <h3>台站识别与筛选</h3>
+        <p>接入 aprs.org 官方设备库，从报文目的呼号识别台站所用设备（厂商 + 型号 + 车台 / 手台 / 跟踪器 / App / 网关…）。列表可筛状态、类型、设备类别与具体型号；详情页可跳 QRZ 呼号库与 aprs.fi 看轨迹。</p>
+      </div>
+      <ul class="feat-tags"><li>官方设备识别</li><li>类别 / 型号筛选</li><li>QRZ / aprs.fi</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c17"><i class="fa-solid fa-map-location-dot"></i></div>
-      <h3>离线地图</h3>
-      <p>把当前视图整片瓦片下到本机（断点续传、单区域上限 20 万张），断网、无信号也能看；四级降级保证地图始终可看可点。</p>
-      <ul class="card-tags"><li>按视图下载</li><li>断点续传</li><li>四级降级</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">09</span>
+      <span class="feat-ico"><i class="fa-solid fa-file-lines"></i></span>
+      <div class="feat-main">
+        <h3>数据包与日志</h3>
+        <p>原始报文用等宽字体展示，长按可复制；解析结果按位置 / 消息 / 气象 / 状态分类。内置分级日志方便排查问题。</p>
+      </div>
+      <ul class="feat-tags"><li>原始报文</li><li>类型筛选</li><li>调试日志</li></ul>
     </article>
-    <article class="card reveal">
-      <div class="card-icon c18"><i class="fa-solid fa-paintbrush"></i></div>
-      <h3>主题与备份</h3>
-      <p>主题不只是换色：颜色、图标、文字、背景图都能改（17 个颜色令牌），可导出成 JSON 分享；设置与数据可整体备份，换机一键导入。</p>
-      <ul class="card-tags"><li>17 色令牌</li><li>JSON 分享</li><li>一键备份</li></ul>
+    <article class="feat reveal">
+      <span class="feat-no">10</span>
+      <span class="feat-ico"><i class="fa-solid fa-tower-cell"></i></span>
+      <div class="feat-main">
+        <h3>五种数据来源</h3>
+        <p>互联网（APRS-IS）、蓝牙 / 串口 TNC（KISS）、声卡音频 AFSK 1200（Bell 202 软 TNC）、Kenwood 航点 <code>$PKWDWPL</code>（只收不发），以及 WLAN 电台直连（支持 IC-705 / IC-9700 / IC-7610 / IC-905 等 Wi-Fi / 以太网型号，CI-V 控制与局域网音频）。多条链路可以同时收报文，发射来源单独指定一条。</p>
+      </div>
+      <ul class="feat-tags"><li>APRS-IS</li><li>TNC</li><li>音频</li><li>PKWDWPL</li><li>WLAN 电台</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">11</span>
+      <span class="feat-ico"><i class="fa-solid fa-chart-line"></i></span>
+      <div class="feat-main">
+        <h3>天气 · 统计 · 荣誉</h3>
+        <p>天气面板（动态背景跟随实时天气强度变化）、台站统计面板（最近上报 / 最远距离 / 报文速率），以及荣誉墙。</p>
+      </div>
+      <ul class="feat-tags"><li>天气面板</li><li>统计面板</li><li>荣誉墙</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">12</span>
+      <span class="feat-ico"><i class="fa-solid fa-file-export"></i></span>
+      <div class="feat-main">
+        <h3>数据导出</h3>
+        <p>一键导出 ADIF —— 业余无线电通用的日志交换格式，频率可自定义，导出后可直接导入其它日志软件。</p>
+      </div>
+      <ul class="feat-tags"><li>ADIF</li><li>频率自定义</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">13</span>
+      <span class="feat-ico"><i class="fa-solid fa-satellite-dish"></i></span>
+      <div class="feat-main">
+        <h3>短波与电离层传播</h3>
+        <p>短波面板与独立组件：SFI / Kp / A 指数、黑子、X 射线、太阳风，四个波段对的「日 / 夜」条件一眼看清；数据来自 hamqsl.com（N0NBH），30 分钟缓存。</p>
+      </div>
+      <ul class="feat-tags"><li>SFI / Kp / A</li><li>日 · 夜</li><li>30 分钟缓存</li></ul>
+    </article>
+    <p class="feat-group">系统与体验</p>
+    <article class="feat reveal">
+      <span class="feat-no">14</span>
+      <span class="feat-ico"><i class="fa-solid fa-wifi"></i></span>
+      <div class="feat-main">
+        <h3>连接与后台</h3>
+        <p>自动连 APRS-IS 公共服务器，TCP / WebSocket 都支持，断线按 8 → 16 → 32 → 60 秒渐进重连。Android 用前台服务保持在线。</p>
+      </div>
+      <ul class="feat-tags"><li>自动重连</li><li>前台服务</li><li>系统通知</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">15</span>
+      <span class="feat-ico"><i class="fa-solid fa-arrows-rotate"></i></span>
+      <div class="feat-main">
+        <h3>自动更新</h3>
+        <p>应用内检查更新，GitHub / GitCode 两个渠道可切，按平台分流下载，也能装历史版本。</p>
+      </div>
+      <ul class="feat-tags"><li>双渠道</li><li>按平台分流</li><li>历史版本</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">16</span>
+      <span class="feat-ico"><i class="fa-solid fa-palette"></i></span>
+      <div class="feat-main">
+        <h3>个性化体验</h3>
+        <p>简体中文 / 繁體中文 / English / 日本語 / Indonesia / Español 可切换，支持深色模式和自定义主题色，界面可缩放 85% ~ 130%。首次启动有六步引导。</p>
+      </div>
+      <ul class="feat-tags"><li>六种语言</li><li>深色模式</li><li>OOBE 引导</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">17</span>
+      <span class="feat-ico"><i class="fa-solid fa-table-cells-large"></i></span>
+      <div class="feat-main">
+        <h3>桌面小组件</h3>
+        <p>Android 桌面小组件：天气（4 档自适应尺寸）、短波传播、系统状态三套；组件不自己联网，由应用单向推送快照，省电可控。</p>
+      </div>
+      <ul class="feat-tags"><li>Android</li><li>4 档自适应</li><li>不自行联网</li></ul>
+    </article>
+    <article class="feat reveal">
+      <span class="feat-no">18</span>
+      <span class="feat-ico"><i class="fa-solid fa-paintbrush"></i></span>
+      <div class="feat-main">
+        <h3>主题与备份</h3>
+        <p>主题不只是换色：颜色、图标、文字、背景图都能改（17 个颜色令牌），可导出成 JSON 分享；设置与数据可整体备份，换机一键导入。</p>
+      </div>
+      <ul class="feat-tags"><li>17 色令牌</li><li>JSON 分享</li><li>一键备份</li></ul>
     </article>
   <!-- /site-sync:features -->
   </div>

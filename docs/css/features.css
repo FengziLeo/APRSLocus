@@ -1,0 +1,99 @@
+/* ═══════════════ 首页 #features：分组序号列表（features.css） ═══════════════
+   只挂首页（三语 index.html 各一行 <link>）。这一层刻意**不是卡片**：
+   一行 = 序号 + 图标片 + 标题/正文 + 标签，组与组之间一行小标题，
+   行与行之间只有一条发丝线 —— 18 个方块堆在一起的观感就没了。
+
+   两处刻意的做法，写在这儿免得以后被"顺手改掉"：
+   1) 发丝线不用 --line。--line 是"玻璃卡边缘"的白色（浅色下 rgba(255,255,255,.65)），
+      铺在浅色页面上根本看不见；卡片上是靠玻璃面衬出来的层次。所以这里自带一个
+      --feat-rule，深浅两套都在本文件里，不再往 style.css 塞规则（那个文件被 46 个
+      页面用 ?v=7 引用，动它就得全站改版本号）。
+   2) 强调色还是全站那一支蓝：序号、图标、hover 后的图标片都是同一个色相，
+      没有第二色相。
+
+   内容不在这里改：#features 里那一整块是 tool/sync_site_content.py 的标记块
+   （18 条文案在它的 CARDS 表里），下次同步会整块重写。
+   ══════════════════════════════════════════════════════════════════ */
+
+.feat-list {
+  --feat-rule: rgba(15, 23, 42, .10);
+  --feat-hover: rgba(3, 105, 161, .05);
+  --feat-ico-bg: rgba(3, 105, 161, .09);
+  --feat-ico-br: rgba(3, 105, 161, .22);
+}
+:root[data-theme="dark"] .feat-list {
+  --feat-rule: rgba(255, 255, 255, .12);
+  --feat-hover: rgba(56, 189, 248, .08);
+  --feat-ico-bg: rgba(56, 189, 248, .14);
+  --feat-ico-br: rgba(56, 189, 248, .26);
+}
+
+/* ── 组标题：小字 + 一条拉到右边的发丝线（分组的唯一标记，靠线不靠留白） ── */
+.feat-group {
+  display: flex; align-items: center; gap: 16px;
+  margin: 42px 0 2px;
+  font-size: 12.5px; font-weight: 800; letter-spacing: .18em;
+  color: var(--cyan);
+}
+.feat-group:first-child { margin-top: 4px; }
+.feat-group::after { content: ""; flex: 1; height: 1px; background: var(--feat-rule); }
+
+/* ── 一行 ── */
+.feat {
+  display: grid;
+  grid-template-columns: 34px 46px minmax(0, 1fr) minmax(0, 280px);
+  gap: 18px;
+  align-items: start;
+  padding: 24px 4px 24px 0;
+  border-bottom: 1px solid var(--feat-rule);
+  transition: background .3s var(--ease);
+}
+.feat:hover { background: linear-gradient(90deg, var(--feat-hover), transparent 62%); }
+
+.feat-no {
+  padding-top: 5px;
+  font-size: 12.5px; font-weight: 800; letter-spacing: .04em;
+  color: var(--cyan); opacity: .7;
+  font-variant-numeric: tabular-nums;
+}
+
+.feat-ico {
+  display: grid; place-items: center;
+  width: 46px; height: 46px; border-radius: 14px;
+  background: var(--feat-ico-bg);
+  border: 1px solid var(--feat-ico-br);
+  color: var(--cyan); font-size: 17px;
+  /* opacity 的过渡放这儿（入场首态在 motion.css）：两边都写 transition 会互相盖掉 */
+  transition: opacity .45s var(--ease), background .3s var(--ease),
+              color .3s var(--ease), border-color .3s var(--ease);
+}
+.feat:hover .feat-ico {
+  background: var(--grad); border-color: transparent; color: #fff;
+}
+
+.feat-main h3 { font-size: 17.5px; font-weight: 800; letter-spacing: -.01em; }
+.feat-main p { margin-top: 7px; color: var(--text-dim); font-size: 14px; line-height: 1.7; }
+
+.feat-tags {
+  list-style: none; display: flex; flex-wrap: wrap; gap: 7px;
+  justify-content: flex-end; padding-top: 3px;
+}
+.feat-tags li {
+  padding: 3px 10px; border-radius: 999px;
+  border: 1px solid var(--feat-rule);
+  color: var(--text-faint); font-size: 11.5px; line-height: 1.5; white-space: nowrap;
+}
+
+/* ── 断点：先收掉标签那一列（挪到正文下面），再收窄序号与图标 ── */
+@media (max-width: 1100px) {
+  .feat { grid-template-columns: 34px 46px minmax(0, 1fr); }
+  .feat-tags { grid-column: 3; justify-content: flex-start; padding-top: 12px; }
+}
+@media (max-width: 640px) {
+  .feat { grid-template-columns: 26px 38px minmax(0, 1fr); gap: 12px; padding: 20px 0; }
+  .feat-ico { width: 38px; height: 38px; border-radius: 12px; font-size: 15px; }
+  .feat-no { padding-top: 3px; font-size: 11.5px; }
+  .feat-main h3 { font-size: 16.5px; }
+  .feat-main p { font-size: 13.5px; }
+  .feat-group { margin-top: 30px; font-size: 11.5px; letter-spacing: .14em; }
+}

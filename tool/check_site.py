@@ -104,13 +104,13 @@ def main():
         vers = _cl_vers()
         missing = [v for v in vers
                    if '<span class="cl-tag">%s</span>' % v not in s]
-        # 卡片计数用**前缀**匹配（`class="card reveal`），不是整串 `card reveal"`：
-        # 首页有几张跨两列的"大卡"写成 `card reveal card-wide`，整串匹配会把它们
-        # 数漏 —— 少几张不算少、看着还全绿，正是这类判据最坑的地方。
-        chk('cards/cl present (%d cards, %d/%d vers)' %
-            (s.count('<article class="card reveal'),
+        # 功能条目计数用**前缀**匹配（`class="feat reveal`）：将来哪天某一行多挂了
+        # 一个类名（`feat reveal is-new`），整串匹配就会把它数漏 —— 少数一行、看着
+        # 还全绿，正是这类判据最坑的地方。
+        chk('feat rows/cl present (%d rows, %d/%d vers)' %
+            (s.count('<article class="feat reveal'),
              len(vers) - len(missing), len(vers)),
-            s.count('<article class="card reveal') >= 10 and not missing)
+            s.count('<article class="feat reveal') >= 10 and not missing)
         # 「最新版本出现在首页」不写死版本号：从 CHANGELOG 现取。
         # 这条同时盯着「发版后忘跑 sync_site_content.py」—— 那时首页还停在旧版本。
         chk('latest release in cl', _newest_ver() in s)
@@ -188,29 +188,56 @@ def main():
     # `.reveal.in{transform:none}` 排在 `.card:hover{transform:…}` 之后、特异性又相同，
     # 拿 transform 做 hover 会被它一直压死（改了看不出变化，极易当成"没生效"再改一遍）。
     chk('动效层 hover 抬升不与 .reveal.in 打架（走 translate）',
-        '[data-fx] > .card:hover { translate:' in motion_css and
         '[data-fx] > .cl-version:hover { translate:' in motion_css and
         # 只盯 :hover 紧跟 { 的那条规则本体（`…:hover::before{transform:…}` 是扫光，合规）
         re.search(r':hover\s*\{[^}]*transform:', motion_plain) is None)
     chk('动效层：延迟只写在 .in 态（hover 才不用跟着等）',
         re.search(r'\[data-fx\] > \.reveal\.in \{[^}]*transition-delay: var\(--fx-d',
                   motion_plain) is not None)
-    chk('动效层：彩虹图标片收成一支蓝 + 大卡跨两列',
-        '#features .card-icon { background:' in motion_css and
-        '#features .cards > .card:nth-child(3n+2) .card-icon' in motion_css and
-        '#features .cards > .card-wide { grid-column: span 2' in motion_css)
-    # 跨列的位置是个布局不变量：三语必须**同几张**。18 张卡 + 3 张跨列刚好 7 行
-    # 排满（这是算过的，2 张或 4 张都会在行尾留洞）；只要有一页少标一张，那一页
-    # 就缺一块，而且看不出是"少标"还是"故意"。
-    wide = {}
+    # 功能清单是**分组序号列表**，不是卡片（docs/css/features.css）：18 行 + 4 个组标题。
+    #
+    # 判据分三层，缺一层就会漏掉真问题：
+    #   * 只查"还有没有卡片"—— 把整段删了也算通过；
+    #   * 只查行数 —— 分组乱序、编号重复都看不见；
+    #   * 只查中文页 —— 另两页少一组很正常（这正是当年"中文页多出一个 section"的翻车）。
+    # 所以三语逐项比对（编号序列 / 组数 / 每行有没有正文与标签），再单独点名编号连续。
+    feat = {}
     for f in homes:
         s = read(f)
         seg = s[s.index('id="features"'):s.index('id="platforms"')]
-        wide[f] = re.findall(
-            r'class="card reveal card-wide">\s*<div class="card-icon (c\d+)"', seg)
-    chk('大卡跨列三语同几张、各 3 张',
-        len(set(tuple(v) for v in wide.values())) == 1 and
-        all(len(v) == 3 for v in wide.values()), wide['docs/index.html'])
+        feat[f] = (tuple(re.findall(r'<span class="feat-no">(\d+)</span>', seg)),
+                   len(re.findall(r'<p class="feat-group">', seg)),
+                   len(re.findall(r'<ul class="feat-tags">', seg)),
+                   len(re.findall(r'<div class="feat-main">', seg)),
+                   '<article class="card' in seg)
+    ref = feat['docs/index.html']
+    chk('功能清单三语同构（编号 / 组数 / 每行正文与标签）',
+        len(set(feat.values())) == 1, feat)
+    chk('功能清单 18 行 4 组、编号 01~18 连续、没有卡片写法',
+        ref[0] == tuple('%02d' % i for i in range(1, len(ref[0]) + 1)) and
+        len(ref[0]) == 18 and ref[1] == 4 and ref[2] == 18 and ref[3] == 18 and
+        not ref[4])
+    # 序号行的入场：只上浮。缩放/模糊是"一堆小方块在弹"的观感 —— 之前正是这个
+    # 被反馈过，所以把"只上浮"钉成判据，免得哪天顺手加个 scale 又回去。
+    row_rule = re.search(r'\[data-fx\] > \.feat \{([^}]*)\}', motion_plain)
+    chk('序号行入场只上浮（不缩放 / 不模糊）',
+        row_rule is not None and 'translateY(14px)' in row_rule.group(1) and
+        'scale' not in row_rule.group(1) and 'blur' not in row_rule.group(1))
+    # 样式层是首页专属：只挂三语 index.html，子页一行都不碰（文档页要稳）。
+    feat_css = read('docs/css/features.css')
+    chk('功能清单样式只挂首页（三语有、子页没有、同一个 ?v=）',
+        all(read(f).count('features.css?v=') == 1 for f in homes) and
+        len(set(re.findall(r'features\.css\?v=(\d+)', read(f))[0] for f in homes)) == 1 and
+        all('features.css' not in read(f)
+            for f in ['docs/faq.html', 'docs/zh-TW/faq.html', 'docs/en/faq.html',
+                      'docs/manual/start.html', 'docs/zh-TW/manual/start.html',
+                      'docs/en/manual/start.html', 'docs/guide.html', 'docs/promo.html']))
+    chk('功能清单 CSS 自洽（括号 / 六个部件 / 深浅两套发丝线 / 自己不写卡片样式）',
+        feat_css.count('{') == feat_css.count('}') and
+        all(x in feat_css for x in ('.feat-list', '.feat-group', '.feat-no', '.feat-ico',
+                                    '.feat-main', '.feat-tags')) and
+        ':root[data-theme="dark"] .feat-list' in feat_css and
+        '--feat-rule' in feat_css and '.card' not in feat_css)
 
     print('[home nav]')
     # 首页导航：13 个链接横排一行 → 收成一个「更多」面板（docs/css/nav.css + nav.js）。

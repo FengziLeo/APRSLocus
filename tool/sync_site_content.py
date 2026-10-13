@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""把「功能卡片 + 更新日志重点版本」同步到官网三个语言页。
+"""把「功能清单 + 更新日志重点版本」同步到官网三个语言页。
 
-背景：官网的功能卡片与更新日志是**静态手写**的（页面本身只由
+背景：官网的功能条目与更新日志原本都是**静态手写**的（页面本身只由
 `docs/js/main.js` 动态替换版本号），所以每次发版都要人来补 —— 实践下来
 就落后了：v1.6.19~v1.6.107 的功能官网全没有，更新日志停在 v1.6.18。
+功能清单后来也从首页整表收进来了：它是三语各手写一份的，改一句要动三个
+文件，跟更新日志同一个毛病。
 
 这个脚本用「标记块」做幂等写入：
     <!-- site-sync:features -->...<!-- /site-sync:features -->
@@ -40,162 +42,375 @@ def T(zh, zh_TW, en):
     return {'zh': zh, 'zh_TW': zh_TW, 'en': en}
 
 
-# ─────────────────────────── 功能卡片 ───────────────────────────
-# 顺序即展示顺序；图标类名 c1~c18 见 docs/css/style.css。
-# 总数 18：4 列时 4×4+2（末行 2 张）、2 列时 9 行，两种断点都不会剩孤零零一张。
+# ─────────────────────────── 功能清单（#features） ───────────────────────────
+# 顺序即展示顺序；序号 01~18 由 render_cards() 按列表位置自动排（不写死在数据里，
+# 增删条目不会漏改编号）。分组只影响展示 —— 每组开头一行小标题。
+# 首页**不再手写功能条目**：早先 c1~c8 是手写在 index.html 里的（三语各一份，
+# 改一句要动三个文件），现已全部收进这张表。
+GROUPS = [
+    ('map',  T('地图与追踪', '地圖與追蹤', 'Maps & tracking')),
+    ('link', T('通信与网关', '通訊與閘道', 'Messaging & gateway')),
+    ('data', T('台站与数据', '臺站與資料', 'Stations & data')),
+    ('sys',  T('系统与体验', '系統與體驗', 'System & experience')),
+]
+GROUP_NAME = {g: t for g, t in GROUPS}
+
 CARDS = [
     {
-        'icon': 'c9', 'fa': 'fa-tower-cell',
-        'title': T('五种数据来源', '五種資料來源', 'Five Data Sources'),
+        'group': 'map', 'fa': 'fa-location-dot',
+        'title': T(
+            '实时地图追踪',
+            '實時地圖追蹤',
+            'Real-time Map Tracking'),
         'desc': T(
-            '互联网（APRS-IS）、蓝牙 / 串口 TNC（KISS）、声卡音频 AFSK 1200（Bell 202 软 TNC）、'
-            'Kenwood 航点 <code>$PKWDWPL</code>（只收不发），以及 WLAN 电台直连（支持 IC-705 / IC-9700 / IC-7610 / IC-905 等 Wi-Fi / 以太网型号，CI-V 控制与局域网音频）。'
-            '多条链路可以同时收报文，发射来源单独指定一条。',
-            '網際網路（APRS-IS）、藍牙 / 串列埠 TNC（KISS）、音效卡音訊 AFSK 1200（Bell 202 軟 TNC）、'
-            'Kenwood 航點 <code>$PKWDWPL</code>（唯讀、不發射），以及 WLAN 電台直連（支援 IC-705 / IC-9700 / IC-7610 / IC-905 等 Wi-Fi / 乙太網路型號，CI-V 控制與區域網路音訊）。'
-            '數條鏈路可以同時收報文，發射來源單獨指定一條。',
-            'Internet (APRS-IS), Bluetooth / serial TNC (KISS), sound-card AFSK 1200 (Bell 202 software TNC), '
-            'Kenwood <code>$PKWDWPL</code> waypoints (receive-only), and WLAN radio direct link (supporting IC-705 / IC-9700 / IC-7610 / IC-905 over Wi-Fi / Ethernet with CI-V and LAN audio). '
-            'Multiple links can receive simultaneously, while the transmit link is picked separately.'),
-        'tags': {'zh': ['APRS-IS', 'TNC', '音频', 'PKWDWPL', 'WLAN 电台'],
-                 'zh_TW': ['APRS-IS', 'TNC', '音訊', 'PKWDWPL', 'WLAN 電台'],
-                 'en': ['APRS-IS', 'TNC', 'Audio', 'PKWDWPL', 'WLAN Radio']},
+            '高德瓦片 / 高德卫星 / 矢量 / Carto（浅色·深色·航行者）/ '
+            'OSM（标准·人道）/ OpenTopo / Esri 十多种底图可切。一台站一个标记（'
+            'v1.6.149 起去掉聚合），也能看轨迹回放，低缩放密度看热力图。',
+            '高德瓦片 / 高德衛星 / 矢量 / Carto（淺色·深色·航行者）/ '
+            'OSM（標準·人道）/ OpenTopo / Esri 十多種底圖可切。一臺站一個標記（'
+            'v1.6.149 起去掉聚合），也能看軌跡回放，低縮放密度看熱力圖。',
+            'Many tile sources: AMap tiles, AMap satellite, Vector, Carto '
+            '(light/dark/voyager), OSM (standard/humanitarian), OpenTopo, and '
+            'Esri. One marker per station (clustering removed in v1.6.149), with '
+            'trail playback support; the heatmap shows density when zoomed out.'),
+        'tags': T(['GCJ-02 / WGS-84', '热力图', '轨迹显示'],
+                  ['GCJ-02 / WGS-84', '熱力圖', '軌跡顯示'],
+                  ['GCJ-02 / WGS-84', 'Heatmap', 'Trail Display']),
     },
     {
-        'icon': 'c10', 'fa': 'fa-right-left',
-        'title': T('网关（iGate）', '閘道（iGate）', 'Gateway (iGate)'),
+        'group': 'map', 'fa': 'fa-compass',
+        'title': T(
+            '沉浸地图（导航风格）',
+            '沉浸地圖（導航風格）',
+            'Immersive Drive View'),
         'desc': T(
-            '把射频收到的报文转到 APRS-IS，自动带 <code>qAr</code> / <code>qAR</code> 来路标识；'
-            '带环路防护（含 <code>TCPIP*</code> 或已有 q 构造的报文绝不送回），'
-            '同一帧 30 秒内只注入一次。可选双向模式会把网络侧发给「刚在射频上听到过」的台站的消息送到射频。',
-            '把射頻收到的報文轉到 APRS-IS，自動帶 <code>qAr</code> / <code>qAR</code> 來路標識；'
-            '具備環路防護（含 <code>TCPIP*</code> 或已有 q 構造的報文絕不送回），'
-            '同一幀 30 秒內只注入一次。可選雙向模式會把網路側發給「剛在射頻上聽到過」的台站的訊息送到射頻。',
-            'Relays RF packets into APRS-IS, tagging them with <code>qAr</code> / <code>qAR</code>; '
-            'loop protection is built in (packets already carrying <code>TCPIP*</code> or a '
-            'q-construct are never echoed back), and the same frame is injected once per 30 '
-            'seconds. Optional two-way mode sends messages to stations recently heard on RF.'),
-        'tags': {'zh': ['RF→IS', '防环', '去重'],
-                 'zh_TW': ['RF→IS', '防環', '去重'],
-                 'en': ['RF→IS', 'Loop-safe', 'De-duplication']},
+            '专为「边开车边看」设计的导航风格页面：大字号方向 / 距离 / '
+            '速度，左侧「附近台站」面板，目标台站居中，Android 与 Windows '
+            '都能用。',
+            '專為「邊開車邊看」設計的導航風格頁面：大字號方向 / 距離 / '
+            '速度，左側「附近台站」面板，目標台站居中，Android 與 Windows '
+            '都能用。',
+            'A navigation-style page built for glancing at while driving: large '
+            'heading / distance / speed readouts, a nearby-stations panel, and '
+            'the target station centred.'),
+        'tags': T(['导航风格', '附近台站', '大字号'],
+                  ['導航風格', '附近台站', '大字號'],
+                  ['Navigation style', 'Nearby stations', 'Large type']),
     },
     {
-        'icon': 'c11', 'fa': 'fa-language',
-        'title': T('双向聊天翻译', '雙向聊天翻譯', 'Two-way Chat Translation'),
+        'group': 'map', 'fa': 'fa-map-location-dot',
+        'title': T(
+            '离线地图',
+            '離線地圖',
+            'Offline Maps'),
         'desc': T(
-            '内置多引擎翻译，默认走免费接口、<b>无需任何密钥</b>。收到的和发出的消息都能译，'
-            '可对照原文，也能在发送前先把自己的输入译成对方的语言。',
-            '內建多引擎翻譯，預設走免費介面、<b>無需任何金鑰</b>。收到的和發出的訊息都能譯，'
-            '可對照原文，也能在發送前先把自己的輸入譯成對方的語言。',
-            'Built-in multi-engine translation that works out of the box on a free endpoint, '
-            '<b>no API key required</b>. Translate both incoming and outgoing messages, compare '
-            'against the original, or translate your text into the other station\'s language '
-            'before sending.'),
-        'tags': {'zh': ['免密钥', '对照翻译', '发送前翻译'],
-                 'zh_TW': ['免金鑰', '對照翻譯', '發送前翻譯'],
-                 'en': ['No API key', 'Side-by-side', 'Pre-send']},
+            '把当前视图整片瓦片下到本机（断点续传、单区域上限 20 '
+            '万张），断网、无信号也能看；四级降级保证地图始终可看可点。',
+            '把當前視圖整片瓦片下載到本機（斷點續傳、單區域上限 20 '
+            '萬張），斷網、無訊號也能看；四級降級保證地圖始終可看可點。',
+            'Download the tiles of the current view to the device (resumable, '
+            '200k tiles per region) and keep the map with no network at all; a '
+            'four-step fallback keeps it readable and clickable.'),
+        'tags': T(['按视图下载', '断点续传', '四级降级'],
+                  ['按視圖下載', '斷點續傳', '四級降級'],
+                  ['Download view', 'Resumable', '4-step fallback']),
     },
     {
-        'icon': 'c12', 'fa': 'fa-compass',
-        'title': T('沉浸地图（导航风格）', '沉浸地圖（導航風格）', 'Immersive Drive View'),
+        'group': 'link', 'fa': 'fa-tower-broadcast',
+        'title': T(
+            '位置信标',
+            '位置信標',
+            'Position Beacon'),
         'desc': T(
-            '专为「边开车边看」设计的导航风格页面：大字号方向 / 距离 / 速度，'
-            '左侧「附近台站」面板，目标台站居中，Android 与 Windows 都能用。',
-            '專為「邊開車邊看」設計的導航風格頁面：大字號方向 / 距離 / 速度，'
-            '左側「附近台站」面板，目標台站居中，Android 與 Windows 都能用。',
-            'A navigation-style page built for glancing at while driving: large heading / '
-            'distance / speed readouts, a nearby-stations panel, and the target station centred.'),
-        'tags': {'zh': ['导航风格', '附近台站', '大字号'],
-                 'zh_TW': ['導航風格', '附近台站', '大字號'],
-                 'en': ['Navigation style', 'Nearby stations', 'Large type']},
+            '一键上报位置，按 APRS 1.0 标准格式发送，自动带上高度、速度、航向和电'
+            '量，上报间隔可调。',
+            '一鍵上報位置，按 APRS 1.0 標準格式發送，自動帶上高度、速度、航向和電'
+            '量，上報間隔可調。',
+            'One-tap position reporting in standard APRS 1.0 format. '
+            'Auto-includes altitude, speed, heading, and battery level. Report '
+            'interval is configurable.'),
+        'tags': T(['标准格式', '自动附带信息', '演示模式'],
+                  ['標準格式', '自動附帶信息', '演示模式'],
+                  ['Standard Format', 'Auto Attachments', 'Demo Mode']),
     },
     {
-        'icon': 'c13', 'fa': 'fa-chart-line',
-        'title': T('天气 · 统计 · 荣誉', '天氣 · 統計 · 榮譽', 'Weather · Statistics · Honors'),
+        'group': 'link', 'fa': 'fa-message',
+        'title': T(
+            '消息通信',
+            '消息通信',
+            'Messaging'),
         'desc': T(
-            '天气面板（动态背景跟随实时天气强度变化）、台站统计面板（最近上报 / 最远距离 / 报文速率），'
-            '以及荣誉墙。',
-            '天氣面板（動態背景跟即時天氣強度變化）、台站統計面板（最近上報 / 最遠距離 / 報文速率），'
-            '以及榮譽牆。',
-            'A weather panel whose dynamic background follows the actual conditions, station '
-            'statistics (latest spot, farthest distance, packet rate), and an honors wall.'),
-        'tags': {'zh': ['天气面板', '统计面板', '荣誉墙'],
-                 'zh_TW': ['天氣面板', '統計面板', '榮譽牆'],
-                 'en': ['Weather', 'Statistics', 'Honors']},
+            '单聊、群聊统一在会话列表里，带 ACK 确认。支持群聊邀请、成员管理、未'
+            '读角标，中文消息也没问题。',
+            '單聊、群聊統一在會話列表裡，帶 ACK 確認。支持群聊邀請、成員管理、未'
+            '讀角標，中文消息也沒問題。',
+            'Private and group chat in a unified conversation list with ACK '
+            'confirmation. Supports group invites, member management, unread '
+            'badges, and Chinese text.'),
+        'tags': T(['ACK 确认', '群聊管理', '中文兼容'],
+                  ['ACK 確認', '群聊管理', '中文兼容'],
+                  ['ACK Confirmation', 'Group Chat', 'Chinese Compatible']),
     },
     {
-        'icon': 'c14', 'fa': 'fa-file-export',
-        'title': T('数据导出', '資料匯出', 'Data Export'),
+        'group': 'link', 'fa': 'fa-language',
+        'title': T(
+            '双向聊天翻译',
+            '雙向聊天翻譯',
+            'Two-way Chat Translation'),
         'desc': T(
-            '一键导出 ADIF —— 业余无线电通用的日志交换格式，频率可自定义，'
-            '导出后可直接导入其它日志软件。',
-            '一鍵匯出 ADIF —— 業餘無線電通用的日誌交換格式，頻率可自訂，'
-            '匯出後可直接匯入其它日誌軟體。',
-            'One-tap ADIF export — the standard amateur-radio log interchange format — with a '
-            'configurable frequency, ready to import into other logging software.'),
-        'tags': {'zh': ['ADIF', '频率自定义'],
-                 'zh_TW': ['ADIF', '頻率自訂'],
-                 'en': ['ADIF', 'Custom frequency']},
+            '内置多引擎翻译，默认走免费接口、<b>无需任何密钥</b>。收到的和发出的'
+            '消息都能译，可对照原文，也能在发送前先把自己的输入译成对方的语言。',
+            '內建多引擎翻譯，預設走免費介面、<b>無需任何金鑰</b>。收到的和發出的'
+            '訊息都能譯，可對照原文，也能在發送前先把自己的輸入譯成對方的語言。',
+            'Built-in multi-engine translation that works out of the box on a '
+            'free endpoint, <b>no API key required</b>. Translate both incoming '
+            'and outgoing messages, compare against the original, or translate '
+            "your text into the other station's language before sending."),
+        'tags': T(['免密钥', '对照翻译', '发送前翻译'],
+                  ['免金鑰', '對照翻譯', '發送前翻譯'],
+                  ['No API key', 'Side-by-side', 'Pre-send']),
     },
     {
-        'icon': 'c15', 'fa': 'fa-table-cells-large',
-        'title': T('桌面小组件', '桌面小組件', 'Home-screen Widgets'),
+        'group': 'link', 'fa': 'fa-right-left',
+        'title': T(
+            '网关（iGate）',
+            '閘道（iGate）',
+            'Gateway (iGate)'),
+        'desc': T(
+            '把射频收到的报文转到 APRS-IS，自动带 <code>qAr</code> / '
+            '<code>qAR</code> 来路标识；带环路防护（含 <code>TCPIP*</code> '
+            '或已有 q 构造的报文绝不送回），同一帧 30 '
+            '秒内只注入一次。可选双向模式会把网络侧发给「刚在射频上听到过」的台站'
+            '的消息送到射频。',
+            '把射頻收到的報文轉到 APRS-IS，自動帶 <code>qAr</code> / '
+            '<code>qAR</code> 來路標識；具備環路防護（含 <code>TCPIP*</code> '
+            '或已有 q 構造的報文絕不送回），同一幀 30 '
+            '秒內只注入一次。可選雙向模式會把網路側發給「剛在射頻上聽到過」的台站'
+            '的訊息送到射頻。',
+            'Relays RF packets into APRS-IS, tagging them with <code>qAr</code> '
+            '/ <code>qAR</code>; loop protection is built in (packets already '
+            'carrying <code>TCPIP*</code> or a q-construct are never echoed '
+            'back), and the same frame is injected once per 30 seconds. Optional '
+            'two-way mode sends messages to stations recently heard on RF.'),
+        'tags': T(['RF→IS', '防环', '去重'],
+                  ['RF→IS', '防環', '去重'],
+                  ['RF→IS', 'Loop-safe', 'De-duplication']),
+    },
+    {
+        'group': 'data', 'fa': 'fa-shield',
+        'title': T(
+            '台站识别与筛选',
+            '臺站識別與篩選',
+            'Station Recognition &amp; Filter'),
+        'desc': T(
+            '接入 aprs.org 官方设备库，从报文目的呼号识别台站所用设备（厂商 + '
+            '型号 + 车台 / 手台 / 跟踪器 / App / 网关…）。列表可筛状态、类型、设'
+            '备类别与具体型号；详情页可跳 QRZ 呼号库与 aprs.fi 看轨迹。',
+            '接入 aprs.org 官方設備庫，從報文目的呼號識別臺站所用設備（廠商 + '
+            '型號 + 車臺 / 手臺 / 跟蹤器 / App / 網關…）。列表可篩狀態、類型、設'
+            '備類別與具體型號；詳情頁可跳 QRZ 呼號庫與 aprs.fi 看軌跡。',
+            'Recognizes station devices via the official aprs.org database '
+            '(tocalls): vendor + model + device class (rig / HT / tracker / app '
+            '/ gateway…). Filter by status, type, device class or exact model; '
+            'jump to QRZ callsign DB or aprs.fi for tracks from the details page.'),
+        'tags': T(['官方设备识别', '类别 / 型号筛选', 'QRZ / aprs.fi'],
+                  ['官方設備識別', '類別 / 型號篩選', 'QRZ / aprs.fi'],
+                  ['Official Device ID', 'Class / Model Filter', 'QRZ / aprs.fi']),
+    },
+    {
+        'group': 'data', 'fa': 'fa-file-lines',
+        'title': T(
+            '数据包与日志',
+            '數據包與日誌',
+            'Packet &amp; Log Viewer'),
+        'desc': T(
+            '原始报文用等宽字体展示，长按可复制；解析结果按位置 / 消息 / 气象 / '
+            '状态分类。内置分级日志方便排查问题。',
+            '原始報文用等寬字體展示，長按可複製；解析結果按位置 / 消息 / 氣象 / '
+            '狀態分類。內置分級日誌方便排查問題。',
+            'Raw packets displayed in monospace with long-press copy. Parsed '
+            'results sorted by type: position, message, weather, status. '
+            'Built-in hierarchical logs for debugging.'),
+        'tags': T(['原始报文', '类型筛选', '调试日志'],
+                  ['原始報文', '類型篩選', '調試日誌'],
+                  ['Raw Packet View', 'Type Filtering', 'Debug Logs']),
+    },
+    {
+        'group': 'data', 'fa': 'fa-tower-cell',
+        'title': T(
+            '五种数据来源',
+            '五種資料來源',
+            'Five Data Sources'),
+        'desc': T(
+            '互联网（APRS-IS）、蓝牙 / 串口 TNC（KISS）、声卡音频 AFSK '
+            '1200（Bell 202 软 TNC）、Kenwood 航点 <code>$PKWDWPL</code>（只收不'
+            '发），以及 WLAN 电台直连（支持 IC-705 / IC-9700 / IC-7610 / IC-905 '
+            '等 Wi-Fi / 以太网型号，CI-V 控制与局域网音频）。多条链路可以同时收报'
+            '文，发射来源单独指定一条。',
+            '網際網路（APRS-IS）、藍牙 / 串列埠 TNC（KISS）、音效卡音訊 AFSK '
+            '1200（Bell 202 軟 TNC）、Kenwood 航點 <code>$PKWDWPL</code>（唯讀、'
+            '不發射），以及 WLAN 電台直連（支援 IC-705 / IC-9700 / IC-7610 / '
+            'IC-905 等 Wi-Fi / 乙太網路型號，CI-V 控制與區域網路音訊）。數條鏈路'
+            '可以同時收報文，發射來源單獨指定一條。',
+            'Internet (APRS-IS), Bluetooth / serial TNC (KISS), sound-card AFSK '
+            '1200 (Bell 202 software TNC), Kenwood <code>$PKWDWPL</code> '
+            'waypoints (receive-only), and WLAN radio direct link (supporting '
+            'IC-705 / IC-9700 / IC-7610 / IC-905 over Wi-Fi / Ethernet with CI-V '
+            'and LAN audio). Multiple links can receive simultaneously, while '
+            'the transmit link is picked separately.'),
+        'tags': T(['APRS-IS', 'TNC', '音频', 'PKWDWPL', 'WLAN 电台'],
+                  ['APRS-IS', 'TNC', '音訊', 'PKWDWPL', 'WLAN 電台'],
+                  ['APRS-IS', 'TNC', 'Audio', 'PKWDWPL', 'WLAN Radio']),
+    },
+    {
+        'group': 'data', 'fa': 'fa-chart-line',
+        'title': T(
+            '天气 · 统计 · 荣誉',
+            '天氣 · 統計 · 榮譽',
+            'Weather · Statistics · Honors'),
+        'desc': T(
+            '天气面板（动态背景跟随实时天气强度变化）、台站统计面板（最近上报 / '
+            '最远距离 / 报文速率），以及荣誉墙。',
+            '天氣面板（動態背景跟即時天氣強度變化）、台站統計面板（最近上報 / '
+            '最遠距離 / 報文速率），以及榮譽牆。',
+            'A weather panel whose dynamic background follows the actual '
+            'conditions, station statistics (latest spot, farthest distance, '
+            'packet rate), and an honors wall.'),
+        'tags': T(['天气面板', '统计面板', '荣誉墙'],
+                  ['天氣面板', '統計面板', '榮譽牆'],
+                  ['Weather', 'Statistics', 'Honors']),
+    },
+    {
+        'group': 'data', 'fa': 'fa-file-export',
+        'title': T(
+            '数据导出',
+            '資料匯出',
+            'Data Export'),
+        'desc': T(
+            '一键导出 ADIF —— 业余无线电通用的日志交换格式，频率可自定义，导出后'
+            '可直接导入其它日志软件。',
+            '一鍵匯出 ADIF —— 業餘無線電通用的日誌交換格式，頻率可自訂，匯出後可'
+            '直接匯入其它日誌軟體。',
+            'One-tap ADIF export — the standard amateur-radio log interchange '
+            'format — with a configurable frequency, ready to import into other '
+            'logging software.'),
+        'tags': T(['ADIF', '频率自定义'],
+                  ['ADIF', '頻率自訂'],
+                  ['ADIF', 'Custom frequency']),
+    },
+    {
+        'group': 'data', 'fa': 'fa-satellite-dish',
+        'title': T(
+            '短波与电离层传播',
+            '短波與電離層傳播',
+            'HF & Ionospheric Propagation'),
+        'desc': T(
+            '短波面板与独立组件：SFI / Kp / A 指数、黑子、X '
+            '射线、太阳风，四个波段对的「日 / 夜」条件一眼看清；数据来自 '
+            'hamqsl.com（N0NBH），30 分钟缓存。',
+            '短波面板與獨立元件：SFI / Kp / A 指數、黑子、X '
+            '射線、太陽風，四個波段對的「日 / 夜」條件一眼看清；資料來自 '
+            'hamqsl.com（N0NBH），30 分鐘快取。',
+            'An HF panel plus a standalone widget: SFI / Kp / A index, sunspots, '
+            'X-rays, solar wind, and day/night conditions for four band pairs at '
+            'a glance. Data comes from hamqsl.com (N0NBH) with a 30-minute cache.'),
+        'tags': T(['SFI / Kp / A', '日 · 夜', '30 分钟缓存'],
+                  ['SFI / Kp / A', '日 · 夜', '30 分鐘快取'],
+                  ['SFI / Kp / A', 'Day / night', '30-min cache']),
+    },
+    {
+        'group': 'sys', 'fa': 'fa-wifi',
+        'title': T(
+            '连接与后台',
+            '連接與後臺',
+            'Connectivity &amp; Background'),
+        'desc': T(
+            '自动连 APRS-IS 公共服务器，TCP / WebSocket 都支持，断线按 8 → 16 → '
+            '32 → 60 秒渐进重连。Android 用前台服务保持在线。',
+            '自動連 APRS-IS 公共伺服器，TCP / WebSocket 都支持，斷線按 8 → 16 → '
+            '32 → 60 秒漸進重連。Android 用前臺服務保持在線。',
+            'Auto-connects to APRS-IS public servers over TCP or WebSocket. '
+            'Progressive reconnect: 8 → 16 → 32 → 60 seconds. Android uses a '
+            'foreground service to stay online.'),
+        'tags': T(['自动重连', '前台服务', '系统通知'],
+                  ['自動重連', '前臺服務', '系統通知'],
+                  ['Auto Reconnect', 'Foreground Service', 'System Notifications']),
+    },
+    {
+        'group': 'sys', 'fa': 'fa-arrows-rotate',
+        'title': T(
+            '自动更新',
+            '自動更新',
+            'Auto Updates'),
+        'desc': T(
+            '应用内检查更新，GitHub / GitCode 两个渠道可切，按平台分流下载，也能'
+            '装历史版本。',
+            '應用內檢查更新，GitHub / GitCode 兩個渠道可切，按平臺分流下載，也能'
+            '裝歷史版本。',
+            'In-app update checker with two channels (GitHub / GitCode). '
+            'Platform-aware download routing and historical version access.'),
+        'tags': T(['双渠道', '按平台分流', '历史版本'],
+                  ['雙渠道', '按平臺分流', '歷史版本'],
+                  ['Dual Channels', 'Platform Routing', 'Historical Versions']),
+    },
+    {
+        'group': 'sys', 'fa': 'fa-palette',
+        'title': T(
+            '个性化体验',
+            '個性化體驗',
+            'Personalization'),
+        'desc': T(
+            '简体中文 / 繁體中文 / English / 日本語 / Indonesia / Español '
+            '可切换，支持深色模式和自定义主题色，界面可缩放 85% ~ '
+            '130%。首次启动有六步引导。',
+            '簡體中文 / 繁體中文 / English / 日本語 / Indonesia / Español '
+            '可切換，支持深色模式和自定義主題色，界面可縮放 85% ~ '
+            '130%。首次啟動有六步引導。',
+            'Simplified Chinese / Traditional Chinese / English / Japanese / '
+            'Indonesian / Spanish UI, dark mode, custom accent colors, scalable '
+            'UI (85%–130%). Six-step onboarding wizard on first launch.'),
+        'tags': T(['六种语言', '深色模式', 'OOBE 引导'],
+                  ['六種語言', '深色模式', 'OOBE 引導'],
+                  ['Six Languages', 'Dark Mode', 'OOBE Wizard']),
+    },
+    {
+        'group': 'sys', 'fa': 'fa-table-cells-large',
+        'title': T(
+            '桌面小组件',
+            '桌面小組件',
+            'Home-screen Widgets'),
         'desc': T(
             'Android 桌面小组件：天气（4 档自适应尺寸）、短波传播、系统状态三套；'
             '组件不自己联网，由应用单向推送快照，省电可控。',
             'Android 桌面小組件：天氣（4 種自適應尺寸）、短波傳播、系統狀態三套；'
             '小組件不自己連線，由應用單向推送快照，省電可控。',
-            'Android home-screen widgets: weather (four adaptive sizes), HF propagation and '
-            'system status. The widgets never open a connection themselves — the app pushes '
-            'a snapshot to them, which keeps them cheap on battery.'),
-        'tags': {'zh': ['Android', '4 档自适应', '不自行联网'],
-                 'zh_TW': ['Android', '4 種自適應', '不自行連線'],
-                 'en': ['Android', '4 adaptive sizes', 'No direct network']},
+            'Android home-screen widgets: weather (four adaptive sizes), HF '
+            'propagation and system status. The widgets never open a connection '
+            'themselves — the app pushes a snapshot to them, which keeps them '
+            'cheap on battery.'),
+        'tags': T(['Android', '4 档自适应', '不自行联网'],
+                  ['Android', '4 種自適應', '不自行連線'],
+                  ['Android', '4 adaptive sizes', 'No direct network']),
     },
     {
-        'icon': 'c16', 'fa': 'fa-satellite-dish',
-        'title': T('短波与电离层传播', '短波與電離層傳播', 'HF & Ionospheric Propagation'),
+        'group': 'sys', 'fa': 'fa-paintbrush',
+        'title': T(
+            '主题与备份',
+            '主題與備份',
+            'Themes & Backup'),
         'desc': T(
-            '短波面板与独立组件：SFI / Kp / A 指数、黑子、X 射线、太阳风，'
-            '四个波段对的「日 / 夜」条件一眼看清；数据来自 hamqsl.com（N0NBH），30 分钟缓存。',
-            '短波面板與獨立元件：SFI / Kp / A 指數、黑子、X 射線、太陽風，'
-            '四個波段對的「日 / 夜」條件一眼看清；資料來自 hamqsl.com（N0NBH），30 分鐘快取。',
-            'An HF panel plus a standalone widget: SFI / Kp / A index, sunspots, X-rays, solar '
-            'wind, and day/night conditions for four band pairs at a glance. Data comes from '
-            'hamqsl.com (N0NBH) with a 30-minute cache.'),
-        'tags': {'zh': ['SFI / Kp / A', '日 · 夜', '30 分钟缓存'],
-                 'zh_TW': ['SFI / Kp / A', '日 · 夜', '30 分鐘快取'],
-                 'en': ['SFI / Kp / A', 'Day / night', '30-min cache']},
-    },
-    {
-        'icon': 'c17', 'fa': 'fa-map-location-dot',
-        'title': T('离线地图', '離線地圖', 'Offline Maps'),
-        'desc': T(
-            '把当前视图整片瓦片下到本机（断点续传、单区域上限 20 万张），断网、无信号也能看；'
-            '四级降级保证地图始终可看可点。',
-            '把當前視圖整片瓦片下載到本機（斷點續傳、單區域上限 20 萬張），斷網、無訊號也能看；'
-            '四級降級保證地圖始終可看可點。',
-            'Download the tiles of the current view to the device (resumable, 200k tiles per '
-            'region) and keep the map with no network at all; a four-step fallback keeps it '
-            'readable and clickable.'),
-        'tags': {'zh': ['按视图下载', '断点续传', '四级降级'],
-                 'zh_TW': ['按視圖下載', '斷點續傳', '四級降級'],
-                 'en': ['Download view', 'Resumable', '4-step fallback']},
-    },
-    {
-        'icon': 'c18', 'fa': 'fa-paintbrush',
-        'title': T('主题与备份', '主題與備份', 'Themes & Backup'),
-        'desc': T(
-            '主题不只是换色：颜色、图标、文字、背景图都能改（17 个颜色令牌），可导出成 JSON 分享；'
-            '设置与数据可整体备份，换机一键导入。',
-            '主題不只是換色：顏色、圖示、文字、背景圖都能改（17 個顏色權杖），可匯出成 JSON 分享；'
-            '設定與資料可整體備份，換機一鍵匯入。',
-            'Themes go beyond colour: icons, text and your own background image (17 colour '
-            'tokens), exported as JSON to share; settings and data back up as one file for a '
-            'one-tap restore.'),
-        'tags': {'zh': ['17 色令牌', 'JSON 分享', '一键备份'],
-                 'zh_TW': ['17 色權杖', 'JSON 分享', '一鍵備份'],
-                 'en': ['17 tokens', 'JSON export', 'One-tap backup']},
+            '主题不只是换色：颜色、图标、文字、背景图都能改（17 '
+            '个颜色令牌），可导出成 JSON 分享；设置与数据可整体备份，换机一键导入'
+            '。',
+            '主題不只是換色：顏色、圖示、文字、背景圖都能改（17 '
+            '個顏色權杖），可匯出成 JSON 分享；設定與資料可整體備份，換機一鍵匯入'
+            '。',
+            'Themes go beyond colour: icons, text and your own background image '
+            '(17 colour tokens), exported as JSON to share; settings and data '
+            'back up as one file for a one-tap restore.'),
+        'tags': T(['17 色令牌', 'JSON 分享', '一键备份'],
+                  ['17 色權杖', 'JSON 分享', '一鍵備份'],
+                  ['17 tokens', 'JSON export', 'One-tap backup']),
     },
 ]
 
@@ -3291,20 +3506,36 @@ def md_inline(s):
     return s
 
 
+ROW = (
+    '    <article class="feat reveal">\n'
+    '      <span class="feat-no">%02d</span>\n'
+    '      <span class="feat-ico"><i class="fa-solid {fa}"></i></span>\n'
+    '      <div class="feat-main">\n'
+    '        <h3>{title}</h3>\n'
+    '        <p>{desc}</p>\n'
+    '      </div>\n'
+    '      <ul class="feat-tags">{tags}</ul>\n'
+    '    </article>')
+
+
 def render_cards(lang):
+    """渲染 #features 的分组序号列表。
+
+    序号按列表位置现算（ROW 里的 `%02d`）：数据里不写编号，所以增删条目不会
+    漏改编号。分组标题只在"组变了"时插一次，所以 main() 会挡住「同组被拆成两段」
+    —— 那种错序在页面上看着像漏了一组，很难认出来。
+    """
     out = [F_OPEN]
-    for c in CARDS:
+    group = None
+    for i, c in enumerate(CARDS, 1):
+        if c['group'] != group:
+            group = c['group']
+            out.append('    <p class="feat-group">%s</p>' % GROUP_NAME[group][lang])
         tags = ''.join('<li>%s</li>' % t for t in c['tags'][lang])
-        out.append(
-            '    <article class="card reveal">\n'
-            '      <div class="card-icon {icon}"><i class="fa-solid {fa}"></i></div>\n'
-            '      <h3>{title}</h3>\n'
-            '      <p>{desc}</p>\n'
-            '      <ul class="card-tags">{tags}</ul>\n'
-            '    </article>'.format(icon=c['icon'], fa=c['fa'],
-                                   title=md_inline(c['title'][lang]),
-                                   desc=md_inline(c['desc'][lang]),
-                                   tags=tags))
+        # 先 % 填编号、再 .format() 填文案：反过来的话，文案里的 `85% ~ 130%`
+        # 会被当成格式符（% 后面跟着空格/波浪线）直接报错。
+        out.append((ROW % i).format(fa=c['fa'], title=md_inline(c['title'][lang]),
+                                    desc=md_inline(c['desc'][lang]), tags=tags))
     out.append('  ' + F_CLOSE)
     return '\n'.join(out)
 
@@ -3332,9 +3563,20 @@ def main():
     for c in CARDS:
         for field in ('title', 'desc'):
             missing = [l for l in LANGS if not c[field].get(l)]
-            assert not missing, '卡片 %s 缺 %s 文案：%s' % (c['title']['zh'], field, missing)
+            assert not missing, '条目 %s 缺 %s 文案：%s' % (c['title']['zh'], field, missing)
         for l in LANGS:
-            assert c['tags'].get(l), '卡片 %s 缺 %s 标签' % (c['title']['zh'], l)
+            assert c['tags'].get(l), '条目 %s 缺 %s 标签' % (c['title']['zh'], l)
+        assert c['group'] in GROUP_NAME, \
+            '条目 %s 的分组 %r 不在 GROUPS 里' % (c['title']['zh'], c['group'])
+    # 同组的条目必须挨着（分组标题只在"组变了"时插一次），而且组的先后要跟
+    # GROUPS 一致：跳着写会让后半个组没有标题，页面上看着像漏了一组。
+    order = []
+    for c in CARDS:
+        if not order or order[-1] != c['group']:
+            assert c['group'] not in order, '分组 %s 的条目被拆成了两段' % c['group']
+            order.append(c['group'])
+    assert order == [g for g, _ in GROUPS if g in order], \
+        '分组的先后跟 GROUPS 对不上：%s' % order
     for e in CL:
         for kind, txt in e['items']:
             missing = [l for l in LANGS if not txt.get(l)]
@@ -3369,7 +3611,7 @@ def main():
             elif n > 1:
                 raise SystemExit('[%s] 片段出现 %d 次，无法安全替换：%s' % (lang, n, old[:40]))
 
-        # 2) 功能卡片：追加到 #features 的 cards 容器末尾
+        # 2) 功能清单：写进 #features 的 .feat-list 容器（整表生成）
         s = strip_block(s, F_OPEN, F_CLOSE)
         fi = s.index('id="features"')
         close = s.index('\n  </div>\n</section>', fi)
@@ -3383,16 +3625,16 @@ def main():
 
         io.open(path, 'w', encoding='utf-8', newline='').write(s)
 
-        counts[lang] = (s.count('<article class="card reveal">'),
+        counts[lang] = (s.count('<article class="feat reveal">'),
                         s.count('<div class="cl-version reveal">'))
-        print('%-6s 卡片 %d · 更新日志 %d 条 · %d → %d 字节'
+        print('%-6s 功能 %d 项 · 更新日志 %d 条 · %d → %d 字节'
               % (lang, counts[lang][0], counts[lang][1], before, len(s)))
 
     if len(set(counts.values())) != 1:
         raise SystemExit('三个语言页数量不一致：%s' % counts)
-    cards, cls = next(iter(set(counts.values())))
-    print('\n✅ 三页一致：%d 张功能卡片（新增 %d），%d 条更新日志（新增 %d）'
-          % (cards, len(CARDS), cls, len(CL)))
+    rows, cls = next(iter(set(counts.values())))
+    print('\n✅ 三页一致：功能 %d 项（表里 %d 项），更新日志 %d 条（表里 %d 条）'
+          % (rows, len(CARDS), cls, len(CL)))
 
 
 if __name__ == '__main__':

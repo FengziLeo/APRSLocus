@@ -1278,7 +1278,7 @@ class AgentService extends ChangeNotifier {
             currentTool = null;
           }
           // 记入工具操作历史：ok = 既非被拒绝、也不是错误结果。
-          unawaited(recordToolRun(call.name, call.arguments, result,
+          unawaited(recordToolRun(call.name, jsonEncode(call.arguments), result,
               ok: !denied && !result.startsWith('ERROR:')));
           messages.add(AgentMessage(
             role: 'tool',

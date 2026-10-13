@@ -165,8 +165,10 @@ html{overflow-x:hidden}
     <div class="hero-copy-next">
       <!-- 折线之下才是「这是什么」：滚上来才淡出（站点的 .reveal） -->
       <div class="hero-intro reveal" data-delay="0">
-        <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
-        <div class="hero-wordmark">TOUCH SKY</div>
+        <!-- 页面唯一的 h1：品牌名（连版本与口号）。下面那句巨型主题字是同一句口号的
+             放大版，重复一遍对读屏没有信息量，标成装饰。 -->
+        <h1 class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></h1>
+        <div class="hero-wordmark" aria-hidden="true">TOUCH SKY</div>
         <p class="hero-slogan">APRS <span class="grad">定位追踪</span> 与 <span class="grad">地图</span></p>
         <p class="hero-sub">
           一个业余无线电爱好者用的 APRS 客户端 —— 在本机运行的工具。<br>

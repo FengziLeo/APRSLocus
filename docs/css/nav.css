@@ -1,0 +1,72 @@
+/* ═══════════════ 首页导航：「更多」面板（nav.css） ═══════════════
+   只有首页挂（三语 index.html 各一行 <link>），子页导航本来就只有 5 个链接。
+   为什么要有这个文件：首页导航原先把 13 个链接横着排一行，再加 CTA、主题、三语切换
+   一共 18 个控件 —— 窄屏挤成一团，大屏也是两排小字。收成一个「更多」之后，
+   留在外面的只有：宣传 / 功能 / 界面 / 手册 + 下载 + 主题 + 三语，链接一个没少，
+   都进了面板（见 nav.js 与 index.html 里的注释）。
+
+   两个刻意的做法：
+   · 面板靠 .open（JS 开合）+ :focus-within（键盘 Tab 进来也开）两条路打开，
+     JS 不跑时它只是永远关着 —— 但里面的链接仍旧在 DOM 里，Tab 得到、爬得到。
+   · 下划线动画与 .nav-links a::after 用同一套（left/right 14px、--grad、scaleX），
+     按钮才和旁边的链接像一个整体，而不是"外挂了一个控件"。 */
+
+.nav-more { position: relative; }
+
+.nav-more-btn {
+  position: relative; display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 12px; border: 0; border-radius: 12px; cursor: pointer;
+  font: inherit; font-size: 14.5px; color: var(--text-dim); background: transparent;
+  transition: color .25s, background .25s, box-shadow .25s;
+}
+.nav-more-btn:hover { color: var(--text); background: rgba(255, 255, 255, .55); box-shadow: 0 4px 14px rgba(45, 70, 120, .06); }
+.nav-more-btn i { font-size: 10px; transition: transform .3s var(--ease); }
+.nav-more-btn::after {
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: 5px; height: 2px;
+  border-radius: 2px; background: var(--grad);
+  transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease);
+}
+.nav-more-btn:hover::after,
+.nav-more-btn.active::after,
+.nav-more.open .nav-more-btn::after { transform: scaleX(1); }
+.nav-more-btn.active { color: var(--text); }
+.nav-more.open .nav-more-btn i { transform: rotate(180deg); }
+
+.nav-more-list {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 2;
+  display: grid; gap: 2px; min-width: 188px; padding: 8px;
+  border-radius: 16px; border: 1px solid var(--line);
+  background: rgba(255, 255, 255, .86);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: 0 22px 50px rgba(45, 70, 120, .18);
+  opacity: 0; visibility: hidden; transform: translateY(-8px) scale(.98);
+  transform-origin: top right;
+  transition: opacity .26s var(--ease), transform .26s var(--ease), visibility .26s;
+}
+.nav-more.open .nav-more-list,
+.nav-more:focus-within .nav-more-list {
+  opacity: 1; visibility: visible; transform: none;
+}
+/* 面板里的条目右对齐更好读：它们锚在右边，左对齐会看着往外飘 */
+.nav-more-list a { text-align: left; white-space: nowrap; }
+.nav-more-list a.active { background: rgba(56, 189, 248, .12); }
+
+:root[data-theme="dark"] .nav-more-btn:hover { background: rgba(255, 255, 255, .08); box-shadow: none; }
+:root[data-theme="dark"] .nav-more-list {
+  background: rgba(11, 17, 30, .9); border-color: rgba(255, 255, 255, .12);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, .55);
+}
+
+/* ── 窄屏：抽屉里不需要折叠 —— 面板直接摊平成一串条目 ── */
+@media (max-width: 720px) {
+  .nav-more { display: contents; }
+  .nav-more-btn { display: none; }
+  .nav-more-list {
+    position: static; display: grid; gap: 4px; min-width: 0; padding: 0;
+    border: 0; border-radius: 0; background: none; box-shadow: none;
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    opacity: 1; visibility: visible; transform: none;
+  }
+  .nav-more-list a { padding: 14px 16px; font-size: 16px; }
+}

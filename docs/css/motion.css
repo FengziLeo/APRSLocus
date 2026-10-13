@@ -1,0 +1,96 @@
+/* ═══════════════ 首页动效层（motion.css） ═══════════════
+   只挂首页：三语 index.html 各一行 <link> + 一行 <script src="motion.js">，
+   子页一行都不碰 —— 招牌动效留在首页，文档页该稳。
+   动效就两件事：一组同层的 .reveal **一排排涌上来**；卡片 hover 抬起来并扫过一道光。
+   三处刻意的做法，写在这儿免得以后被"顺手改掉"：
+
+   1) 入场用 transform，hover 抬升用**独立的 translate**。
+      style.css 里 `.reveal.in{transform:none}` 排在 `.card:hover{transform:…}` 之后，
+      特异性又相同 —— 结果所有带 .reveal 的卡片/步骤/更新日志条目的 hover 抬升
+      一直被压死（点了半天没反应）。换成 translate 两个就各走各的。
+   2) 延迟（--fx-d）只写在 .in 态上。transition-delay 取的是"切过去那一边"的值：
+      写在基础态的话，hover 也得跟着等半秒，手感发黏。
+   3) 延迟由 motion.js 按"行 % 3"算好写进 --fx-d。JS 不跑（或系统开了
+      prefers-reduced-motion）时，这儿全是 0 延迟 —— 只是没有波浪，静态样子不变。
+   ══════════════════════════════════════════════════════ */
+
+/* ── 1. 涌上来：同层的一排 .reveal 依次淡入 ── */
+[data-fx] > .reveal {
+  transition: opacity .6s var(--ease), transform .72s var(--ease), filter .5s ease,
+              border-color .4s, box-shadow .4s, translate .4s var(--ease);
+}
+[data-fx] > .reveal.in {
+  transform: none;
+  filter: none;
+  transition-delay: var(--fx-d, 0s), var(--fx-d, 0s), var(--fx-d, 0s);
+}
+
+/* 卡片这类小方块再补一点"缩着浮上来"的劲（大行块不加 scale：整块缩放会糊字） */
+[data-fx] > .card, [data-fx] > .cgroup, [data-fx] > .step,
+[data-fx] > .platform, [data-fx] > .link-card, [data-fx] > .clink {
+  transform: translateY(30px) scale(.972);
+  filter: blur(5px);
+}
+[data-fx] > .cl-version { transform: translateY(26px); }
+
+/* ── 2. 图标比正文慢半拍地"弹"出来 ── */
+[data-fx] > .reveal .card-icon {
+  opacity: 0; translate: 0 14px; scale: .82;
+  transition: opacity .5s var(--ease) calc(var(--fx-d, 0s) + .12s),
+              translate .6s var(--ease) calc(var(--fx-d, 0s) + .12s),
+              scale .6s var(--ease) calc(var(--fx-d, 0s) + .12s),
+              transform .4s var(--ease);
+}
+[data-fx] > .reveal.in .card-icon { opacity: 1; translate: 0 0; scale: 1; }
+
+/* ── 3. 章节标题：整块抬一下，比卡片略早 ── */
+[data-fx1].reveal {
+  transform: translateY(22px); filter: blur(4px);
+  transition: opacity .66s var(--ease) .04s, transform .78s var(--ease) .04s,
+              filter .5s ease .04s;
+}
+[data-fx1].reveal.in { transform: none; filter: none; }
+
+/* ── 4. hover：抬起来 + 扫过一道光（光的颜色就是全站那一支蓝，没有第二色相） ── */
+[data-fx] > .card:hover { translate: 0 -9px; }
+[data-fx] > .cgroup:hover, [data-fx] > .contributor:hover { translate: 0 -3px; }
+[data-fx] > .step:hover { translate: 0 -6px; }
+[data-fx] > .platform:hover, [data-fx] > .clink:hover { translate: 0 -5px; }
+[data-fx] > .link-card:hover { translate: 0 -3px; }
+[data-fx] > .cl-version:hover { translate: 0 -3px; }
+
+[data-fx] > .card::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(105deg, transparent 34%, rgba(56, 189, 248, .15) 46%,
+              rgba(255, 255, 255, .28) 51%, rgba(56, 189, 248, .10) 56%, transparent 68%);
+  transform: translateX(-135%);
+  transition: transform .9s var(--ease);
+}
+[data-fx] > .card:hover::before { transform: translateX(135%); }
+
+/* ── 5. 功能卡片：18 张彩虹图标片收成一支蓝（深浅三档轮着来，不至于一片死平） ── */
+#features .card-icon { background: linear-gradient(135deg, #38bdf8, #0369a1); box-shadow: 0 12px 26px rgba(3, 105, 161, .26); }
+#features .cards > .card:nth-child(3n+2) .card-icon { background: linear-gradient(135deg, #0ea5e9, #1d4ed8); }
+#features .cards > .card:nth-child(3n) .card-icon { background: linear-gradient(135deg, #7dd3fc, #075985); }
+
+/* ── 6. 大卡（跨两列）：一眼看出是重点，不是网格里多出来的一格 ── */
+@media (min-width: 1025px) {
+  #features .cards > .card-wide { grid-column: span 2; }
+  #features .cards > .card-wide h3 { font-size: 22px; }
+  #features .cards > .card-wide p { max-width: 64ch; }
+  #features .cards > .card-wide::after { opacity: .5; }
+  #features .cards > .card-wide:hover::after { opacity: 1; }
+}
+/* 两列 / 一列时不跨列：跨了会在行尾留个洞（明明 18 张卡排不满） */
+@media (max-width: 1024px) {
+  #features .cards > .card-wide { grid-column: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-fx] > .reveal, [data-fx1].reveal,
+  [data-fx] > .card, [data-fx] > .cgroup, [data-fx] > .step,
+  [data-fx] > .platform, [data-fx] > .link-card, [data-fx] > .clink,
+  [data-fx] > .cl-version { transform: none; filter: none; opacity: 1; }
+  [data-fx] > .reveal .card-icon { opacity: 1; translate: 0 0; scale: 1; }
+  [data-fx] > .card::before { display: none; }
+}

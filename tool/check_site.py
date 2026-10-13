@@ -104,10 +104,13 @@ def main():
         vers = _cl_vers()
         missing = [v for v in vers
                    if '<span class="cl-tag">%s</span>' % v not in s]
+        # 卡片计数用**前缀**匹配（`class="card reveal`），不是整串 `card reveal"`：
+        # 首页有几张跨两列的"大卡"写成 `card reveal card-wide`，整串匹配会把它们
+        # 数漏 —— 少几张不算少、看着还全绿，正是这类判据最坑的地方。
         chk('cards/cl present (%d cards, %d/%d vers)' %
-            (s.count('<article class="card reveal">'),
+            (s.count('<article class="card reveal'),
              len(vers) - len(missing), len(vers)),
-            s.count('<article class="card reveal">') >= 10 and not missing)
+            s.count('<article class="card reveal') >= 10 and not missing)
         # 「最新版本出现在首页」不写死版本号：从 CHANGELOG 现取。
         # 这条同时盯着「发版后忘跑 sync_site_content.py」—— 那时首页还停在旧版本。
         chk('latest release in cl', _newest_ver() in s)
@@ -150,6 +153,115 @@ def main():
         chk('首页导航同构 %s vs zh' % lang, nav == ref_nav,
             '缺=%s 多=%s' % ([x for x in ref_nav if x not in nav],
                             [x for x in nav if x not in ref_nav]))
+
+    print('[home motion]')
+    # 首页动效层（docs/css/motion.css + docs/js/motion.js）：同层的一排 .reveal
+    # 依次涌上来、hover 抬升、功能卡的单一强调色。
+    #
+    # 这一层是**首页专属**：只挂三语 index.html，子页一行都不碰（文档页要稳）。
+    # 所以既查"三语都在"，也查"别的页都没有" —— 只查一半的话，哪天有人把它拷进
+    # 帮助中心，子页的 .cards 会跟着一起晃，而判据照样全绿。
+    homes = ['docs/index.html', 'docs/zh-TW/index.html', 'docs/en/index.html']
+    motion_css = read('docs/css/motion.css')
+    motion_js = read('docs/js/motion.js')
+    # 下面的正则一律拿**去掉注释**的副本去跑：motion.css 的注释里正好写着
+    # “`.card:hover{transform:…}` 被压死”这句说明，拿原文匹配会把说明本身当成
+    # 违规（当场报了一次假 FAIL）。注释不是代码，不该进判据。
+    motion_plain = re.sub(r'/\*.*?\*/', '', motion_css, flags=re.S)
+    mj, _mjerr = _mask_js(motion_js)
+    chk('动效层语法自洽（CSS 括号 / JS 括号）',
+        motion_css.count('{') == motion_css.count('}') and
+        mj.count('{') == mj.count('}') and mj.count('(') == mj.count(')') and
+        all(x in motion_js for x in ('data-fx', '--fx-d', 'data-fx1', 'getBoundingClientRect')))
+    chk('动效层只挂首页（三语有、别的页没有）',
+        all('motion.css' in read(f) and 'motion.js' in read(f) for f in homes) and
+        all('motion.css' not in read(f) and 'motion.js' not in read(f)
+            for f in ['docs/faq.html', 'docs/zh-TW/faq.html', 'docs/en/faq.html',
+                      'docs/manual/start.html', 'docs/zh-TW/manual/start.html',
+                      'docs/en/manual/start.html']))
+    chk('动效层接线三语一致（相对路径 + 同一个 ?v=）',
+        all(read(f).count('motion.css?v=1') == 1 and read(f).count('motion.js?v=1') == 1
+            for f in homes) and
+        len(set(re.findall(r'motion\.css\?v=(\d+)', read(f))[0] for f in homes)) == 1 and
+        len(set(re.findall(r'motion\.js\?v=(\d+)', read(f))[0] for f in homes)) == 1)
+    # hover 抬升必须走 translate 而不是 transform：style.css 里
+    # `.reveal.in{transform:none}` 排在 `.card:hover{transform:…}` 之后、特异性又相同，
+    # 拿 transform 做 hover 会被它一直压死（改了看不出变化，极易当成"没生效"再改一遍）。
+    chk('动效层 hover 抬升不与 .reveal.in 打架（走 translate）',
+        '[data-fx] > .card:hover { translate:' in motion_css and
+        '[data-fx] > .cl-version:hover { translate:' in motion_css and
+        # 只盯 :hover 紧跟 { 的那条规则本体（`…:hover::before{transform:…}` 是扫光，合规）
+        re.search(r':hover\s*\{[^}]*transform:', motion_plain) is None)
+    chk('动效层：延迟只写在 .in 态（hover 才不用跟着等）',
+        re.search(r'\[data-fx\] > \.reveal\.in \{[^}]*transition-delay: var\(--fx-d',
+                  motion_plain) is not None)
+    chk('动效层：彩虹图标片收成一支蓝 + 大卡跨两列',
+        '#features .card-icon { background:' in motion_css and
+        '#features .cards > .card:nth-child(3n+2) .card-icon' in motion_css and
+        '#features .cards > .card-wide { grid-column: span 2' in motion_css)
+    # 跨列的位置是个布局不变量：三语必须**同几张**。18 张卡 + 3 张跨列刚好 7 行
+    # 排满（这是算过的，2 张或 4 张都会在行尾留洞）；只要有一页少标一张，那一页
+    # 就缺一块，而且看不出是"少标"还是"故意"。
+    wide = {}
+    for f in homes:
+        s = read(f)
+        seg = s[s.index('id="features"'):s.index('id="platforms"')]
+        wide[f] = re.findall(
+            r'class="card reveal card-wide">\s*<div class="card-icon (c\d+)"', seg)
+    chk('大卡跨列三语同几张、各 3 张',
+        len(set(tuple(v) for v in wide.values())) == 1 and
+        all(len(v) == 3 for v in wide.values()), wide['docs/index.html'])
+
+    print('[home nav]')
+    # 首页导航：13 个链接横排一行 → 收成一个「更多」面板（docs/css/nav.css + nav.js）。
+    #
+    # 判据分两层，缺一层就会漏掉真问题：
+    #   * 只看"外面剩几个" —— 把链接直接删掉也算通过（面板空了谁知道）；
+    #   * 只看"旧的入口都在" —— 把 13 个又摆回外面也通过（旧样子正好全符合）。
+    # 所以两边都点：外面 ≤5 个顶层链接、面板 ≥8 条，且旧的 13 个 href 一个不少。
+    NAV_INNER = re.compile(r'<nav class="nav-links" id="navLinks">(.*?)</nav>', re.S)
+    KEEP = ['#announce', '#features', '#ui2', '#platforms', '#changelog',
+            '#getting-started', '#faq', '#community', '#friends',
+            'manual/index.html', 'guide.html', 'card.html', 'promo.html']
+    for f in homes:
+        s = read(f)
+        m = NAV_INNER.search(s)
+        inner = m.group(1) if m else ''
+        pm = re.search(r'<div class="nav-more" id="navMore">.*?<div class="nav-more-list" id="navMoreList">(.*?)</div>\s*</div>',
+                       inner, re.S)
+        items = re.findall(r'<a\b[^>]*href="([^"]+)"', pm.group(1)) if pm else []
+        # 把面板整块抽掉再数外面剩了几个 —— 面板在 DOM 里排在 theme 按钮之前，
+        # 不抽掉的话它会跟着一起被数进"顶层"（当时测出 14 个，其实外面只有 5 个）。
+        outer = inner[:pm.start()] + inner[pm.end():] if pm else inner
+        outer = outer.split('<button class="theme-toggle"')[0]
+        top = re.findall(r'<a\b[^>]*href="([^"]+)"', outer)
+        got = set(h.replace('../', '') for h in top + items)
+        chk('%s : 导航不再堆一排（顶层 %d 个 / 面板 %d 条）' % (f, len(top), len(items)),
+            len(top) <= 5 and len(items) >= 8 and all(k in got for k in KEEP) and
+            'aria-haspopup="true"' in s and 'aria-controls="navMoreList"' in s and
+            'id="navMoreBtn"' in s,
+            '缺=%s' % [k for k in KEEP if k not in got])
+    nav_css = read('docs/css/nav.css')
+    nav_js = read('docs/js/nav.js')
+    nav_plain = re.sub(r'/\*.*?\*/', '', nav_css, flags=re.S)
+    nj, _njerr = _mask_js(nav_js)
+    chk('导航层语法自洽 + 窄屏把面板摊平',
+        nav_css.count('{') == nav_css.count('}') and
+        nj.count('{') == nj.count('}') and nj.count('(') == nj.count(')') and
+        '.nav-more { display: contents; }' in nav_css and
+        '.nav-more-btn { display: none; }' in nav_css)
+    chk('导航层只挂首页（三语有、别的页没有，且同一个 ?v=）',
+        all(read(f).count('nav.css?v=1') == 1 and read(f).count('nav.js?v=1') == 1
+            for f in homes) and
+        all('nav.css' not in read(f) and 'nav.js' not in read(f)
+            for f in ['docs/faq.html', 'docs/zh-TW/faq.html', 'docs/en/faq.html',
+                      'docs/manual/start.html', 'docs/zh-TW/manual/start.html',
+                      'docs/en/manual/start.html']))
+    # 面板收起来时 scrollspy 的高亮看不见了 —— 得过继到「更多」按钮上，
+    # 否则滚到「平台 / 更新 / 问答」时导航看上去像没在跟着走。
+    chk('导航高亮过继给「更多」按钮',
+        'MutationObserver' in nav_js and 'classList.toggle("active"' in nav_js and
+        '.nav-more-btn.active::after' in nav_plain)
 
     print('[hero 3d]')
     # 首页 Hero：左侧 3D 星球（原生 WebGL 点云）+ 右侧累计报文遥测。

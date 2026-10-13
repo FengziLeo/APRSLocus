@@ -57,6 +57,8 @@
 <link rel="icon" type="image/png" href="../assets/favicon.png">
 <link rel="stylesheet" href="../css/style.css?v=7">
 <link rel="stylesheet" href="../css/hero-3d.css?v=9">
+<link rel="stylesheet" href="../css/motion.css?v=1">
+<link rel="stylesheet" href="../css/nav.css?v=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -90,18 +92,27 @@
     </a>
     <nav class="nav-links" id="navLinks">
       <a href="../promo.html" class="nav-new">2.0 Promo</a>
-      <a href="#announce">News</a>
       <a href="#features">Features</a>
       <a href="#ui2">Interface</a>
-      <a href="#platforms">Platforms</a>
-      <a href="#changelog">Changelog</a>
-      <a href="#getting-started">Getting Started</a>
-      <a href="#faq">FAQ</a>
       <a href="manual/index.html">Guide</a>
-      <a href="#community">Community</a>
-      <a href="#friends">Links</a>
-      <a href="../guide.html">Walkthrough</a>
-      <a href="../card.html">Card</a>
+      <!-- 2.0 时这里横着排了 13 个链接：窄屏挤成一团，大屏也是两排小字。
+           收成一个「更多」：常用的四个留在外面，其余进面板 —— 链接一个没少。 -->
+      <div class="nav-more" id="navMore">
+        <button class="nav-more-btn" id="navMoreBtn" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="navMoreList">
+          More<i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+        </button>
+        <div class="nav-more-list" id="navMoreList">
+          <a href="#announce">News</a>
+          <a href="#platforms">Platforms</a>
+          <a href="#changelog">Changelog</a>
+          <a href="#getting-started">Getting Started</a>
+          <a href="#faq">FAQ</a>
+          <a href="../guide.html">Walkthrough</a>
+          <a href="../card.html">Card</a>
+          <a href="#community">Community</a>
+          <a href="#friends">Links</a>
+        </div>
+      </div>
       <a class="nav-cta" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">Download 2.0</a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode" title="Switch to dark mode" data-label-dark="Switch to light mode" data-label-light="Switch to dark mode"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
       <span class="lang-switch-group"><a class="lang-switch" href="../" hreflang="zh-Hans">简中</a><a class="lang-switch" href="../zh-TW/" hreflang="zh-Hant">繁中</a><a class="lang-switch" href="./" hreflang="en">EN</a></span>
@@ -287,7 +298,7 @@ html{overflow-x:hidden}
   </div>
 
   <div class="cards">
-    <article class="card reveal">
+    <article class="card reveal card-wide">
       <div class="card-icon c1"><i class="fa-solid fa-location-dot"></i></div>
       <h3>Real-time Map Tracking</h3>
       <p>Many tile sources: AMap tiles, AMap satellite, Vector, Carto (light/dark/voyager), OSM (standard/humanitarian), OpenTopo, and Esri. One marker per station (clustering removed in v1.6.149), with trail playback support; the heatmap shows density when zoomed out.</p>
@@ -322,7 +333,7 @@ html{overflow-x:hidden}
       <ul class="card-tags"><li>Raw Packet View</li><li>Type Filtering</li><li>Debug Logs</li></ul>
     </article>
 
-    <article class="card reveal">
+    <article class="card reveal card-wide">
       <div class="card-icon c6"><i class="fa-solid fa-wifi"></i></div>
       <h3>Connectivity &amp; Background</h3>
       <p>Auto-connects to APRS-IS public servers over TCP or WebSocket. Progressive reconnect: 8 → 16 → 32 → 60 seconds. Android uses a foreground service to stay online.</p>
@@ -343,7 +354,7 @@ html{overflow-x:hidden}
       <ul class="card-tags"><li>Six Languages</li><li>Dark Mode</li><li>OOBE Wizard</li></ul>
     </article>
 <!-- site-sync:features -->
-    <article class="card reveal">
+    <article class="card reveal card-wide">
       <div class="card-icon c9"><i class="fa-solid fa-tower-cell"></i></div>
       <h3>Five Data Sources</h3>
       <p>Internet (APRS-IS), Bluetooth / serial TNC (KISS), sound-card AFSK 1200 (Bell 202 software TNC), Kenwood <code>$PKWDWPL</code> waypoints (receive-only), and WLAN radio direct link (supporting IC-705 / IC-9700 / IC-7610 / IC-905 over Wi-Fi / Ethernet with CI-V and LAN audio). Multiple links can receive simultaneously, while the transmit link is picked separately.</p>
@@ -1946,5 +1957,7 @@ html{overflow-x:hidden}
 
 <script src="../js/main.js?v=7"></script>
 <script src="../js/planet-3d.js?v=9"></script>
+<script src="../js/motion.js?v=1"></script>
+<script src="../js/nav.js?v=1"></script>
 </body>
 </html>

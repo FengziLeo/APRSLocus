@@ -58,6 +58,8 @@
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="stylesheet" href="css/style.css?v=7">
 <link rel="stylesheet" href="css/hero-3d.css?v=9">
+<link rel="stylesheet" href="css/motion.css?v=1">
+<link rel="stylesheet" href="css/nav.css?v=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -92,18 +94,27 @@
     </a>
     <nav class="nav-links" id="navLinks">
       <a href="promo.html" class="nav-new">2.0 宣传</a>
-      <a href="#announce">公告</a>
       <a href="#features">功能</a>
       <a href="#ui2">界面</a>
-      <a href="#platforms">平台</a>
-      <a href="#changelog">更新</a>
-      <a href="#getting-started">上手</a>
-      <a href="#faq">问答</a>
       <a href="manual/index.html">手册</a>
-      <a href="#community">社区</a>
-      <a href="#friends">友链</a>
-      <a href="guide.html">解说</a>
-      <a href="card.html">名片</a>
+      <!-- 2.0 时这里横着排了 13 个链接：窄屏挤成一团，大屏也是两排小字。
+           收成一个「更多」：常用的四个留在外面，其余进面板 —— 链接一个没少。 -->
+      <div class="nav-more" id="navMore">
+        <button class="nav-more-btn" id="navMoreBtn" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="navMoreList">
+          更多<i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+        </button>
+        <div class="nav-more-list" id="navMoreList">
+          <a href="#announce">公告</a>
+          <a href="#platforms">平台</a>
+          <a href="#changelog">更新</a>
+          <a href="#getting-started">上手</a>
+          <a href="#faq">问答</a>
+          <a href="guide.html">解说</a>
+          <a href="card.html">名片</a>
+          <a href="#community">社区</a>
+          <a href="#friends">友链</a>
+        </div>
+      </div>
       <a class="nav-cta" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">下载 2.0</a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切换深色模式" title="切换深色模式" data-label-dark="切换浅色模式" data-label-light="切换深色模式"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
       <span class="lang-switch-group"><a class="lang-switch" href="./" hreflang="zh-Hans">简中</a><a class="lang-switch" href="zh-TW/" hreflang="zh-Hant">繁中</a><a class="lang-switch" href="en/" hreflang="en">EN</a></span>
@@ -305,7 +316,7 @@ html{overflow-x:hidden}
   </style>
 
   <div class="cards">
-    <article class="card reveal">
+    <article class="card reveal card-wide">
       <div class="card-icon c1"><i class="fa-solid fa-location-dot"></i></div>
       <h3>实时地图追踪</h3>
       <p>高德瓦片 / 高德卫星 / 矢量 / Carto（浅色·深色·航行者）/ OSM（标准·人道）/ OpenTopo / Esri 十多种底图可切。一台站一个标记（v1.6.149 起去掉聚合），也能看轨迹回放，低缩放密度看热力图。</p>
@@ -340,7 +351,7 @@ html{overflow-x:hidden}
       <ul class="card-tags"><li>原始报文</li><li>类型筛选</li><li>调试日志</li></ul>
     </article>
 
-    <article class="card reveal">
+    <article class="card reveal card-wide">
       <div class="card-icon c6"><i class="fa-solid fa-wifi"></i></div>
       <h3>连接与后台</h3>
       <p>自动连 APRS-IS 公共服务器，TCP / WebSocket 都支持，断线按 8 → 16 → 32 → 60 秒渐进重连。Android 用前台服务保持在线。</p>
@@ -361,7 +372,7 @@ html{overflow-x:hidden}
       <ul class="card-tags"><li>六种语言</li><li>深色模式</li><li>OOBE 引导</li></ul>
     </article>
 <!-- site-sync:features -->
-    <article class="card reveal">
+    <article class="card reveal card-wide">
       <div class="card-icon c9"><i class="fa-solid fa-tower-cell"></i></div>
       <h3>五种数据来源</h3>
       <p>互联网（APRS-IS）、蓝牙 / 串口 TNC（KISS）、声卡音频 AFSK 1200（Bell 202 软 TNC）、Kenwood 航点 <code>$PKWDWPL</code>（只收不发），以及 WLAN 电台直连（支持 IC-705 / IC-9700 / IC-7610 / IC-905 等 Wi-Fi / 以太网型号，CI-V 控制与局域网音频）。多条链路可以同时收报文，发射来源单独指定一条。</p>
@@ -1981,5 +1992,7 @@ html{overflow-x:hidden}
 
 <script src="js/main.js?v=7"></script>
 <script src="js/planet-3d.js?v=9"></script>
+<script src="js/motion.js?v=1"></script>
+<script src="js/nav.js?v=1"></script>
 </body>
 </html>

@@ -588,6 +588,8 @@
         <div class="cl-item"><span class="cl-dot fix"></span><b>智慧代理回覆更快</b>：2.0.67 的「逐字回覆」請求體裡<b>漏了 <code>stream</code></b>，後端按普通請求回一整段 JSON，應用判定「沒拿到串流」後<b>又把同樣的請求發了一遍</b> —— 每輪白等一倍時間、白花一倍 token。現在串流請求真的帶 <code>stream</code>：一次請求、邊收邊顯示；後端不認這個欄位時照舊自動退回整段式，<b>不會少一句回覆</b>。</div>
         <div class="cl-item"><span class="cl-dot fix"></span><b>智慧代理不再「呼叫幾次工具就斷掉」</b>：單個工具出錯不再帶走整輪對話（例外變成<b>這次呼叫的結果</b>回給模型）；一輪的工具往返次數用完後會補一次<b>不帶工具</b>的收尾請求，把結論說出來，而不是乾停在最後一個工具氣泡上。</div>
         <div class="cl-item"><span class="cl-dot up"></span><b>台站備註更完整</b>：備註單獨成行、可換行、預設不限行數，長備註不再被省略號吃掉；備註裡的網址（<code>https://…</code> / <code>www.…</code>）自動變成<b>可點連結</b>，台站列表 / 台站詳情 / 地圖資訊浮窗三處一致。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>智慧代理更快</b>：預設系統提示從 5.3KB 瘦到 2KB —— 它原本把 57 個工具的用法逐條複述了一遍，而每個工具的說明本來就隨請求一起發。工具描述也一併精簡（名字 / 參數 / 取值都不變）。系統提示 + 工具schema 每輪都要重發，兩份合計小了約四分之一，回覆更快。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>台站狀態報文更省、不再閃</b>：APRS-IS 保活以前每 15 秒先發一幀 <code>>APRSlocus CONNECT …</code>、再發一幀你的自訂狀態，白佔一幀還讓 aprs.fi 上的狀態在兩者間反覆閃。現在<b>只發一幀、誰有內容發誰</b>：填了自訂發自訂，沒填才發內建預設幀；CONNECT 身分幀只在連上的一瞬間發一次。自訂幀萬一寫失敗仍會自動補發，狀態不會被 CONNECT 頂掉。</div>
       </div>
     </div>
     <div class="cl-version reveal">

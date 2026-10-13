@@ -10,6 +10,10 @@ CONNECT —— 等于每 15s 把错误文本又续一次。
 修法（本轮）：连接器 `send` 回传成败，保活记住「上次自定义帧丢了」，下个 tick
 无视发报门槛立刻补发**自定义帧本身**（不重复发 CONNECT），直到写成功。
 
+后续调整：保活帧改为**只发一帧** —— 填了自定义状态就发自定义，没填才发内置
+默认帧 `>APRSlocus CONNECT vX.Y.Z 平台`。CONNECT 身份帧只在上线那一下发一次
+（`_connectAprsIs`），不再每 15s 先发 CONNECT、再由自定义帧把它顶回来。
+
 两条用途（与 tool/sim_prune.py 同一套路）：
 
   1) **定规则**：`python3 tool/sim_status_selfheal.py` 打印各场景下的动作序列。
@@ -65,10 +69,13 @@ class Sim:
                 self.last_tx = now
                 return 'heal-custom'
             return 'heal-retry'
-        self.sent.append(CONNECT_FRAME)
         frame = self._frame()
         if frame is not None:
+            # 填了自定义 → 只发自定义帧（不再先发 CONNECT）
             self.custom_lost = not self._try(frame, custom_write_ok)
+        else:
+            # 没填 → 发内置默认帧保活
+            self._try(CONNECT_FRAME, True)
         self.last_tx = now
         return 'keepalive'
 
@@ -96,6 +103,8 @@ def _dart_marker_check():
         (state, '空文本清标记', '_customStatusLost = false;'),
         (state, '补发成功清标记', '} else if (aprs.send(re)) {'),
         (state, '保活记录失败', '_customStatusLost = !aprs.send(frame);'),
+        (state, '内置默认状态帧', 'String _defaultStatusFrame() =>'),
+        (state, '保活无自定义→默认帧', 'aprs.send(_defaultStatusFrame());'),
         (state, '连接时记录失败', 'if (customFrame != null) _customStatusLost = !aprs.send(customFrame);'),
     ]
     for src, label, frag in need:
@@ -136,6 +145,11 @@ def _scenarios():
     s = Sim('IN SHACK', t0)
     a = s.tick(t0 + timedelta(seconds=10))
     out.append(('⑤ 未到门槛', a, s.sent, s.custom_lost))
+
+    # ⑥ 没填自定义文本的正常保活 → 发内置默认帧
+    s = Sim('', t0)
+    a = s.tick(t0 + timedelta(seconds=60))
+    out.append(('⑥ 无自定义保活', a, s.sent, s.custom_lost))
     return out
 
 
@@ -166,12 +180,18 @@ def _run_asserts():
     a, sent, lost = scen['④ 正常保活']
     if a != 'keepalive' or lost:
         errs.append('④ 正常保活不该置 lost，实为 a=%s lost=%s' % (a, lost))
-    if sent != [CONNECT_FRAME, '>IN SHACK']:
-        errs.append('④ 正常保活应发 CONNECT+自定义，实为 %r' % (sent,))
+    if sent != ['>IN SHACK']:
+        errs.append('④ 填了自定义的正常保活 → 只发自定义、不再发 CONNECT，实为 %r' % (sent,))
 
     a, sent, lost = scen['⑤ 未到门槛']
     if a != 'skip' or sent:
         errs.append('⑤ 未到门槛应 skip，实为 a=%s sent=%r' % (a, sent))
+
+    a, sent, lost = scen['⑥ 无自定义保活']
+    if a != 'keepalive' or lost:
+        errs.append('⑥ 无自定义保活应发默认帧且不置 lost，实为 a=%s lost=%s' % (a, lost))
+    if sent != [CONNECT_FRAME]:
+        errs.append('⑥ 无自定义保活应发内置默认帧，实为 %r' % (sent,))
     return errs
 
 

@@ -29,6 +29,25 @@
 - 备注里的 `https://…` 与裸 `www.…` 自动识别成**可点链接**（尾部的中英文标点先
   剔除，不会被一起带走），台站列表 / 台站详情 / 地图信息浮窗三处一致。
 
+### 优化：智能体更快 —— 系统提示与工具说明瘦身
+
+- 默认系统提示从 5.3KB 砍到 2KB（-62%）：里面原本把 57 个工具挨个复述了一遍，
+  而每个工具的用法本来就写在它的 schema 里、随请求一起发。现在系统提示只留
+  行为规则（回复语言 / 主动调工具 / 改设置先读状态 / 副作用要确认 / 权限 /
+  后台任务 / 记忆）。
+- 57 个工具的说明文字整体精简（**名字、参数、取值都不变**，只把描述写短）。
+  系统提示 + 工具 schema 是**每一轮请求都要重发**的固定开销，两者合计小了约
+  四分之一，回复更快。
+
+### 优化：台站状态报文更省 —— 保活只发一帧，不再来回闪
+
+- APRS-IS 保活以前每 15 秒**先发一帧** `>APRSlocus CONNECT …` 身份帧、紧跟一帧
+  用户自定义状态：等于白占一帧，还会让 aprs.fi 上的「台站状态」在 CONNECT 与
+  自定义文本之间反复闪。现在**谁有内容发谁、保活只发一帧**：填了自定义就发
+  自定义，没填才发内置默认帧。CONNECT 身份帧只在**连上那一瞬间**发一次。
+- 自定义帧写失败（socket 抖动）时仍会记下来，下个周期无视发报门槛立刻补发，
+  直到写成功 —— 不会再出现「设了状态却被 CONNECT 顶掉」。
+
 ---
 
 ## [2.0.68] - 2026-10-13 (English)
@@ -70,6 +89,30 @@
 - `https://…` and bare `www.…` inside a comment are recognised as **tappable
   links** (trailing Chinese/English punctuation is trimmed off first), consistently
   in the station list, the station detail page, and the map info window.
+
+### Improved: a faster agent — slimmer prompt and tool descriptions
+
+- The default system prompt went from 5.3KB to 2KB (-62%): it used to restate all
+  57 tools one by one, even though each tool's usage already lives in its own
+  schema, sent with every request. It now keeps only the behavioural rules (reply
+  language, be proactive with tools, read state before changing it, confirm side
+  effects, permissions, background tasks, memory).
+- The 57 tool descriptions were shortened as well (**names, parameters and value
+  ranges unchanged**, only the prose is terser). The prompt plus the tool schemas
+  are re-sent on every request, and the two together are now roughly a quarter
+  smaller, so replies come faster.
+
+### Improved: leaner status reports — the keep-alive sends a single frame
+
+- The APRS-IS keep-alive used to send an `>APRSlocus CONNECT …` identity frame
+  **every 15 seconds** and then a second frame with the user's custom status: a
+  wasted frame that also made the "station status" on aprs.fi flip back and forth
+  between the CONNECT text and the custom one. Now **one frame is sent, whichever
+  has content**: the custom text if set, otherwise the built-in default. The
+  CONNECT identity frame is sent once, at the moment of connecting.
+- A custom frame that fails to write (a flaky socket) is still remembered and
+  re-sent as soon as the send threshold allows, until it goes through — a status
+  you set is no longer overwritten by CONNECT.
 
 ---
 

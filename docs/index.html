@@ -662,6 +662,8 @@ html{overflow-x:hidden}
         <div class="cl-item"><span class="cl-dot fix"></span><b>智能体回复更快</b>：2.0.67 的「逐字回复」请求体里<b>漏了 <code>stream</code></b>，后端按普通请求回一整段 JSON，应用判定「没拿到流」后<b>又把同样的请求发了一遍</b> —— 每轮白等一倍时间、白花一倍 token。现在流式请求真的带 <code>stream</code>：一次请求、边收边显示；后端不认这个字段时照旧自动退回整段式，<b>不会少一句回复</b>。</div>
         <div class="cl-item"><span class="cl-dot fix"></span><b>智能体不再「调几次工具就断掉」</b>：单个工具出错不再带走整轮对话（异常变成<b>这次调用的结果</b>回给模型）；一轮的工具往返次数用完后会补一次<b>不带工具</b>的收尾请求，把结论说出来，而不是干停在最后一个工具气泡上。</div>
         <div class="cl-item"><span class="cl-dot up"></span><b>台站备注更完整</b>：备注单独成行、可换行、默认不限行数，长备注不再被省略号吃掉；备注里的网址（<code>https://…</code> / <code>www.…</code>）自动变成<b>可点链接</b>，台站列表 / 台站详情 / 地图信息浮窗三处一致。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>智能体更快</b>：默认系统提示从 5.3KB 瘦到 2KB —— 它原本把 57 个工具的用法逐条复述了一遍，而每个工具的说明本来就随请求一起发。工具描述也一并精简（名字 / 参数 / 取值都不变）。系统提示 + 工具schema 每轮都要重发，两份合计小了约四分之一，回复更快。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>台站状态报文更省、不再闪</b>：APRS-IS 保活以前每 15 秒先发一帧 <code>>APRSlocus CONNECT …</code>、再发一帧你的自定义状态，白占一帧还让 aprs.fi 上的状态在两者间反复闪。现在<b>只发一帧、谁有内容发谁</b>：填了自定义发自定义，没填才发内置默认帧；CONNECT 身份帧只在连上的一瞬间发一次。自定义帧万一写失败仍会自动补发，状态不会被 CONNECT 顶掉。</div>
       </div>
     </div>
     <div class="cl-version reveal">

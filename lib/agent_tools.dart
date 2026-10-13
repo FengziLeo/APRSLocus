@@ -59,10 +59,9 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'get_app_state',
     description:
-        'Read the current app state: my callsign, connection status, tracking '
-        '(beacon) settings, preference values, counts of stations/messages/'
-        'groups, and the allowed value ranges for settings. Call this before '
-        'changing settings or sending messages.',
+        'Read the current app state: callsign, connection, tracking (beacon) '
+        'settings, preferences, counts, and the allowed value ranges. Call this '
+        'before changing settings or sending anything.',
     parameters: {'type': 'object', 'properties': {}},
   ),
   const AgentToolSpec(
@@ -73,43 +72,32 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'search_stations',
     description:
-        'Search recently heard APRS stations by callsign substring. Returns '
-        'callsign, position and how long ago it was heard.',
+        'Search recently heard stations by callsign substring; returns call, '
+        'position and age.',
     parameters: {
       'type': 'object',
       'properties': {
-        'query': {
-          'type': 'string',
-          'description': 'Callsign or substring to search for.',
-        },
-        'limit': {
-          'type': 'integer',
-          'description': 'Max results (default 20, max 50).',
-        },
+        'query': {'type': 'string', 'description': 'Callsign or substring.'},
+        'limit': {'type': 'integer', 'description': 'Max results (default 20, max 50).'},
       },
       'required': ['query'],
     },
   ),
   const AgentToolSpec(
     name: 'list_stations',
-    description:
-        'List the most recently heard APRS stations (no query). Use this to get '
-        'an overview of what is on the air.',
+    description: 'List the most recently heard stations, to see what is on the air.',
     parameters: {
       'type': 'object',
       'properties': {
-        'limit': {
-          'type': 'integer',
-          'description': 'Max results (default 20, max 50).',
-        },
+        'limit': {'type': 'integer', 'description': 'Max results (default 20, max 50).'},
       },
     },
   ),
   const AgentToolSpec(
     name: 'station_detail',
     description:
-        'Get full detail for one station by exact callsign (or nearest match): '
-        'position, symbol, comment, last heard, and how many track points.',
+        'Full detail for one station (exact call or nearest match): position, '
+        'symbol, comment, last heard, track point count.',
     parameters: {
       'type': 'object',
       'properties': {
@@ -121,20 +109,16 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'read_messages',
     description:
-        'Read recent chat messages (private and group). Optionally filter by a '
-        'peer callsign or a group call. Never send anything: this is read-only. '
-        'Use it to summarize conversations or answer "did anyone message me".',
+        'Read recent chat messages (private and group), optionally filtered by '
+        'a peer or group call. Read-only.',
     parameters: {
       'type': 'object',
       'properties': {
         'with': {
           'type': 'string',
-          'description': 'Only messages to/from this callsign or group call.',
+          'description': 'Only messages to/from this call or group.',
         },
-        'limit': {
-          'type': 'integer',
-          'description': 'Max messages (default 20, max 50).',
-        },
+        'limit': {'type': 'integer', 'description': 'Max messages (default 20, max 50).'},
       },
     },
   ),
@@ -142,7 +126,7 @@ final List<AgentToolSpec> kAgentTools = [
     name: 'send_message',
     description:
         'Send an APRS text message to a callsign, or to a group by its group '
-        'call. Requires the "allow sending messages" permission.',
+        'call. Needs "allow sending".',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -155,23 +139,22 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'send_beacon_now',
-    description: 'Immediately send one position beacon.',
+    description: 'Send one position beacon now.',
     mutating: true,
     parameters: {'type': 'object', 'properties': {}},
   ),
   const AgentToolSpec(
     name: 'set_tracking',
     description:
-        'Enable/disable and configure automatic position reporting (beacon). '
-        'Only the provided fields are changed. This enables or disables '
-        'tracking directly; it is unrelated to "beacon auto-start on launch".',
+        'Configure automatic position reporting (beacon); only the given fields '
+        'change. Unrelated to "beacon auto-start on launch".',
     mutating: true,
     parameters: {
       'type': 'object',
       'properties': {
         'beacon_enabled': {
           'type': 'boolean',
-          'description': 'true = enable tracking now, false = stop tracking.',
+          'description': 'true = start tracking now, false = stop.',
         },
         'beacon_interval_sec': {'type': 'integer', 'description': '5..3600'},
         'beacon_net_interval_sec': {
@@ -191,7 +174,7 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'set_station_filters',
-    description: 'Change which stations are displayed and how many are kept.',
+    description: 'Change which stations are shown and how many are kept.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -207,9 +190,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'set_preferences',
     description:
-        'Change general preferences: language, dark mode, UI layout, UI '
-        'scale, map type, interface material, weather, sensor assist, heat '
-        'level. Only the provided fields change.',
+        'Change general preferences (language, dark mode, layout, scale, map '
+        'type, material, weather, sensor assist, heat). Only given fields change.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -252,9 +234,7 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'navigate',
     description:
-        'Switch the app to a screen and optionally focus a station on the '
-        'map: screen = map/stations/messages/data/settings; or pass focus_call '
-        'to center the map on that station.',
+        'Open a screen and optionally centre the map on a station.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -265,7 +245,7 @@ final List<AgentToolSpec> kAgentTools = [
         },
         'focus_call': {
           'type': 'string',
-          'description': 'Callsign to focus on the map.',
+          'description': 'Callsign to centre on the map.',
         },
       },
     },
@@ -273,31 +253,23 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'create_task',
     description:
-        'Create a task that runs without the user present. "prompt" is what to '
-        'do (written as if the user said it). "trigger" = "timer" (default) runs '
-        'on a schedule: "interval_minutes" > 0 repeats it every N minutes, 0 runs '
-        'it once. "trigger" = "message" runs the instruction each time a new APRS '
-        'message arrives (and may run a burst of them back to back, so avoid '
-        'long tasks). Use "list_tasks" first to avoid duplicates.',
+        'Create a task that runs with no user present. "prompt" is the '
+        'instruction. trigger "timer" runs on a schedule (interval_minutes 0 = '
+        'once, N = every N minutes); trigger "message" runs on each new incoming '
+        'message. List tasks first to avoid duplicates.',
     mutating: true,
     parameters: {
       'type': 'object',
       'properties': {
-        'prompt': {
-          'type': 'string',
-          'description': 'The instruction to run at that time.',
-        },
+        'prompt': {'type': 'string', 'description': 'Instruction to run.'},
         'trigger': {
           'type': 'string',
           'enum': ['timer', 'message'],
-          'description':
-              '"timer" = on a schedule (default); "message" = on each new message.',
+          'description': '"timer" = schedule (default); "message" = each new message.',
         },
         'interval_minutes': {
           'type': 'integer',
-          'description':
-              'timer trigger only: 0 = once, otherwise repeat every N minutes '
-              '(min 1). Ignored for the message trigger.',
+          'description': 'timer only: 0 = once, else every N minutes (min 1).',
         },
       },
       'required': ['prompt'],
@@ -305,12 +277,12 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'list_tasks',
-    description: 'List the currently scheduled agent tasks.',
+    description: 'List the scheduled agent tasks.',
     parameters: {'type': 'object', 'properties': {}},
   ),
   const AgentToolSpec(
     name: 'cancel_task',
-    description: 'Cancel a scheduled task by its id (see "list_tasks").',
+    description: 'Cancel a task by its id (see list_tasks).',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -323,11 +295,9 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'set_connection_server',
     description:
-        'Change the APRS-IS server used for the internet link. Only the '
-        'provided fields are changed. Setting a server does NOT connect — call '
-        '"connect" afterwards if the user wants to go online. NOTE: the app '
-        'does not provide or recommend any server; only use an address the user '
-        'explicitly gave you.',
+        'Change the APRS-IS server; only given fields change. Does NOT connect '
+        'by itself — call "connect" afterwards. Use only an address the user '
+        'gave you.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -343,10 +313,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'set_connection_source',
     description:
-        'Enable or disable a data link source. "source" is one of: aprsis '
-        '(internet), tnc, audio, pkwdwpl. Enabling a source makes it eligible; '
-        'call "connect" to actually bring links up. Use get_app_state to see the '
-        'current "sources" map.',
+        'Enable or disable a link source (aprsis, tnc, audio, pkwdwpl); call '
+        '"connect" to actually bring links up.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -357,7 +325,7 @@ final List<AgentToolSpec> kAgentTools = [
         },
         'enabled': {
           'type': 'boolean',
-          'description': 'true = enable this source, false = disable it.',
+          'description': 'true = enable, false = disable.',
         },
       },
       'required': ['source', 'enabled'],
@@ -366,52 +334,45 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'connect',
     description:
-        'Bring up the connection to the APRS-IS server and/or the radio link '
-        '(all currently enabled sources). Requires that the user has accepted '
-        'the data & network usage notice; if not, this returns an error asking '
-        'the user to accept it manually first.',
+        'Connect all enabled sources (APRS-IS and/or radio). Refused until the '
+        'user has accepted the data & network usage notice.',
     mutating: true,
     parameters: {'type': 'object', 'properties': {}},
   ),
   const AgentToolSpec(
     name: 'disconnect',
-    description:
-        'Tear down the current connection and stop automatic reconnects until '
-        'the next explicit connect.',
+    description: 'Disconnect and stop automatic reconnects until the next connect.',
     mutating: true,
     parameters: {'type': 'object', 'properties': {}},
   ),
   const AgentToolSpec(
     name: 'nearby_stations',
     description:
-        'List the stations currently nearest to the user (by distance from '
-        'their position), nearest first. Use this for "who is near me / around '
-        'me" — no need to search by callsign. Read-only, never needs confirmation.',
+        'List the stations currently nearest the user, nearest first (no search '
+        'needed). Read-only.',
     parameters: {
       'type': 'object',
       'properties': {
         'radius_km': {
           'type': 'number',
-          'description': 'Only stations within this many km (default: current filter).',
+          'description': 'Only within this many km (default: current filter).',
         },
-        'limit': {'type': 'integer', 'description': 'How many to return (default 5).'},
+        'limit': {'type': 'integer', 'description': 'How many (default 5).'},
       },
     },
   ),
   const AgentToolSpec(
     name: 'reply_message',
     description:
-        'Reply to the person who sent you the latest message in a conversation. '
-        'This is the natural tool for answering an incoming message — you do not '
-        'need to know the callsign, just pass the sender it came from. Requires '
-        'the "allow sending" permission and the user\'s confirmation.',
+        'Reply to the sender of the latest message in a conversation (no need '
+        'to know the callsign). Needs "allow sending".',
     mutating: true,
     parameters: {
       'type': 'object',
       'properties': {
         'to': {
           'type': 'string',
-          'description': 'Call sign (or group call) the incoming message came from.',
+          'description': 'Call (or group) the incoming message came from.',
         },
         'text': {'type': 'string', 'description': 'The reply text.'},
       },
@@ -421,9 +382,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'send_group_message',
     description:
-        'Send a message to a chat group by its name or group call (see '
-        '"list_groups"). Use "send_message" for a single person. Requires the '
-        '"allow sending" permission and the user\'s confirmation.',
+        'Send a message to a group by its name or group call (see list_groups). '
+        'Needs "allow sending".',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -436,18 +396,16 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'create_group',
-    description:
-        'Create a new chat group with the given members. Requires the '
-        '"allow settings" permission and the user\'s confirmation.',
+    description: 'Create a chat group with the given members. Needs "allow settings".',
     mutating: true,
     parameters: {
       'type': 'object',
       'properties': {
-        'name': {'type': 'string', 'description': 'Display name of the group.'},
+        'name': {'type': 'string', 'description': 'Group display name.'},
         'members': {
           'type': 'array',
           'items': {'type': 'string'},
-          'description': 'Call signs to invite (the owner is added automatically).',
+          'description': 'Call signs to invite (owner is added automatically).',
         },
       },
       'required': ['name'],
@@ -455,9 +413,7 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'set_task_enabled',
-    description:
-        'Pause or resume a scheduled task by its id (see "list_tasks"). '
-        'Pausing keeps it but stops it from running.',
+    description: 'Pause or resume a task by its id (see list_tasks).',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -471,9 +427,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'update_task',
     description:
-        'Edit an existing task in place (see "list_tasks"). Only the provided '
-        'fields change; use this instead of cancel + create. Changing "trigger" '
-        'resets the schedule.',
+        'Edit a task in place (see list_tasks); only given fields change. '
+        'Changing "trigger" resets the schedule.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -483,17 +438,15 @@ final List<AgentToolSpec> kAgentTools = [
         'trigger': {
           'type': 'string',
           'enum': ['timer', 'message'],
-          'description': 'timer = on a schedule; message = on each new message.',
+          'description': 'timer = schedule; message = each new message.',
         },
         'interval_minutes': {
           'type': 'integer',
-          'description': 'timer trigger: 0 = once, otherwise every N min.',
+          'description': 'timer: 0 = once, else every N min.',
         },
         'run_at': {
           'type': 'string',
-          'description':
-              'timer trigger: run once at an absolute time (ISO-8601, e.g. '
-              '2026-10-03T20:00 local). Overrides interval_minutes.',
+          'description': 'timer: run once at this ISO-8601 time (overrides interval).',
         },
       },
       'required': ['id'],
@@ -501,9 +454,7 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'list_task_runs',
-    description:
-        'Recent execution history of scheduled/message tasks: when each ran and '
-        'what happened. Read-only.',
+    description: 'Recent task run history: when each ran and what happened. Read-only.',
     parameters: {
       'type': 'object',
       'properties': {
@@ -514,7 +465,7 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'clear_task_runs',
-    description: 'Clear task execution history (one task, or all when id is omitted).',
+    description: 'Clear task run history (one task, or all if id is omitted).',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -525,16 +476,12 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'list_contacts',
-    description:
-        'List the user\'s contacts / favourite stations (callsigns kept on the '
-        'map even when they go quiet). Read-only.',
+    description: "List the user's followed / favourite stations. Read-only.",
     parameters: {'type': 'object', 'properties': {}},
   ),
   const AgentToolSpec(
     name: 'update_group',
-    description:
-        'Change an existing group: rename it and/or add or remove members. '
-        'A group is found by name or group call.',
+    description: 'Rename a group and/or add or remove its members.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -544,12 +491,12 @@ final List<AgentToolSpec> kAgentTools = [
         'add': {
           'type': 'array',
           'items': {'type': 'string'},
-          'description': 'Callsigns to add as members.',
+          'description': 'Callsigns to add.',
         },
         'remove': {
           'type': 'array',
           'items': {'type': 'string'},
-          'description': 'Callsigns to remove from the member list.',
+          'description': 'Callsigns to remove.',
         },
       },
       'required': ['group'],
@@ -557,8 +504,7 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'join_group',
-    description:
-        'Join a group chat by its group call (or a group already in the list).',
+    description: 'Join a group chat by its group call or name.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -570,7 +516,7 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'leave_group',
-    description: 'Leave a group chat (the group stays in the list, you stop taking part).',
+    description: 'Leave a group chat (it stays listed, you no longer take part).',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -582,8 +528,7 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'dismiss_group',
-    description:
-        'Delete a group chat you own. This removes it from this device.',
+    description: 'Delete a group you own from this device.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -596,8 +541,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'set_favorite',
     description:
-        'Follow or unfollow a station. Followed stations are kept on the map. '
-        'Adding a call that is not heard yet creates a manual contact.',
+        'Follow or unfollow a station (followed stations stay on the map); an '
+        'unheard call creates a manual contact.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -611,8 +556,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'set_station_ignored',
     description:
-        'Block or unblock a station from the map/station list. Packets are '
-        'still received and shown on the packets page; this only hides it.',
+        'Hide a station from the map/list (packets are still received and shown '
+        'on the packets page).',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -626,9 +571,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'set_status_text',
     description:
-        'Set the station status text (the APRS "status" report, separate from '
-        'the position comment). Stored only; it is sent with the next status '
-        'report, not immediately.',
+        'Set the station status text (the APRS status report, separate from the '
+        'position comment). Stored; sent with the next status report.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -641,8 +585,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'broadcast_message',
     description:
-        'Send the same message to several callsigns at once (one APRS message '
-        'per recipient). Radio mode limits each message to 67 characters.',
+        'Send the same message to several callsigns (one APRS message each; '
+        'radio mode limits each to 67 characters).',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -660,15 +604,15 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'get_sensors',
     description:
-        'Read the current on-device sensor values: heart rate, steps today, '
-        'battery, speed, course, and trip/total mileage. Read-only.',
+        'Read on-device sensors: heart rate, steps today, battery, speed, '
+        'course, trip/total mileage. Read-only.',
     parameters: {'type': 'object', 'properties': {}},
   ),
   const AgentToolSpec(
     name: 'get_station_packets',
     description:
-        'Recent raw APRS packets, optionally only those from one callsign. '
-        'Includes the raw frame and the digipeater path. Read-only.',
+        'Recent raw APRS packets (optionally from one callsign), with the '
+        'digipeater path. Read-only.',
     parameters: {
       'type': 'object',
       'properties': {
@@ -680,8 +624,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'get_track',
     description:
-        'The position track of a station (or of yourself with "my call" / '
-        'callsign). Read-only. Use "export_track_gpx" to get it as GPX.',
+        "A station's position track (or \"me\"). Read-only; see "
+        'export_track_gpx for GPX.',
     parameters: {
       'type': 'object',
       'properties': {
@@ -694,8 +638,7 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'export_track_gpx',
     description:
-        'Export a station track as a GPX document (returned as text; nothing '
-        'is written to disk). Read-only.',
+        'Export a station track as GPX text (nothing is written to disk). Read-only.',
     parameters: {
       'type': 'object',
       'properties': {
@@ -707,8 +650,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'distance_between',
     description:
-        'Great-circle distance and initial bearing between two stations (or '
-        'points). Use "me" for the user\'s own position. Read-only.',
+        'Distance and initial bearing between two stations or points ("me" for '
+        'the user). Read-only.',
     parameters: {
       'type': 'object',
       'properties': {
@@ -721,9 +664,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'set_my_position',
     description:
-        'Set the user\'s position manually (simulated position), e.g. for '
-        'testing or when there is no location service. Overrides real GPS until '
-        'cleared. Requires the data notice to be accepted.',
+        'Set a manual (simulated) position, overriding GPS until cleared. Needs '
+        'the data notice accepted.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -737,16 +679,15 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'clear_my_position',
-    description: 'Stop using a manually set position and go back to real GPS.',
+    description: 'Drop the manual position and use real GPS again.',
     mutating: true,
     parameters: {'type': 'object', 'properties': {}},
   ),
   const AgentToolSpec(
     name: 'http_request',
     description:
-        'Make an HTTP request to a URL and return the response body (truncated). '
-        'Use for any API call the user asks for: GET to read, POST/PUT/PATCH/'
-        'DELETE to send data. Requires the "Allow network requests" permission.',
+        'Make an HTTP request and return the (truncated) response body. Needs '
+        '"allow network requests".',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -772,10 +713,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'save_memory',
     description:
-        'Permanently remember a durable fact about the user so it survives '
-        'future conversations (their name, callsign, preferences, routines, '
-        'favourite places). Do NOT store secrets or transient details. Writes to '
-        'local long-term memory.',
+        'Remember a durable fact about the user across conversations (name, '
+        'callsign, preferences, routines, places). No secrets or transient details.',
     parameters: {
       'type': 'object',
       'properties': {
@@ -789,14 +728,14 @@ final List<AgentToolSpec> kAgentTools = [
   ),
   const AgentToolSpec(
     name: 'list_memories',
-    description: 'List the long-term memories currently stored. Read-only.',
+    description: 'List the stored long-term memories. Read-only.',
     parameters: {'type': 'object', 'properties': {}},
   ),
   const AgentToolSpec(
     name: 'forget_memory',
     description:
-        'Delete long-term memories matching an id or a text substring. Use when '
-        'the user asks you to forget something. Read the list first.',
+        'Delete long-term memories matching an id or a text substring. Read the '
+        'list first.',
     parameters: {
       'type': 'object',
       'properties': {
@@ -809,21 +748,15 @@ final List<AgentToolSpec> kAgentTools = [
     },
   ),
 
-  // ─── 策略地图（和队友共享标点 / 划线 / 圈 / 集合点）───
-  //
-  // 这组工具把 `AppState.putStrategy` / `deleteStrategy` / `clearStrategy` 暴露
-  // 给模型：用户说「在那条路上给队友画条线」「把集合点挪到海边」，模型能直接落
-  // 到策略图层并广播给群里。写类工具会真正发出 APRS 帧（射频下占用时隙），所以
-  // 统一按 `strategy_` 前缀纳入 [_isSendingTool]，受「允许发送」闸门与逐次确认约束。
-  //
-  // `group` 一律接受**群呼号或群名**（与 send_group_message 同一套解析），
-  // 群只有一个时可省略。
+  // ─── 策略地图：与队友共享标点 / 划线 / 圈 / 集合点 ───
+  // 写工具会真的广播 APRS 帧（射频下占时隙），故按 `strategy_` 前缀纳入
+  // [_isSendingTool]，受「允许发送」闸门与逐次确认约束。`group` 传群呼号或群名。
   const AgentToolSpec(
     name: 'list_strategy',
     description:
-        'List the shared strategy-map elements (points, lines, circles, rally '
-        'points) of a group, with id, kind, owner, label, coordinates, radius '
-        'and point count. Read-only.',
+        'List a group\'s shared strategy elements (points, lines, circles, rally '
+        'points) with id, kind, owner, label, coordinates, radius, point count. '
+        'Read-only.',
     parameters: {
       'type': 'object',
       'properties': {
@@ -838,8 +771,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'strategy_add_point',
     description:
-        'Add a marker point to a group\'s shared strategy map and broadcast it '
-        'to the group over APRS.',
+        "Add a marker point to a group's shared strategy map and broadcast it to "
+        'the group.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -858,8 +791,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'strategy_add_rally',
     description:
-        'Add a rally (meeting) point to a group\'s shared strategy map and '
-        'broadcast it to the group.',
+        "Add a rally (meeting) point to a group's shared strategy map and "
+        'broadcast it.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -875,8 +808,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'strategy_add_circle',
     description:
-        'Add a circle (radius in metres) to a group\'s shared strategy map and '
-        'broadcast it to the group.',
+        "Add a circle (radius in metres) to a group's shared strategy map and "
+        'broadcast it.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -888,8 +821,7 @@ final List<AgentToolSpec> kAgentTools = [
         'label': {'type': 'string', 'description': 'Optional short name (≤8 characters).'},
         'color': {
           'type': 'integer',
-          'description': 'Palette index 0..5 (0 red, 1 blue, 2 green, 3 '
-              'orange, 4 purple, 5 cyan). Optional.',
+          'description': 'Palette 0..5 (0 red 1 blue 2 green 3 orange 4 purple 5 cyan).',
         },
       },
       'required': ['group', 'lat', 'lng', 'radius_m'],
@@ -898,9 +830,9 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'strategy_add_line',
     description:
-        'Add a polyline (route/boundary) to a group\'s shared strategy map and '
-        'broadcast it. Points may be a string "lat,lng;lat,lng" or a list of '
-        '[lat,lng] pairs; up to about 80 points.',
+        "Add a polyline to a group's shared strategy map and broadcast it. "
+        'Points: a "lat,lng;lat,lng" string, or a list of [lat,lng] pairs '
+        '(up to about 80 points).',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -914,7 +846,7 @@ final List<AgentToolSpec> kAgentTools = [
         'label': {'type': 'string', 'description': 'Optional short name (≤8 characters).'},
         'color': {
           'type': 'integer',
-          'description': 'Palette index 0..5. Optional.',
+          'description': 'Palette index 0..5.',
         },
       },
       'required': ['group', 'points'],
@@ -923,18 +855,17 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'strategy_update',
     description:
-        'Edit an existing strategy element (identified by "id") in a group and '
-        'broadcast the change. Only the given fields change. Call list_strategy '
-        'first to get the id. Sends an APRS frame.',
+        'Edit a strategy element (by "id") and broadcast the change; only given '
+        'fields change. Get the id from list_strategy first.',
     mutating: true,
     parameters: {
       'type': 'object',
       'properties': {
         'group': {'type': 'string', 'description': 'Group call or name.'},
         'id': {'type': 'string', 'description': 'Element id from list_strategy.'},
-        'lat': {'type': 'number', 'description': 'New latitude (optional).'},
-        'lng': {'type': 'number', 'description': 'New longitude (optional).'},
-        'radius_m': {'type': 'number', 'description': 'New radius in metres (circle only).'},
+        'lat': {'type': 'number', 'description': 'New latitude.'},
+        'lng': {'type': 'number', 'description': 'New longitude.'},
+        'radius_m': {'type': 'number', 'description': 'New radius in metres (circle).'},
         'label': {'type': 'string', 'description': 'New short name (≤8 characters).'},
         'color': {'type': 'integer', 'description': 'New palette index 0..5.'},
         'points': {
@@ -947,8 +878,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'strategy_delete',
     description:
-        'Remove a strategy element (by id) from a group\'s shared map and '
-        'broadcast the deletion. Use list_strategy to get the id.',
+        "Remove a strategy element (by id) from a group's shared map and "
+        'broadcast the deletion. Get the id from list_strategy.',
     mutating: true,
     parameters: {
       'type': 'object',
@@ -962,7 +893,7 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'strategy_clear',
     description:
-        'Delete every strategy element of a group (both mine and received) and '
+        "Delete every strategy element of a group (mine and received) and "
         'broadcast a clear. Use with care.',
     mutating: true,
     parameters: {
@@ -977,7 +908,7 @@ final List<AgentToolSpec> kAgentTools = [
     name: 'strategy_request_snapshot',
     description:
         'Ask every member of a group to re-send their strategy elements, to '
-        'rebuild the shared layer (e.g. after joining). Sends an APRS frame.',
+        'rebuild the shared layer (e.g. after joining).',
     mutating: true,
     parameters: {
       'type': 'object',

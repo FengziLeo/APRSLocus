@@ -251,6 +251,44 @@ CL = [
                'ellipsis; URLs inside a comment (`https://…` / `www.…`) become '
                '**tappable links**, consistently in the station list, the station '
                'detail page and the map info window.')),
+            ('up',
+             T('**智能体更快**：默认系统提示从 5.3KB 瘦到 2KB —— 它原本把 57 个'
+               '工具的用法逐条复述了一遍，而每个工具的说明本来就随请求一起发。'
+               '工具描述也一并精简（名字 / 参数 / 取值都不变）。系统提示 + 工具'
+               'schema 每轮都要重发，两份合计小了约四分之一，回复更快。',
+               '**智慧代理更快**：預設系統提示從 5.3KB 瘦到 2KB —— 它原本把 57 個'
+               '工具的用法逐條複述了一遍，而每個工具的說明本來就隨請求一起發。'
+               '工具描述也一併精簡（名字 / 參數 / 取值都不變）。系統提示 + 工具'
+               'schema 每輪都要重發，兩份合計小了約四分之一，回覆更快。',
+               '**A faster agent**: the default system prompt shrank from 5.3KB to '
+               '2KB — it used to restate all 57 tools one by one, even though each '
+               'tool is already described in the schemas sent with every request; the '
+               'tool descriptions were trimmed too (names / parameters / values '
+               'unchanged). Prompt plus tool schemas are re-sent on every request, '
+               'and together they are now about a quarter smaller, so replies come '
+               'faster.')),
+            ('up',
+             T('**台站状态报文更省、不再闪**：APRS-IS 保活以前每 15 秒先发一帧 '
+               '`>APRSlocus CONNECT …`、再发一帧你的自定义状态，白占一帧还让 '
+               'aprs.fi 上的状态在两者间反复闪。现在**只发一帧、谁有内容发谁**：'
+               '填了自定义发自定义，没填才发内置默认帧；CONNECT 身份帧只在连上的'
+               '一瞬间发一次。自定义帧万一写失败仍会自动补发，状态不会被 CONNECT '
+               '顶掉。',
+               '**台站狀態報文更省、不再閃**：APRS-IS 保活以前每 15 秒先發一幀 '
+               '`>APRSlocus CONNECT …`、再發一幀你的自訂狀態，白佔一幀還讓 '
+               'aprs.fi 上的狀態在兩者間反覆閃。現在**只發一幀、誰有內容發誰**：'
+               '填了自訂發自訂，沒填才發內建預設幀；CONNECT 身分幀只在連上的'
+               '一瞬間發一次。自訂幀萬一寫失敗仍會自動補發，狀態不會被 CONNECT '
+               '頂掉。',
+               '**Leaner, no-flicker status reports**: the APRS-IS keep-alive used to '
+               'send an `>APRSlocus CONNECT …` frame every 15 seconds and then a '
+               'second frame with your custom status — a wasted frame that also made '
+               'the status on aprs.fi flip between the two. Now **a single frame is '
+               'sent, whichever has content**: custom text if set, otherwise the '
+               'built-in default; the CONNECT identity frame goes out once, at the '
+               'moment of connecting. A custom frame that fails to write is still '
+               'retried automatically, so your status is never overwritten by '
+               'CONNECT.')),
         ],
     },
     {

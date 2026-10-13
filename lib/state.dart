@@ -4595,23 +4595,23 @@ class AppState extends ChangeNotifier {
           return; // 仍然发不出去：下个 tick（15s 后）再试
         }
       }
-      // 保活：发送身份/在线状态帧。tocall=APALOC（本应用官方注册标识），
-      // body=APRSLocus CONNECT（区分于位置信标；不再用非标 “保持连接”）
-      final raw =
-          '$myFullCall>APALOC,TCPIP*:>APRSlocus CONNECT v$appVersion $platformTag';
-      aprs.send(raw);
-      // 用户填了自定义状态文本时，紧跟着**补发一帧**自定义状态报文：
-      // 保活帧会把 aprs.fi 上「台站状态」那一栏改写成内置的 CONNECT 文本，
-      // 不补一帧的话，用户自己的状态每 15 秒就被顶掉一次（看起来就是
-      // 「状态根本设不住」）。
+      // 保活：**只发一帧**状态报文 —— 谁有内容发谁：
+      //   * 填了自定义状态文本 → 发自定义帧；
+      //   * 没填 → 发内置默认帧（`>APRSlocus CONNECT vX.Y.Z 平台`）。
+      // CONNECT 身份帧只在上线那一下发一次（见 [_connectAprsIs]）。以前每 15s
+      // 都先发一帧 CONNECT、再由自定义帧把它顶回来，既白占一帧，又让 aprs.fi 上
+      // 的「台站状态」在 CONNECT 与自定义之间反复闪（用户看到的现象）。
       //
       // 这里**不走 [sendStatus]**：那条路会改连接状态、写日志、_notify()，
       // 于是界面每 15 秒弹一次「状态已发送」—— 保活是后台行为，不该打扰用户。
       final frame = _customStatusFrame();
       if (frame != null) {
-        // 写失败（socket 抖动/半开）就记下来：这帧没进链路，aprs.fi 会停在
-        // CONNECT 上。下个 tick 由上面的自愈分支重发，直到成功。
+        // 写失败（socket 抖动/半开）就记下来：这帧没进链路。下个 tick 由上面的
+        // 自愈分支重发，直到成功。
         _customStatusLost = !aprs.send(frame);
+      } else {
+        // 没填自定义文本：发内置默认帧保活（与上线那帧同文，见 [_defaultStatusFrame]）。
+        aprs.send(_defaultStatusFrame());
       }
       _lastTx = DateTime.now();
       _updateNotification(); // 定期刷新通知内容（台站数/收包数）
@@ -5322,12 +5322,13 @@ class AppState extends ChangeNotifier {
       setConnStatus(ConnPhase.online, arg: myCall);
       _log(LogLevel.info, '连接', '已连接 · $myCall 在线 (过滤: $filterString)');
       _flushPendingTx();
-      // 连接成功即发一次身份状态帧（APRS 惯例：上报在线/客户端标识）
-      aprs.send('$myFullCall>APALOC,TCPIP*:>APRSLocus CONNECT v$appVersion $platformTag');
+      // 连接成功即发一次身份状态帧（APRS 惯例：上报在线/客户端标识）。
+      aprs.send(_defaultStatusFrame());
+      // 这是 CONNECT 帧唯一的自动发送点：保活帧只在没填自定义文本时才用它兜底。
       // 紧接着补一帧自定义状态（issue #31）：上面那帧会把 aprs.fi 上「台站状态」
-      // 改写成 CONNECT 文本，与 15 秒保活帧是同一个问题 —— 不补就等于「一连上
-      // 服务器，用户自己设的状态立刻被内置文本顶掉」。保活路径的同一处理见
-      // [_keepaliveTimer]，两处共用 [_customStatusFrame]。
+      // 改写成 CONNECT 文本，不补就等于「一连上服务器，用户自己设的状态立刻被
+      // 内置文本顶掉」。保活路径现在直接发自定义帧、不再先发 CONNECT，
+      // 所以只有这条「上线」路径还需要补一帧（见 [_keepaliveTimer]）。
       // 这一帧若写失败（socket 刚建好就抖动），aprs.fi 会停在 CONNECT 上；记下
       // 失败标记，交给 [_keepaliveTimer] 的自愈分支补发（射频模式没有保活，
       // 但射频也不发 CONNECT 帧，不存在这个覆盖问题）。
@@ -5629,7 +5630,7 @@ class AppState extends ChangeNotifier {
   String sendStatus() {
     var text = aprsStatusText.trim();
     if (text.isEmpty) {
-      text = 'APRSlocus CONNECT v$appVersion $platformTag';
+      text = _defaultStatusText;
     }
     if (text.length > statusMaxLen) {
       text = text.substring(0, statusMaxLen);
@@ -5662,13 +5663,28 @@ class AppState extends ChangeNotifier {
     return raw;
   }
 
+  /// 内置默认状态**文本**（不含报文头）：`APRSlocus CONNECT vX.Y.Z 平台`。
+  ///
+  /// [sendStatus] 文本留空、以及没填自定义文本时的保活帧都用它。版本号会随它
+  /// 发到空中（见仓库 AGENT.md「版本号会发射」一节）。
+  static String get _defaultStatusText =>
+      'APRSlocus CONNECT v$appVersion $platformTag';
+
+  /// APRS-IS 上的内置默认**状态帧**（头 + [_defaultStatusText]）。
+  ///
+  /// 两个用途：连接成功时上报在线的那**一帧**（见 [_connectAprsIs]），以及**没填
+  /// 自定义状态文本时的保活帧**（见 [_keepaliveTimer]，仅 APRS-IS）。射频不发
+  /// CONNECT 帧（见 [_connectTnc]）。
+  String _defaultStatusFrame() =>
+      '$myFullCall>APALOC,TCPIP*:>$_defaultStatusText';
+
   /// 当前自定义状态文本对应的状态帧原文（DTI `>`）；未填自定义文本时返回 null。
   ///
-  /// 抽出来给两处「会被内置身份帧顶掉」的发送点复用（issue #31）：连接成功时的
-  /// 身份帧、以及每 15 秒的保活帧。两者都把 aprs.fi 上「台站状态」那一栏改写成
-  /// 内置的 CONNECT 文本，必须紧随其后补一帧自定义状态，否则用户设的状态每 15
-  /// 秒（或每次重连）就被顶掉一次，看起来就是「状态根本设不住」。
-  /// 保活那条路径见 [_keepaliveTimer]；这里只组帧，不碰连接状态、不写日志、不 _notify()。
+  /// 唯一用途：连接成功时，紧跟在上线上报帧之后**补一帧**（issue #31）。那帧会把
+  /// aprs.fi 上「台站状态」那一栏改写成内置的 CONNECT 文本，不补就等于「一连上
+  /// 服务器，用户自己设的状态立刻被内置文本顶掉」。保活帧现在直接发自定义帧
+  /// （不再先发 CONNECT，见 [_keepaliveTimer]），所以只有「上线」这条路要补。
+  /// 只组帧，不碰连接状态、不写日志、不 _notify()。
   String? _customStatusFrame() {
     final custom = aprsStatusText.trim();
     if (custom.isEmpty) return null;

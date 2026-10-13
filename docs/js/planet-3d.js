@@ -155,22 +155,20 @@
   var FOV = 33 * Math.PI / 180;
   var U_PROJ = 1 / Math.tan(FOV / 2);
   var RING_OUT = 1.78;                // 最外圈环半径（决定取景）
-  var ORBIT = 2.05;                   // 卫星轨道半径
   var CLOUD = 13000;
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
 
   /* 定点随机与噪声函数挪到文件开头（第 2 节）：底纹与星球各用一条随机流。 */
 
-  /* ── 配色：照参考实现的海王星调子 —— 整颗星只有一族蓝（深靛 → 亮天蓝），
-        明暗差全交给噪声带；另外两类单独点出来：台站点用琥珀 / 橙（会闪），
-        环带用偏白的蓝。彩色但不花，因为色相只留一支。 ── */
+  /* ── 配色：整颗星只有一族蓝（深靛 → 亮天蓝），明暗差全交给噪声带。
+        台站点与卫星**不换色相**：由 uStn 按主题给「同族里更亮的一档」——
+        深色主题下几乎是白（加色混合，白就是最亮），浅色主题下是更深的靛
+        （浅底上深一档才看得见）。整屏没有第二种颜色，也就不存在"花"。 ── */
   var PAL = {
     deep:   [0.055, 0.086, 0.290],   // 深靛
     mid:    [0.145, 0.290, 0.760],   // 中蓝
     bright: [0.420, 0.620, 1.000],   // 亮天蓝
-    storm:  [0.030, 0.045, 0.150],   // 风暴带 / 无站区
-    amber:  [0.843, 0.671, 0.380],   // 台站（黄）
-    orange: [0.878, 0.384, 0.212]    // 台站（橙）
+    storm:  [0.030, 0.045, 0.150]    // 风暴带 / 无站区
   };
   function mix3(a, b, t, out) {
     out[0] = a[0] + (b[0] - a[0]) * t;
@@ -179,8 +177,22 @@
     return out;
   }
 
-  var ORBIT_SPIN = 0.18;              // 卫星角速度（rad/s），轨道那圈点同速
   var RING_IN = 1.30;                 // 最内圈环半径：开普勒比例以它为准
+
+  /* ── 卫星：几颗小亮点各自绕在倾斜的轨道上**快速划过**。每颗后面拖一小串
+        逐渐变暗的点（不是发光线，还是点），看上去就是"嗖"地过去的那一下。
+        半径 / 倾角 / 相位 / 快慢 / 方向全部错开 —— 一组卫星，不是一串糖葫芦。
+        位置每帧由 JS 按绝对时间算（见 buildSats），所以 aSpin 给 0：它们不跟
+        球体自转走，各自在自己的轨道上跑。 ── */
+  var SATS = [
+    { r: 1.96, tilt: 0.40, ph: 0.00, w: 0.66, sz: 0.0130, tail: 11 },
+    { r: 2.16, tilt: -0.26, ph: 2.10, w: -0.80, sz: 0.0112, tail: 9 },
+    { r: 2.34, tilt: 0.94, ph: 4.00, w: 0.50, sz: 0.0142, tail: 13 },
+    { r: 2.04, tilt: -0.72, ph: 5.35, w: -1.02, sz: 0.0098, tail: 7 }
+  ];
+  var SAT_STEP = 0.038;               // 尾迹相邻两点的角距（rad）
+  var SAT_PTS = 0, si;
+  for (si = 0; si < SATS.length; si++) SAT_PTS += 1 + SATS[si].tail;
 
   /* ── 几何：交错 10 float/点 = pos(3) + col(3) + meta(尺寸, 呼吸频率, 呼吸幅度) + spin
         meta.z > 0 的点会自己呼吸（大小与亮度一起抖）；spin 是自己的角速度，
@@ -202,22 +214,24 @@
       if (fine < 0.32) mix3(col, PAL.storm, (0.32 - fine) * 1.2, col);     // 暗斑
       g = 0.72 + 0.56 * fine;                                              // 逐点亮度抖动
       arr.push(x * r, y * r, z * r, col[0] * g, col[1] * g, col[2] * g,
-        0.0075 + rnd() * 0.0045,              // 尺寸：相对星球屏幕半径
+        0.0105 + rnd() * 0.0062,              // 尺寸：相对星球屏幕半径
         0.35 + rnd() * 1.60,                  // 呼吸频率
         0.06 + 0.22 * fine,                   // 呼吸幅度（本体很轻）
         0);
     }
 
-    // 台站点：琥珀 / 橙，呼吸最明显 —— 会闪的那几粒就是台站在上报
+    // 台站点：同族蓝里最亮的一档，呼吸最明显 —— 会闪的那几粒就是台站在上报
     for (i = 0; i < 90; i++) {
       u = rnd() * 2 - 1;
       th = rnd() * Math.PI * 2;
       s = Math.sqrt(1 - u * u);
       x = s * Math.cos(th); y = u; z = s * Math.sin(th);
-      c = rnd() < 0.35 ? PAL.orange : PAL.amber;
-      g = 0.72 + rnd() * 0.5;
+      // 不再上色：台站点就是同族蓝里最亮的一档，靠亮度点出来。
+      // （抽样次数故意与上一版一致，星球几何因此逐点不变。）
+      c = PAL.bright;
+      g = 0.62 + rnd() * 0.70;
       arr.push(x, y, z, c[0] * g, c[1] * g, c[2] * g,
-        0.0100 + rnd() * 0.0075,
+        0.0140 + rnd() * 0.0105,
         0.9 + rnd() * 2.4,
         0.80 + rnd() * 0.20,
         0);
@@ -240,22 +254,13 @@
         g = (0.55 + rnd() * 0.6) * fade * bright;
         arr.push(ex * r, (rnd() - 0.5) * 0.01, ez * r,
           c[0] * g, c[1] * g, c[2] * g,
-          0.0042 + rnd() * 0.0026,
+          0.0058 + rnd() * 0.0036,
           0.6 + rnd() * 1.5,
           0.20 + 0.25 * fade,
           rate);
       }
     }
 
-    // 卫星轨道：一圈细点，与下面那颗跑动的卫星同角速度
-    var ON = 300;
-    for (i = 0; i < ON; i++) {
-      ang = (i / ON) * Math.PI * 2;
-      g = 0.30 + (i % 5) * 0.03;
-      arr.push(Math.cos(ang) * ORBIT, 0, Math.sin(ang) * ORBIT,
-        PAL.bright[0] * g, PAL.bright[1] * g, PAL.bright[2] * g,
-        0.0036, 0.5 + (i % 7) * 0.10, 0.20, ORBIT_SPIN);
-    }
     return { data: new Float32Array(arr), count: arr.length / 10 };
   }
 
@@ -296,7 +301,7 @@
     "uniform float uPxScale; uniform float uMaxSize; uniform float uMinPx;",
     "uniform float uTime; uniform float uBurst; uniform float uSeed;",
     "uniform float uGather;",                          // 入场进度 0 → 1
-    "uniform vec2 uCenter; uniform vec3 uTint;",
+    "uniform vec2 uCenter; uniform vec3 uTint; uniform vec3 uStn;",
     "varying vec3 vCol;",
     "varying float vFade;",
     "void main() {",
@@ -326,7 +331,9 @@
     "  float flare = uBurst * step(0.95, pick);",
     "  k *= 1.0 + 1.6 * flare;",
     "  gl_PointSize = clamp(aMeta.x * uPxScale / max(d, 0.35) * k * (0.30 + 0.70 * gp), uMinPx, uMaxSize);",
-    "  vCol = aCol * uTint * k;",
+    "  float isStn = step(0.5, aMeta.z);",              // 台站 / 卫星：比本体亮一大截的那一类
+    "  vec3 base = mix(aCol, uStn * (0.72 + 0.62 * aCol.b), isStn);",
+    "  vCol = base * uTint * k;",
     "  vFade = ((0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6) * (0.10 + 0.90 * gp);",
     "}"
   ].join("\n");
@@ -434,8 +441,8 @@
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
   gl.bufferData(gl.ARRAY_BUFFER, cloud.data, gl.STATIC_DRAW);
 
-  var marker = new Float32Array(10);
-  var mBuf = gl.createBuffer();
+  var satArr = new Float32Array(SAT_PTS * 10);
+  var satBuf = gl.createBuffer();
 
   var A = {
     pos: gl.getAttribLocation(prog, "aPos"),
@@ -445,7 +452,7 @@
   };
   var U = {};
   ["uCosY", "uSinY", "uCosP", "uSinP", "uSpinT", "uDist", "uProj", "uAspect", "uPxScale",
-    "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uAlpha", "uBurst", "uSeed", "uGather"
+    "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uStn", "uAlpha", "uBurst", "uSeed", "uGather"
   ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
 
   function bindPointers() {
@@ -470,8 +477,16 @@
      浅底用正常混合（蓝墨点压在浅底上），深底用加色混合（同样的点变霓虹辉光）。
      线框在浅底上要更实一点才看得见，颜色也往靛蓝收一档。 */
   var MODES = {
-    light: { add: false, tint: [1.00, 1.00, 1.00], alpha: 1.00, wire: 0.42, wireCol: [0.15, 0.33, 0.68] },
-    dark: { add: true, tint: [1.08, 1.12, 1.26], alpha: 0.88, wire: 0.55, wireCol: [0.42, 0.62, 1.00] }
+    light: {
+      add: false, tint: [1.00, 1.00, 1.00], alpha: 1.00,
+      wire: 0.42, wireCol: [0.05, 0.36, 0.60],          // 站点本来就有的那支靛蓝
+      stn: [0.075, 0.165, 0.520]                        // 台站 / 卫星：同族里更深一档
+    },
+    dark: {
+      add: true, tint: [1.08, 1.12, 1.26], alpha: 0.88,
+      wire: 0.55, wireCol: [0.42, 0.62, 1.00],
+      stn: [0.930, 0.980, 1.000]                        // 加色混合下就是"最亮"
+    }
   };
   var dark = false;
   function syncMode() {
@@ -534,6 +549,7 @@
     gl.useProgram(prog);
     gl.blendFunc(gl.SRC_ALPHA, m.add ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
     gl.uniform3f(U.uTint, m.tint[0], m.tint[1], m.tint[2]);
+    gl.uniform3f(U.uStn, m.stn[0], m.stn[1], m.stn[2]);
     gl.uniform1f(U.uAlpha, m.alpha);
     gl.uniform2f(U.uCenter, f.cx * 2 - 1, 1 - f.cy * 2);
     gl.uniform1f(U.uCosY, Math.cos(yaw));
@@ -545,8 +561,8 @@
     gl.uniform1f(U.uProj, U_PROJ);
     gl.uniform1f(U.uAspect, w / h);
     gl.uniform1f(U.uPxScale, (h / 2) * U_PROJ);
-    gl.uniform1f(U.uMaxSize, Math.max(10, 11 * DPR));
-    gl.uniform1f(U.uMinPx, Math.max(1, 1.6 * DPR));
+    gl.uniform1f(U.uMaxSize, Math.max(14, 15 * DPR));
+    gl.uniform1f(U.uMinPx, Math.max(1, 2.0 * DPR));
     gl.uniform1f(U.uTime, reduce ? 0 : now);
     gl.uniform1f(U.uBurst, burst);
     gl.uniform1f(U.uSeed, burstSeed);
@@ -576,14 +592,39 @@
     bindPointers();
     gl.drawArrays(gl.POINTS, 0, cloud.count);
 
-    // 卫星：本体待在轨道角 0 处，靠 aSpin 自己沿轨道跑（与轨道那圈点同角速度）
-    marker[0] = ORBIT; marker[1] = 0; marker[2] = 0;
-    marker[3] = 1.00; marker[4] = 0.72; marker[5] = 0.30;
-    marker[6] = 0.016; marker[7] = 1.4; marker[8] = 0.85; marker[9] = ORBIT_SPIN;
-    gl.bindBuffer(gl.ARRAY_BUFFER, mBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, marker, gl.DYNAMIC_DRAW);
+    // 卫星：几颗小亮点带着尾迹，各在自己的倾斜轨道上快速划过
+    if (!reduce) buildSats(now);
+    gl.bindBuffer(gl.ARRAY_BUFFER, satBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, satArr, gl.DYNAMIC_DRAW);
     bindPointers();
-    gl.drawArrays(gl.POINTS, 0, 1);
+    gl.drawArrays(gl.POINTS, 0, SAT_PTS);
+  }
+
+  /* 把每颗卫星（含尾迹）的位置算进 satArr：head 在最前，后面一串点按角距往回
+     排、越往后越暗越小。角距 = SAT_STEP，尾点排在**运动方向的反面**，所以谁
+     快谁尾巴长都对得上。位置每帧重算，不需要 aSpin（顶点着色器里给 0）。 */
+  function buildSats(t) {
+    var o = 0, k, j, s2, ct, st, base, dir, a, x, y, z, f, g, sz;
+    for (k = 0; k < SATS.length; k++) {
+      s2 = SATS[k];
+      base = s2.ph + s2.w * t;
+      dir = s2.w >= 0 ? 1 : -1;
+      ct = Math.cos(s2.tilt); st = Math.sin(s2.tilt);
+      for (j = 0; j <= s2.tail; j++) {
+        a = base - dir * j * SAT_STEP;
+        x = Math.cos(a) * s2.r; z = Math.sin(a) * s2.r;
+        y = -z * st; z = z * ct;                 // 轨道面绕 X 轴倾斜 tilt
+        f = j === 0 ? 1 : 1 - j / (s2.tail + 1);
+        g = j === 0 ? 1 : 0.16 + 0.84 * f * f;   // 头最亮，尾点快速衰减
+        sz = s2.sz * (j === 0 ? 1 : 0.34 + 0.66 * f);
+        satArr[o++] = x; satArr[o++] = y; satArr[o++] = z;
+        satArr[o++] = g; satArr[o++] = g; satArr[o++] = g;   // 亮度：色相由 uStn 按主题给
+        satArr[o++] = sz;
+        satArr[o++] = 0.35 + 0.20 * k;           // 呼吸频率：卫星也轻轻喘，很慢
+        satArr[o++] = 0.55;                      // 幅度 > 0.5 → 着色器当成"台站 / 卫星"那一类
+        satArr[o++] = 0;                         // aSpin = 0：位置自己算
+      }
+    }
   }
 
   function loop(now) {
@@ -701,7 +742,7 @@
   function applyScroll() {
     scrollQueued = false;
     if (reduce) return;
-    var h = hero.offsetHeight || 1;
+    var h = window.innerHeight || hero.offsetHeight || 1;   // 以"一屏"为准
     var y = window.pageYOffset || document.documentElement.scrollTop || 0;
     var p = Math.max(0, Math.min(1, y / (h * 0.8)));
     if (p === scrollP) return;

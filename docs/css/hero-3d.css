@@ -13,8 +13,10 @@
 
 /* ── 星球层 ── */
 .planet-canvas {
-  position: absolute; inset: 0; z-index: 1;
-  width: 100%; height: 100%; display: block;
+  /* 只铺满**第一屏**：hero 现在比一屏高（下载那块在下面等着滚出来），画布要是
+     跟着 hero 一起长，取景半径 h 会跟着变大，星球就被动地变大、变低。 */
+  position: absolute; top: 0; left: 0; z-index: 1;
+  width: 100%; height: 100vh; display: block;
   cursor: grab;
   touch-action: pan-y;            /* 手机上竖向滑动照样能滚页面，横向拖动才转星球 */
   outline: none;
@@ -29,12 +31,18 @@
   will-change: transform, opacity;
 }
 .hero.grabbing .planet-canvas { cursor: grabbing; }
-.planet-canvas:focus-visible { outline: 2px solid rgba(56, 189, 248, .6); outline-offset: -6px; }
+.planet-canvas:focus-visible { outline: 2px solid rgba(3, 105, 161, .6); outline-offset: -6px; }
 /* 文案在最上层。hero-inner 自己不拦指针事件，好让右半边的拖动落到画布上，
    只有文案栏恢复接收（链接、选中文字照常）。 */
 .hero-inner { grid-template-columns: minmax(0, 1fr); pointer-events: none; }
 .hero-copy {
   pointer-events: auto; position: relative; max-width: 620px;
+  /* 第一拍（说明 + 数字）自己占满第一屏：hero 的上下内边距是 140/80，所以
+     减 90 之后盒子正好压在折线上，下载那块就稳稳落在折线之下 —— 不然在
+     高一点的屏幕上它会跟着首屏一起出现，"往下滑才弹出"就没了。
+     保守一句：文字这一块仍是正常块流，只是盒子变高，孩子不多挪一格。 */
+  min-height: calc(100vh - 90px);
+  padding-top: clamp(0px, 4vh, 44px);
   /* 往下拉：文案比星球走得快一点、先淡掉，hero 交给下一屏 */
   transform: translate3d(0, var(--hero-3d-copy, 0px), 0);
   opacity: var(--hero-3d-copy-fade, 1);
@@ -45,7 +53,8 @@
 :root[data-theme="dark"] .hero { --hero-veil: rgba(9, 14, 26, .84); }
 .hero-copy::before {
   content: ""; position: absolute; z-index: -1; pointer-events: none;
-  inset: -8% -18% -8% -12%;
+  /* 盒子现在有一屏高，晕只跟着"字"走：高度收在文字那一段，别糊满整屏 */
+  inset: -4% -16% auto -10%; height: 70%;
   background: radial-gradient(50% 50% at 36% 50%, var(--hero-veil), transparent 76%);
 }
 
@@ -57,11 +66,7 @@
   color: var(--text-dim); letter-spacing: .01em;
 }
 .hero-invite .hi-mark { color: var(--cyan); margin-right: 8px; }
-.hero-invite em {
-  font-style: normal; font-weight: 700;
-  background: linear-gradient(100deg, #0284c7, #0891b2 52%, #7c3aed);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
+.hero-invite em { font-style: normal; font-weight: 700; color: var(--text); }
 
 /* ── 一行读数：没有卡片、没有进度条，只有会跳的数字。
       数字是这一屏的主角，所以它比周围大一整档，单位退到它下面当注释。 ── */
@@ -79,58 +84,64 @@
 .hs-live {
   display: inline-flex; align-items: center; gap: 7px;
   font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  letter-spacing: .16em; color: #0ea5e9;
+  letter-spacing: .16em; color: var(--cyan);
 }
 .hs-live i {
-  width: 7px; height: 7px; border-radius: 50%; background: var(--green, #22c55e);
+  width: 7px; height: 7px; border-radius: 50%; background: var(--cyan);
   position: relative;
 }
 .hs-live i::after {
   content: ""; position: absolute; inset: -4px; border-radius: 50%;
-  border: 1.5px solid rgba(34, 197, 94, .8); animation: pulse 1.8s ease-out infinite;
+  border: 1.5px solid rgba(3, 105, 161, .75); animation: pulse 1.8s ease-out infinite;
 }
 .hero-stat .tl-value {
   display: inline-block;
   font: 800 clamp(30px, 3.4vw, 46px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   letter-spacing: -.02em; font-variant-numeric: tabular-nums;
-  /* background-size 拉到 240%、位置停在正中：平时就是青 → 靛那一截，
-     跳的时候让它整幅走一圈（见下面的 tlBump）。 */
-  background: linear-gradient(100deg, #0284c7, #06b6d4 34%, #6366f1 66%, #a855f7);
-  background-size: 240% 100%; background-position: 50% 50%;
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  filter: drop-shadow(0 8px 20px rgba(2, 132, 199, .16));
+  /* 不上渐变、不上彩：就是正文墨色。跳动靠"抬起 + 换成站点那一支青再退回来"，
+     整条读数里只有这一处强调色，也就不会跟旁边的玻璃、按钮抢色。 */
+  color: var(--text);
+  filter: drop-shadow(0 10px 24px rgba(15, 23, 42, .14));
 }
 /* 每跳一格：数字轻轻上浮一下、辉光一闪、渐变扫过一整轮 —— 看上去是「亮了一下」，
    而不是「换了一张图」。 */
 .tl-value.bump { animation: tlBump .62s var(--ease); }
 @keyframes tlBump {
-  /* 起手与收尾都停在静止态，中间走一圈：跳完不留色差，所以看不出"跳"的那一下
-     是从哪一帧接上的 —— 只记得它亮过。 */
+  /* 起手与收尾都停在静止态：跳完不留色差，看不出是从哪一帧接上的 —— 只记得它亮过 */
   0% {
     transform: translateY(-3px) scale(1.035);
-    background-position: 50% 50%;
-    filter: drop-shadow(0 0 18px rgba(34, 211, 238, .8));
+    color: var(--cyan);
+    filter: drop-shadow(0 0 16px rgba(3, 105, 161, .38));
   }
-  35% { background-position: 0% 50%; }
-  70% { background-position: 100% 50%; }
   55% { transform: translateY(0) scale(1); }
   100% {
     transform: none;
-    background-position: 50% 50%;
-    filter: drop-shadow(0 8px 20px rgba(2, 132, 199, .16));
+    color: var(--text);
+    filter: drop-shadow(0 10px 24px rgba(15, 23, 42, .14));
   }
 }
 
 /* 快照过期（> 12h）：停止外推，LIVE 点转琥珀并停掉呼吸 */
-.hero-stat.stale .hs-live { color: rgba(148, 163, 184, .95); }
-.hero-stat.stale .hs-live i { background: #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, .75); }
+.hero-stat.stale .hs-live { color: var(--text-faint); }
+.hero-stat.stale .hs-live i { background: var(--text-faint); box-shadow: none; }
 .hero-stat.stale .hs-live i::after { display: none; }
+
+/* ── 往下滑才出现的那一块：真正要动手的东西（版本卡 + 下载按钮 + 来源）。
+      hero 上面只负责说清"这是什么、这个数字是什么"；动手的部分等在下面，
+      滚到位才淡上来。.reveal 是站点本来就有的机制（风格与其它 section 一致），
+      这里只把它从 hero 的依次登场里摘出来 —— 否则遮罩一走开它就自己演完了，
+      也就不用"往下滑"了。 ── */
+.hero-copy > .hero-cta { animation: none; margin-top: clamp(40px, 9vh, 96px); }
+
+/* hero 背景那层网（main.js 画的）压一档：这一屏的主角是星球，不是噪点 */
+.hero-canvas { opacity: .5; }
 
 /* ── 没有 WebGL：退回纯 CSS 星球，位置与脚本里的取景对齐（偏右 / 窄屏居中） ── */
 .planet-fallback { display: none; }
 .hero.no-3d .planet-canvas { display: none; }
 .hero.no-3d .planet-fallback {
-  display: block; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  display: block; position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none;
+  width: 100%; height: 100vh;
   /* 跟画布同一套变量：降级成纯 CSS 星球时，往下拉也一样退开 */
   transform: translate3d(0, var(--hero-3d-y, 0px), 0) scale(var(--hero-3d-scale, 1));
   opacity: var(--hero-3d-fade, 1);
@@ -139,22 +150,22 @@
   position: absolute; left: 71.5%; top: 47.5%; width: 65vh; aspect-ratio: 1;
   transform: translate(-50%, -50%); border-radius: 50%;
   background:
-    radial-gradient(circle at 36% 32%, #6ee7d7 0%, #22d3ee 26%, #3b82f6 48%, #7c3aed 72%, #1e1b4b 100%);
-  box-shadow: 0 0 140px rgba(56, 189, 248, .35);
+    radial-gradient(circle at 36% 32%, #dbeafe 0%, #93c5fd 22%, #3b82f6 54%, #1d4ed8 82%, #0f172a 100%);
+  box-shadow: 0 0 140px rgba(37, 99, 235, .26);
   opacity: .92;
 }
 .planet-fallback .pf-ring {
   position: absolute; left: 71.5%; top: 47.5%; width: 116vh; height: 40vh;
   transform: translate(-50%, -50%) rotate(-13deg); border-radius: 50%;
-  border: 2px solid rgba(56, 189, 248, .5);
-  box-shadow: 0 0 40px rgba(124, 58, 237, .3);
+  border: 2px solid rgba(37, 99, 235, .45);
+  box-shadow: 0 0 40px rgba(37, 99, 235, .22);
 }
 
 /* ── 底部的「往下拉」提示：一根渐隐的细线 + 一颗往下走的点。没有圆环、没有
       箭头图标、没有盒子 —— 它就是一条线，接住「继续往下看」这个动作；
       真的往下拉之后，星球与文案的退场动画接上，提示自己也就随 hero 走掉了。 ── */
 .hero-scroll {
-  display: block; position: absolute; left: 50%; bottom: 24px; z-index: 3;
+  display: block; position: absolute; left: 50%; top: calc(100vh - 76px); z-index: 3;
   width: 26px; height: 52px; margin-left: -13px;
   opacity: .62; transition: opacity .4s var(--ease);
   animation: heroCueFloat 2.8s var(--ease) infinite;
@@ -163,12 +174,12 @@
 .hero-scroll span {
   position: absolute; left: 50%; top: 0; width: 1.5px; height: 100%;
   margin-left: -.75px; border-radius: 2px;
-  background: linear-gradient(180deg, rgba(14, 165, 233, 0), rgba(14, 165, 233, .55) 45%, rgba(14, 165, 233, 0));
+  background: linear-gradient(180deg, rgba(3, 105, 161, 0), rgba(3, 105, 161, .5) 45%, rgba(3, 105, 161, 0));
 }
 .hero-scroll span::after {
   content: ""; position: absolute; left: 50%; top: 0; width: 6px; height: 6px;
-  margin-left: -3px; border-radius: 50%; background: #0ea5e9;
-  box-shadow: 0 0 14px rgba(14, 165, 233, .85);
+  margin-left: -3px; border-radius: 50%; background: var(--cyan);
+  box-shadow: 0 0 14px rgba(3, 105, 161, .55);
   animation: heroCueDrop 2.8s var(--ease) infinite;
 }
 @keyframes heroCueFloat {

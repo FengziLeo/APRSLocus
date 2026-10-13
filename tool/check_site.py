@@ -194,6 +194,11 @@ def main():
             st = s.find('id="heroTelemetry"')
             chk('%s : 邀请文案在读数之前' % f,
                 inv > 0 and 'class="hi-mark"' in s and inv < st)
+            # 下载那块要排在读数之后，并且挂着 .reveal：先说明、再看数字、往下滑
+            # 才轮到你动手。顺序写反、或者漏了 reveal（那就会在首屏直接冒出来），
+            # 这一屏的节奏就散了。
+            cta = s.find('class="hero-cta reveal"')
+            chk('%s : 下载排在读数之后、滚下去才弹出' % f, cta > st > 0)
             vers.append(re.findall(r'hero-3d\.css\?v=(\d+)', s) + re.findall(r'planet-3d\.js\?v=(\d+)', s))
             chk('%s : hero-3d 资源接线' % f,
                 '%scss/hero-3d.css?v=' % up in s
@@ -229,6 +234,17 @@ def main():
         and 'heroCueDrop' in hero_css)
     # 星球的模样照参考设计（NASA-Punk Observatory）：点云 + 线框球 + 环带。
     # 这三样是这一版星球的骨架，回退某一样就不是那颗星了。
+    # 一屏只有一支强调色：星球是单族蓝，台站 / 卫星靠"亮度分档"（uStn 按主题
+    # 给）区分，而不是换色相。上一版是琥珀 / 橙 + 青紫渐变，摆在一起就是花的。
+    chk('hero 只用一族蓝（无第二色相）',
+        'amber' not in hero_js and 'orange' not in hero_js
+        and all(x not in hero_css for x in ('#a855f7', '#7c3aed', '#22d3ee', '#f59e0b', '#22c55e'))
+        and 'vec3 uStn' in hero_js and 'stn: [' in hero_js)
+    # 卫星：几颗带尾迹的小亮点快速划过。位置每帧现算（buildSats），不是一圈
+    # 静止的轨道点 —— 上一版那圈点已经撤掉，留着会和对不上的轨道叠成两层。
+    chk('hero 卫星：一组带尾迹的亮点',
+        'var SATS = [' in hero_js and 'function buildSats' in hero_js
+        and 'SAT_STEP' in hero_js and 'satBuf' in hero_js and 'ORBIT_SPIN' not in hero_js)
     chk('hero 星球：线框球 + 纬向色带 + 开普勒环',
         'function buildWire' in hero_js and 'gl.LINES' in hero_js
         and 'uSpinT' in hero_js

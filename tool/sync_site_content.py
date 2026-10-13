@@ -419,6 +419,30 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.0', 'date': '2026-10-14',
+        'items': [
+            ('new',
+             T('**封面彩蛋不再等那五秒**：关于页封面上那颗蛋，以前点一下要盯着一张'
+               '不动的封面等五秒 —— 谁也分不清那是彩蛋还是卡住了。现在**一点就是'
+               '一次激活**：抖动、翻面、粒子一起发生，翻牌动画刚走完，那一页故事'
+               '就递到眼前；再点一下翻回正面，故事也不再打开。包里带着那一页就在'
+               '应用内翻开，没带就交给系统浏览器。',
+               '**封面彩蛋不再等那五秒**：關於頁封面上那顆蛋，以前點一下要盯著一張'
+               '不動的封面等五秒 —— 誰也分不清那是彩蛋還是卡住了。現在**一點就是'
+               '一次啟動**：抖動、翻面、粒子一起發生，翻牌動畫剛走完，那一頁故事'
+               '就遞到眼前；再點一下翻回正面，故事也不再打開。包裡帶著那一頁就在'
+               '應用內翻開，沒帶就交給系統瀏覽器。',
+               '**The cover easter egg no longer counts to five**: the egg on the About '
+               'cover used to be "tap, then watch a motionless cover for five seconds" '
+               '— nobody can tell an easter egg from a freeze. **A tap is the '
+               'activation now**: the shudder, the flip and the particles happen '
+               'together, and the moment the flip lands, that page of story is handed '
+               'over; one more tap turns the cover back and the story stays closed. '
+               'If the app carries a copy it opens in-app, otherwise it goes to the '
+               'system browser.')),
+        ],
+    },
+    {
         'ver': 'v2.0.68', 'date': '2026-10-13',
         'items': [
             ('fix',

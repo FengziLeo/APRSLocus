@@ -486,9 +486,12 @@ def main():
         ldq = len(json.loads(ld.group(1))['mainEntity']) if ld else 0
         print(' ' + f)
         chk('html structure', not p.err and not p.stack, p.err[:1])
-        chk('23 q / 5 groups / ld23',
+        # 分组标题必须是 h2：帮助中心正文只有一级（页面 h1 =「帮助中心」），
+        # 分组写成 h3 就是跳级 —— 读屏按标题跳转时会以为中间漏了一层。
+        chk('23 q / 5 groups (h2) / ld23',
             s.count('<details class="faq') == 23
-            and s.count('<h3 class="faq-group"') == 5 and ldq == 23)
+            and s.count('<h2 class="faq-group"') == 5
+            and '<h3 class="faq-group"' not in s and ldq == 23)
         chk('release line =150', 'v1.6.150' in s and '当前对应 v1.6.149' not in s
             and '目前對應 v1.6.149' not in s and 'matches v1.6.149' not in s)
         chk('skip-link + main + theme',

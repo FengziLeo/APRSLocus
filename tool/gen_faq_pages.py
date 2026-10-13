@@ -432,7 +432,7 @@ def render(lang, path):
             ld_items.append({'@type': 'Question', 'name': _strip(q),
                              'acceptedAnswer': {'@type': 'Answer', 'text': _strip(a)}})
         blocks.append(
-            '    <h3 class="faq-group" id="g%d">%s</h3>\n'
+            '    <h2 class="faq-group" id="g%d">%s</h2>\n'
             '    <div class="faq-list">\n%s\n    </div>' % (i, title, '\n'.join(qs)))
 
     ld = {

@@ -8837,6 +8837,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit 单声道)';
+  @override
+  String get agentTool_list_strategy => "列出策略图层";
+
+  @override
+  String get agentTool_strategy_add_point => "添加标点";
+
+  @override
+  String get agentTool_strategy_add_rally => "添加集合点";
+
+  @override
+  String get agentTool_strategy_add_circle => "添加圆圈";
+
+  @override
+  String get agentTool_strategy_add_line => "添加划线";
+
+  @override
+  String get agentTool_strategy_update => "修改策略元素";
+
+  @override
+  String get agentTool_strategy_delete => "删除策略元素";
+
+  @override
+  String get agentTool_strategy_clear => "清空策略图层";
+
+  @override
+  String get agentTool_strategy_request_snapshot => "请求重播图层";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -17671,4 +17698,31 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit 單聲道)';
+  @override
+  String get agentTool_list_strategy => "列出策略圖層";
+
+  @override
+  String get agentTool_strategy_add_point => "新增標點";
+
+  @override
+  String get agentTool_strategy_add_rally => "新增集合點";
+
+  @override
+  String get agentTool_strategy_add_circle => "新增圓圈";
+
+  @override
+  String get agentTool_strategy_add_line => "新增劃線";
+
+  @override
+  String get agentTool_strategy_update => "修改策略元素";
+
+  @override
+  String get agentTool_strategy_delete => "刪除策略元素";
+
+  @override
+  String get agentTool_strategy_clear => "清空策略圖層";
+
+  @override
+  String get agentTool_strategy_request_snapshot => "請求重播圖層";
+
 }

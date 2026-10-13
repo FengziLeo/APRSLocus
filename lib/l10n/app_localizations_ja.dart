@@ -8938,4 +8938,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit モノラル)';
+  @override
+  String get agentTool_list_strategy => "戦略マップを一覧";
+
+  @override
+  String get agentTool_strategy_add_point => "マーカーを追加";
+
+  @override
+  String get agentTool_strategy_add_rally => "集合点を追加";
+
+  @override
+  String get agentTool_strategy_add_circle => "円を追加";
+
+  @override
+  String get agentTool_strategy_add_line => "線を追加";
+
+  @override
+  String get agentTool_strategy_update => "戦略要素を編集";
+
+  @override
+  String get agentTool_strategy_delete => "戦略要素を削除";
+
+  @override
+  String get agentTool_strategy_clear => "戦略マップを消去";
+
+  @override
+  String get agentTool_strategy_request_snapshot => "マップの再送を要求";
+
 }

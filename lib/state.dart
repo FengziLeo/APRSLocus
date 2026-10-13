@@ -117,7 +117,7 @@ class SmartBeaconTier {
 
 class AppState extends ChangeNotifier {
   /// 应用版本（用于信标备注、APRSlocus 识别）
-  static const appVersion = '2.0.65';
+  static const appVersion = '2.0.66';
   // 我的电台
   String myCall = 'BV2AAA';
   int mySsid = 0; // 0 = 无后缀, 1-15 = -1 到 -15
@@ -3799,8 +3799,17 @@ class AppState extends ChangeNotifier {
   /// 最近 60 秒内收到的数据包数（即当前接收速率，包/分）
   int get rxPerMin => _rxTimes.length;
 
+  /// 智能体代用户操作时置真（见 [executeAgentTool]）——此期间**普通运行日志
+  /// 不写进日志页**。
+  ///
+  /// 智能体的每个动作在对话里本来就看得见（确认条 + 工具结果行），再往日志页
+  /// 灌一遍「发送到群…」之类只会把用户真正要排查的链路日志淹掉。所以工具执行
+  /// 期间只放行 [LogLevel.warn] / [LogLevel.error]：真出问题仍有痕，正常操作不刷屏。
+  bool agentQuiet = false;
+
   /// 记录一条日志（最新在前，超出上限丢弃最旧）
   void _log(LogLevel level, String source, String message) {
+    if (agentQuiet && level.index < LogLevel.warn.index) return;
     logs.insert(0, LogEntry(DateTime.now(), level, source, message));
     if (logs.length > _maxLogs) logs.removeLast();
   }

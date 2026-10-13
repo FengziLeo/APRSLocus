@@ -655,6 +655,15 @@ html{overflow-x:hidden}
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.66</span>
+        <span class="cl-date">2026-10-13</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot new"></span><b>智能体可以操作「策略地图」了</b>：现在能用一句话让智能体在群里给队友标点、画线、画圈、放集合点 —— 它调用 <code>strategy_add_point</code> / <code>strategy_add_line</code> 等新工具，元素立刻落到每个人图上并广播给群；也能用 <code>list_strategy</code> 看清图上有哪些元素、按 id 修改或删除，或 <code>strategy_clear</code> 一键清空。只读的 <code>list_strategy</code> 免确认；会发 APRS 帧的写操作仍需「允许发送 / 允许修改设置」权限与逐次确认。</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.65</span>
         <span class="cl-date">2026-10-12</span>
       </div>

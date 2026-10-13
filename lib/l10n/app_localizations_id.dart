@@ -9227,4 +9227,31 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16-bit mono)';
+  @override
+  String get agentTool_list_strategy => "Daftar peta strategi";
+
+  @override
+  String get agentTool_strategy_add_point => "Tambah penanda";
+
+  @override
+  String get agentTool_strategy_add_rally => "Tambah titik kumpul";
+
+  @override
+  String get agentTool_strategy_add_circle => "Tambah lingkaran";
+
+  @override
+  String get agentTool_strategy_add_line => "Tambah garis";
+
+  @override
+  String get agentTool_strategy_update => "Ubah elemen strategi";
+
+  @override
+  String get agentTool_strategy_delete => "Hapus elemen strategi";
+
+  @override
+  String get agentTool_strategy_clear => "Kosongkan peta strategi";
+
+  @override
+  String get agentTool_strategy_request_snapshot => "Minta kirim ulang peta";
+
 }

@@ -16038,6 +16038,60 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'12000 Hz (LPCM 16-bit 单声道)'**
   String get icomAudioFmtValue;
+  /// No description provided for @agentTool_list_strategy.
+  ///
+  /// In zh, this message translates to:
+  /// **'列出策略图层'**
+  String get agentTool_list_strategy;
+
+  /// No description provided for @agentTool_strategy_add_point.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加标点'**
+  String get agentTool_strategy_add_point;
+
+  /// No description provided for @agentTool_strategy_add_rally.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加集合点'**
+  String get agentTool_strategy_add_rally;
+
+  /// No description provided for @agentTool_strategy_add_circle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加圆圈'**
+  String get agentTool_strategy_add_circle;
+
+  /// No description provided for @agentTool_strategy_add_line.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加划线'**
+  String get agentTool_strategy_add_line;
+
+  /// No description provided for @agentTool_strategy_update.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改策略元素'**
+  String get agentTool_strategy_update;
+
+  /// No description provided for @agentTool_strategy_delete.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除策略元素'**
+  String get agentTool_strategy_delete;
+
+  /// No description provided for @agentTool_strategy_clear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清空策略图层'**
+  String get agentTool_strategy_clear;
+
+  /// No description provided for @agentTool_strategy_request_snapshot.
+  ///
+  /// In zh, this message translates to:
+  /// **'请求重播图层'**
+  String get agentTool_strategy_request_snapshot;
+
 }
 
 class _AppLocalizationsDelegate

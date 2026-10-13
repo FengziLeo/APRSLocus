@@ -1615,6 +1615,24 @@ extension AgentToolLabel on AppLocalizations {
         return agentTool_list_memories;
       case 'forget_memory':
         return agentTool_forget_memory;
+      case 'list_strategy':
+        return agentTool_list_strategy;
+      case 'strategy_add_point':
+        return agentTool_strategy_add_point;
+      case 'strategy_add_rally':
+        return agentTool_strategy_add_rally;
+      case 'strategy_add_circle':
+        return agentTool_strategy_add_circle;
+      case 'strategy_add_line':
+        return agentTool_strategy_add_line;
+      case 'strategy_update':
+        return agentTool_strategy_update;
+      case 'strategy_delete':
+        return agentTool_strategy_delete;
+      case 'strategy_clear':
+        return agentTool_strategy_clear;
+      case 'strategy_request_snapshot':
+        return agentTool_strategy_request_snapshot;
       default:
         return agentTool_unknown;
     }

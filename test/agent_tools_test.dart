@@ -7,6 +7,7 @@ import 'package:aprslocus/agent.dart';
 import 'package:aprslocus/agent_tools.dart';
 import 'package:aprslocus/models.dart';
 import 'package:aprslocus/state.dart';
+import 'package:aprslocus/strategy_map.dart';
 
 /// 智能体「工具层」的回归测试。
 ///
@@ -927,6 +928,114 @@ void main() {
       got.clear();
       st.emitNewMessageForTest('BG2HCB', 'dup', null);
       expect(got, ['agent:BG2HCB/dup']);
+    });
+  });
+
+  group('策略地图工具', () {
+    test('list_strategy 空群返回空数组', () async {
+      final st = AppState();
+      st.createGroup('Team', {'BG1AAA'});
+      final r = await run(st, 'list_strategy', {'group': 'Team'});
+      expect(r.text, isNot(contains('ERROR')));
+      expect(jsonDecodeSafe(r.text), isEmpty);
+    });
+
+    test('strategy_add_point 落图，能自己列出来（mine=true）', () async {
+      final st = AppState();
+      final g = st.createGroup('Team', {'BG1AAA'});
+      final add = await run(st, 'strategy_add_point',
+          {'group': 'Team', 'lat': 39.9, 'lng': 116.4, 'label': '集合'});
+      expect(add.text, isNot(contains('ERROR')));
+      final items = st.strategyOf(g.groupCall);
+      expect(items.length, 1);
+      expect(items.single.kind, StrategyKind.point);
+      expect(items.single.label, '集合');
+
+      final list =
+          jsonDecodeSafe((await run(st, 'list_strategy', {'group': 'Team'})).text)
+              as List;
+      expect(list.single['kind'], 'point');
+      expect(list.single['mine'], isTrue);
+      expect(list.single['lat'], 39.9);
+    });
+
+    test('strategy_add_line 解析 "lat,lng;lat,lng" 字符串', () async {
+      final st = AppState();
+      final g = st.createGroup('Team', {'BG1AAA'});
+      final r = await run(st, 'strategy_add_line', {
+        'group': 'Team',
+        'points': '39.90,116.40;39.91,116.41;39.92,116.42',
+      });
+      expect(r.text, isNot(contains('ERROR')));
+      final it = st.strategyOf(g.groupCall).single;
+      expect(it.kind, StrategyKind.line);
+      expect(it.path.length, 3);
+      // 越界/畸形点一律拒绝，不静默落一半。
+      final bad = await run(st, 'strategy_add_line',
+          {'group': 'Team', 'points': '39.9,116.4;999,116.41'});
+      expect(bad.text, contains('ERROR'));
+    });
+
+    test('strategy_add_circle 半径越界被拒', () async {
+      final st = AppState();
+      st.createGroup('Team', {'BG1AAA'});
+      final r = await run(st, 'strategy_add_circle',
+          {'group': 'Team', 'lat': 39.9, 'lng': 116.4, 'radius_m': 999999999});
+      expect(r.text, contains('ERROR'));
+    });
+
+    test('strategy_update / delete 按 id 操作', () async {
+      final st = AppState();
+      final g = st.createGroup('Team', {'BG1AAA'});
+      await run(st, 'strategy_add_point',
+          {'group': 'Team', 'lat': 39.9, 'lng': 116.4});
+      final id = st.strategyOf(g.groupCall).single.id;
+
+      final upd = await run(st, 'strategy_update',
+          {'group': 'Team', 'id': id, 'lat': 30.0, 'lng': 120.0, 'label': 'X'});
+      expect(upd.text, isNot(contains('ERROR')));
+      final it = st.strategyOf(g.groupCall).single;
+      expect(it.id, id);
+      expect(it.lat, 30.0);
+      expect(it.label, 'X');
+
+      final del = await run(st, 'strategy_delete', {'group': 'Team', 'id': id});
+      expect(del.text, isNot(contains('ERROR')));
+      expect(st.strategyOf(g.groupCall), isEmpty);
+      // 删不存在的 id 要报错，而不是静默成功。
+      final again = await run(st, 'strategy_delete', {'group': 'Team', 'id': id});
+      expect(again.text, contains('ERROR'));
+    });
+
+    test('strategy_clear 清空整群', () async {
+      final st = AppState();
+      final g = st.createGroup('Team', {'BG1AAA'});
+      await run(st, 'strategy_add_point', {'group': 'Team', 'lat': 1.0, 'lng': 2.0});
+      await run(st, 'strategy_add_rally', {'group': 'Team', 'lat': 3.0, 'lng': 4.0});
+      final r = await run(st, 'strategy_clear', {'group': 'Team'});
+      expect(r.text, isNot(contains('ERROR')));
+      expect(st.strategyOf(g.groupCall), isEmpty);
+    });
+
+    test('写工具需发送权限，list_strategy 免确认', () async {
+      final st = AppState();
+      st.createGroup('Team', {'BG1AAA'});
+      final denied = await run(st, 'strategy_add_point',
+          {'group': 'Team', 'lat': 1.0, 'lng': 2.0},
+          allowSend: false);
+      expect(denied.text, contains('Permission denied'));
+      expect(st.strategyOf(st.chatGroups.single.groupCall), isEmpty);
+
+      expect(agentNeedsConfirm('list_strategy'), isFalse);
+      expect(agentNeedsConfirm('strategy_add_point'), isTrue);
+    });
+
+    test('找不到群时报错，不落任何元素', () async {
+      final st = AppState();
+      final r = await run(st, 'strategy_add_point',
+          {'group': 'nope', 'lat': 1.0, 'lng': 2.0});
+      expect(r.text, contains('ERROR'));
+      expect(st.strategyItems, isEmpty);
     });
   });
 }

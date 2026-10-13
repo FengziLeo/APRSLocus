@@ -204,6 +204,33 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.0.66', 'date': '2026-10-13',
+        'items': [
+            ('new',
+             T('**智能体可以操作「策略地图」了**：现在能用一句话让智能体在群里'
+               '给队友标点、画线、画圈、放集合点 —— 它调用 `strategy_add_point` / '
+               '`strategy_add_line` 等新工具，元素立刻落到每个人图上并广播给群；'
+               '也能用 `list_strategy` 看清图上有哪些元素、按 id 修改或删除，'
+               '或 `strategy_clear` 一键清空。只读的 `list_strategy` 免确认；'
+               '会发 APRS 帧的写操作仍需「允许发送 / 允许修改设置」权限与逐次确认。',
+               '**智慧代理可以操作「策略地圖」了**：現在能用一句話讓智慧代理在群裡'
+               '給隊友標點、畫線、畫圈、放集合點 —— 它呼叫 `strategy_add_point` / '
+               '`strategy_add_line` 等新工具，元素立刻落到每個人圖上並廣播給群；'
+               '也能用 `list_strategy` 看清圖上有哪些元素、按 id 修改或刪除，'
+               '或 `strategy_clear` 一鍵清空。唯讀的 `list_strategy` 免確認；'
+               '會發 APRS 幀的寫操作仍需「允許傳送 / 允許修改設定」權限與逐次確認。',
+               '**The agent can now drive the shared strategy map**. Ask it in plain '
+               'language to drop markers, draw lines and circles, or place rally points '
+               'for your group: it calls the new `strategy_add_point` / `strategy_add_line` '
+               'and friends, and each element lands on every member\'s map and is '
+               'broadcast to the group. Use `list_strategy` to see what is there, edit '
+               'or delete by id, or `strategy_clear` to wipe the layer. The read-only '
+               '`list_strategy` needs no confirmation; the frame-sending writes still '
+               'need the "allow sending"/"allow settings" permissions and a per-action '
+               'confirmation.')),
+        ],
+    },
+    {
         'ver': 'v2.0.65', 'date': '2026-10-12',
         'items': [
             ('fix',

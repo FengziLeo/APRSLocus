@@ -1,9 +1,14 @@
 # 智能体工具缺口与路线图（对照当前代码核实）
 
 > 这份是根据「智能体能力审计」逐条对照 `lib/agent_tools.dart` 核实后的结论与优先级。
-> **更新**：路线图已按 P0→P2 落地（工具数 25 → 44）。P3 中已做的见下；未做的保留说明。
+> **更新**：路线图已按 P0→P2 落地（工具数 25 → 53）。P3 中已做的见下；未做的保留说明。
 
-## 本轮已实现（新增 19 个工具）
+## 本轮已实现（新增 28 个工具）
+
+- **策略地图（与队友共享的标点 / 划线 / 圈 / 集合点）**：`list_strategy`（只读）
+  + `strategy_add_point` / `strategy_add_rally` / `strategy_add_circle` /
+  `strategy_add_line` / `strategy_update` / `strategy_delete` / `strategy_clear` /
+  `strategy_request_snapshot`。写类工具发 APRS 帧，纳入 `_isSendingTool` 闸门。
 
 - **自身位置/权限可见**：`get_app_state` 补 `my_lat/my_lng/my_has_fix/my_fix_min_ago`
   + `permissions:{allow_send,allow_settings,agent_enabled,agent_notice_accepted,data_notice_accepted}`。

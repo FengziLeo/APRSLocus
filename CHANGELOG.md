@@ -1,5 +1,53 @@
 # 更新日志
 
+## [2.0.66] - 2026-10-13
+
+### 新功能：智能体可操作「策略地图」（与队友共享标点 / 划线 / 圈 / 集合点）
+
+- 新增 9 个工具：`list_strategy` 列出某群的图层元素；`strategy_add_point` /
+  `strategy_add_rally` / `strategy_add_circle` / `strategy_add_line` 各添加一个
+  元素并广播给群；`strategy_update` / `strategy_delete` 按 id 改 / 删；
+  `strategy_clear` 清空整群图层；`strategy_request_snapshot` 请成员重播自己的
+  元素（新入群补齐图层用）。
+- 读写分离：`list_strategy` 只读、免确认；其余会往群里发 APRS 帧，受「允许
+  发送 / 允许修改设置」权限与聊天框内逐次确认约束（与 `send_group_message`
+  同一套闸门）。
+- 参数校验：经纬度范围、圈半径上限、颜色下标 0..5、划线点数上限都会拦；
+  线路径接受 `"lat,lng;lat,lng"` 字符串或坐标数组，越界即整条拒绝，不会静默
+  落一半、也不会把超长元素硬塞进帧。
+- 群一律接受**群呼号或群名**；元素用短 id 引用，先 `list_strategy` 拿 id 再改删。
+- 附带修复：智能体代用户操作期间不再往「日志页」灌普通运行日志（只保留警告 /
+  错误），避免确认条与工具结果之外再刷一遍「发送到群…」，把真正的链路日志淹掉。
+
+---
+
+## [2.0.66] - 2026-10-13 (English)
+
+### New: the agent can now drive the shared strategy map (markers, lines, circles, rally points)
+
+- 9 new tools: `list_strategy` lists a group's elements; `strategy_add_point` /
+  `strategy_add_rally` / `strategy_add_circle` / `strategy_add_line` each add an
+  element and broadcast it to the group; `strategy_update` / `strategy_delete`
+  edit or remove one by id; `strategy_clear` wipes the layer; and
+  `strategy_request_snapshot` asks the members to re-send their elements (use it
+  after joining a group to fill in the layer).
+- Read/write split: `list_strategy` is read-only and needs no confirmation; the
+  rest send APRS frames and are gated by the "allow sending"/"allow settings"
+  permissions plus a per-action confirmation in the chat (the same gate as
+  `send_group_message`).
+- Validation: latitude/longitude range, circle radius cap, colour index 0..5 and
+  a line point cap are all enforced; a line path is given as a
+  `"lat,lng;lat,lng"` string or an array of coordinates — an out-of-range point
+  rejects the whole line rather than silently keeping half, and oversized
+  elements are never forced into a frame.
+- A group is addressed by **call or name**; elements are referred to by a short
+  id — call `list_strategy` first to get it.
+- Also fixed: while the agent acts on the user's behalf, ordinary run logs no
+  longer flood the Log page (only warnings/errors are kept), so the "sending to
+  group…" lines no longer drown the link logs the user actually debugs with.
+
+---
+
 ## [2.0.65] - 2026-10-12
 
 ### 修复：WLAN 电台直连无法更改射频中继路径（#35）

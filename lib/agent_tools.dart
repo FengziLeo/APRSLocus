@@ -23,6 +23,7 @@ import 'map_math.dart';
 import 'models.dart';
 import 'net/http_send.dart';
 import 'state.dart';
+import 'strategy_map.dart';
 
 /// 工具定义：名称、说明（给模型看）、参数 schema、是否有副作用。
 class AgentToolSpec {
@@ -807,6 +808,185 @@ final List<AgentToolSpec> kAgentTools = [
       'required': ['key'],
     },
   ),
+
+  // ─── 策略地图（和队友共享标点 / 划线 / 圈 / 集合点）───
+  //
+  // 这组工具把 `AppState.putStrategy` / `deleteStrategy` / `clearStrategy` 暴露
+  // 给模型：用户说「在那条路上给队友画条线」「把集合点挪到海边」，模型能直接落
+  // 到策略图层并广播给群里。写类工具会真正发出 APRS 帧（射频下占用时隙），所以
+  // 统一按 `strategy_` 前缀纳入 [_isSendingTool]，受「允许发送」闸门与逐次确认约束。
+  //
+  // `group` 一律接受**群呼号或群名**（与 send_group_message 同一套解析），
+  // 群只有一个时可省略。
+  const AgentToolSpec(
+    name: 'list_strategy',
+    description:
+        'List the shared strategy-map elements (points, lines, circles, rally '
+        'points) of a group, with id, kind, owner, label, coordinates, radius '
+        'and point count. Read-only.',
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {
+          'type': 'string',
+          'description':
+              'Group call (e.g. BD4TYW-G1) or name. Omit to list every group.',
+        },
+      },
+    },
+  ),
+  const AgentToolSpec(
+    name: 'strategy_add_point',
+    description:
+        'Add a marker point to a group\'s shared strategy map and broadcast it '
+        'to the group over APRS.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group call or name.'},
+        'lat': {'type': 'number', 'description': '-90..90'},
+        'lng': {'type': 'number', 'description': '-180..180'},
+        'label': {
+          'type': 'string',
+          'description': 'Optional short name (at most 8 characters).',
+        },
+      },
+      'required': ['group', 'lat', 'lng'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'strategy_add_rally',
+    description:
+        'Add a rally (meeting) point to a group\'s shared strategy map and '
+        'broadcast it to the group.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group call or name.'},
+        'lat': {'type': 'number', 'description': '-90..90'},
+        'lng': {'type': 'number', 'description': '-180..180'},
+        'label': {'type': 'string', 'description': 'Optional short name (≤8 characters).'},
+      },
+      'required': ['group', 'lat', 'lng'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'strategy_add_circle',
+    description:
+        'Add a circle (radius in metres) to a group\'s shared strategy map and '
+        'broadcast it to the group.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group call or name.'},
+        'lat': {'type': 'number', 'description': 'Centre latitude, -90..90'},
+        'lng': {'type': 'number', 'description': 'Centre longitude, -180..180'},
+        'radius_m': {'type': 'number', 'description': 'Radius in metres (1..50000).'},
+        'label': {'type': 'string', 'description': 'Optional short name (≤8 characters).'},
+        'color': {
+          'type': 'integer',
+          'description': 'Palette index 0..5 (0 red, 1 blue, 2 green, 3 '
+              'orange, 4 purple, 5 cyan). Optional.',
+        },
+      },
+      'required': ['group', 'lat', 'lng', 'radius_m'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'strategy_add_line',
+    description:
+        'Add a polyline (route/boundary) to a group\'s shared strategy map and '
+        'broadcast it. Points may be a string "lat,lng;lat,lng" or a list of '
+        '[lat,lng] pairs; up to about 80 points.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group call or name.'},
+        'points': {
+          'description':
+              'The path: a "lat,lng;lat,lng" string, or a list of [lat,lng] '
+              'arrays or {lat,lng} objects.',
+        },
+        'label': {'type': 'string', 'description': 'Optional short name (≤8 characters).'},
+        'color': {
+          'type': 'integer',
+          'description': 'Palette index 0..5. Optional.',
+        },
+      },
+      'required': ['group', 'points'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'strategy_update',
+    description:
+        'Edit an existing strategy element (identified by "id") in a group and '
+        'broadcast the change. Only the given fields change. Call list_strategy '
+        'first to get the id. Sends an APRS frame.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group call or name.'},
+        'id': {'type': 'string', 'description': 'Element id from list_strategy.'},
+        'lat': {'type': 'number', 'description': 'New latitude (optional).'},
+        'lng': {'type': 'number', 'description': 'New longitude (optional).'},
+        'radius_m': {'type': 'number', 'description': 'New radius in metres (circle only).'},
+        'label': {'type': 'string', 'description': 'New short name (≤8 characters).'},
+        'color': {'type': 'integer', 'description': 'New palette index 0..5.'},
+        'points': {
+          'description': 'New path for a line (same format as strategy_add_line).',
+        },
+      },
+      'required': ['group', 'id'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'strategy_delete',
+    description:
+        'Remove a strategy element (by id) from a group\'s shared map and '
+        'broadcast the deletion. Use list_strategy to get the id.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group call or name.'},
+        'id': {'type': 'string', 'description': 'Element id from list_strategy.'},
+      },
+      'required': ['group', 'id'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'strategy_clear',
+    description:
+        'Delete every strategy element of a group (both mine and received) and '
+        'broadcast a clear. Use with care.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group call or name.'},
+      },
+      'required': ['group'],
+    },
+  ),
+  const AgentToolSpec(
+    name: 'strategy_request_snapshot',
+    description:
+        'Ask every member of a group to re-send their strategy elements, to '
+        'rebuild the shared layer (e.g. after joining). Sends an APRS frame.',
+    mutating: true,
+    parameters: {
+      'type': 'object',
+      'properties': {
+        'group': {'type': 'string', 'description': 'Group call or name.'},
+      },
+      'required': ['group'],
+    },
+  ),
 ];
 
 /// 名称 → spec
@@ -850,10 +1030,14 @@ bool _isNetworkTool(String name) => name == 'http_request';
 /// 会发出 APRS 消息的工具（受「允许发送」开关约束）。
 /// `reply_message` 不以 `send_` 开头，但同样是发送，必须一并纳入；
 /// `broadcast_message` 发多条单播，同样受此闸门约束。
+/// 策略地图的写工具（`strategy_add_*` / `strategy_update` / `strategy_delete` /
+/// `strategy_clear` / `strategy_request_snapshot`）会往群里广播 APRS 帧，射频下
+/// 占用时隙，同样算「发送」；只读的 `list_strategy` 不在此列。
 bool _isSendingTool(String name) =>
     name.startsWith('send_') ||
     name == 'reply_message' ||
-    name == 'broadcast_message';
+    name == 'broadcast_message' ||
+    (name.startsWith('strategy_') && name != 'list_strategy');
 
 /// 免确认白名单：这些工具无副作用，执行前不问用户。
 ///
@@ -939,7 +1123,11 @@ Future<AgentToolOutcome> executeAgentTool(
     return _err('Permission denied: changing settings is disabled.');
   }
 
-  switch (name) {
+  // 工具执行期间进入「静默」：智能体的动作不进日志页（见 [AppState.agentQuiet]）。
+  // 用 try/finally 包住整个分派，无论工具从哪个分支 return 都会复位。
+  st.agentQuiet = true;
+  try {
+    switch (name) {
     case 'get_app_state':
       return AgentToolOutcome(jsonEncode({
         'my_callsign': st.myFullCall,
@@ -2018,6 +2206,199 @@ Future<AgentToolOutcome> executeAgentTool(
             n == 0 ? 'No matching memory found.' : 'Forgot $n memory(ies).',
             note: 'forget_memory $key');
       }
+
+    // ─── 策略地图（与队友共享标点 / 划线 / 圈 / 集合点）───
+    //
+    // 落图/广播/群聊提示全部复用 [AppState.putStrategy] 等既有入口，工具层只做
+    // 参数校验 + 群解析，不重复实现协议。
+
+    case 'list_strategy':
+      {
+        final q = _val(args, 'group');
+        final groups = q.trim().isEmpty
+            ? st.chatGroups.toList()
+            : st.chatGroups.where((g) => _sameGroup(g, q)).toList();
+        if (q.trim().isNotEmpty && groups.isEmpty) {
+          return _err('No group named "$q".');
+        }
+        final out = <Map<String, dynamic>>[];
+        final me = _bareCall(st.myCall);
+        for (final g in groups) {
+          for (final it in st.strategyOf(g.groupCall)) {
+            out.add({
+              'group': g.name,
+              'group_call': g.groupCall,
+              'id': it.id,
+              'kind': it.kind.name,
+              'owner': it.owner,
+              'mine': it.owner == me,
+              'label': it.label,
+              'lat': it.lat,
+              'lng': it.lng,
+              if (it.kind == StrategyKind.circle) 'radius_m': it.radiusM,
+              if (it.kind == StrategyKind.line) 'points': it.path.length,
+              if (it.colorIndex >= 0) 'color': it.colorIndex,
+            });
+          }
+        }
+        return AgentToolOutcome(jsonEncode(out),
+            note: 'list_strategy → ${out.length}');
+      }
+
+    case 'strategy_add_point':
+    case 'strategy_add_rally':
+    case 'strategy_add_circle':
+    case 'strategy_add_line':
+      {
+        final g = _resolveGroup(st, _val(args, 'group'));
+        if (g == null) return _err('No group "${_val(args, 'group')}".');
+        final kind = switch (name) {
+          'strategy_add_rally' => StrategyKind.rally,
+          'strategy_add_circle' => StrategyKind.circle,
+          'strategy_add_line' => StrategyKind.line,
+          _ => StrategyKind.point,
+        };
+        final label = _strategyLabel(args['label']);
+        final color = _strategyColor(args['color']);
+        if (color == null) return _err('"color" must be an integer 0..5.');
+
+        if (kind == StrategyKind.line) {
+          final pts = _parsePath(args['points']);
+          if (pts == null || pts.isEmpty) {
+            return _err('"points" must be "lat,lng;lat,lng" or a list of pairs.');
+          }
+          if (pts.length > _maxStrategyLinePts) {
+            return _err('Too many points (max $_maxStrategyLinePts).');
+          }
+          final ok = st.putStrategy(g.groupCall, StrategyKind.line,
+              lat: pts.first.$1,
+              lng: pts.first.$2,
+              path: pts,
+              label: label,
+              colorIndex: color);
+          if (!ok) {
+            return _err('The line cannot fit into APRS frames (too long?).');
+          }
+          return AgentToolOutcome(
+              'Line with ${pts.length} point(s) added to ${g.name}.',
+              note: 'strategy_add_line → ${g.name} (${pts.length} pts)');
+        }
+
+        final lat = _asDouble(args['lat']);
+        final lng = _asDouble(args['lng']);
+        if (lat == null || lng == null || !_validLatLng(lat, lng)) {
+          return _err('"lat"/"lng" are required and must be in range.');
+        }
+        var radius = 0;
+        if (kind == StrategyKind.circle) {
+          final r = _asInt(args['radius_m']);
+          if (r == null || r <= 0 || r > StrategyProto.maxRadiusM) {
+            return _err('"radius_m" must be 1..${StrategyProto.maxRadiusM}.');
+          }
+          radius = r;
+        }
+        final ok = st.putStrategy(g.groupCall, kind,
+            lat: lat, lng: lng, radiusM: radius,
+            label: label, colorIndex: color);
+        if (!ok) return _err('The element cannot fit into an APRS frame.');
+        return AgentToolOutcome('${_strategyKindNoun(kind)} added to ${g.name}.',
+            note: '$name → ${g.name}');
+      }
+
+    case 'strategy_update':
+      {
+        final g = _resolveGroup(st, _val(args, 'group'));
+        if (g == null) return _err('No group "${_val(args, 'group')}".');
+        final id = _val(args, 'id').trim().toUpperCase();
+        if (id.isEmpty) return _err('"id" is required.');
+        final prev = st.strategyItems['${g.groupCall.toUpperCase()}|$id'];
+        if (prev == null) {
+          return _err('No element "$id" in ${g.name} (use list_strategy).');
+        }
+        final lat = args['lat'] == null ? prev.lat : _asDouble(args['lat']);
+        final lng = args['lng'] == null ? prev.lng : _asDouble(args['lng']);
+        if (lat == null || lng == null || !_validLatLng(lat, lng)) {
+          return _err('"lat"/"lng" must be in range.');
+        }
+        var radius = prev.radiusM;
+        if (args['radius_m'] != null) {
+          final r = _asInt(args['radius_m']);
+          if (r == null || r <= 0 || r > StrategyProto.maxRadiusM) {
+            return _err('"radius_m" must be 1..${StrategyProto.maxRadiusM}.');
+          }
+          radius = r;
+        }
+        final label = args['label'] == null
+            ? prev.label
+            : _strategyLabel(args['label']);
+        final color = args['color'] == null
+            ? prev.colorIndex
+            : _strategyColor(args['color']);
+        if (color == null) return _err('"color" must be an integer 0..5.');
+        var path = prev.path;
+        if (args['points'] != null) {
+          final pts = _parsePath(args['points']);
+          if (pts == null || pts.isEmpty) {
+            return _err('"points" must be "lat,lng;lat,lng" or a list of pairs.');
+          }
+          if (pts.length > _maxStrategyLinePts) {
+            return _err('Too many points (max $_maxStrategyLinePts).');
+          }
+          path = pts;
+        }
+        final ok = st.putStrategy(g.groupCall, prev.kind,
+            id: id,
+            lat: lat,
+            lng: lng,
+            radiusM: radius,
+            path: path,
+            label: label,
+            colorIndex: color);
+        if (!ok) return _err('The change cannot fit into APRS frames.');
+        return AgentToolOutcome('Updated "${id}" in ${g.name}.',
+            note: 'strategy_update → ${g.name} $id');
+      }
+
+    case 'strategy_delete':
+      {
+        final g = _resolveGroup(st, _val(args, 'group'));
+        if (g == null) return _err('No group "${_val(args, 'group')}".');
+        final id = _val(args, 'id').trim().toUpperCase();
+        if (id.isEmpty) return _err('"id" is required.');
+        if (!st.strategyItems.containsKey('${g.groupCall.toUpperCase()}|$id')) {
+          return _err('No element "$id" in ${g.name} (use list_strategy).');
+        }
+        st.deleteStrategy(g.groupCall, id);
+        return AgentToolOutcome('Deleted "$id" from ${g.name}.',
+            note: 'strategy_delete → ${g.name} $id');
+      }
+
+    case 'strategy_clear':
+      {
+        final g = _resolveGroup(st, _val(args, 'group'));
+        if (g == null) return _err('No group "${_val(args, 'group')}".');
+        final n = st.strategyOf(g.groupCall).length;
+        if (n == 0) {
+          return AgentToolOutcome('${g.name} already has no strategy elements.',
+              note: 'strategy_clear (empty)');
+        }
+        st.clearStrategy(g.groupCall);
+        return AgentToolOutcome('Cleared $n element(s) from ${g.name}.',
+            note: 'strategy_clear → ${g.name}');
+      }
+
+    case 'strategy_request_snapshot':
+      {
+        final g = _resolveGroup(st, _val(args, 'group'));
+        if (g == null) return _err('No group "${_val(args, 'group')}".');
+        st.requestStrategySnapshot(g.groupCall);
+        return AgentToolOutcome(
+            'Asked ${g.name} members to re-send their strategy elements.',
+            note: 'strategy_request_snapshot → ${g.name}');
+      }
+    }
+  } finally {
+    st.agentQuiet = false;
   }
   return _err('Unhandled tool: $name');
 }
@@ -2139,3 +2520,117 @@ Map<String, dynamic> _stationBrief(Station s) => {
       'comment': s.comment,
       'heard_min_ago': DateTime.now().difference(s.lastHeard).inMinutes,
     };
+
+// ─── 策略地图工具的辅助函数 ───
+//
+// 工具层只做「参数校验 + 群解析 + 调用 AppState 入口」，协议细节一律留给
+// [AppState.putStrategy] / [StrategyProto]，这些函数是它们之间的粘合层。
+
+/// 一条线的最大点数。与 [StrategyProto.maxParts] 对应（每片约 2 个点），
+/// 超过这个规模先在这里挡下，别让模型构造出几十条广播把时隙刷爆。
+const int _maxStrategyLinePts = StrategyProto.maxParts * 2;
+
+/// 经纬度是否在合法范围（并挡掉 NaN/Infinity）。
+bool _validLatLng(double lat, double lng) =>
+    lat.isFinite &&
+    lng.isFinite &&
+    lat >= -90 &&
+    lat <= 90 &&
+    lng >= -180 &&
+    lng <= 180;
+
+/// 去掉呼号的 `-SSID`，得到基呼号（大写）。与 [AppState._baseCall] 同一语义
+/// —— 策略元素里存的 owner 就是这个形态，比较「是不是我建的」时必须一致。
+String _bareCall(String call) {
+  final s = call.trim().toUpperCase();
+  final i = s.indexOf('-');
+  return i <= 0 ? s : s.substring(0, i);
+}
+
+/// 群名 / 群呼号（大小写不敏感）是否匹配。用于 list_strategy 的过滤。
+bool _sameGroup(ChatGroup g, String q) {
+  final key = q.trim().toUpperCase();
+  if (key.isEmpty) return false;
+  return g.groupCall.toUpperCase() == key || g.name.toUpperCase() == key;
+}
+
+/// 把一个群名或群呼号解析成 [ChatGroup]；找不到返回 null。
+ChatGroup? _resolveGroup(AppState st, String q) {
+  final key = q.trim().toUpperCase();
+  if (key.isEmpty) return null;
+  for (final g in st.chatGroups) {
+    if (g.groupCall.toUpperCase() == key || g.name.toUpperCase() == key) {
+      return g;
+    }
+  }
+  return null;
+}
+
+/// 策略元素的类型名词（工具回执里用，跟随协议而非界面语言）。
+String _strategyKindNoun(StrategyKind k) => switch (k) {
+  StrategyKind.point => 'Point',
+  StrategyKind.rally => 'Rally point',
+  StrategyKind.circle => 'Circle',
+  StrategyKind.line => 'Line',
+};
+
+/// 标签归一：去首尾空白，按**字符**（不是字节）截断到
+/// [StrategyProto.maxLabelLen]。超长直接截断而不是报错 —— 模型给个长名字也
+/// 照样能出图，没必要为名字把整个操作打回。
+String _strategyLabel(Object? v) {
+  final raw = _val({'x': v}, 'x').trim();
+  if (raw.isEmpty) return '';
+  final cs = raw.runes.toList();
+  if (cs.length <= StrategyProto.maxLabelLen) return raw;
+  return String.fromCharCodes(cs.take(StrategyProto.maxLabelLen));
+}
+
+/// 颜色下标归一：`null` / `-1` 表示「用默认色」；其余必须是
+/// `0..palette.length-1`。非法返回 null（调用方据此报错）。
+int? _strategyColor(Object? v) {
+  if (v == null) return -1;
+  final n = _asInt(v);
+  if (n == null) return null;
+  if (n == -1) return -1;
+  if (n < 0 || n >= StrategyProto.palette.length) return null;
+  return n;
+}
+
+/// 解析一条线的路径。接受三种写法：
+///   - `"lat,lng;lat,lng"` 字符串；
+///   - `[[lat,lng], [lat,lng]]`；
+///   - `[{"lat":..,"lng":..}, ...]`。
+/// 返回点列；格式非法或全部越界时返回 null。
+List<(double, double)>? _parsePath(Object? v) {
+  final out = <(double, double)>[];
+  bool add(Object? latO, Object? lngO) {
+    final la = _asDouble(latO);
+    final ln = _asDouble(lngO);
+    if (la == null || ln == null || !_validLatLng(la, ln)) return false;
+    out.add((la, ln));
+    return true;
+  }
+
+  if (v is String) {
+    for (final seg in v.split(';')) {
+      final t = seg.trim();
+      if (t.isEmpty) continue;
+      final parts = t.split(',');
+      if (parts.length < 2 || !add(parts[0], parts[1])) return null;
+    }
+    return out.isEmpty ? null : out;
+  }
+  if (v is List) {
+    for (final e in v) {
+      if (e is List && e.length >= 2) {
+        if (!add(e[0], e[1])) return null;
+      } else if (e is Map) {
+        if (!add(e['lat'], e['lng'])) return null;
+      } else {
+        return null;
+      }
+    }
+    return out.isEmpty ? null : out;
+  }
+  return null;
+}

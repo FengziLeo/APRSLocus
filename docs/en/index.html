@@ -576,6 +576,15 @@
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.66</span>
+        <span class="cl-date">2026-10-13</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot new"></span><b>The agent can now drive the shared strategy map</b>. Ask it in plain language to drop markers, draw lines and circles, or place rally points for your group: it calls the new <code>strategy_add_point</code> / <code>strategy_add_line</code> and friends, and each element lands on every member's map and is broadcast to the group. Use <code>list_strategy</code> to see what is there, edit or delete by id, or <code>strategy_clear</code> to wipe the layer. The read-only <code>list_strategy</code> needs no confirmation; the frame-sending writes still need the "allow sending"/"allow settings" permissions and a per-action confirmation.</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.65</span>
         <span class="cl-date">2026-10-12</span>
       </div>

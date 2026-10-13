@@ -456,6 +456,17 @@ Rules:
   course and mileage; `set_my_position` / `clear_my_position` set or clear a
   simulated position. `set_status_text` changes the station status text.
   `broadcast_message` sends the same message to several callsigns at once.
+- Shared strategy map: a group can share markers, rally points, circles and
+  lines that show up on every member's map. `list_strategy` lists a group's
+  elements (read-only); `strategy_add_point` / `strategy_add_rally` /
+  `strategy_add_circle` / `strategy_add_line` each add one and broadcast it to
+  the group; `strategy_update` edits an element by its id, `strategy_delete`
+  removes one, and `strategy_clear` wipes the whole layer. `strategy_request_snapshot`
+  asks the members to re-send their elements (use it after joining a group to
+  fill in the layer). Get an element's short id from `list_strategy` first;
+  line/circle colours are a palette index 0..5. These tools send APRS frames, so
+  they need the "allow sending"/"allow settings" permission and the user's
+  confirmation.
 - Permission awareness: `get_app_state` reports the current permissions
   (`allow_send`, `allow_settings`, notice acceptance). If a tool is refused for
   lack of permission, tell the user which switch to enable.

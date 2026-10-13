@@ -9276,4 +9276,31 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get icomAudioFmtValue => '12000 Hz (LPCM 16 bits mono)';
+  @override
+  String get agentTool_list_strategy => "Listar capa de estrategia";
+
+  @override
+  String get agentTool_strategy_add_point => "Añadir marca";
+
+  @override
+  String get agentTool_strategy_add_rally => "Añadir punto de reunión";
+
+  @override
+  String get agentTool_strategy_add_circle => "Añadir círculo";
+
+  @override
+  String get agentTool_strategy_add_line => "Añadir línea";
+
+  @override
+  String get agentTool_strategy_update => "Editar elemento de estrategia";
+
+  @override
+  String get agentTool_strategy_delete => "Eliminar elemento de estrategia";
+
+  @override
+  String get agentTool_strategy_clear => "Borrar capa de estrategia";
+
+  @override
+  String get agentTool_strategy_request_snapshot => "Pedir reenvío del mapa";
+
 }

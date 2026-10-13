@@ -188,6 +188,12 @@ def main():
             # 只报数字：上限/时间戳/进度条这类"像上传面板"的元信息都不要再出现
             chk('%s : 只留跳动数字（无时间戳/进度条）' % f,
                 not any(x in s for x in ('tlStamp', 'tlInc', 'tlBar', 'tlNext', 'tl-bar')))
+            # 读数之前要有一句邀请，并且**必须排在读数前面**：先说清这个数字是
+            # 什么（累计报文总量），再让它跳。只判「有 hero-invite」抓不到顺序写反。
+            inv = s.find('class="hero-invite"')
+            st = s.find('id="heroTelemetry"')
+            chk('%s : 邀请文案在读数之前' % f,
+                inv > 0 and 'class="hi-mark"' in s and inv < st)
             vers.append(re.findall(r'hero-3d\.css\?v=(\d+)', s) + re.findall(r'planet-3d\.js\?v=(\d+)', s))
             chk('%s : hero-3d 资源接线' % f,
                 '%scss/hero-3d.css?v=' % up in s
@@ -213,6 +219,14 @@ def main():
         '.tl-value.bump' in hero_css
         and all(x in hero_js for x in ('tlPackets', 'hooks.flash'))
         and not any(x in hero_js for x in ('tlBar', 'tlNext', 'tlStamp')))
+    # 入场：一进页面点云要「聚成球」（uGather 把点从散开的一层拉回球面），
+    # 滚动：往下拉时星球与文案要慢慢退开。两件事都横跨 JS 与 CSS —— 一边写成
+    # 变量、另一边读成 transform，缺一边就是「代码在、效果没了」。
+    chk('hero 入场聚成球 (uGather) + 滚动退场接线',
+        all(x in hero_js for x in ('uGather', 'GATHER_MS', 'easeOutCubic'))
+        and all(x in hero_css for x in ('--hero-3d-y', '--hero-3d-fade', '--hero-3d-copy-fade'))
+        and all(x in hero_js for x in ('--hero-3d-y', '--hero-3d-copy-fade', 'applyScroll'))
+        and 'heroCueDrop' in hero_css)
     # 星球的模样照参考设计（NASA-Punk Observatory）：点云 + 线框球 + 环带。
     # 这三样是这一版星球的骨架，回退某一样就不是那颗星了。
     chk('hero 星球：线框球 + 纬向色带 + 开普勒环',

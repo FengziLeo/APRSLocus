@@ -58,7 +58,7 @@
 <link rel="canonical" href="https://aprslocus.theez.top/zh-TW/">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
 <link rel="stylesheet" href="../css/style.css?v=7">
-<link rel="stylesheet" href="../css/hero-3d.css?v=3">
+<link rel="stylesheet" href="../css/hero-3d.css?v=4">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -166,13 +166,17 @@ html{overflow-x:hidden}
         <span>Android / Windows</span>
       </div>
 
+      <p class="hero-invite">
+        <span class="hi-mark" aria-hidden="true">✦</span>電波穿過夜空，最後都落在這顆星球上。<em>下面跳動的數字，是全世界 APRS 台站累計轉發過的報文總量</em> —— 下一格，等你來補。
+      </p>
+
       <!-- 累計報文：只報數字，讓它自己跳（數值源 stats.json） -->
       <div class="hero-stat" id="heroTelemetry"
            data-stats="../stats.json" data-packets="509260" data-rate="18"
            data-updated="2026-10-13T16:06:00+08:00"
            data-stale-title="資料快照已超過 12 小時，停止外推（顯示上限估算）">
         <span class="hs-live"><i></i>LIVE</span>
-        <span class="hs-item"><span class="tl-value" id="tlPackets">509,260</span><em>packets</em></span>
+        <span class="hs-item"><span class="tl-value" id="tlPackets">509,260</span><em>累計報文總量</em></span>
         <span class="hs-item">每分鐘 <b><i id="tlRateNum">+18</i></b></span>
       </div>
     </div>
@@ -1936,6 +1940,6 @@ html{overflow-x:hidden}
 </a>
 
 <script src="../js/main.js?v=7"></script>
-<script src="../js/planet-3d.js?v=3"></script>
+<script src="../js/planet-3d.js?v=4"></script>
 </body>
 </html>

@@ -24,6 +24,10 @@
    遥测：数值源头是 /stats.json（仓库里的静态快照，由 check_site.py 与页面
    静态值强制一致），页面按"基线 + 速率 × 经过分钟数"每秒本地推算，
    不需要任何后端与定时任务。
+   入场：一进页面，点云不是一下就摆好——每个点带一个相位，从上方散落着被「拉」下来，错峰聚成一颗球；
+   相机同时从更近的机位缓缓退到取景位，线框球比点云慢半步收拢到位。
+   滚动：往下拉时星球退得比页面慢半步（视差）并缓缓淡出，文案上浮隐去，滚回顶部一切复原。
+
    ══════════════════════════════════════════════════════════════════════ */
 (function () {
   "use strict";
@@ -291,28 +295,39 @@
     "uniform float uDist; uniform float uProj; uniform float uAspect;",
     "uniform float uPxScale; uniform float uMaxSize; uniform float uMinPx;",
     "uniform float uTime; uniform float uBurst; uniform float uSeed;",
+    "uniform float uGather;",                          // 入场进度 0 → 1
     "uniform vec2 uCenter; uniform vec3 uTint;",
     "varying vec3 vCol;",
     "varying float vFade;",
     "void main() {",
     "  float own = aSpin * uSpinT;",                    // 自己转过的角度
     "  float co = cos(own), so = sin(own);",
+    // 入场：点云不是一下就摆好，而是从上方散落着被「拉」下来 ——
+    // 每点一个 [0,1) 相位，起点是抬高且摊开的一层，逐点错峰落回球面。
+    "  float sd = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719))) * 43758.5453);",
+    "  vec3 src = aPos * (1.05 + 0.75 * sd) + vec3(0.0, 0.35 + 1.70 * sd, 0.0);",
+    "  float gp = clamp((uGather - sd * 0.55) / (1.0 - sd * 0.55), 0.0, 1.0);",
+    "  gp = gp * gp * (3.0 - 2.0 * gp);",               // 缓入缓出，落点不带刹车感
+    "  vec3 loc = mix(src, aPos, gp);",
     "  float cy = uCosY * co - uSinY * so;",            // 拖着走 + 自己转，一次合成
     "  float sy = uSinY * co + uCosY * so;",
-    "  vec3 p = vec3(aPos.x * cy + aPos.z * sy, aPos.y, aPos.z * cy - aPos.x * sy);",
+    // 明暗用「落定后」的法线算：飞行途中的位置不参与打光，否则一路乱闪
+    "  vec3 hn = vec3(aPos.x * cy + aPos.z * sy, aPos.y, aPos.z * cy - aPos.x * sy);",
+    "  hn = vec3(hn.x, hn.y * uCosP - hn.z * uSinP, hn.y * uSinP + hn.z * uCosP);",
+    "  vec3 p = vec3(loc.x * cy + loc.z * sy, loc.y, loc.z * cy - loc.x * sy);",
     "  p = vec3(p.x, p.y * uCosP - p.z * uSinP, p.y * uSinP + p.z * uCosP);",
     "  float d = uDist - p.z;",
     "  gl_Position = vec4(p.x * uProj / uAspect + uCenter.x, p.y * uProj + uCenter.y, d - uDist, d);",
     "  vec3 L = normalize(vec3(-0.45, 0.42, 0.79));",   // 左上偏前的一束光
-    "  float lam = 0.58 + 0.52 * max(dot(normalize(p), L), 0.0);",
+    "  float lam = 0.58 + 0.52 * max(dot(normalize(hn), L), 0.0);",
     "  float tw = 0.5 + 0.5 * sin(uTime * aMeta.y + aPos.x * 9.0 + aPos.z * 5.0 + aPos.y * 3.0);",
     "  float k = mix(1.0, 0.34 + 1.20 * tw, aMeta.z) * lam;",
     "  float pick = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719)) + uSeed) * 43758.5453);",
     "  float flare = uBurst * step(0.95, pick);",
     "  k *= 1.0 + 1.6 * flare;",
-    "  gl_PointSize = clamp(aMeta.x * uPxScale / d * k, uMinPx, uMaxSize);",
+    "  gl_PointSize = clamp(aMeta.x * uPxScale / max(d, 0.35) * k * (0.30 + 0.70 * gp), uMinPx, uMaxSize);",
     "  vCol = aCol * uTint * k;",
-    "  vFade = (0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6;",
+    "  vFade = ((0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6) * (0.10 + 0.90 * gp);",
     "}"
   ].join("\n");
 
@@ -335,10 +350,14 @@
     "uniform float uAngle; uniform float uCosP; uniform float uSinP;",
     "uniform float uDist; uniform float uProj; uniform float uAspect;",
     "uniform vec2 uCenter;",
+    "uniform float uGather;",
     "varying float vFace;",
+    "varying float vIn;",
     "void main() {",
+    "  vIn = smoothstep(0.0, 1.0, uGather);",           // 线框比点云慢半步落位
+    "  vec3 a = aPos * (1.0 + 0.34 * (1.0 - vIn));",
     "  float cy = cos(uAngle), sy = sin(uAngle);",
-    "  vec3 p = vec3(aPos.x * cy + aPos.z * sy, aPos.y, aPos.z * cy - aPos.x * sy);",
+    "  vec3 p = vec3(a.x * cy + a.z * sy, a.y, a.z * cy - a.x * sy);",
     "  p = vec3(p.x, p.y * uCosP - p.z * uSinP, p.y * uSinP + p.z * uCosP);",
     "  float d = uDist - p.z;",
     "  gl_Position = vec4(p.x * uProj / uAspect + uCenter.x, p.y * uProj + uCenter.y, d - uDist, d);",
@@ -349,8 +368,13 @@
   var WFS = [
     "precision mediump float;",
     "varying float vFace;",
+    "varying float vIn;",
     "uniform vec3 uColor; uniform float uAlpha;",
-    "void main() { gl_FragColor = vec4(uColor * (0.30 + 0.70 * vFace), uAlpha); }"
+    "void main() {",
+    "  float a = uAlpha * vIn;",
+    "  if (a < 0.004) discard;",
+    "  gl_FragColor = vec4(uColor * (0.30 + 0.70 * vFace), a);",
+    "}"
   ].join("\n");
 
   function fail(why) {
@@ -396,7 +420,7 @@
   if (!gl.getProgramParameter(wProg, gl.LINK_STATUS)) { fail("link"); return; }
   var WA = { pos: gl.getAttribLocation(wProg, "aPos") };
   var WU = {};
-  ["uAngle", "uCosP", "uSinP", "uDist", "uProj", "uAspect", "uCenter", "uColor", "uAlpha"
+  ["uAngle", "uCosP", "uSinP", "uDist", "uProj", "uAspect", "uCenter", "uColor", "uAlpha", "uGather"
   ].forEach(function (k) { WU[k] = gl.getUniformLocation(wProg, k); });
   var wire = buildWire();
   var wBuf = gl.createBuffer();
@@ -421,7 +445,7 @@
   };
   var U = {};
   ["uCosY", "uSinY", "uCosP", "uSinP", "uSpinT", "uDist", "uProj", "uAspect", "uPxScale",
-    "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uAlpha", "uBurst", "uSeed"
+    "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uAlpha", "uBurst", "uSeed", "uGather"
   ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
 
   function bindPointers() {
@@ -462,6 +486,23 @@
   var dragging = false, lastX = 0, lastY = 0;
   var running = false, paused = false, raf = 0, last = 0;
 
+  /* 入场（聚成球）：gather 从 0 → 1，顶点着色器用 uGather 把点从「散开的一层」
+     拉回球面；相机同时从更近的机位退到取景位（先是一颗大地球，再落定）。
+     降级动效下直接到位，不动。 */
+  var GATHER_MS = 2400;
+  var gather = reduce ? 1 : 0, gatherT0 = 0, gateAt = 0;
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+  function nowMs() { return window.performance && performance.now ? performance.now() : Date.now(); }
+  /* 入场的发令枪：等启动遮罩走开（body.loaded）再开演 —— 遮罩还在就开演的话，
+     整段动画在遮罩后面自己演完，用户什么都没看到。但遮罩要是因为任何原因不
+     消失（main.js 的外链资源卡住），最多等 3.6s 就直接开场：宁可早一步，
+     也不要 hero 一直停在"还没聚拢"的状态。（main.js 自己 3.2s 有兜底。） */
+  function gatherGate() {
+    if (!gateAt) gateAt = nowMs() + 3600;
+    if (document.body && document.body.classList.contains("loaded")) return true;
+    return nowMs() >= gateAt;
+  }
+
   /* ── 取景：view.r 是星球本体的屏幕半径，view.cx/cy 是它在 hero 里的相对位置。
         相机距离由 r 反推，所以换屏不会"忽大忽小"，环带始终切出右缘。 ── */
   var view = { cx: 0.715, cy: 0.475, r: 1 };
@@ -483,7 +524,8 @@
     if (!w || !h) return;
     var f = frame(w, h);
     var m = MODES[dark ? "dark" : "light"];
-    var dist = camDist(h);
+    var zoom = reduce ? 1 : 1 + 0.20 * (1 - gather);   // 入场：从更近的机位缓缓退回
+    var dist = camDist(h) / zoom;
     var cp = Math.cos(TILT + pitch), sp = Math.sin(TILT + pitch);
     var age = reduce ? 1 : (Date.now() - burstAt) / BURST_MS;
     var burst = (age < 0 || age > 1) ? 0 : Math.pow(1 - age, 2);
@@ -508,6 +550,7 @@
     gl.uniform1f(U.uTime, reduce ? 0 : now);
     gl.uniform1f(U.uBurst, burst);
     gl.uniform1f(U.uSeed, burstSeed);
+    gl.uniform1f(U.uGather, gather);
 
     // 线框球先画：点云自己写深度，正面那一半自然把线压住
     gl.useProgram(wProg);
@@ -519,6 +562,8 @@
     gl.uniform1f(WU.uAspect, w / h);
     gl.uniform2f(WU.uCenter, f.cx * 2 - 1, 1 - f.cy * 2);
     gl.uniform3f(WU.uColor, m.wireCol[0], m.wireCol[1], m.wireCol[2]);
+    var wireIn = reduce ? 1 : Math.max(0, Math.min(1, (gather - 0.40) / 0.60));
+    gl.uniform1f(WU.uGather, wireIn);
     gl.uniform1f(WU.uAlpha, m.wire);
     gl.bindBuffer(gl.ARRAY_BUFFER, wBuf);
     gl.vertexAttribPointer(WA.pos, 3, gl.FLOAT, false, 0, 0);
@@ -544,6 +589,12 @@
   function loop(now) {
     var dt = Math.min(0.05, (now - last) / 1000) || 0;
     last = now;
+    if (!gatherT0) {                                // 入场：先等发令枪
+      if (gatherGate()) gatherT0 = now;
+    } else if (gather < 1) {                        // 聚成球 + 机位退定
+      gather = easeOutCubic(Math.min(1, (now - gatherT0) / GATHER_MS));
+      if (gather > 0.999) gather = 1;
+    }
     var k = Math.min(1, dt * 9);                   // 阻尼跟随（参考实现是每帧 0.1）
     yaw += (tYaw - yaw) * k;
     pitch += (tPitch - pitch) * k;
@@ -560,8 +611,8 @@
   function start() {
     if (running || paused) return;
     running = true;
-    last = (window.performance && performance.now ? performance.now() : Date.now());
-    raf = requestAnimationFrame(loop);
+    last = nowMs();
+    raf = requestAnimationFrame(loop);               // 入场起点由 loop 里的发令枪定
   }
 
   function resize() {
@@ -573,6 +624,7 @@
     canvas.width = w;
     canvas.height = h;
     draw(reduce ? 0 : (window.performance && performance.now ? performance.now() / 1000 : 0));
+    applyScroll();
     start();
   }
 
@@ -642,6 +694,35 @@
   start();
   hooks.flash = flash;                             // 遥测那边每跳一次就调它
 
+  /* ── 滚动：往下拉时星球退得比页面慢半步（视差）并缓缓淡出，文案上浮隐去；
+        滚回顶部一切复原。变量写在 .hero 上，位移 / 透明度全交给 hero-3d.css。
+        降级动效（prefers-reduced-motion）下不接这个监听，CSS 保持原样。 ── */
+  var scrollP = 0, scrollQueued = false;
+  function applyScroll() {
+    scrollQueued = false;
+    if (reduce) return;
+    var h = hero.offsetHeight || 1;
+    var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+    var p = Math.max(0, Math.min(1, y / (h * 0.8)));
+    if (p === scrollP) return;
+    scrollP = p;
+    var e = p * p * (3 - 2 * p);                    // 缓入缓出：起手不出戏，收尾不突兀
+    hero.style.setProperty("--hero-3d-y", (e * 30).toFixed(2) + "px");
+    hero.style.setProperty("--hero-3d-scale", (1 + e * 0.06).toFixed(4));
+    hero.style.setProperty("--hero-3d-fade", (1 - e * 0.62).toFixed(3));
+    hero.style.setProperty("--hero-3d-copy", (-e * 34).toFixed(2) + "px");
+    hero.style.setProperty("--hero-3d-copy-fade", (1 - e * 0.88).toFixed(3));
+  }
+  function onScroll() {
+    if (scrollQueued) return;
+    scrollQueued = true;
+    requestAnimationFrame(applyScroll);
+  }
+  if (!reduce) {
+    window.addEventListener("scroll", onScroll, { passive: true });
+    applyScroll();
+  }
+
   /* 主题切换（站点的 toggle 改的是 <html data-theme>）：只换混合模式与 tint，重画一帧 */
   if (window.MutationObserver) {
     new MutationObserver(function () {
@@ -694,6 +775,9 @@
         yaw: +yaw.toFixed(3),
         pitch: +pitch.toFixed(3),
         reduce: reduce,
+        gate: gatherT0 > 0,
+        gather: +gather.toFixed(3),
+        scroll: +scrollP.toFixed(3),
         running: running
       };
     },

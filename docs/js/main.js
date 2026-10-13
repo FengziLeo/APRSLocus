@@ -147,8 +147,7 @@
       document.documentElement.setAttribute("data-theme", next);
       try { localStorage.setItem("theme", next); } catch (e) {}
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute("content", next === "dark" ? "#12171b" : "#cfd6dd");
-      readNetInk();                      // 背景那张网的冷蓝跟着主题重取一次
+      if (meta) meta.setAttribute("content", next === "dark" ? "#0a0e12" : "#f4f7fc");
       syncTheme();
     });
   }
@@ -180,94 +179,60 @@
     revealEls.forEach((el) => el.classList.add("in"));
   }
 
-  /* ── Hero 背景：一张技术中继网（图纸上的链路图） ──
-     为什么重画：旧版是「粒子 + 呼吸辉光」，属上一版的发光语言（无发光是新皮
-     的硬规矩）；而且它是写死的 rgba，切主题不变。现在它就是控制台图纸上的
-     一张链路图：冷蓝细线连相邻节点，节点是**方点**（不是药丸圆点、不呼吸、
-     不带光晕），线宽 1px、透明度很低 —— 它只负责让铝底不平。
-
-     颜色不写死：从 style.css 的 token 里读（--line-cool 连线 / --cyan 节点），
-     resize 与切主题时各重取一次，所以深浅两套皮肤下都是自己那档色。
-     子页（如帮助中心）没有 hero 画布：canvas 为 null 时下面 if 守卫会跳过动画，
+  /* ── Hero 粒子背景（APRS 星网/雷达网络感） ──
+     子页（如帮助中心）没有 hero 画布：canvas 为 null 时下面的 if 守卫会跳过动画，
      但 ctx 取值必须空值安全 —— 否则 `null.getContext` 会抛错，
      把后面的版本号刷新与赞助渲染一并打断（IIFE 内无 try 包裹）。 */
   const canvas = document.getElementById("heroCanvas");
   const ctx = canvas ? canvas.getContext("2d") : null;
-  let w = 0, h = 0, nodes = [], rafId = null;
-  // 兜底值贴着浅色那套 token；读到真 token 就覆盖掉
-  let netInk = { line: "rgba(29, 95, 176, .45)", node: "#1d5fb0" };
-
-  function readNetInk() {
-    try {
-      const cs = getComputedStyle(document.documentElement);
-      const line = (cs.getPropertyValue("--line-cool") || "").trim();
-      const node = (cs.getPropertyValue("--cyan") || "").trim();
-      if (line) netInk = Object.assign({}, netInk, { line: line });
-      if (node) netInk = Object.assign({}, netInk, { node: node });
-    } catch (e) {}
-  }
+  let w = 0, h = 0, particles = [], rafId = null;
 
   function resize() {
     w = canvas.width = canvas.offsetWidth * devicePixelRatio;
     h = canvas.height = canvas.offsetHeight * devicePixelRatio;
-    readNetInk();
     seed();
   }
 
-  /* 节点布在 160px 一格的格点上（各带一点抖动）：这张网要看着像「基站分布」，
-     不是均匀撒盐 —— 格点骨架 + 抖动正好。 */
   function seed() {
-    const step = 160 * devicePixelRatio;
-    const cols = Math.max(2, Math.round(w / step));
-    const rows = Math.max(2, Math.round(h / step));
-    nodes = [];
-    for (let r = 0; r <= rows; r++) {
-      for (let c = 0; c <= cols; c++) {
-        if (Math.random() < 0.28) continue;              // 留些空位，别糊成一整张
-        nodes.push({
-          x: (c + 0.5) * step + (Math.random() - 0.5) * step * 0.7,
-          y: (r + 0.5) * step + (Math.random() - 0.5) * step * 0.7,
-          vx: (Math.random() - 0.5) * 0.14 * devicePixelRatio,
-          vy: (Math.random() - 0.5) * 0.14 * devicePixelRatio,
-        });
-      }
-    }
+    const count = Math.min(90, Math.floor((w * h) / 26000));
+    particles = Array.from({ length: count }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.35 * devicePixelRatio,
+      vy: (Math.random() - 0.5) * 0.35 * devicePixelRatio,
+      r: (Math.random() * 1.6 + 0.6) * devicePixelRatio,
+    }));
   }
 
-  /* 方点 + 细线：尺寸按 DPR 给整数像素，才不会糊成毛边。 */
   function draw() {
     ctx.clearRect(0, 0, w, h);
-    const link = 190 * devicePixelRatio;
-    ctx.lineWidth = Math.max(1, Math.round(devicePixelRatio));
-    ctx.strokeStyle = netInk.line;
-    ctx.fillStyle = netInk.node;
-    const dot = Math.max(2, Math.round(2 * devicePixelRatio));
-
-    for (let i = 0; i < nodes.length; i++) {
-      const p = nodes[i];
+    const maxDist = 150 * devicePixelRatio;
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
       p.x += p.vx; p.y += p.vy;
       if (p.x < 0 || p.x > w) p.vx *= -1;
       if (p.y < 0 || p.y > h) p.vy *= -1;
 
-      for (let j = i + 1; j < nodes.length; j++) {
-        const q = nodes[j];
+      for (let j = i + 1; j < particles.length; j++) {
+        const q = particles[j];
         const dx = p.x - q.x, dy = p.y - q.y;
         const d2 = dx * dx + dy * dy;
-        // 只连「近邻」：格子骨架 + 上限距离，图纸上的链路就长这样
-        if (d2 < link * link) {
-          const a = 1 - Math.sqrt(d2) / link;
-          if (a < 0.18) continue;
-          ctx.globalAlpha = a * 0.8;
+        if (d2 < maxDist * maxDist) {
+          const a = (1 - Math.sqrt(d2) / maxDist) * 0.5;
+          ctx.strokeStyle = `rgba(45, 122, 200, ${a * 0.3})`;
+          ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(q.x, q.y);
           ctx.stroke();
         }
       }
-      ctx.globalAlpha = 0.85;
-      ctx.fillRect(p.x - dot / 2, p.y - dot / 2, dot, dot);
+      const glow = 0.4 + Math.sin(performance.now() / 1200 + i) * 0.3;
+      ctx.fillStyle = `rgba(77, 163, 255, ${glow * 0.7})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
     }
-    ctx.globalAlpha = 1;
     rafId = requestAnimationFrame(draw);
   }
 

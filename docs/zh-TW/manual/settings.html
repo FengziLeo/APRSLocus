@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>設定參考 — APRSlocus</title>
 <meta name="description" content="設定的逐項參考：名稱、控件、預設值、說明 —— 全部由程式碼與官方文案產生，改了程式碼重新產生即可對齊。">
-<meta name="theme-color" content="#cfd6dd">
+<meta name="theme-color" content="#0a0e12">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="APRSlocus">
 <meta property="og:title" content="設定參考 — APRSlocus">
@@ -22,17 +22,17 @@
     <link rel="alternate" hreflang="en" href="https://aprslocus.theez.top/en/manual/settings.html">
     <link rel="alternate" hreflang="x-default" href="https://aprslocus.theez.top/manual/settings.html">
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
-<link rel="stylesheet" href="../../css/style.css?v=9">
+<link rel="stylesheet" href="../../css/style.css?v=8">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <script>
 /* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）；首帧前执行防闪底 */
 (function () {
   try {
     var t = localStorage.getItem('theme');
-    if (t !== 'dark' && t !== 'light') t = 'light';
+    if (t !== 'dark' && t !== 'light') t = 'dark';
     document.documentElement.setAttribute('data-theme', t);
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#12171b' : '#cfd6dd');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
   } catch (e) {}
 })();
 </script>
@@ -900,7 +900,7 @@
   <svg class="backtop-arrow" viewBox="0 0 24 24"><path d="M12 5l7 7-1.4 1.4L13 8.8V20h-2V8.8l-4.6 4.6L5 12l7-7z"/></svg>
 </a>
 
-<script src="../../js/main.js?v=9"></script>
+<script src="../../js/main.js?v=8"></script>
 <script>
 /* 手册页专属：小节搜索 + 侧栏 scrollspy（无 JS 时正文照常可读） */
 (function () {

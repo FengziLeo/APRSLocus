@@ -702,11 +702,11 @@ def main():
     cssb = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
     chk('css braces balanced', cssb.count('{') == cssb.count('}'))
     # 对比度那条判据以前点的是几个写死的颜色值，现在颜色都收进 token 了，
-    # 所以改成点 token 本身：浅色（银白铝）那套里必须还在（值可以对不上，名字不许丢）。
+    # 所以改成点 token 本身：浅色那套里必须还在（值可以对不上，名字不许丢）。
     chk('contrast fixes present',
-        all(x in css for x in ['--text: #1c2228', '--cyan: #1d5fb0',
-                               '--accent: #ff6a00', '--on-accent: #1c2228',
-                               '--led-ok: #3ddc97', '--font-mono', '--grad-text']))
+        all(x in css for x in ['--text-faint: #5b6b85', '--cyan: #1d6fd0',
+                               '--cyan-deep: #0369a1', '--accent: #e25700',
+                               '--on-accent: #1a1207', '--font-mono', '--grad-text']))
 
     # ── 调色板只有一个源头：style.css 里那两块 token ────────────────────
     # 深色收成「一块 token 覆盖」之后，"深色规则数 >= 40" 这种数数的判据就
@@ -728,20 +728,10 @@ def main():
     chk('深色 token 覆盖浅色 token（%d 个颜色 token）' % len(need_dark),
         bool(need_dark) and all(k in dark_tok for k in need_dark),
         [k for k in need_dark if k not in dark_tok][:6])
-    # 颜色字面量只允许出现在 token 声明行、和 mask 的那两行 #000 里。
-    # 注意 token 的值可以是多行的（--shadow / --brushed / --rivet 就是），
-    # 所以得跟着「一行 --x: 开始、到出现 ; 为止」的状态走 —— 逐行判断会把
-    # 这些 token 的续行当成写死颜色，白白报一片假 FAIL。
+    # 颜色字面量只允许出现在 token 声明行、和 mask 的那两行 #000 里
     literals = []
-    in_tok = False
     for i, line in enumerate(cssb.split('\n')):
-        if in_tok:
-            if ';' in line:
-                in_tok = False
-            continue
         if re.match(r'^\s*--[a-z0-9-]+\s*:', line):
-            if ';' not in line:
-                in_tok = True
             continue
         if re.search(r'#[0-9a-fA-F]{3,8}\b|rgba?\(', line):
             literals.append('L%d %s' % (i + 1, line.strip()[:70]))
@@ -788,9 +778,9 @@ def main():
 
     css_pins, js_pins = _pins(r'style\.css\?v=(\d+)'), _pins(r'main\.js\?v=(\d+)')
     chk('css 缓存版本全站一致（style.css %s）' % ','.join(sorted(css_pins)),
-        list(css_pins) == ['9'] and 'style.css?v=9' in read('docs/index.html'))
+        list(css_pins) == ['8'] and 'style.css?v=8' in read('docs/index.html'))
     chk('js 缓存版本全站一致（main.js %s）' % ','.join(sorted(js_pins)),
-        list(js_pins) == ['9'])
+        list(js_pins) == ['8'])
     # 只挂独立页的 theme.css 也必须跟 style.css 同名版本
     STANDALONE = ("docs/promo.html", "docs/card.html", "docs/badge.html",
                   "docs/member-card.html", "docs/memorial.html", "docs/terms.html",

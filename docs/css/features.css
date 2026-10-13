@@ -16,9 +16,9 @@
 
 .feat-list {
   --feat-rule: var(--line);
-  --feat-hover: var(--surface-2);
-  --feat-ico-bg: var(--surface-3);
-  --feat-ico-br: var(--line);
+  --feat-hover: var(--halo-cool);
+  --feat-ico-bg: var(--halo-cool);
+  --feat-ico-br: var(--line-cool);
 }
 
 /* ── 组标题：小字 + 一条拉到右边的发丝线（分组的唯一标记，靠线不靠留白） ── */
@@ -42,7 +42,7 @@
   border-bottom: 1px solid var(--feat-rule);
   transition: background .3s var(--ease);
 }
-.feat:hover { background: var(--feat-hover); }
+.feat:hover { background: linear-gradient(90deg, var(--feat-hover), transparent 62%); }
 
 .feat-no {
   padding-top: 5px;
@@ -54,19 +54,16 @@
 
 .feat-ico {
   display: grid; place-items: center;
-  width: 46px; height: 46px; border-radius: var(--radius-sm);
-  background-color: var(--feat-ico-bg); background-image: var(--brushed);
+  width: 46px; height: 46px; border-radius: var(--radius);
+  background: var(--feat-ico-bg);
   border: 1px solid var(--feat-ico-br);
-  box-shadow: var(--bevel-hi), var(--bevel-in-hi);
   color: var(--cyan); font-size: 17px;
   /* opacity 的过渡放这儿（入场首态在 motion.css）：两边都写 transition 会互相盖掉 */
-  transition: opacity .45s var(--ease), background-color .3s var(--ease),
+  transition: opacity .45s var(--ease), background .3s var(--ease),
               color .3s var(--ease), border-color .3s var(--ease);
 }
 .feat:hover .feat-ico {
-  /* hover 不是「号召」：小图标片只是抬起一档（更亮的铝面 + 冷蓝描边），
-     安全橙留给真正要按的东西 —— 一屏一个主号召色，不抢。 */
-  background-color: var(--surface-4); border-color: var(--line-cool); color: var(--cyan-deep);
+  background: var(--grad); border-color: transparent; color: var(--on-accent);
 }
 
 .feat-main h3 { font-size: 17.5px; font-weight: 800; letter-spacing: -.01em; }
@@ -77,11 +74,9 @@
   justify-content: flex-end; padding-top: 3px;
 }
 .feat-tags li {
-  padding: 3px 9px; border-radius: var(--radius-sm);
+  padding: 3px 10px; border-radius: 999px;
   border: 1px solid var(--feat-rule);
-  background: var(--surface-3);
-  font-family: var(--font-mono);
-  color: var(--text-faint); font-size: 11px; line-height: 1.5; white-space: nowrap;
+  color: var(--text-faint); font-size: 11.5px; line-height: 1.5; white-space: nowrap;
 }
 
 /* ── 断点：先收掉标签那一列（挪到正文下面），再收窄序号与图标 ── */
@@ -91,7 +86,8 @@
 }
 @media (max-width: 640px) {
   .feat { grid-template-columns: 26px 38px minmax(0, 1fr); gap: 12px; padding: 20px 0; }
-  .feat-ico { width: 38px; height: 38px; border-radius: var(--radius-sm); font-size: 15px; }  .feat-no { padding-top: 3px; font-size: 11.5px; }
+  .feat-ico { width: 38px; height: 38px; border-radius: var(--radius-sm); font-size: 15px; }
+  .feat-no { padding-top: 3px; font-size: 11.5px; }
   .feat-main h3 { font-size: 16.5px; }
   .feat-main p { font-size: 13.5px; }
   .feat-group { margin-top: 30px; font-size: 11.5px; letter-spacing: .14em; }

@@ -15,16 +15,15 @@
 
 .nav-more-btn {
   position: relative; display: inline-flex; align-items: center; gap: 6px;
-  padding: 9px 12px; border: 0; border-radius: var(--radius-sm); cursor: pointer;
+  padding: 9px 12px; border: 0; border-radius: 12px; cursor: pointer;
   font: inherit; font-size: 14.5px; color: var(--text-dim); background: transparent;
   transition: color .25s, background .25s, box-shadow .25s;
 }
-.nav-more-btn:hover { color: var(--text); background: var(--surface-2); box-shadow: var(--bevel-in-hi); }
+.nav-more-btn:hover { color: var(--text); background: var(--surface-2); }
 .nav-more-btn i { font-size: 10px; transition: transform .3s var(--ease); }
 .nav-more-btn::after {
-  /* 选中标线：一条 2px 的安全橙细条（先前的橙→蓝渐变属旧皮的彩虹习惯） */
-  content: ""; position: absolute; left: 12px; right: 12px; bottom: 4px; height: 2px;
-  border-radius: 1px; background: var(--accent);
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: 5px; height: 2px;
+  border-radius: 2px; background: var(--grad);
   transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease);
 }
 .nav-more-btn:hover::after,
@@ -37,8 +36,8 @@
   position: absolute; top: calc(100% + 10px); right: 0; z-index: 2;
   display: grid; gap: 2px; min-width: 188px; padding: 8px;
   border-radius: var(--radius); border: 1px solid var(--line);
-  background-color: var(--surface-1); background-image: var(--brushed);
-  box-shadow: var(--bevel-hi), var(--bevel-lo), var(--shadow-hover);
+  background: var(--surface-1);
+  box-shadow: var(--shadow-hover);
   opacity: 0; visibility: hidden; transform: translateY(-8px) scale(.98);
   transform-origin: top right;
   transition: opacity .26s var(--ease), transform .26s var(--ease), visibility .26s;
@@ -49,7 +48,7 @@
 }
 /* 面板里的条目右对齐更好读：它们锚在右边，左对齐会看着往外飘 */
 .nav-more-list a { text-align: left; white-space: nowrap; }
-.nav-more-list a.active { background: var(--surface-3); box-shadow: var(--bevel-in-hi); color: var(--text); }
+.nav-more-list a.active { background: var(--halo-cool); }
 
 /* ── 窄屏：抽屉里不需要折叠 —— 面板直接摊平成一串条目 ── */
 @media (max-width: 720px) {

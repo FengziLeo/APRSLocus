@@ -5,7 +5,7 @@
  * 只挂 css/theme.css），所以共用这一份。
  *
  * 初始主题不在这里设：<head> 里的内联脚本已经在首帧前把 data-theme 写到
- * <html> 上了（localStorage 优先，没存过 = light）。这里只负责按钮与后续切换。
+ * <html> 上了（localStorage 优先，没存过 = dark）。这里只负责按钮与后续切换。
  * 图标是 CSS 换的（细线 SVG：深色下画太阳 = "切到浅色"，浅色下画月亮）。
  */
 (function () {
@@ -32,7 +32,7 @@
     document.documentElement.setAttribute("data-theme", next);
     try { localStorage.setItem("theme", next); } catch (e) {}
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", next === "dark" ? "#12171b" : "#cfd6dd");
+    if (meta) meta.setAttribute("content", next === "dark" ? "#0a0e12" : "#f4f7fc");
     sync();
   });
 })();

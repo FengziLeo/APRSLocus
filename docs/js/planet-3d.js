@@ -1,23 +1,24 @@
 /* ══════════════════════════════════════════════════════════════════════
-   APRSlocus 官网 Hero：3D 星球 + 累计报文遥测
+   APRSlocus 官网 Hero：观测台底纹 + 3D 星球 + 累计报文遥测
    ──────────────────────────────────────────────────────────────────────
    为什么手写 WebGL 而不是引 three.js：
    官网是零构建、零依赖的静态站（唯一外链资源是 Font Awesome），为一个
-   一万多点的星球塞进 900 KB 的渲染库不划算。这里只用原生 WebGL1：
-   两个着色器、两个缓冲，几何在加载时一次性生成。
+   两万点的星球塞进 900 KB 的渲染库不划算。这里只用原生 WebGL1：
+   三个着色器、三个缓冲，几何在加载时一次性生成。
 
-   渲染思路（与 NASA-Punk Observatory 的 three.js 点云同源）：
-   · 球面均匀采样 + 薄球壳（半径 1±0.025）→ 星球本体；
-   · 颜色按 value noise 在经度方向拉伸取值（noise3(x*1.7, y*4.6, z*1.7)）
-     得到纬向环带，再叠 60 个"信标"点（暖色 + 各自呼吸脉冲）代表台站；
-   · 环带与卫星轨道放在 XZ 平面，着色器里跳过 yaw（圆环绕自身轴转看不出
-     差别），只跟 pitch 与 24° 轴倾角一起走。倾角只进着色器、几何里不预烘，
-     否则会被叠加两次；
+   参考设计：NASA-Punk Observatory（deep navy + 测绘图底纹 + 线框球）。
+   抄的是"调子"，不是代码：
+   · 第 3 节把噪声场的等值线画成底纹（等高线 + 120px 网格 + 150 颗星点）；
+   · 星球本体是一族蓝色的点云，横条带来自纬向拉伸的噪声（y 放大 6 倍），
+     另外套一层 12 条经线 + 7 条纬线的线框球（gl.LINES）——点云是实体，
+     线框是仪表感；
+   · 92 颗台站点点在球面上闪（琥珀 / 橙），环带三圈按开普勒比例 ω ∝ r^-1.5
+     各转各的，卫星沿轨道跑；
    · 相机固定在 +Z，靠 uDist 缩放；打开深度测试（加色混合 + 写深度），
      背面点被正面挡住，星球才有实体感，否则只是一团发光的雾。
 
    降级：没有 WebGL 或着色器编译失败 → 给 .hero 加 .no-3d，用纯 CSS
-   的星球顶上；遥测数字照常跳动（它只依赖 DOM）。
+   的星球顶上；底纹与遥测数字照常（它们只依赖 2D canvas 与 DOM）。
 
    遥测：数值源头是 /stats.json（仓库里的静态快照，由 check_site.py 与页面
    静态值强制一致），页面按"基线 + 速率 × 经过分钟数"每秒本地推算，
@@ -106,20 +107,10 @@
     setInterval(tick, 1000);
   })();
 
-  /* ═════════════ 2. 3D 星球 ═════════════ */
-  var canvas = document.getElementById("planetCanvas");
-  var hero = document.querySelector(".hero");
-  if (!canvas || !hero || !canvas.getContext) return;
-
-  var TILT = 23.4 * Math.PI / 180;    // 轴倾角（与舷窗上 AXIS TILT 标签一致）
-  var FOV = 33 * Math.PI / 180;
-  var U_PROJ = 1 / Math.tan(FOV / 2);
-  var RING_OUT = 1.78;                // 最外圈环半径（决定取景）
-  var ORBIT = 2.05;                   // 卫星轨道半径
-  var CLOUD = 13000;
-  var DPR = Math.min(window.devicePixelRatio || 1, 2);
-
-  /* ── 定点随机：固定种子 → 每次刷新都是同一颗星球（也方便截图对比） ── */
+  /* ═════════════ 2. 定点随机 & value noise ═════════════
+     放在最前面定义：底纹与星球几何共用同一套噪声函数，但各用各的随机流 ——
+     共用一条流的话，背景多画一次（比如改窗口大小）就把星球的几何推偏一截，
+     同一颗星再也画不出第二遍。 */
   function mulberry32(a) {
     return function () {
       a = a + 0x6D2B79F5 | 0;
@@ -128,7 +119,7 @@
       return ((t ^ t >>> 14) >>> 0) / 4294967296;
     };
   }
-  var rnd = mulberry32(0x41505253);   // 'APRS'
+  var rnd = mulberry32(0x41505253);   // 'APRS'：星球几何（每次刷新同一颗星）
 
   /* ── 3D value noise（三线性插值） ── */
   function nodeHash(i, j, k) {
@@ -150,102 +141,239 @@
     return (y0 + (y1 - y0) * w) * 2 - 1;          // → [-1, 1]
   }
 
-  /* ── 配色：HSL 色斑。整颗星是一族冷色（青绿 ↔ 靛蓝 ↔ 紫），
-        台站点用琥珀 / 洋红单独点出来 —— 彩色但不花。 ── */
-  function hsl2rgb(h, s, l, out) {
-    h = h - Math.floor(h);
-    if (s < 0) s = 0; else if (s > 1) s = 1;
-    if (l < 0) l = 0; else if (l > 1) l = 1;
-    var c = (1 - Math.abs(2 * l - 1)) * s;
-    var hp = h * 6, x = c * (1 - Math.abs(hp % 2 - 1)), m = l - c * 0.5;
-    var i = Math.floor(hp) % 6, r = 0, g = 0, b = 0;
-    if (i === 0) { r = c; g = x; }
-    else if (i === 1) { r = x; g = c; }
-    else if (i === 2) { g = c; b = x; }
-    else if (i === 3) { g = x; b = c; }
-    else if (i === 4) { r = x; b = c; }
-    else { r = c; b = x; }
-    out[0] = r + m; out[1] = g + m; out[2] = b + m;
+  /* ═════════════ 3. 观测台底纹：等高线 + 十字网格 + 星点 ═════════════
+     做法照着参考实现（NASA-Punk Observatory 的 topoRenderer）：把噪声场的
+     等值线画成 1.8px 细线，压一层 120px 测绘图网格与 150 颗星点。它是整块
+     hero 的底子 —— 深蓝绒面上只有航线图，没有卡片、没有边框。 */
+  (function topo() {
+    var cv = document.getElementById("heroTopo");
+    if (!cv || !cv.getContext) return;
+    var ctx = cv.getContext("2d");
+    var LINE = "#3b4e6b", CELL = 5, SCALE = 0.0021, LEVELS = 6, GRID = 120, STARS = 150, PHASE = 41.5;
+
+    function paint() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var rect = cv.getBoundingClientRect();
+      var w = Math.round(rect.width), h = Math.round(rect.height);
+      if (w < 8 || h < 8) return;
+      cv.width = Math.round(w * dpr);
+      cv.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+
+      // 1) 测绘图网格 + 交点十字
+      var x, y, i, j, k, lv, pts = [];
+      ctx.strokeStyle = LINE; ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.05;
+      ctx.beginPath();
+      for (x = 0; x <= w; x += GRID) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
+      for (y = 0; y <= h; y += GRID) { ctx.moveTo(0, y); ctx.lineTo(w, y); }
+      ctx.stroke();
+      ctx.globalAlpha = 0.125;
+      ctx.beginPath();
+      for (x = 0; x <= w; x += GRID) {
+        for (y = 0; y <= h; y += GRID) {
+          ctx.moveTo(x - 3, y); ctx.lineTo(x + 3, y);
+          ctx.moveTo(x, y - 3); ctx.lineTo(x, y + 3);
+        }
+      }
+      ctx.stroke();
+
+      // 2) 星点（种子固定：换窗口大小也不会重排）
+      var sr = mulberry32(0x4e415341);
+      ctx.fillStyle = "#ffffff";
+      for (i = 0; i < STARS; i++) {
+        var sx = sr() * w, sy = sr() * h, srad = sr() * 1.5 + 0.3;
+        ctx.globalAlpha = sr() * 0.6 + 0.1;
+        ctx.beginPath(); ctx.arc(sx, sy, srad, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // 3) 等高线：噪声场按 5px 采样，逐格找等值线穿过的那条边
+      var cols = Math.ceil(w / CELL) + 1, rows = Math.ceil(h / CELL) + 1;
+      var f = new Float32Array(cols * rows);
+      for (i = 0; i < cols; i++) {
+        for (j = 0; j < rows; j++) {
+          f[j * cols + i] = (noise3(i * CELL * SCALE + PHASE, j * CELL * SCALE + PHASE, PHASE * 0.5) + 1) * 0.5;
+        }
+      }
+      ctx.globalAlpha = 0.5; ctx.strokeStyle = LINE; ctx.lineWidth = 1.8;
+      ctx.lineCap = "round"; ctx.lineJoin = "round";
+      var step = 1 / LEVELS;
+      for (lv = 0.2; lv < 0.8; lv += step) {
+        ctx.beginPath();
+        for (i = 0; i < cols - 1; i++) {
+          for (j = 0; j < rows - 1; j++) {
+            var a = f[j * cols + i], b = f[j * cols + i + 1],
+                c = f[(j + 1) * cols + i], d = f[(j + 1) * cols + i + 1];
+            if ((a < lv && b < lv && c < lv && d < lv) || (a > lv && b > lv && c > lv && d > lv)) continue;
+            pts.length = 0;
+            if ((a < lv) !== (b < lv)) pts.push(i + (lv - a) / (b - a), j);         // 上边
+            if ((b < lv) !== (d < lv)) pts.push(i + 1, j + (lv - b) / (d - b));     // 右边
+            if ((c < lv) !== (d < lv)) pts.push(i + (lv - c) / (d - c), j + 1);     // 下边
+            if ((a < lv) !== (c < lv)) pts.push(i, j + (lv - a) / (c - a));         // 左边
+            for (k = 0; k + 3 < pts.length; k += 4) {
+              ctx.moveTo(pts[k] * CELL, pts[k + 1] * CELL);
+              ctx.lineTo(pts[k + 2] * CELL, pts[k + 3] * CELL);
+            }
+          }
+        }
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    paint();
+    if (window.ResizeObserver) new ResizeObserver(paint).observe(cv);
+    else window.addEventListener("resize", paint, { passive: true });
+    window.__heroTopo = { paint: paint };          // 自检钩子：底纹能重画
+  })();
+
+  /* ═════════════ 4. 3D 星球 ═════════════ */
+  var canvas = document.getElementById("planetCanvas");
+  var hero = document.querySelector(".hero");
+  if (!canvas || !hero || !canvas.getContext) return;
+
+  var TILT = 23.4 * Math.PI / 180;    // 轴倾角（与舷窗上 AXIS TILT 标签一致）
+  var FOV = 33 * Math.PI / 180;
+  var U_PROJ = 1 / Math.tan(FOV / 2);
+  var RING_OUT = 1.78;                // 最外圈环半径（决定取景）
+  var ORBIT = 2.05;                   // 卫星轨道半径
+  var CLOUD = 13000;
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  /* 定点随机与噪声函数挪到文件开头（第 2 节）：底纹与星球各用一条随机流。 */
+
+  /* ── 配色：照参考实现的海王星调子 —— 整颗星只有一族蓝（深靛 → 亮天蓝），
+        明暗差全交给噪声带；另外两类单独点出来：台站点用琥珀 / 橙（会闪），
+        环带用偏白的蓝。彩色但不花，因为色相只留一支。 ── */
+  var PAL = {
+    deep:   [0.055, 0.086, 0.290],   // 深靛
+    mid:    [0.145, 0.290, 0.760],   // 中蓝
+    bright: [0.420, 0.620, 1.000],   // 亮天蓝
+    storm:  [0.030, 0.045, 0.150],   // 风暴带 / 无站区
+    amber:  [0.843, 0.671, 0.380],   // 台站（黄）
+    orange: [0.878, 0.384, 0.212]    // 台站（橙）
+  };
+  function mix3(a, b, t, out) {
+    out[0] = a[0] + (b[0] - a[0]) * t;
+    out[1] = a[1] + (b[1] - a[1]) * t;
+    out[2] = a[2] + (b[2] - a[2]) * t;
+    return out;
   }
 
-  /* ── 几何：交错 10 float/点 = pos(3) + col(3) + meta(尺寸, 呼吸频率, 呼吸幅度) + spin
-        meta.y > 0 的点会自己呼吸（大小与亮度一起抖， 0.5~2.8 Hz）。 ── */
-  function buildCloud() {
-    var arr = [], col = [0, 0, 0], i, u, th, s, x, y, z, r, ang, ex, ez, live, fade, patch, fine, hue;
+  var ORBIT_SPIN = 0.18;              // 卫星角速度（rad/s），轨道那圈点同速
+  var RING_IN = 1.30;                 // 最内圈环半径：开普勒比例以它为准
 
-    // 星球本体
+  /* ── 几何：交错 10 float/点 = pos(3) + col(3) + meta(尺寸, 呼吸频率, 呼吸幅度) + spin
+        meta.z > 0 的点会自己呼吸（大小与亮度一起抖）；spin 是自己的角速度，
+        0 = 跟着拖动走（星球本体），非 0 = 自己转（环带 / 卫星轨道）。 ── */
+  function buildCloud() {
+    var arr = [], col = [0, 0, 0], i, j, u, th, s, x, y, z, r, ang, ex, ez, live, fade, band, fine, g, c;
+
+    // 星球本体：纬向拉伸的噪声（y 放大 6 倍）→ 一颗星球该有的横条带
     for (i = 0; i < CLOUD; i++) {
       u = rnd() * 2 - 1;
       th = rnd() * Math.PI * 2;
       s = Math.sqrt(1 - u * u);
       x = s * Math.cos(th); y = u; z = s * Math.sin(th);
-      r = 1 + (rnd() - 0.5) * 0.05;
-      patch = noise3(x * 1.25, y * 2.6, z * 1.25) * 0.5 + 0.5;
-      fine = noise3(x * 4.2, y * 4.2, z * 4.2) * 0.5 + 0.5;
-      hue = 0.44 + 0.31 * (patch - 0.5) + 0.16 * Math.abs(y) + 0.03 * fine;
-      hsl2rgb(hue, 0.62 + 0.30 * fine,
-        0.30 + 0.34 * Math.pow(0.35 * patch + 0.65 * fine, 0.9), col);
-      arr.push(x * r, y * r, z * r, col[0], col[1], col[2],
-        0.0085 + rnd() * 0.0050,              // 尺寸：相对星球屏幕半径
-        0.5 + rnd() * 2.3,                    // 呼吸频率
-        0.10 + 0.45 * fine,                   // 呼吸幅度
+      r = 1 + (rnd() - 0.5) * 0.03;
+      band = noise3(x * 0.5, y * 3.0, z * 0.5) * 0.5 + 0.5;
+      fine = noise3(x * 4.4, y * 4.4, z * 4.4) * 0.5 + 0.5;
+      if (band < 0.44) mix3(PAL.deep, PAL.mid, band / 0.44, col);
+      else mix3(PAL.mid, PAL.bright, (band - 0.44) / 0.56, col);
+      if (fine < 0.32) mix3(col, PAL.storm, (0.32 - fine) * 1.2, col);     // 暗斑
+      g = 0.72 + 0.56 * fine;                                              // 逐点亮度抖动
+      arr.push(x * r, y * r, z * r, col[0] * g, col[1] * g, col[2] * g,
+        0.0075 + rnd() * 0.0045,              // 尺寸：相对星球屏幕半径
+        0.35 + rnd() * 1.60,                  // 呼吸频率
+        0.06 + 0.22 * fine,                   // 呼吸幅度（本体很轻）
         0);
     }
 
-    // 台站点：琥珀 / 洋红，呼吸最明显
-    for (i = 0; i < 60; i++) {
+    // 台站点：琥珀 / 橙，呼吸最明显 —— 会闪的那几粒就是台站在上报
+    for (i = 0; i < 90; i++) {
       u = rnd() * 2 - 1;
       th = rnd() * Math.PI * 2;
       s = Math.sqrt(1 - u * u);
       x = s * Math.cos(th); y = u; z = s * Math.sin(th);
-      var pink = rnd() < 0.25;
-      hsl2rgb(pink ? 0.92 : 0.055 + rnd() * 0.06, 0.95, pink ? 0.62 : 0.56, col);
-      arr.push(x, y, z, col[0], col[1], col[2],
-        0.0115 + rnd() * 0.0075,
-        1.2 + rnd() * 2.8,
-        0.85 + rnd() * 0.15,
+      c = rnd() < 0.35 ? PAL.orange : PAL.amber;
+      g = 0.72 + rnd() * 0.5;
+      arr.push(x, y, z, c[0] * g, c[1] * g, c[2] * g,
+        0.0100 + rnd() * 0.0075,
+        0.9 + rnd() * 2.4,
+        0.80 + rnd() * 0.20,
         0);
     }
 
-    // 环带：XZ 平面三圈，色相青 → 蓝 → 紫，密度按 noise 立方取舍 → 亮暗相间的弧段
-    var rings = [[1.30, 900, 0.50], [1.52, 1000, 0.58], [1.74, 1100, 0.67]];
+    // 环带：XZ 平面三圈，密度按噪声立方取舍 → 亮暗相间的弧段；
+    // 角速度取开普勒比例 ω ∝ r^-1.5，三圈快慢不同，转起来才像"有质量的环"。
+    var rings = [[RING_IN, 1100, 0.34], [1.52, 1200, 0.46], [1.74, 1300, 0.60]];
     for (i = 0; i < rings.length; i++) {
-      var rad = rings[i][0], cnt = rings[i][1], base = rings[i][2];
-      for (var j = 0; j < cnt; j++) {
+      var rad = rings[i][0], cnt = rings[i][1], bright = rings[i][2];
+      var rate = 0.06 * Math.pow(RING_IN / rad, 1.5);   // 内圈 3.4°/s → 外圈 2.2°/s
+      for (j = 0; j < cnt; j++) {
         ang = rnd() * Math.PI * 2;
         ex = Math.cos(ang); ez = Math.sin(ang);
-        live = Math.pow((noise3(ex * 2.2, ez * 2.2, 0) + 1) * 0.5, 3);
-        if (rnd() > live * 1.15) continue;
-        r = rad + (rnd() - 0.5) * 0.035;
+        live = Math.pow((noise3(ex * 2.0, ez * 2.0, 0.5) + 1) * 0.5, 3);
+        if (rnd() > live * 1.2) continue;
+        r = rad + (rnd() - 0.5) * 0.03;
         fade = 1 - Math.abs(r - rad) / 0.05;
-        hsl2rgb(base + (rnd() - 0.5) * 0.06, 0.86, 0.42 + 0.18 * fade, col);
-        arr.push(ex * r, (rnd() - 0.5) * 0.012, ez * r,
-          col[0] * fade, col[1] * fade, col[2] * fade,
-          0.0050 + rnd() * 0.0030,
-          0.7 + rnd() * 1.8,
-          0.35 + 0.35 * fade,
-          1);
+        c = bright > 0.45 ? PAL.bright : PAL.mid;
+        g = (0.55 + rnd() * 0.6) * fade * bright;
+        arr.push(ex * r, (rnd() - 0.5) * 0.01, ez * r,
+          c[0] * g, c[1] * g, c[2] * g,
+          0.0042 + rnd() * 0.0026,
+          0.6 + rnd() * 1.5,
+          0.20 + 0.25 * fade,
+          rate);
       }
     }
 
-    // 卫星轨道：一圈细点
-    var ON = 280;
-    hsl2rgb(0.42, 0.70, 0.50, col);
+    // 卫星轨道：一圈细点，与下面那颗跑动的卫星同角速度
+    var ON = 300;
     for (i = 0; i < ON; i++) {
       ang = (i / ON) * Math.PI * 2;
-      arr.push(Math.cos(ang) * ORBIT, 0, Math.sin(ang) * ORBIT, col[0], col[1], col[2],
-        0.0042, 0.9 + (i % 7) * 0.12, 0.30, 1);
+      g = 0.30 + (i % 5) * 0.03;
+      arr.push(Math.cos(ang) * ORBIT, 0, Math.sin(ang) * ORBIT,
+        PAL.bright[0] * g, PAL.bright[1] * g, PAL.bright[2] * g,
+        0.0036, 0.5 + (i % 7) * 0.10, 0.20, ORBIT_SPIN);
     }
     return { data: new Float32Array(arr), count: arr.length / 10 };
+  }
+
+  /* ── 经纬网：参考实现里星球外面套了一层 6% 不透明度的线框球。手写同一件事：
+        12 条经线 + 7 条纬线，半径 1.004，用 gl.LINES 画。点云是"实体"，线框是
+        "仪表感" —— 只有一团点的话，看上去还是雾。 ── */
+  function buildWire() {
+    var v = [], SEG = 48, MER = 12, PAR = 7, R = 1.004, i, k, a, a1, y, rr, p0, p1;
+    for (i = 0; i < MER; i++) {
+      a = (i / MER) * Math.PI * 2;
+      for (k = 0; k < SEG; k++) {
+        p0 = (k / SEG) * Math.PI; p1 = ((k + 1) / SEG) * Math.PI;
+        v.push(Math.sin(p0) * Math.cos(a) * R, Math.cos(p0) * R, Math.sin(p0) * Math.sin(a) * R,
+          Math.sin(p1) * Math.cos(a) * R, Math.cos(p1) * R, Math.sin(p1) * Math.sin(a) * R);
+      }
+    }
+    for (i = 1; i <= PAR; i++) {
+      y = -1 + (i / (PAR + 1)) * 2;
+      rr = Math.sqrt(Math.max(0, 1 - y * y)) * R;
+      for (k = 0; k < SEG; k++) {
+        a = (k / SEG) * Math.PI * 2; a1 = ((k + 1) / SEG) * Math.PI * 2;
+        v.push(Math.cos(a) * rr, y * R, Math.sin(a) * rr,
+          Math.cos(a1) * rr, y * R, Math.sin(a1) * rr);
+      }
+    }
+    return { data: new Float32Array(v), count: v.length / 3 };
   }
 
   var VS = [
     "attribute vec3 aPos;",
     "attribute vec3 aCol;",
     "attribute vec3 aMeta;",              // 尺寸 / 呼吸频率 / 呼吸幅度
-    "attribute float aSpin;",
+    "attribute float aSpin;",             // 自己的角速度（0 = 跟着拖动走）
     "uniform float uCosY; uniform float uSinY;",
     "uniform float uCosP; uniform float uSinP;",
+    "uniform float uSpinT;",
     "uniform float uDist; uniform float uProj; uniform float uAspect;",
     "uniform float uPxScale; uniform float uMaxSize; uniform float uMinPx;",
     "uniform float uTime; uniform float uBurst; uniform float uSeed;",
@@ -253,14 +381,18 @@
     "varying vec3 vCol;",
     "varying float vFade;",
     "void main() {",
-    "  float cy = mix(uCosY, 1.0, aSpin);",
-    "  float sy = mix(uSinY, 0.0, aSpin);",
+    "  float own = aSpin * uSpinT;",                    // 自己转过的角度
+    "  float co = cos(own), so = sin(own);",
+    "  float cy = uCosY * co - uSinY * so;",            // 拖着走 + 自己转，一次合成
+    "  float sy = uSinY * co + uCosY * so;",
     "  vec3 p = vec3(aPos.x * cy + aPos.z * sy, aPos.y, aPos.z * cy - aPos.x * sy);",
     "  p = vec3(p.x, p.y * uCosP - p.z * uSinP, p.y * uSinP + p.z * uCosP);",
     "  float d = uDist - p.z;",
     "  gl_Position = vec4(p.x * uProj / uAspect + uCenter.x, p.y * uProj + uCenter.y, d - uDist, d);",
-    "  float tw = aMeta.y > 0.0 ? 0.5 + 0.5 * sin(uTime * aMeta.y + aPos.x * 9.0 + aPos.z * 5.0 + aPos.y * 3.0) : 1.0;",
-    "  float k = mix(1.0, 0.34 + 1.20 * tw, aMeta.z);",
+    "  vec3 L = normalize(vec3(-0.45, 0.42, 0.79));",   // 左上偏前的一束光
+    "  float lam = 0.45 + 0.65 * max(dot(normalize(p), L), 0.0);",
+    "  float tw = 0.5 + 0.5 * sin(uTime * aMeta.y + aPos.x * 9.0 + aPos.z * 5.0 + aPos.y * 3.0);",
+    "  float k = mix(1.0, 0.34 + 1.20 * tw, aMeta.z) * lam;",
     "  float pick = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719)) + uSeed) * 43758.5453);",
     "  float flare = uBurst * step(0.95, pick);",
     "  k *= 1.0 + 1.6 * flare;",
@@ -281,6 +413,30 @@
     "  if (r2 > 0.25) discard;",
     "  gl_FragColor = vec4(vCol, clamp(smoothstep(0.25, 0.05, r2) * vFade * uAlpha, 0.0, 1.0));",
     "}"
+  ].join("\n");
+
+  /* 线框球：单独的 program（gl_PointCoord 对线段无意义，不能复用上面那支片元着色器） */
+  var WVS = [
+    "attribute vec3 aPos;",
+    "uniform float uAngle; uniform float uCosP; uniform float uSinP;",
+    "uniform float uDist; uniform float uProj; uniform float uAspect;",
+    "uniform vec2 uCenter;",
+    "varying float vFace;",
+    "void main() {",
+    "  float cy = cos(uAngle), sy = sin(uAngle);",
+    "  vec3 p = vec3(aPos.x * cy + aPos.z * sy, aPos.y, aPos.z * cy - aPos.x * sy);",
+    "  p = vec3(p.x, p.y * uCosP - p.z * uSinP, p.y * uSinP + p.z * uCosP);",
+    "  float d = uDist - p.z;",
+    "  gl_Position = vec4(p.x * uProj / uAspect + uCenter.x, p.y * uProj + uCenter.y, d - uDist, d);",
+    "  vFace = clamp(p.z * 1.1 + 0.5, 0.0, 1.0);",      // 背面的线更淡
+    "}"
+  ].join("\n");
+
+  var WFS = [
+    "precision mediump float;",
+    "varying float vFace;",
+    "uniform vec3 uColor; uniform float uAlpha;",
+    "void main() { gl_FragColor = vec4(uColor * (0.30 + 0.70 * vFace), uAlpha); }"
   ].join("\n");
 
   function fail(why) {
@@ -316,6 +472,24 @@
   if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { fail("link"); return; }
   gl.useProgram(prog);
 
+  /* 线框球的 program：gl_PointCoord 对线段无意义，所以单独一支片元着色器 */
+  var wProg = gl.createProgram();
+  var wvs = compile(gl.VERTEX_SHADER, WVS), wfs = compile(gl.FRAGMENT_SHADER, WFS);
+  if (!wvs || !wfs) { fail("shader-compile"); return; }
+  gl.attachShader(wProg, wvs);
+  gl.attachShader(wProg, wfs);
+  gl.linkProgram(wProg);
+  if (!gl.getProgramParameter(wProg, gl.LINK_STATUS)) { fail("link"); return; }
+  var WA = { pos: gl.getAttribLocation(wProg, "aPos") };
+  var WU = {};
+  ["uAngle", "uCosP", "uSinP", "uDist", "uProj", "uAspect", "uCenter", "uColor", "uAlpha"
+  ].forEach(function (k) { WU[k] = gl.getUniformLocation(wProg, k); });
+  var wire = buildWire();
+  var wBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, wBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, wire.data, gl.STATIC_DRAW);
+  gl.useProgram(prog);
+
   var cloud = buildCloud();
   var STRIDE = 10 * 4;
   var buf = gl.createBuffer();
@@ -332,7 +506,7 @@
     spin: gl.getAttribLocation(prog, "aSpin")
   };
   var U = {};
-  ["uCosY", "uSinY", "uCosP", "uSinP", "uDist", "uProj", "uAspect", "uPxScale",
+  ["uCosY", "uSinY", "uCosP", "uSinP", "uSpinT", "uDist", "uProj", "uAspect", "uPxScale",
     "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uAlpha", "uBurst", "uSeed"
   ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
 
@@ -354,11 +528,11 @@
   gl.depthMask(true);
   gl.clearColor(0, 0, 0, 0);                       // 画布全透明：点之外什么都不画，所以没有"面板"
 
-  /* 深浅主题共用同一份几何，只换混合函数与两个 uniform：
-     浅底用正常混合（彩色墨点压在浅底上），深底用加色混合（同样的点变成霓虹辉光）。 */
+  /* hero 现在两套主题都是深蓝台面，所以两边都用加色混合（点叠成辉光）；
+     深色主题再把色调与线框推亮一档，免得整块发闷。 */
   var MODES = {
-    light: { add: false, tint: [1.00, 1.00, 1.00], alpha: 1.00 },
-    dark: { add: true, tint: [1.10, 1.16, 1.30], alpha: 0.80 }
+    light: { add: true, tint: [1.06, 1.10, 1.20], alpha: 0.95, wire: 0.115 },
+    dark: { add: true, tint: [1.08, 1.12, 1.26], alpha: 0.88, wire: 0.075 }
   };
   var dark = false;
   function syncMode() {
@@ -409,6 +583,7 @@
     gl.uniform1f(U.uSinY, Math.sin(yaw));
     gl.uniform1f(U.uCosP, cp);
     gl.uniform1f(U.uSinP, sp);
+    gl.uniform1f(U.uSpinT, reduce ? 0 : now);
     gl.uniform1f(U.uDist, dist);
     gl.uniform1f(U.uProj, U_PROJ);
     gl.uniform1f(U.uAspect, w / h);
@@ -419,17 +594,32 @@
     gl.uniform1f(U.uBurst, burst);
     gl.uniform1f(U.uSeed, burstSeed);
 
+    // 线框球先画：点云自己写深度，正面那一半自然把线压住
+    gl.useProgram(wProg);
+    gl.uniform1f(WU.uAngle, yaw);
+    gl.uniform1f(WU.uCosP, cp);
+    gl.uniform1f(WU.uSinP, sp);
+    gl.uniform1f(WU.uDist, dist);
+    gl.uniform1f(WU.uProj, U_PROJ);
+    gl.uniform1f(WU.uAspect, w / h);
+    gl.uniform2f(WU.uCenter, f.cx * 2 - 1, 1 - f.cy * 2);
+    gl.uniform3f(WU.uColor, 0.42, 0.62, 1.0);
+    gl.uniform1f(WU.uAlpha, m.wire);
+    gl.bindBuffer(gl.ARRAY_BUFFER, wBuf);
+    gl.vertexAttribPointer(WA.pos, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(WA.pos);
+    gl.drawArrays(gl.LINES, 0, wire.count);
+    gl.disableVertexAttribArray(WA.pos);          // 免得下一趟点到线框的缓冲上去
+
+    gl.useProgram(prog);
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     bindPointers();
     gl.drawArrays(gl.POINTS, 0, cloud.count);
 
-    // 卫星：沿轨道移动的单点
-    var ang = (reduce ? 0 : now) * 0.26;
-    marker[0] = Math.cos(ang) * ORBIT;
-    marker[1] = 0;
-    marker[2] = Math.sin(ang) * ORBIT;
-    marker[3] = 0.98; marker[4] = 0.42; marker[5] = 0.78;
-    marker[6] = 0.018; marker[7] = 1.6; marker[8] = 0.9; marker[9] = 1;
+    // 卫星：本体待在轨道角 0 处，靠 aSpin 自己沿轨道跑（与轨道那圈点同角速度）
+    marker[0] = ORBIT; marker[1] = 0; marker[2] = 0;
+    marker[3] = 1.00; marker[4] = 0.72; marker[5] = 0.30;
+    marker[6] = 0.016; marker[7] = 1.4; marker[8] = 0.85; marker[9] = ORBIT_SPIN;
     gl.bindBuffer(gl.ARRAY_BUFFER, mBuf);
     gl.bufferData(gl.ARRAY_BUFFER, marker, gl.DYNAMIC_DRAW);
     bindPointers();
@@ -582,6 +772,7 @@
         ok: !hero.classList.contains("no-3d"),
         glError: gl.getError(),
         points: cloud.count,
+        wire: wire.count,
         dist: +camDist(canvas.height).toFixed(3),
         frame: { cx: +view.cx.toFixed(3), cy: +view.cy.toFixed(3), r: Math.round(view.r) },
         mode: dark ? "dark" : "light",

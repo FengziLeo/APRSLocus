@@ -56,7 +56,7 @@
 <link rel="canonical" href="https://aprslocus.theez.top/en/">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
 <link rel="stylesheet" href="../css/style.css?v=7">
-<link rel="stylesheet" href="../css/hero-3d.css?v=2">
+<link rel="stylesheet" href="../css/hero-3d.css?v=3">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -120,6 +120,7 @@ html{overflow-x:hidden}
 
 <!-- ═══════════ HERO ═══════════ -->
 <section class="hero" id="hero">
+  <canvas class="hero-topo" id="heroTopo" aria-hidden="true"></canvas>
   <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
   <div class="hero-grid"></div>
 
@@ -127,6 +128,8 @@ html{overflow-x:hidden}
   <canvas class="planet-canvas" id="planetCanvas" tabindex="0" role="img"
           aria-label="Draggable 3D planet: APRS stations, ring bands and a satellite orbit"></canvas>
   <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
+
+  <span class="hero-serif" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
 
   <div class="hero-inner">
 
@@ -139,11 +142,11 @@ html{overflow-x:hidden}
         It ships with no server address: enter your own APRS-IS server, or use a
         Bluetooth TNC / sound card / direct Icom connection.
       </p>
-      <div class="hero-release" id="heroRelease" style="display:inline-flex;align-items:center;gap:12px;margin:8px 0 6px;padding:12px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 30px rgba(45,70,120,.14);backdrop-filter:blur(14px)">
-        <span id="hrIcon" style="font-size:20px">✅</span>
+      <div class="hero-release" id="heroRelease">
+        <span id="hrIcon">✅</span>
         <span>
-          <b style="font-size:14px">APRSlocus 2.0 <span id="hrState" style="color:var(--cyan)">released</span></b>
-          <span id="hrTimer" style="display:block;font-size:12.5px;color:var(--text-faint)">2.0 is out · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener" style="color:var(--cyan);font-weight:700">Download now →</a></span>
+          <b>APRSlocus 2.0 <span id="hrState">released</span></b>
+          <span id="hrTimer">2.0 is out · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">Download now →</a></span>
         </span>
       </div>
       <div class="hero-actions">
@@ -152,7 +155,7 @@ html{overflow-x:hidden}
           <span id="heroDlText">Download 2.0</span>
         </a>
         <a class="btn btn-ghost" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
-          <i class="fa-solid fa-desktop" style="width:20px;height:20px"></i>
+          <i class="fa-solid fa-desktop"></i>
           Windows Installer
         </a>
         <a class="btn btn-text" href="../promo.html">2.0 Promo<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
@@ -1934,6 +1937,6 @@ html{overflow-x:hidden}
 </a>
 
 <script src="../js/main.js?v=7"></script>
-<script src="../js/planet-3d.js?v=2"></script>
+<script src="../js/planet-3d.js?v=3"></script>
 </body>
 </html>

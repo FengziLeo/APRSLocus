@@ -11,6 +11,10 @@
 - 故事在哪儿打开：**能内嵌的平台（Android / iOS / macOS）直接在应用内整屏翻开**
   —— 那一页本来就是给一块屏幕看的；Windows / Linux / Web 没有可用的内嵌后端，
   才交给系统浏览器。应用内那一页右上角另留了「在浏览器打开」。
+- 这一页自带背景音乐，所以退出时得把声音收干净：**返回或切到后台，音乐跟着停**。
+  Android 的 WebView 拆掉之后，页面里的 `<audio>` 并不会自己安静 —— 人回到关于页，
+  音乐还在。现在退出前先让页面按停、退场动画里再把整页腾空；切到后台也按停
+  （回来时音乐不会自动续上，页面上那个 BGM 开关可以重新点）。
 
 ---
 
@@ -27,6 +31,12 @@
   full-screen inside the app** — that page was written for a screen; only Windows /
   Linux / Web, which have no embedder available, hand it to the system browser. The
   in-app copy keeps an "open in browser" action in its top bar.
+- That page plays its own background music, so leaving it now takes the sound with it:
+  **going back or switching the app away stops the music**. An Android WebView does not
+  silence the `<audio>` inside it when it is torn down — you went back to About and the
+  music stayed. The page is now silenced before the route pops and unloaded during the
+  exit animation, and switching the app away silences it too (the music does not resume
+  by itself; the page's own BGM switch starts it again).
 
 ---
 

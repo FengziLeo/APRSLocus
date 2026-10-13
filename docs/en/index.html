@@ -610,6 +610,7 @@ html{overflow-x:hidden}
       </div>
       <div class="cl-body">
         <div class="cl-item"><span class="cl-dot new"></span><b>The cover easter egg no longer counts to five</b>: the egg on the About cover used to be "tap, then watch a motionless cover for five seconds" — nobody can tell an easter egg from a freeze. <b>A tap is the activation now</b>: the shudder, the flip and the particles happen together, and the moment the flip lands, that page of story is handed over; one more tap turns the cover back and the story stays closed. <b>Platforms with an embedder (Android / iOS / macOS) open it full-screen inside the app</b>; only Windows / Linux / Web hand it to the system browser.</div>
+        <div class="cl-item"><span class="cl-dot fix"></span><b>Leaving the page takes the music with it</b>: the story page plays its own background music, and leaving it (back, or switching the app away) used to leave the sound running — an Android WebView does not silence the audio inside it when it is torn down. The page is now silenced before the route pops and unloaded during the exit animation, and switching away silences it too.</div>
       </div>
     </div>
     <div class="cl-version reveal">

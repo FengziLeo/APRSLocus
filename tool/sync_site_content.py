@@ -443,6 +443,21 @@ CL = [
                '**Platforms with an embedder (Android / iOS / macOS) open it '
                'full-screen inside the app**; only Windows / Linux / Web hand it to '
                'the system browser.')),
+            ('fix',
+             T('**离开这一页，音乐就停**：故事页自带背景音乐，以前退出这一页（返回或'
+               '切到后台）之后声音还在响 —— Android 的 WebView 拆掉后，页面里的音频'
+               '（`audio` 元素）并不会自己安静。现在退出前先把声音按停、退场动画里'
+               '再把整页腾空，切到后台也同样按停。',
+               '**離開這一頁，音樂就停**：故事頁自帶背景音樂，以前退出這一頁（返回或'
+               '切到後台）之後聲音還在響 —— Android 的 WebView 拆掉後，頁面裡的音訊'
+               '（`audio` 元素）並不會自己安靜。現在退出前先把聲音按停、退場動畫裡'
+               '再把整頁騰空，切到後台也同樣按停。',
+               '**Leaving the page takes the music with it**: the story page plays its '
+               'own background music, and leaving it (back, or switching the app away) '
+               'used to leave the sound running — an Android WebView does not silence '
+               'the audio inside it when it is torn down. The page is now silenced '
+               'before the route pops and unloaded during the exit animation, and '
+               'switching away silences it too.')),
         ],
     },
     {

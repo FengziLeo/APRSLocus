@@ -611,6 +611,7 @@ html{overflow-x:hidden}
       </div>
       <div class="cl-body">
         <div class="cl-item"><span class="cl-dot new"></span><b>封面彩蛋不再等那五秒</b>：關於頁封面上那顆蛋，以前點一下要盯著一張不動的封面等五秒 —— 誰也分不清那是彩蛋還是卡住了。現在<b>一點就是一次啟動</b>：抖動、翻面、粒子一起發生，翻牌動畫剛走完，那一頁故事就遞到眼前；再點一下翻回正面，故事也不再打開。故事<b>能內嵌的平台（Android / iOS / macOS）直接在應用內整屏翻開</b>，只有 Windows / Linux / Web 才交給系統瀏覽器。</div>
+        <div class="cl-item"><span class="cl-dot fix"></span><b>離開這一頁，音樂就停</b>：故事頁自帶背景音樂，以前退出這一頁（返回或切到後台）之後聲音還在響 —— Android 的 WebView 拆掉後，頁面裡的音訊（<code>audio</code> 元素）並不會自己安靜。現在退出前先把聲音按停、退場動畫裡再把整頁騰空，切到後台也同樣按停。</div>
       </div>
     </div>
     <div class="cl-version reveal">

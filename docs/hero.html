@@ -6,6 +6,10 @@
 <title>下一格等你来补 · APRSlocus</title>
 <meta name="description" content="那颗一直在走的星球，和第一屏上那个数字背后的东西：电波从哪儿来、落在哪里，以及把它一起做出来的人。">
 <meta name="theme-color" content="#0a0e12">
+<!-- 声音那只 <audio> 会 302 到 http 的 CDN（只能这样拿到音源）：这条策略让浏览器
+     把那一跳升级成 https（CDN 本身支持 https），否则混合内容策略会当场掐掉这段音频。
+     这页没有别的 http 子资源，不会误伤。 -->
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <!-- 彩蛋页：整站没有一处链接指向它，robots 也不收它进 sitemap —— 只有自己走到这个
      地址的人才看得见。所以这页不放下载入口、不放品牌徽标与口号（要装应用从首页走），
      只留首页 hero 那一段画面，加上它背后的故事。 -->
@@ -36,15 +40,20 @@
 .story-text p { color: var(--text-dim); font-size: 16.5px; line-height: 1.85; margin: 0 0 16px; }
 .story-text p:last-child { margin-bottom: 0; }
 .story-text b { color: var(--text); }
-/* BGM 播放器：网易云的对外播放器，固定在右下角跟着整篇故事走（只有这页有 BGM）。
-   330×86 是那个播放器自己的尺寸；窄屏放不下就让它铺满减去两侧留白。
-   右侧留白与上面那颗 .hero-toggle 用同一个式子，两者在同一列上。 */
-.story-bgm {
-  position: fixed; right: clamp(20px, 6vw, 96px); bottom: 18px; z-index: 90;
-  width: 330px; max-width: calc(100vw - 40px);
+/* BGM：整页唯一的声音（只有这页有）。右下角一颗音符是开关，右侧留白与上面
+   那颗 .hero-toggle 用同一个式子，两者在同一列上。
+   330×86 那条 iframe 规则留着：音源万一载不出来，脚本会退回网易云播放器。 */
+.story-bgm { position: fixed; right: clamp(20px, 6vw, 96px); bottom: 18px; z-index: 90; }
+.story-bgm iframe { display: block; width: 330px; max-width: calc(100vw - 40px); height: 86px; border: 0; }
+/* 那颗音符：与右上角那颗主题按钮同一套玻璃语言，只是实心一点、大一号（右下角
+   是唯一的开关，得让人一眼看见）。响着的时候是强调色，不响的时候是灰的。 */
+.bgm-toggle { width: 40px; height: 40px; border-radius: 50%;
+  background: var(--glass); border-color: var(--line); box-shadow: 0 10px 26px var(--shadow-color); }
+.bgm-toggle.on { color: var(--cyan); border-color: var(--line-cool); }
+@media (max-width: 520px) {
+  .story-bgm { right: 14px; bottom: 14px; }
+  .story-bgm iframe { width: calc(100vw - 28px); }
 }
-.story-bgm iframe { display: block; width: 100%; height: 86px; border: 0; }
-@media (max-width: 520px) { .story-bgm { left: 12px; right: 12px; bottom: 12px; width: auto; } }
 /* ── 开场那一屏 ──
    这页从一句招呼开始：一屏高、垂直居中，只放招呼与标语；星球与那个数字在
    下面一屏，要往下翻才到 —— 所以这一屏自己不带任何画面。 */
@@ -350,57 +359,99 @@
 </main>
 
 <!-- ═══════════ BGM ═══════════
-     整页只有这一个外链 iframe（网易云音乐的对外播放器），挂在右下角跟着故事走。
-     auto=1 只是「请求自动播放」—— 浏览器通常要等到一次用户交互才肯出声，
-     所以这个播放器自己就是那颗播放键：点一下就唱，不点就一直安静。
-     title 是给读屏用的：iframe 没有可见文案，不给名字就是一个无名区块。 -->
-<div class="story-bgm">
-  <iframe id="bgmFrame" title="背景音乐播放器（网易云音乐）" allow="autoplay" frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&id=1903408779&auto=1&height=66"></iframe>
+     整页唯一的声音（网易云音乐「14.3 Billion Years」/ Outer Wilds 原声，循环播放）。
+     这里不再挂那个跨域 iframe —— 它的 <audio> 活在别人的壳子里，读者那一下手势
+     传不进去，「点一下就有声」就永远得看它脸色。换成一枚我们自己的 <audio>：
+     手势还在手上时直接 play()，声音就出得来。
+     右下角那颗音符是开关，与右上角那颗主题按钮同一套玻璃语言、同一个右侧留白，
+     两者在同一列上。音源万一载不出来（被墙、被浏览器挡），脚本会退回原来那个
+     网易云播放器 —— 退路总得留一条。 -->
+<div class="story-bgm" id="bgmBox">
+  <button class="theme-toggle bgm-toggle" id="bgmToggle" type="button" aria-pressed="false" aria-label="背景音乐：播放" title="背景音乐：播放"><i class="fa-solid fa-music" aria-hidden="true"></i></button>
 </div>
+<!-- 声音源：网易云音乐「14.3 Billion Years」（Outer Wilds 原声），循环。
+     不写 controls —— 开关就是上面那颗音符，播放器控件那一条不该出现在这里。 -->
+<audio id="bgm" loop preload="none" src="https://music.163.com/song/media/outer/url?id=1903408779.mp3"></audio>
 
-<!-- 让音乐真的响起来。浏览器不允许「页面还没被点过就出声」，这条跨域 iframe 里
-     那个 <audio> 我们碰不到，所以只能两步走：
-       ① 播放器自带 auto=1 先试一次 —— 常来的读者、手动放宽过策略的浏览器，
-          这一步当场就响；
-       ② 还没响，就借读者在这页上的**第一次交互**（点一下 / 按一下键 / 滚一下）
-          把播放器重新载入一次：在手势之后加载的播放器才有出声的资格。
-     同一次交互顺手在这页留个回响：开场那句邀请换一句回话，球面闪一批点
-     （和收到一条报文时同一个钩子），那个数字亮一下（同一段 bump 动画）——
-     你按的这一下，看上去就是一次真实的上报。全部一次性，触发完就撤监听。 -->
+<!-- 让音乐真的响起来。浏览器只认一条规矩：声音必须在读者自己的那一下手势里起头。
+     原来那个网易云播放器是别人域里的 iframe，它的 <audio> 我们够不着、手势也传不
+     进去，所以「点一下就有声」永远得看它脸色；现在声音源在我们自己手里 —— 第一次
+     交互（点 / 按 / 滚）当场 play()，手势还没散，声音一定出得来。
+     同一次交互顺手在这页留个回响：球面闪一批点（和收到一条报文时同一个钩子），
+     那个数字亮一下（同一段 bump 动画）—— 你按的这一下，看上去就是一次真实的上报。
+     等声音真的起来了，开场那句邀请才换成回话；音源要是载不出来，退回网易云播放器。 -->
 <script>
 (function () {
   var press = document.getElementById("heroPress");
-  var frame = document.getElementById("bgmFrame");
+  var audio = document.getElementById("bgm");
+  var btn = document.getElementById("bgmToggle");
+  var box = document.getElementById("bgmBox");
   var val = document.getElementById("tlPackets");
-  var src = frame && frame.getAttribute("src");
   var TYPES = ["pointerdown", "touchstart", "keydown", "wheel"];
-  var fired = false;
+  var want = false, said = false, dead = false, watch = 0;
 
-  function echo() {
-    // 球面闪一批点：与遥测每跳一格调的是同一个钩子（没有 WebGL 时不必勉强）
+  /* 这一下的回响：与遥测每跳一格调的是同一套钩子（没有 WebGL 时不必勉强） */
+  function react() {
     try {
       if (window.__planet3d && window.__planet3d.flash) window.__planet3d.flash(1);
     } catch (e) {}
-    // 数字亮一下：与「刚收到一条报文」同一段动画（先摘再挂，动画才会重播）
-    if (val) {
-      val.classList.remove("bump");
-      void val.offsetWidth;
-      val.classList.add("bump");
-    }
+    if (val) { val.classList.remove("bump"); void val.offsetWidth; val.classList.add("bump"); }
   }
-
-  function wake() {
-    if (fired) return;
-    fired = true;
-    TYPES.forEach(function (t) { window.removeEventListener(t, wake); });
-    if (frame && src) frame.setAttribute("src", src + "&_r=" + Date.now());  // 手势后再载一次
-    echo();
+  /* 真出声了，才把开场那句邀请换成回话 —— 不然说完发现没响，就成了空话。 */
+  function say() {
+    if (said) return;
+    said = true;
     if (press) {
       press.textContent = "听见了吗 —— 这一下也算数了，你已经在广播里。";
       setTimeout(function () { press.classList.add("done"); }, 1500);
     }
   }
-
+  function paint(on) {
+    if (!btn) return;
+    btn.classList.toggle("on", !!on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.setAttribute("aria-label", on ? "背景音乐：暂停" : "背景音乐：播放");
+    btn.setAttribute("title", on ? "背景音乐：暂停" : "背景音乐：播放");
+  }
+  /* 退路：音源载不出来（被墙、被浏览器的策略挡掉、超时没动静）就换回原来那个
+     网易云播放器，还读者一颗自己能按的播放键。 */
+  function fallback() {
+    if (dead) return;
+    dead = true;
+    want = false;
+    if (watch) { clearTimeout(watch); watch = 0; }
+    if (box) {
+      box.innerHTML = '<iframe title="背景音乐播放器（网易云音乐）" allow="autoplay"'
+        + ' frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86"'
+        + ' src="//music.163.com/outchain/player?type=2&id=1903408779&auto=1&height=66"></iframe>';
+    }
+  }
+  function start() {
+    if (!audio || dead) return;
+    want = true;
+    paint(true);
+    var p = audio.play();
+    if (p && p.catch) p.catch(function () { want = false; paint(false); });
+    if (!watch) watch = setTimeout(function () {      // 12s 还没动静，就当它载不出来
+      if (audio && audio.paused) fallback();
+    }, 12000);
+  }
+  if (audio) {
+    audio.addEventListener("playing", function () { paint(true); say(); });
+    audio.addEventListener("pause", function () { want = false; paint(false); });
+    audio.addEventListener("error", fallback);
+  }
+  if (btn) btn.addEventListener("click", function () {
+    if (want) audio.pause();
+    else { react(); start(); }
+  });
+  /* 全页第一次交互：这一下就是一次发射。点在那颗音符上不算 —— 那颗按钮自己说了算。 */
+  function wake(e) {
+    if (box && e && e.target && box.contains(e.target)) return;
+    TYPES.forEach(function (t) { window.removeEventListener(t, wake); });
+    react();
+    start();
+  }
   TYPES.forEach(function (t) {
     window.addEventListener(t, wake, { once: true, passive: true });
   });

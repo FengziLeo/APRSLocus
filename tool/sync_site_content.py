@@ -3509,7 +3509,7 @@ def md_inline(s):
 ROW = (
     '    <article class="feat reveal">\n'
     '      <span class="feat-no">%02d</span>\n'
-    '      <span class="feat-ico"><i class="fa-solid {fa}"></i></span>\n'
+    '      <span class="feat-ico"><i class="fa-solid {fa}" aria-hidden="true"></i></span>\n'
     '      <div class="feat-main">\n'
     '        <h3>{title}</h3>\n'
     '        <p>{desc}</p>\n'

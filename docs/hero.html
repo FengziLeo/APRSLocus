@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>下一格等你来补 · APRSlocus</title>
-<meta name="description" content="APRSlocus 官网首屏那颗星球、以及那个一直在走的数字背后的故事：报文从哪来、落在哪里、为什么它会一直往上跳。">
+<meta name="description" content="那颗一直在走的星球，和第一屏上那个数字背后的东西：电波从哪儿来、落在哪里，以及把它一起做出来的人。">
 <meta name="theme-color" content="#0a0e12">
 <!-- 彩蛋页：整站没有一处链接指向它，robots 也不收它进 sitemap —— 只有自己走到这个
      地址的人才看得见。所以这页不放下载入口、不放品牌徽标与口号（要装应用从首页走），
@@ -127,17 +127,20 @@
 </section>
 
 <!-- ═══════════ 一 · 那个数字是谁的 ═══════════
-     页面唯一的 h1：这页没有品牌徽标可当下标题，故事本身就得自己开篇
+     这一页只做一件事：把第一屏那颗球和那个数字讲成人话。全篇叙情，不介绍产品 ——
+     所以这里没有数据源文件名、没有外推公式、没有接口与协议名（那些在首页与文档里）。
+     页面唯一的 h1 落在这里：这页没有品牌徽标可当下标题，故事自己开篇
      （.section-head h1 与 h2 同一套度量，见 style.css）。 -->
 <section class="section" id="story">
   <div class="section-head reveal">
     <h1>那个数字是谁的</h1>
-    <p>APRSlocus 累计转发报文 —— 第一屏上一直往上走的那个数。</p>
+    <p>它在第一屏上一直往上走。不是刻度，是此刻天空里正在发生的应答。</p>
   </div>
   <div class="section-body">
     <div class="story-text reveal" data-delay="1">
-      <p>它不是统计图里的一格刻度，而是<strong>此刻全世界 APRS 台站累计转发过的报文总量</strong>。屏幕上每跳一格，就有一条报文刚被转发出去 —— 可能来自城里某辆车的车载台，也可能来自某个山头上的一台手台。</p>
-      <p>数字从 <code>stats.json</code> 里那张快照出发，按「基线 + 速率 × 经过的分钟数」在本地往前推，不需要后端，也不需要定时任务。快照超过 12 小时就不再外推 —— 宁可停在一个保守的上限，也不给你一个凭空涨出来的数。</p>
+      <p>它不是统计图上刻好的一格。它是此刻，全世界 APRS 台站转发过的每一次应答 —— 可能来自城里某辆车的车载台，也可能来自山头上的一台手台，海面上的一条船。</p>
+      <p>它一刻不停地往上走。每跳一格，就是有人在某个地方按下了发射键。</p>
+      <p>它不靠谁在背后推：你打开这页，它就自己往前走。走得久了会慢下来，停在最后一张快照上 —— 宁可少报一点，也不凭空涨给你看。</p>
     </div>
   </div>
 </section>
@@ -146,12 +149,12 @@
 <section class="section alt" id="air">
   <div class="section-head reveal">
     <h2>电波从哪来</h2>
-    <p>一条报文到你眼前之前，走哪条路由发的人自己决定。</p>
+    <p>一条报文到你眼前之前，先得有人把它送上天。</p>
   </div>
   <div class="section-body">
     <div class="story-text reveal" data-delay="1">
-      <p>它可能经由 APRS-IS 服务器从一台手机或电脑发出；也可能从蓝牙 TNC、声卡音频进来，或者来自一台直连的 Icom 电台；地图上那些站点，就是这些不同的路最后汇在一起的样子。APRS-IS · TNC · 音频 · PKWDWPL —— <strong>四种来源，同一张地图</strong>。</p>
-      <p>APRSlocus 不提供、也不预置任何服务器地址。要联网，服务器和连接方式都由你自己填 —— 这条路是你的。</p>
+      <p>它可能起于一台手机，顺着网络绕回来；也可能从一根蓝牙线、一块声卡、一台直连的电台里进来。路有很多条，落点只有一个 —— 你面前这张地图。</p>
+      <p>于是同一张地图上，你会看见不同来路的点：有人从网络里来，有人从电台上来。他们未必相识，却在同一片天空下被画在了一起。</p>
     </div>
   </div>
 </section>
@@ -160,13 +163,13 @@
 <section class="section" id="planet">
   <div class="section-head reveal">
     <h2>它落在哪里</h2>
-    <p>每一条报文最后都落回顶上那颗星球 —— 那一屏不是贴图。</p>
+    <p>每一条电波，最后都落回上面那颗星球。</p>
   </div>
   <div class="section-body">
     <div class="story-text reveal" data-delay="1">
-      <p>一万三千个点铺成球体，十二根经线与七根纬线撑着那层线框；球面上会闪的那几粒，就是台站在上报。</p>
-      <p>三圈环带各转各的（内圈走得快、外圈慢，按开普勒的 ω ∝ r<sup>-1.5</sup> 排），七颗卫星带着尾迹从球外划过去；偶尔有流星斜插进来，在落点荡开一圈冲击波，再慢慢化开。星面上还有三层浪在跑。一共就这些 —— 都是这一屏里真实在动的几何。</p>
-      <p>它自转、它呼吸，但不接受拖动：这层画面是给你看的，不是给你转的。</p>
+      <p>一万三千个点聚成一颗球，经纬线把它撑起来；球面上闪的那几粒，就是有人在回答。</p>
+      <p>三圈环带各转各的，越靠里走得越快；七颗卫星带着尾迹从球外划过；偶尔有流星斜插进来，在落点荡开一圈波纹，又慢慢化开。球面上还有三层浪在走。</p>
+      <p>它自转，它呼吸，却从不接受谁的拖动 —— 这层画面是给你看的，不是给你转的。</p>
     </div>
   </div>
 </section>
@@ -175,12 +178,12 @@
 <section class="section alt" id="next">
   <div class="section-head reveal">
     <h2>下一格等你来补</h2>
-    <p>电波穿过夜空，最后都落在这颗星球上。</p>
+    <p>你还没开口，球面上就空着一格。</p>
   </div>
   <div class="section-body">
     <div class="story-text reveal" data-delay="1">
-      <p>想自己也发一条，从首页开始 —— 装好、填上呼号和服务器，你那个点就会出现在球面上。</p>
-      <p>开口之前先看一眼下面那份名单：球面上已经亮着的那些点，不少就是他们留下的。</p>
+      <p>总有一天你也会按一次发射键：到那时，球面上会多一点光，是你在回答。</p>
+      <p>在那之前，先看一眼下面那份名单 —— 球面上已经亮着的那些点，不少是他们留下的。</p>
     </div>
   </div>
 </section>
@@ -288,6 +291,7 @@
     </div>
     <p class="cta-line reveal">完整称号、简介与徽标在 <a href="member-card.html">荣誉墙</a>。</p>
     <div class="story-text reveal">
+      <p>名单之外，还有一整片正在应答的天空。</p>
       <p><a class="btn btn-text" href="index.html">回首页<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a></p>
     </div>
   </div>

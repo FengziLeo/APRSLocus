@@ -75,18 +75,13 @@
 
     var shown = -1;
 
-    // 外推上限：快照越旧，"基线 + 速率 × 经过时间"离真值越远。超过 12 小时就停止
-    // 推算（数字冻结在上限值、压暗一档，说明挂在 title 上）—— 宁可保守一点，
-    // 也不要让一个月后打开页面的人看到一个凭空多出 15% 的"累计"。
-    var MAX_DRIFT_MIN = 720, wasStale = false;
-
+    // 不做上限：这个数字就该一直往上走（维护者的要求）。代价说清楚 —— 快照越旧，
+    // "基线 + 速率 × 经过的分钟数"离真值越远，估算就是估算；换来的是一直在动的
+    // 读数，而不是一个到点就冻住、还压暗一档的数。想让它准，就更新 stats.json。
     function tick() {
       var now = Date.now();
       if (now < t0) t0 = now;                       // 快照时间在未来（时钟偏差）→ 不倒退
-      var elapsed = (now - t0) / 60000;
-      var stale = elapsed > MAX_DRIFT_MIN;
-      var mins = stale ? MAX_DRIFT_MIN : elapsed;
-      var live = packets + Math.floor(mins * rate);
+      var live = packets + Math.floor(((now - t0) / 60000) * rate);
       if (live !== shown) {
         var grew = shown >= 0 && live > shown;
         elVal.textContent = fmt(live);
@@ -97,11 +92,6 @@
           if (hooks.flash) hooks.flash(live);       // 读数一跳，星面闪一批点
         }
         shown = live;
-      }
-      if (stale !== wasStale) {
-        wasStale = stale;
-        root.classList.toggle("stale", stale);
-        if (stale) root.title = root.getAttribute("data-stale-title") || "";
       }
     }
 

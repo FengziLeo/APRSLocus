@@ -332,8 +332,7 @@ def main():
             chk('%s : hero 星球层就位、旧面板已撤' % f,
                 'id="planetCanvas"' in s and 'class="planet-fallback"' in s
                 and 'id="heroTelemetry"' in s and 'class="hero-stat"' in s
-                and 'hero-phone' not in s and 'hero-stage' not in s
-                and 'data-stale-title="' in s)
+                and 'hero-phone' not in s and 'hero-stage' not in s)
             # 星球直接长在 hero 上、不在面板里：画布必须排在 .hero-inner 前面
             chk('%s : 星球画布在 hero 层（非面板）' % f,
                 s.index('id="planetCanvas"') < s.index('class="hero-inner"')
@@ -421,7 +420,7 @@ def main():
         all(x in hero_js for x in ('uWave', 'uImpDir0', 'uImpAge2', 'IMP_SLOTS', 'IMP_AGE',
                                    'buildImpacts', 'stepImpacts', 'pickImpactDir'))
         and 'exp(-qa * qa)' in hero_js and 'pow((distance(' not in hero_js
-        and 'uWave' in hero_js and '.hero-stat.stale .tl-value' in hero_css)
+        and 'uWave' in hero_js)
     # 撞击的收尾必须"化开"而不是被闸门切断：环要减速扩张（1-e^-t）、要随时间变宽、
     # 亮度用 smoothstep 起手 + 长尾衰减，且流星在到达前先淡掉（命中是一次交接）。
     # 上一版是 step(1.20, age) 一刀切 + 匀速环 —— 用户看到的就是"啪"地断掉。

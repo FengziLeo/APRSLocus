@@ -97,6 +97,13 @@
     columns: 6 116px; column-gap: 24px;
     font-size: 15px; line-height: 2.05; color: var(--text-dim); }
   .lit-list li { break-inside: avoid; }
+  /* ── 成员名单（开山 / 早期成员）──
+     不做成一颗颗胶囊：人多的时候一排排名字最好读，也不会有「标签」的味道。
+     与「已点亮用户」那份纯呼号名单同一套做法，只是列数按人数收。 */
+  .name-list { list-style: none; margin: 0; padding: 0;
+    columns: 4 120px; column-gap: 22px;
+    font-size: 15px; line-height: 2.05; color: var(--text); }
+  .name-list li { break-inside: avoid; }
 
 
   /* 页脚那句「点一下继续」：第一下之后才出现，走到最后一屏自己退场。 */
@@ -380,62 +387,72 @@ html, body { height: auto; overflow: auto; }
   <section class="slide">
     <div class="slide-inner rise">
       <div class="cgroup">
-            <div class="cgroup-title">早期成员 · 53 位</div>
-            <div class="contributors">
-              <span class="contributor"><span class="c-name">BG7PGW</span><span class="c-role">功能测试 · 赞助</span></span>
-              <span class="contributor"><span class="c-name">BG7LMW</span><span class="c-role">功能测试</span></span>
-              <span class="contributor"><span class="c-name">BG7OSL</span><span class="c-role">功能测试</span></span>
-              <span class="contributor"><span class="c-name">BG4LZY</span><span class="c-role">Bug 提交与反馈</span></span>
-              <span class="contributor"><span class="c-name">BA3RZL</span><span class="c-role">AI 算力支持</span></span>
-              <span class="contributor"><span class="c-name">BA4JLD</span></span>
-              <span class="contributor"><span class="c-name">BA4RAB</span></span>
-              <span class="contributor"><span class="c-name">BA8AFU</span></span>
-              <span class="contributor"><span class="c-name">BA8AZJ</span></span>
-              <span class="contributor"><span class="c-name">BD7LGH</span></span>
-              <span class="contributor"><span class="c-name">BG0AVI</span></span>
-              <span class="contributor"><span class="c-name">BG7MYN</span></span>
-              <span class="contributor"><span class="c-name">BG1QGB</span></span>
-              <span class="contributor"><span class="c-name">BG0FCU</span></span>
-              <span class="contributor"><span class="c-name">BH3PYF</span></span>
-              <span class="contributor"><span class="c-name">BH6JOI</span></span>
-              <span class="contributor"><span class="c-name">BH6RIZ</span></span>
-              <span class="contributor"><span class="c-name">BH6TAD</span></span>
-              <span class="contributor"><span class="c-name">BH2WTV</span></span>
-              <span class="contributor"><span class="c-name">BI3ATV</span></span>
-              <span class="contributor"><span class="c-name">BD6KIR</span></span>
-              <span class="contributor"><span class="c-name">BG7PJV</span></span>
-              <span class="contributor"><span class="c-name">BG7ORC</span></span>
-              <span class="contributor"><span class="c-name">BA3MDC</span></span>
-              <span class="contributor"><span class="c-name">BG9KAG</span></span>
-              <span class="contributor"><span class="c-name">BG5JVM</span></span>
-              <span class="contributor"><span class="c-name">BG6XVJ</span></span>
-              <span class="contributor"><span class="c-name">BA4IUD</span></span>
-              <span class="contributor"><span class="c-name">BG7MGR</span></span>
-              <span class="contributor"><span class="c-name">BI7LKD</span></span>
-              <span class="contributor"><span class="c-name">BI7JEN</span></span>
-              <span class="contributor"><span class="c-name">BG7NMF</span></span>
-              <span class="contributor"><span class="c-name">BH7LDC</span></span>
-              <span class="contributor"><span class="c-name">BI7NQM</span></span>
-              <span class="contributor"><span class="c-name">BG7OSQ</span></span>
-              <span class="contributor"><span class="c-name">BA7KK</span></span>
-              <span class="contributor"><span class="c-name">BG7PFE</span></span>
-              <span class="contributor"><span class="c-name">BA7LUT</span></span>
-              <span class="contributor"><span class="c-name">BH6SXA</span></span>
-              <span class="contributor"><span class="c-name">BD1FEH</span></span>
-              <span class="contributor"><span class="c-name">BG7OTH</span></span>
-              <span class="contributor"><span class="c-name">BI4APF</span></span>
-              <span class="contributor"><span class="c-name">BG7ODE</span></span>
-              <span class="contributor"><span class="c-name">BD3QYZ</span></span>
-              <span class="contributor"><span class="c-name">YF3CJU</span></span>
-              <span class="contributor"><span class="c-name">BI4BNF</span></span>
-              <span class="contributor"><span class="c-name">BA7OPF</span></span>
-              <span class="contributor"><span class="c-name">BG6TA</span></span>
-              <span class="contributor"><span class="c-name">BG2EFX</span><span class="c-role">赞助支持</span></span>
-              <span class="contributor"><span class="c-name">BG2WX</span><span class="c-role">赞助支持</span></span>
-              <span class="contributor"><span class="c-name">BA7NFI</span><span class="c-role">分享传播</span></span>
-              <span class="contributor"><span class="c-name">BD4TYW</span><span class="c-role">赞助支持</span></span>
-              <span class="contributor"><span class="c-name">BH2WIX</span><span class="c-role">赞助支持</span></span>
-            </div>
+            <div class="cgroup-title">开山成员 · 15 位</div>
+            <ul class="name-list">
+              <li>BG7PGW</li>
+              <li>BG7LMW</li>
+              <li>BG7OSL</li>
+              <li>BG7MYN</li>
+              <li>BH6RIZ</li>
+              <li>BG7ORC</li>
+              <li>BG7MGR</li>
+              <li>BI7LKD</li>
+              <li>BI7JEN</li>
+              <li>BG7NMF</li>
+              <li>BH7LDC</li>
+              <li>BI7NQM</li>
+              <li>BG7OSQ</li>
+              <li>BA7KK</li>
+              <li>BG7PFE</li>
+            </ul>
+          </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="slide-inner rise">
+      <div class="cgroup">
+            <div class="cgroup-title">早期成员 · 38 位</div>
+            <ul class="name-list">
+              <li>BG4LZY</li>
+              <li>BA3RZL</li>
+              <li>BA4JLD</li>
+              <li>BA4RAB</li>
+              <li>BA8AFU</li>
+              <li>BA8AZJ</li>
+              <li>BD7LGH</li>
+              <li>BG0AVI</li>
+              <li>BG1QGB</li>
+              <li>BG0FCU</li>
+              <li>BH3PYF</li>
+              <li>BH6JOI</li>
+              <li>BH6TAD</li>
+              <li>BH2WTV</li>
+              <li>BI3ATV</li>
+              <li>BD6KIR</li>
+              <li>BG7PJV</li>
+              <li>BA3MDC</li>
+              <li>BG9KAG</li>
+              <li>BG5JVM</li>
+              <li>BG6XVJ</li>
+              <li>BA4IUD</li>
+              <li>BA7LUT</li>
+              <li>BH6SXA</li>
+              <li>BD1FEH</li>
+              <li>BG7OTH</li>
+              <li>BI4APF</li>
+              <li>BG7ODE</li>
+              <li>BD3QYZ</li>
+              <li>YF3CJU</li>
+              <li>BI4BNF</li>
+              <li>BA7OPF</li>
+              <li>BG6TA</li>
+              <li>BG2EFX</li>
+              <li>BG2WX</li>
+              <li>BA7NFI</li>
+              <li>BD4TYW</li>
+              <li>BH2WIX</li>
+            </ul>
           </div>
     </div>
   </section>
@@ -813,8 +830,14 @@ html, body { height: auto; overflow: auto; }
   </section>
 
   <section class="slide">
+    <div class="slide-inner slide-line rise">
+      <p>谢谢你们 —— 名单上的每一个名字，和名单外的每一次应答。</p>
+    </div>
+  </section>
+
+  <section class="slide">
     <div class="slide-inner slide-slogan rise">
-      <p>那颗星球还在转，那个数字还在往上走。</p>
+      <p>那颗星球还在转，那个数字还在往上走 —— 下一次让它亮起来的，可能就是你。</p>
     </div>
   </section>
 

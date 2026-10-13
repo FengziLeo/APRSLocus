@@ -25,7 +25,7 @@
   /* 只铺满**第一屏**：hero 现在比一屏高（下载那块在下面等着滚出来），画布要是
      跟着 hero 一起长，取景半径 h 会跟着变大，星球就被动地变大、变低。 */
   position: absolute; top: 0; left: 0; z-index: 1;
-  width: 100%; height: 100vh; display: block;
+  width: 100%; height: 100vh; height: 100svh; display: block;
   pointer-events: none;           /* 这层是画面不是控件：不接指针、不接焦点 */
   /* 这里不做 CSS 入场动画：「聚成球 + 机位退定」由 planet-3d.js 在 WebGL 里
      做（否则 CSS 的 transform 会盖掉滚动视差）。这一层只负责往下拉页面时
@@ -40,13 +40,21 @@
 /* 文案在最上层。hero-inner 自己不拦指针事件（整个 hero 只剩文案要接事件），
    只有文案栏恢复接收：链接、选中文字照常。 */
 .hero-inner { grid-template-columns: minmax(0, 1fr); pointer-events: none; }
+
+/* ── 首屏高度的基准：只定义一次 ──
+   hero 的顶部留白（原来硬写在 style.css 的 padding: 140px … 里）在这里收成
+   一个变量，首屏高度 = 一屏（svh，手机地址栏收起也不会溢出）减去它。
+   以前是“140px 的内边距”和下面那个 min-height: calc(100vh - 150px) 两个数
+   各说各话 —— 内边距一改，那个 150 就静静地错了。 */
+.hero { --hero-pad-top: 140px; padding-top: var(--hero-pad-top); }
 /* ── 第一屏只摆那个数字 ──
-   进来第一眼应该是一个数，不是一段自我介绍。所以首屏就是一个差不多一屏高的
-   盒子（hero 的上内边距是 140px，减 150 之后盒子正好压在折线上），数字在盒子
-   里垂直居中；说明与下载都在它下面，要滚上来。 */
+   进来第一眼应该是一个数，不是一段自我介绍。所以第一屏就是"一屏减去 hero 顶部
+   留白"这么高的盒子（两个数都从 --hero-pad-top 来，见上面），数字在盒子里垂直
+   居中；说明与下载都在它下面，要滚上来。 */
 .hero-copy {
   pointer-events: auto; position: relative; max-width: 620px;
-  min-height: calc(100vh - 150px);
+  min-height: calc(100vh - var(--hero-pad-top));
+  min-height: calc(100svh - var(--hero-pad-top));
   display: flex; align-items: center; justify-content: flex-start;
   /* 往下拉：数字比星球走得快一点、先淡掉、再轻缩一档，hero 交给下一屏。
      位移 / 缩放 / 透明度都是脚本按"缓动后的滚动量"每帧写进来的变量 ——
@@ -148,7 +156,7 @@
 .hero.no-3d .planet-canvas { display: none; }
 .hero.no-3d .planet-fallback {
   display: block; position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none;
-  width: 100%; height: 100vh;
+  width: 100%; height: 100vh; height: 100svh;
   /* 跟画布同一套变量：降级成纯 CSS 星球时，往下拉也一样退开 */
   transform: translate3d(0, var(--hero-3d-y, 0px), 0) scale(var(--hero-3d-scale, 1));
   opacity: var(--hero-3d-fade, 1);
@@ -173,7 +181,7 @@
       箭头图标、没有盒子 —— 它就是一条线，接住「继续往下看」这个动作；
       真的往下拉之后，星球与文案的退场动画接上，提示自己也就随 hero 走掉了。 ── */
 .hero-scroll {
-  display: block; position: absolute; left: 50%; top: calc(100vh - 76px); z-index: 3;
+  display: block; position: absolute; left: 50%; top: calc(100vh - 76px); top: calc(100svh - 76px); z-index: 3;
   width: 26px; height: 52px; margin-left: -13px;
   opacity: .62; transition: opacity .4s var(--ease);
   animation: heroCueFloat 2.8s var(--ease) infinite;

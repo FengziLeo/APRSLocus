@@ -88,8 +88,10 @@
       <span class="brand-name">APRSlocus</span>
     </a>
     <nav class="nav-links" id="navLinks">
-      <a href="#announce" class="nav-new">News</a>
+      <a href="../promo.html" class="nav-new">2.0 Promo</a>
+      <a href="#announce">News</a>
       <a href="#features">Features</a>
+      <a href="#ui2">Interface</a>
       <a href="#platforms">Platforms</a>
       <a href="#changelog">Changelog</a>
       <a href="#getting-started">Getting Started</a>
@@ -97,8 +99,9 @@
       <a href="manual/index.html">Guide</a>
       <a href="#community">Community</a>
       <a href="#friends">Links</a>
+      <a href="../guide.html">Walkthrough</a>
       <a href="../card.html">Card</a>
-      <a class="nav-cta" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">2.0 BETA</a>
+      <a class="nav-cta" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">Download 2.0</a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode" title="Switch to dark mode" data-label-dark="Switch to light mode" data-label-light="Switch to dark mode"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
       <span class="lang-switch-group"><a class="lang-switch" href="../" hreflang="zh-Hans">简中</a><a class="lang-switch" href="../zh-TW/" hreflang="zh-Hant">繁中</a><a class="lang-switch" href="./" hreflang="en">EN</a></span>
     </nav>
@@ -108,6 +111,19 @@
   </div>
 </header>
 
+<style>
+.hero-phone .phone-screen>.ph-shot{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:30;background:#F4F7FC}
+.hero-phone .phone-notch{display:none}
+.hero-phone .phone{background:linear-gradient(150deg,#525b6e,#2b3242 40%,#0c0f16);border:none;aspect-ratio:900/1900}
+.hero-phone .deskwin{display:none!important}
+.hero-phone{display:flex;align-items:center;justify-content:center;height:auto;min-height:700px;overflow:visible}
+.hero-phone .phone{position:relative;right:auto;bottom:auto;width:min(360px,86%);aspect-ratio:9/19}
+.hero-phone::after{display:none}
+.nav-links{flex-wrap:nowrap;gap:2px}
+.nav-links>a{padding:9px 11px;font-size:14px}
+html{overflow-x:hidden}
+</style>
+
 <!-- ═══════════ HERO ═══════════ -->
 <section class="hero" id="hero">
   <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
@@ -115,7 +131,7 @@
 
   <div class="hero-inner">
     <div class="hero-copy">
-      <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0 BETA</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
+      <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
       <div class="hero-wordmark">TOUCH SKY</div>
       <p class="hero-slogan">APRS <span class="grad">Tracking</span> &amp; <span class="grad">Mapping</span></p>
       <p class="hero-sub">
@@ -123,15 +139,23 @@
         It ships with no server address: enter your own APRS-IS server, or use a
         Bluetooth TNC / sound card / direct Icom connection.
       </p>
+      <div class="hero-release" id="heroRelease" style="display:inline-flex;align-items:center;gap:12px;margin:8px 0 6px;padding:12px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 30px rgba(45,70,120,.14);backdrop-filter:blur(14px)">
+        <span id="hrIcon" style="font-size:20px">✅</span>
+        <span>
+          <b style="font-size:14px">APRSlocus 2.0 <span id="hrState" style="color:var(--cyan)">released</span></b>
+          <span id="hrTimer" style="display:block;font-size:12.5px;color:var(--text-faint)">2.0 is out · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener" style="color:var(--cyan);font-weight:700">Download now →</a></span>
+        </span>
+      </div>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
+        <a class="btn btn-primary" id="heroDownload" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
           <i class="fa-solid fa-mobile-screen"></i>
-          Download Android APK
+          <span id="heroDlText">Download 2.0</span>
         </a>
         <a class="btn btn-ghost" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
           <i class="fa-solid fa-desktop" style="width:20px;height:20px"></i>
           Windows Installer
         </a>
+        <a class="btn btn-text" href="../promo.html">2.0 Promo<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
         <a class="btn btn-text" href="#getting-started">Get Started<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
       </div>
       <div class="hero-meta">
@@ -144,6 +168,7 @@
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
+          <img class="ph-shot" src="../assets/hero-2.0.png" alt="APRSlocus 2.0 interface" width="900" height="1900">
           <div class="ph-statusbar">
             <span class="ph-time">14:28</span>
             <span class="ph-sig">
@@ -322,6 +347,40 @@
       </a>
     </div>
   </div>
+</section>
+
+<!-- ═══════════ UI 2.0 Preview ═══════════ -->
+<section class="section" id="ui2">
+  <div class="section-head" style="max-width:760px;margin:0 auto 44px;text-align:center">
+    <div style="width:42px;height:3px;border-radius:3px;background:var(--grad);margin:0 auto 16px"></div>
+    <h2 style="font-size:clamp(28px,4.4vw,44px);font-weight:800;letter-spacing:-.02em">UI 2.0 · Live Preview</h2>
+    <p style="color:var(--text-dim);margin-top:12px">The all-new UI 2.0: a full-screen map with floating capsule navigation and draggable panels. <a href="../promo.html" style="color:var(--cyan);font-weight:700">See the full promo page →</a></p>
+  </div>
+  <div class="ui2one">
+    <div class="ui2one-img"><span class="dev"><img loading="lazy" src="../assets/hero-2.0.png" alt="APRSlocus 2.0 interface" width="900" height="1900"></span></div>
+    <div class="ui2one-txt">
+      <h3>Map-first · Everything floats</h3>
+      <ul>
+        <li>The map stays on screen full-time — pages no longer destroy it</li>
+        <li>Floating capsule navigation at the bottom, with a sliding indicator</li>
+        <li>Draggable content panels with a 44px grab handle</li>
+        <li>Top-right capsules: weather / link status / position</li>
+        <li>Frosted glass · Mica materials, light and dark themes</li>
+      </ul>
+      <a class="btn btn-primary" href="../promo.html">Open the 2.0 promo page →</a>
+    </div>
+  </div>
+  <style>
+    .ui2one{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:56px;align-items:center}
+    .ui2one-img{display:flex;justify-content:center}
+    .ui2one-img .dev{display:block;width:300px;padding:10px;border-radius:44px;background:linear-gradient(150deg,#525b6e,#2b3242 40%,#0c0f16);box-shadow:0 34px 80px rgba(45,70,120,.3);box-sizing:border-box}
+    .ui2one-img img{display:block;width:280px;height:591px;object-fit:contain;border-radius:36px;background:#F4F7FC}
+    .ui2one-txt h3{font-size:clamp(22px,2.6vw,30px);font-weight:800;margin-bottom:16px}
+    .ui2one-txt ul{list-style:none;display:grid;gap:10px;margin-bottom:24px}
+    .ui2one-txt li{position:relative;padding-left:26px;color:var(--text-dim);font-size:15.5px}
+    .ui2one-txt li::before{content:"";position:absolute;left:0;top:9px;width:12px;height:12px;border-radius:4px;background:linear-gradient(135deg,#38bdf8,#0284c7)}
+    @media(max-width:900px){.ui2one{grid-template-columns:1fr;gap:32px}.ui2one-img img{width:min(300px,72vw)}}
+  </style>
 </section>
 
 <!-- ═══════════ Features ═══════════ -->

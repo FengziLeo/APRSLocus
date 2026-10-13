@@ -91,8 +91,10 @@
       <span class="brand-name">APRSlocus</span>
     </a>
     <nav class="nav-links" id="navLinks">
-      <a href="#announce" class="nav-new">公告</a>
+      <a href="../promo.html" class="nav-new">2.0 宣傳</a>
+      <a href="#announce">公告</a>
       <a href="#features">功能</a>
+      <a href="#ui2">介面</a>
       <a href="#platforms">平臺</a>
       <a href="#changelog">更新</a>
       <a href="#getting-started">上手</a>
@@ -100,8 +102,9 @@
       <a href="manual/index.html">手冊</a>
       <a href="#community">社區</a>
       <a href="#friends">友鏈</a>
+      <a href="../guide.html">解說</a>
       <a href="../card.html">名片</a>
-      <a class="nav-cta" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">2.0 BETA</a>
+      <a class="nav-cta" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">下載 2.0</a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切換深色模式" title="切換深色模式" data-label-dark="切換淺色模式" data-label-light="切換深色模式"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
       <span class="lang-switch-group"><a class="lang-switch" href="../" hreflang="zh-Hans">簡中</a><a class="lang-switch active" href="../zh-TW/" hreflang="zh-Hant">繁中</a><a class="lang-switch" href="../en/" hreflang="en">EN</a></span>
     </nav>
@@ -111,6 +114,19 @@
   </div>
 </header>
 
+<style>
+.hero-phone .phone-screen>.ph-shot{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:30;background:#F4F7FC}
+.hero-phone .phone-notch{display:none}
+.hero-phone .phone{background:linear-gradient(150deg,#525b6e,#2b3242 40%,#0c0f16);border:none;aspect-ratio:900/1900}
+.hero-phone .deskwin{display:none!important}
+.hero-phone{display:flex;align-items:center;justify-content:center;height:auto;min-height:700px;overflow:visible}
+.hero-phone .phone{position:relative;right:auto;bottom:auto;width:min(360px,86%);aspect-ratio:9/19}
+.hero-phone::after{display:none}
+.nav-links{flex-wrap:nowrap;gap:2px}
+.nav-links>a{padding:9px 11px;font-size:14px}
+html{overflow-x:hidden}
+</style>
+
 <!-- ═══════════ HERO ═══════════ -->
 <section class="hero" id="hero">
   <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
@@ -118,7 +134,7 @@
 
   <div class="hero-inner">
     <div class="hero-copy">
-      <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0 BETA</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
+      <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
       <div class="hero-wordmark">TOUCH SKY</div>
       <p class="hero-slogan">APRS <span class="grad">定位追蹤</span> 與 <span class="grad">地圖</span></p>
       <p class="hero-sub">
@@ -126,15 +142,23 @@
         不提供、也不預置任何伺服器位址：要連網請自行填寫 APRS-IS 伺服器，
         或改用藍牙 TNC / 音效卡音訊 / Icom 電台直連。
       </p>
+      <div class="hero-release" id="heroRelease" style="display:inline-flex;align-items:center;gap:12px;margin:8px 0 6px;padding:12px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 30px rgba(45,70,120,.14);backdrop-filter:blur(14px)">
+        <span id="hrIcon" style="font-size:20px">✅</span>
+        <span>
+          <b style="font-size:14px">APRSlocus 2.0 <span id="hrState" style="color:var(--cyan)">已發佈</span></b>
+          <span id="hrTimer" style="display:block;font-size:12.5px;color:var(--text-faint)">2.0 已發佈 · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener" style="color:var(--cyan);font-weight:700">立即下載 →</a></span>
+        </span>
+      </div>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
+        <a class="btn btn-primary" id="heroDownload" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
           <i class="fa-solid fa-mobile-screen"></i>
-          下載 Android APK
+          <span id="heroDlText">下載 2.0 最新版</span>
         </a>
         <a class="btn btn-ghost" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
           <i class="fa-solid fa-desktop" style="width:20px;height:20px"></i>
           Windows 安裝包
         </a>
+        <a class="btn btn-text" href="../promo.html">2.0 宣傳頁<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
         <a class="btn btn-text" href="#getting-started">開始使用<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
       </div>
       <div class="hero-meta">
@@ -149,6 +173,7 @@
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
+          <img class="ph-shot" src="../assets/hero-2.0.png" alt="APRSlocus 2.0 介面" width="900" height="1900">
           <div class="ph-statusbar">
             <span class="ph-time">14:28</span>
             <span class="ph-sig">
@@ -327,6 +352,40 @@
       </a>
     </div>
   </div>
+</section>
+
+<!-- ═══════════ 2.0 介面預覽 ═══════════ -->
+<section class="section" id="ui2">
+  <div class="section-head" style="max-width:760px;margin:0 auto 44px;text-align:center">
+    <div style="width:42px;height:3px;border-radius:3px;background:var(--grad);margin:0 auto 16px"></div>
+    <h2 style="font-size:clamp(28px,4.4vw,44px);font-weight:800;letter-spacing:-.02em">2.0 介面 · 畫面預覽</h2>
+    <p style="color:var(--text-dim);margin-top:12px">全新 UI 2.0：地圖為底、懸浮膠囊導覽、可拖曳面板。 <a href="../promo.html" style="color:var(--cyan);font-weight:700">查看完整宣傳頁 →</a></p>
+  </div>
+  <div class="ui2one">
+    <div class="ui2one-img"><span class="dev"><img loading="lazy" src="../assets/hero-2.0.png" alt="APRSlocus 2.0 介面" width="900" height="1900"></span></div>
+    <div class="ui2one-txt">
+      <h3>地圖為底 · 萬物懸浮</h3>
+      <ul>
+        <li>地圖常駐整屏，切頁不銷毀</li>
+        <li>底部懸浮膠囊導覽，滑動指示膠囊</li>
+        <li>可拖曳內容面板，44px 把手隨便抓</li>
+        <li>右上懸浮膠囊：天氣 / 連線狀態 / 定位</li>
+        <li>磨砂玻璃 · 雲母材質，深淺主題隨心換</li>
+      </ul>
+      <a class="btn btn-primary" href="../promo.html">查看 2.0 宣傳頁 →</a>
+    </div>
+  </div>
+  <style>
+    .ui2one{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:56px;align-items:center}
+    .ui2one-img{display:flex;justify-content:center}
+    .ui2one-img .dev{display:block;width:300px;padding:10px;border-radius:44px;background:linear-gradient(150deg,#525b6e,#2b3242 40%,#0c0f16);box-shadow:0 34px 80px rgba(45,70,120,.3);box-sizing:border-box}
+    .ui2one-img img{display:block;width:280px;height:591px;object-fit:contain;border-radius:36px;background:#F4F7FC}
+    .ui2one-txt h3{font-size:clamp(22px,2.6vw,30px);font-weight:800;margin-bottom:16px}
+    .ui2one-txt ul{list-style:none;display:grid;gap:10px;margin-bottom:24px}
+    .ui2one-txt li{position:relative;padding-left:26px;color:var(--text-dim);font-size:15.5px}
+    .ui2one-txt li::before{content:"";position:absolute;left:0;top:9px;width:12px;height:12px;border-radius:4px;background:linear-gradient(135deg,#38bdf8,#0284c7)}
+    @media(max-width:900px){.ui2one{grid-template-columns:1fr;gap:32px}.ui2one-img img{width:min(300px,72vw)}}
+  </style>
 </section>
 
 <!-- ═══════════ 功能特性 ═══════════ -->

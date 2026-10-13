@@ -573,6 +573,7 @@
   "agentCompressDone": "会話を圧縮しました",
   "agentAllowNetwork": "ネットワーク要求を許可",
   "agentAllowNetworkDesc": "エージェントが HTTP リクエスト（GET / POST / PUT / DELETE…）を送れるようにします。既定はオフ。実行前に毎回確認します。",
+  "agentNoFinalAnswer": "このターンの連続操作回数の上限に達し、結論を出せませんでした。「続けて」と送ると続きを実行します。",
   "agentTool_http_request": "ネットワーク要求",
   "agentTool_save_memory": "情報を記憶",
   "agentTool_list_memories": "記憶を表示",

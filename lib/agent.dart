@@ -1187,6 +1187,7 @@ class AgentService extends ChangeNotifier {
     required AgentNeedsConfirm needsConfirm,
     required String needConfigText,
     required String Function(String raw) formatError,
+    required String noFinalAnswerText,
   }) async {
     final t = text.trim();
     if (t.isEmpty || busy) return;
@@ -1204,6 +1205,9 @@ class AgentService extends ChangeNotifier {
       // required，逼它先取一次数据 / 执行动作；只逼这一次，之后回到 auto，
       // 免得把每一句寒暄都变成工具调用。
       var nudged = false;
+      // 是否已经拿到「给用户的正文答复」。循环是因为**轮次用完**而退出时为 false
+      // —— 那时候历史里最后一条往往是「我在调工具」，界面上就是干停住。
+      var answered = false;
       for (var round = 0; round < maxToolRounds; round++) {
         if (_epoch != my) return; // 被取消
         final force = !nudged && tools.isNotEmpty;
@@ -1224,15 +1228,25 @@ class AgentService extends ChangeNotifier {
 
         if (calls.isEmpty && force) {
           // 被强制却仍没调工具（少见）：收下这条回复，当普通回答结束本轮。
-          messages.add(reply);
-          notifyListeners();
+          answered = reply.content.trim().isNotEmpty;
+          if (answered) {
+            messages.add(reply);
+            notifyListeners();
+          }
           break;
         }
 
-        messages.add(reply);
-        notifyListeners();
+        // 空正文不进历史：留一个空气泡比什么都不显示更让人以为「卡住了」。
+        // 真需要收尾时下面的收尾轮会给出正文或兜底提示。
+        if (reply.content.trim().isNotEmpty || calls.isNotEmpty) {
+          messages.add(reply);
+          notifyListeners();
+        }
 
-        if (calls.isEmpty) break;
+        if (calls.isEmpty) {
+          answered = reply.content.trim().isNotEmpty;
+          break;
+        }
 
         for (final call in calls) {
           // 取消后不再执行，但**仍要**为每个 tool_call 补一条 tool 消息：
@@ -1274,6 +1288,12 @@ class AgentService extends ChangeNotifier {
               final outcome = await execute(call.name, call.arguments);
               result = outcome.text;
             }
+          } catch (e) {
+            // 单个工具抛异常（参数畸形、内部偶发 bug）**不能把整轮对话带走** ——
+            // 那样用户看到的就是「调了工具之后突然没了下文」。把它当作**这次调用
+            // 的结果**回给模型，既保住了 assistant.tool_calls ↔ tool 消息的配对，
+            // 也让模型有机会解释或换个做法。
+            result = 'ERROR: $e';
           } finally {
             currentTool = null;
           }
@@ -1289,6 +1309,27 @@ class AgentService extends ChangeNotifier {
           notifyListeners();
         }
         if (_epoch != my) return;
+      }
+
+      // 轮次用完（或模型只回了空串）时**不能就这么停下**：历史里最后一条往往是
+      // 「智能体在调工具」，界面就停在最后一个工具气泡上，用户看到的是「调几次
+      // 工具就没下文了」。再给一次**不带工具**的机会，逼它把话说完 —— 这时它没有
+      // 工具可选，只能产出正文；连这次都没有正文，才补一句兜底提示
+      // （[noFinalAnswerText]，由上层传 l10n 文案进来）。
+      if (!answered && _epoch == my) {
+        var tail = '';
+        try {
+          final closing = await _chat(const []);
+          if (_epoch != my) return;
+          tail = closing.content.trim();
+        } catch (e) {
+          tail = formatError('$e');
+        }
+        messages.add(AgentMessage(
+          role: 'assistant',
+          content: tail.isEmpty ? noFinalAnswerText : tail,
+        ));
+        notifyListeners();
       }
     } catch (e) {
       messages.add(AgentMessage(
@@ -1364,10 +1405,22 @@ class AgentService extends ChangeNotifier {
     };
     final raw = jsonEncode(body);
     if (config.streamReply) {
-      final streamed = await _chatStreaming(headers, raw);
-      // 被取消时 [send] 马上就会 return，这里返回什么都不会进历史。
-      if (_epoch != my) return AgentMessage(role: 'assistant');
-      if (streamed != null) return streamed;
+      // ⚠️ 流式请求**必须显式带上 `stream: true`**：不带的话后端按普通请求回一整段
+      // JSON，流里一个 `data:` 分片都没有 —— 解析器只能判定「没拿到流」，于是退回
+      // 下面的整段式**再发一次一模一样的请求**：每轮白等一倍时间、白花一倍 token，
+      // 而用户看到的「逐字」其实只是 [_typeOut] 那层假动画。带上之后才是真的边收
+      // 边显示，也才只用一次请求。
+      try {
+        final streamed = await _chatStreaming(
+            headers, jsonEncode({...body, 'stream': true}));
+        // 被取消时 [send] 马上就会 return，这里返回什么都不会进历史。
+        if (_epoch != my) return AgentMessage(role: 'assistant');
+        if (streamed != null) return streamed;
+      } on AgentException {
+        // 后端不认 `stream: true`（直接 4xx）或有别的流式故障：退回整段式重试一次，
+        // 不因为「想逐字」把整轮对话搞挂。真正的错误（Key 错 / 余额不足）会在下面
+        // 那次请求里如实抛出。
+      }
     }
     final reply = await _chatOnce(headers, raw);
     // 后端不支持流式（回到这里）时，用打字机补上「逐字」的观感：

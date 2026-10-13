@@ -1629,6 +1629,7 @@ class _AgentOverlayState extends State<AgentOverlay> {
         needsConfirm: agentNeedsConfirm,
         needConfigText: s.agentNeedConfig,
         formatError: (raw) => s.agentError(raw),
+        noFinalAnswerText: s.agentNoFinalAnswer,
       );
     } on AgentException catch (e) {
       if (!background && mounted) {

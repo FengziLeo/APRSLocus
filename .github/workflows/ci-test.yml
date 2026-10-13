@@ -95,6 +95,13 @@ jobs:
       - name: Check agent allowlist
         run: python3 tool/check_agent_allow.py
 
+      # 智能体对话循环的三条安全线：流式请求必须带 `stream: true`（不带就每轮白
+      # 发一次同样的请求 → 回复慢一倍）、单个工具抛异常不得带走整轮（否则看起来
+      # 就是「调完工具突然没下文」）、轮次用尽必须有收尾请求 + 兜底文案。
+      # 这三件事编译与 analyze 都不报错，坏了只有在真机上用起来才看得见。
+      - name: Check agent loop
+        run: python3 tool/check_agent_loop.py
+
       # 打点质量层的**接线**检查：算法写好了但忘了在某条路径上调用，
       # 编译与 analyze 都不会报错 —— 功能只是悄悄不生效。
       - name: Check position quality wiring

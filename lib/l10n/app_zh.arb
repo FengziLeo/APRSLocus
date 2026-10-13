@@ -622,6 +622,7 @@
   "agentCompressDone": "已压缩对话",
   "agentAllowNetwork": "允许联网请求",
   "agentAllowNetworkDesc": "允许智能体主动发起 HTTP 请求（GET / POST / PUT / DELETE…）。默认关闭；开启后每次请求仍需你确认。",
+  "agentNoFinalAnswer": "已达到本轮的连续操作次数上限，没能给出结论。再发一句「继续」让它接着做。",
   "agentTool_http_request": "发起网络请求",
   "agentTool_save_memory": "记住一条信息",
   "agentTool_list_memories": "查看记忆",

@@ -9004,4 +9004,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get phgOmni => "無指向";
 
+  @override
+  String get agentNoFinalAnswer => "このターンの連続操作回数の上限に達し、結論を出せませんでした。「続けて」と送ると続きを実行します。";
+
 }

@@ -573,6 +573,7 @@
   "agentCompressDone": "Percakapan dikompres",
   "agentAllowNetwork": "Izinkan permintaan jaringan",
   "agentAllowNetworkDesc": "Biarkan agen membuat permintaan HTTP (GET / POST / PUT / DELETE…). Nonaktif secara bawaan; tiap permintaan tetap minta konfirmasi.",
+  "agentNoFinalAnswer": "Batas aksi per giliran tercapai dan kesimpulan tidak bisa dibuat. Kirim \"lanjutkan\" agar ia meneruskan.",
   "agentTool_http_request": "Buat permintaan jaringan",
   "agentTool_save_memory": "Ingat sebuah fakta",
   "agentTool_list_memories": "Lihat memori",

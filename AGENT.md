@@ -211,7 +211,7 @@ push tag v*  ──►  build-windows ┐
 
 ```bash
 # 1) 静态检查：CI 跑的那 17 条 + 2 条算法回归
-for s in android_res_ids backup_keys beacon_track const_colors cross_imports \
+for s in agent_loop android_res_ids backup_keys beacon_track const_colors cross_imports \
          dark_mode frame_cost hr_garmin ipa_packaging l10n_sync landscape_layout \
          material_coverage notice oss_channel pos_quality release_notes transition_backdrop \
          ui_wiring widget_members; do python3 tool/check_$s.py || echo "❌ $s"; done

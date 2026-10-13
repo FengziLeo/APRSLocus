@@ -572,6 +572,7 @@
   "agentCompressDone": "Conversación comprimida",
   "agentAllowNetwork": "Permitir solicitudes de red",
   "agentAllowNetworkDesc": "Permite al agente hacer solicitudes HTTP (GET / POST / PUT / DELETE…). Desactivado por defecto; cada solicitud te pregunta antes.",
+  "agentNoFinalAnswer": "Se alcanzó el límite de acciones por turno y no se pudo dar una conclusión. Envía «continúa» para que siga.",
   "agentTool_http_request": "Hacer una solicitud de red",
   "agentTool_save_memory": "Recordar un dato",
   "agentTool_list_memories": "Ver memorias",

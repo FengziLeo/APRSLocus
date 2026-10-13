@@ -9342,4 +9342,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get phgOmni => "Omni";
 
+  @override
+  String get agentNoFinalAnswer => "Se alcanzó el límite de acciones por turno y no se pudo dar una conclusión. Envía «continúa» para que siga.";
+
 }

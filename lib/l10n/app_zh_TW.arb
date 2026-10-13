@@ -622,6 +622,7 @@
   "agentCompressDone": "已壓縮對話",
   "agentAllowNetwork": "允許聯網請求",
   "agentAllowNetworkDesc": "允許智慧代理主動發起 HTTP 請求（GET / POST / PUT / DELETE…）。預設關閉；開啟後每次請求仍需你確認。",
+  "agentNoFinalAnswer": "已達到本輪的連續操作次數上限，沒能給出結論。再送一句「繼續」讓它接著做。",
   "agentTool_http_request": "發起網路請求",
   "agentTool_save_memory": "記住一則資訊",
   "agentTool_list_memories": "查看記憶",

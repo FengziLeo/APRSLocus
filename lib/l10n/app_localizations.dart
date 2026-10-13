@@ -16170,6 +16170,12 @@ abstract class AppLocalizations {
   /// **'全向'**
   String get phgOmni;
 
+  /// No description provided for @agentNoFinalAnswer.
+  ///
+  /// In zh, this message translates to:
+  /// **'已达到本轮的连续操作次数上限，没能给出结论。再发一句「继续」让它接着做。'**
+  String get agentNoFinalAnswer;
+
 }
 
 class _AppLocalizationsDelegate

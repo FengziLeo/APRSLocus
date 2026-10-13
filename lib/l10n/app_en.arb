@@ -640,6 +640,7 @@
   "agentCompressDone": "Conversation compressed",
   "agentAllowNetwork": "Allow network requests",
   "agentAllowNetworkDesc": "Let the agent make HTTP requests (GET / POST / PUT / DELETE…). Off by default; every request still asks you first.",
+  "agentNoFinalAnswer": "Reached the per-turn limit for tool actions, so no conclusion could be produced. Send “continue” to let it carry on.",
   "agentTool_http_request": "Make a network request",
   "agentTool_save_memory": "Remember a fact",
   "agentTool_list_memories": "Read memories",

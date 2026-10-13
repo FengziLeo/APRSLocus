@@ -9293,4 +9293,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get phgOmni => "Omni";
 
+  @override
+  String get agentNoFinalAnswer => "Batas aksi per giliran tercapai dan kesimpulan tidak bisa dibuat. Kirim \"lanjutkan\" agar ia meneruskan.";
+
 }

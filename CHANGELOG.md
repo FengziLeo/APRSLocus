@@ -1,5 +1,36 @@
 # 更新日志
 
+## [2.1.0] - 2026-10-14
+
+### 封面彩蛋：不再等那五秒 —— 点一下，它就带你去看那一页故事
+
+- 关于页封面那颗蛋，以前是「点一下，抖一下，然后对着一张不动的封面等五秒」。
+  那五秒里谁也分不清这是彩蛋还是卡住了 —— **现在点下去就是一次激活**：抖动、
+  翻面、粒子一起发生，翻牌动画刚走完，那一页故事就递到眼前。反悔随时可以：
+  再点一下，它翻回正面，故事也不再打开。
+- 故事在哪儿打开，看包里有没有带着它：**带着就在应用内翻开**（整屏内嵌），
+  没带就交给系统浏览器 —— 那一页本来就是写给浏览器看的网站，不该被塞进一个
+  没有地址栏、也没有返回键的壳里。应用内翻开的那一份，右上角另留了「在浏览器
+  打开」。
+
+---
+
+## [2.1.0] - 2026-10-14 (English)
+
+### The cover easter egg no longer counts to five — one tap, and it takes you to that page
+
+- The egg on the About cover used to be "tap, shudder, then watch a motionless cover
+  for five seconds". Nobody can tell an easter egg from a freeze in five seconds.
+  **A tap is the activation now**: the shudder, the flip and the particles happen
+  together, and the moment the flip lands, the story is handed over. Changed your mind?
+  One more tap turns the cover back, and the story stays closed.
+- Where it opens depends on whether the app carries a copy: **bundled → inside the
+  app** (full-screen embed), otherwise the system browser. That page is a website
+  written for a browser; it does not belong in a shell without an address bar or a back
+  button. The in-app copy keeps an "open in browser" action in its top bar.
+
+---
+
 ## [2.0.68] - 2026-10-13
 
 ### 修复：智能体「回复过慢」的根子 —— 流式请求漏了 `stream:true`

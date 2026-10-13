@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hero 单独页 · APRSlocus</title>
-<meta name="description" content="APRSlocus 官网首屏（3D 星球 + 累计转发报文数字）的单独一页：只有 hero 这一块，没有导航与其余栏目，用来单独查看这一段。">
+<title>下一格等你来补 · APRSlocus</title>
+<meta name="description" content="APRSlocus 官网首屏那颗星球、以及那个一直在走的数字背后的故事：报文从哪来、落在哪里、为什么它会一直往上跳。">
 <meta name="theme-color" content="#0a0e12">
-<!-- 这一页与首页 hero 是同一段内容（重复内容），不进 sitemap、也不给搜索引擎收录 -->
+<!-- 故事页：不放下载入口（要装应用从首页走）。与首页 hero 同一段画面，不进 sitemap。 -->
 <meta name="robots" content="noindex, follow">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <script>
@@ -26,17 +26,22 @@
 <link rel="stylesheet" href="css/hero-3d.css?v=17">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
-/* 这页没有导航栏，主题按钮自己贴在 hero 右上角（只这一页用到，不进共享样式表；
-   按钮本体还是 style.css 里的 .theme-toggle，样子与首页那颗完全一样）。 */
-.hero-toggle { position: absolute; top: 22px; right: clamp(20px, 6vw, 96px); z-index: 3; }
+/* 这页没有导航栏，主题按钮固定贴在右上角（只这一页用到，不进共享样式表；
+   按钮本体还是 style.css 里的 .theme-toggle，样子与首页那颗一样）。 */
+.hero-toggle { position: fixed; top: 22px; right: clamp(20px, 6vw, 96px); z-index: 100; }
+/* 故事正文一行别拉太长：宽度收到 720px，字号与配色跟 .section-head 里那句说明一致。 */
+.story-text { max-width: 720px; }
+.story-text p { color: var(--text-dim); font-size: 16.5px; line-height: 1.85; margin: 0 0 16px; }
+.story-text p:last-child { margin-bottom: 0; }
+.story-text b { color: var(--text); }
 </style>
 </head>
 <body>
 
 <!-- main.js 是整站共用的那一份（首屏粒子、滚入显形、主题切换都靠它），它开头就会
      取导航那几个元素并直接 .classList / .setAttribute —— 四个里缺一个就当场抛错，
-     而 IIFE 里没有 try，后面那些代码（含 body.loaded）全都不执行。这页只有 hero、
-     没有导航栏，所以留一组不显示、也不占位的空壳把这一段走过去。 -->
+     而 IIFE 里没有 try，后面那些代码（含 body.loaded）全都不执行。这页没有导航栏，
+     所以留一组不显示、也不占位的空壳把这一段走过去。 -->
 <div id="nav" hidden></div>
 <div id="backTop" hidden></div>
 <button id="navBurger" type="button" hidden aria-label="菜单"></button>
@@ -54,10 +59,11 @@
 <main id="main">
 
 <!-- ═══════════ HERO ═══════════
-     与三语首页的 hero 是同一块（装饰层 → 文案 → 数字），只有两处按这页的处境改：
-     · 页面唯一的主题按钮从导航里挪到 hero 右上角（这页没有导航栏）；
-     · 「向下箭头」撤了 —— 它指向 #features，这页没有那一节，留着是个点不动的死锚；
-     · 按钮行最后一条改为「回首页」（原本指向首页的 #getting-started）。 -->
+     与三语首页同一块（装饰层 → 文案 → 数字），只有三处按这页的处境改：
+     · 页面唯一的主题按钮从导航里挪到右上角（这页没有导航栏）；
+     · 「向下箭头」指向下面的故事，不再是首页的 #features；
+     · 说明块里那句「上面那个数字是…」搬到了第一章 —— 故事页里这句话是正文，
+       不是首屏的一句注解，留着就重复了。 -->
 <section class="hero" id="hero">
   <button class="theme-toggle hero-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切换深色模式" title="切换深色模式" data-label-dark="切换浅色模式" data-label-light="切换深色模式"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
   <!-- 装饰层：网格、星尘、3D 星球、以及没有 WebGL 时的静态球，全都在这一层。
@@ -75,7 +81,7 @@
   <div class="hero-inner">
 
     <div class="hero-copy">
-      <!-- 第一屏只有这一件事：那个数字（APRSlocus 累计转发报文总量，数值源 stats.json）；"这是什么"的说明在折线之下 -->
+      <!-- 第一屏只有这一件事：那个数字（APRSlocus 累计转发报文总量，数值源 stats.json）；"这是什么"在下面的故事里 -->
         <div class="hero-stat" id="heroTelemetry"
              data-stats="stats.json" data-packets="509260" data-rate="18"
              data-updated="2026-10-13T16:06:00+08:00"
@@ -86,7 +92,6 @@
     </div>
 
     <div class="hero-copy-next">
-      <!-- 折线之下才是「这是什么」：滚上来才淡出（站点的 .reveal） -->
       <div class="hero-intro reveal" data-delay="0">
         <!-- 页面唯一的 h1：品牌名（连版本与口号）。下面那句巨型主题字是同一句口号的
              放大版，重复一遍对读屏没有信息量，标成装饰。 -->
@@ -98,39 +103,68 @@
           不提供、也不预置任何服务器地址：要联网请自行填写 APRS-IS 服务器，
           或改用蓝牙 TNC / 声卡音频 / Icom 电台直连。
         </p>
-        <p class="hero-invite">
-          <span class="hi-mark" aria-hidden="true">✦</span>上面那个数字，是全世界 APRS 台站累计转发过的报文总量 —— 电波穿过夜空，最后都落在这颗星球上，下一格等你来补。
-        </p>
       </div>
-
-      <!-- 再往下：真正要动手的那一块（版本卡 + 下载按钮 + 来源） -->
-        <div class="hero-cta reveal" data-delay="0">
-          <p class="hero-release">
-            <span class="hr-icon" aria-hidden="true">✅</span>
-            <span class="hr-body">
-              <b class="hr-name">APRSlocus 2.0 <span class="hr-state">已发布</span></b>
-              <span class="hr-note">2.0 已发布 · <a class="hr-link" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">立即下载 →</a></span>
-            </span>
-          </p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" id="heroDownload" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
-              <i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>
-              <span id="heroDlText">下载 2.0 最新版</span>
-            </a>
-            <a class="btn btn-ghost" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
-              <i class="fa-solid fa-desktop" aria-hidden="true"></i>
-              Windows 安装包
-            </a>
-            <a class="btn btn-text" href="promo.html">2.0 宣传页<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a>
-            <a class="btn btn-text" href="index.html">回首页<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a>
-          </div>
-          <div class="hero-meta">
-            <span>APRS-IS · TNC · 音频 · PKWDWPL 四种来源</span>
-            <span>Android / Windows</span>
-          </div>
-        </div>
     </div>
 
+  </div>
+
+  <a class="hero-scroll" href="#story" aria-label="往下看故事"><span></span></a>
+</section>
+
+<!-- ═══════════ 一 · 那个数字是谁的 ═══════════ -->
+<section class="section" id="story">
+  <div class="section-head reveal">
+    <h2>那个数字是谁的</h2>
+    <p>APRSlocus 累计转发报文 —— 第一屏上一直往上走的那个数。</p>
+  </div>
+  <div class="section-body">
+    <div class="story-text reveal">
+      <p>它不是统计图里的一格刻度，而是<strong>此刻全世界 APRS 台站累计转发过的报文总量</strong>。屏幕上每跳一格，就有一条报文刚被转发出去 —— 可能来自城里某辆车的车载台，也可能来自某个山头上的一台手台。</p>
+      <p>数字从 <code>stats.json</code> 里那张快照出发，按「基线 + 速率 × 经过的分钟数」在本地往前推，不需要后端，也不需要定时任务。快照超过 12 小时就不再外推 —— 宁可停在一个保守的上限，也不给你一个凭空涨出来的数。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 二 · 电波从哪来 ═══════════ -->
+<section class="section alt" id="air">
+  <div class="section-head reveal">
+    <h2>电波从哪来</h2>
+    <p>一条报文到你眼前之前，走哪条路由发的人自己决定。</p>
+  </div>
+  <div class="section-body">
+    <div class="story-text reveal">
+      <p>它可能经由 APRS-IS 服务器从一台手机或电脑发出；也可能从蓝牙 TNC、声卡音频进来，或者来自一台直连的 Icom 电台；地图上那些站点，就是这些不同的路最后汇在一起的样子。APRS-IS · TNC · 音频 · PKWDWPL —— <strong>四种来源，同一张地图</strong>。</p>
+      <p>APRSlocus 不提供、也不预置任何服务器地址。要联网，服务器和连接方式都由你自己填 —— 这条路是你的。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 三 · 它落在哪里 ═══════════ -->
+<section class="section" id="planet">
+  <div class="section-head reveal">
+    <h2>它落在哪里</h2>
+    <p>每一条报文最后都落回顶上那颗星球 —— 那一屏不是贴图。</p>
+  </div>
+  <div class="section-body">
+    <div class="story-text reveal">
+      <p>一万三千个点铺成球体，十二根经线与七根纬线撑着那层线框；球面上会闪的那几粒，就是台站在上报。</p>
+      <p>三圈环带各转各的（内圈走得快、外圈慢，按开普勒的 ω ∝ r<sup>-1.5</sup> 排），七颗卫星带着尾迹从球外划过去；偶尔有流星斜插进来，在落点荡开一圈冲击波，再慢慢化开。星面上还有三层浪在跑。一共就这些 —— 都是这一屏里真实在动的几何。</p>
+      <p>它自转、它呼吸，但不接受拖动：这层画面是给你看的，不是给你转的。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 四 · 下一格等你来补 ═══════════ -->
+<section class="section alt" id="next">
+  <div class="section-head reveal">
+    <h2>下一格等你来补</h2>
+    <p>电波穿过夜空，最后都落在这颗星球上。</p>
+  </div>
+  <div class="section-body">
+    <div class="story-text reveal">
+      <p>想自己也发一条，从首页开始 —— 装好、填上呼号和服务器，你那个点就会出现在球面上。</p>
+      <p><a class="btn btn-text" href="index.html">回首页<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a></p>
+    </div>
   </div>
 </section>
 

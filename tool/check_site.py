@@ -326,14 +326,9 @@ def main():
     if stats:
         pk = '{:,}'.format(stats['packets'])
         vers = []
-        # docs/hero.html = 把首页这一块**单独抽出来**的那一页（没有导航与其余栏目）。
-        # 它挂的是同一份 hero-3d.css / planet-3d.js，所以一并进这个循环：版本号一旦
-        # 各写各的，单独页会静默停在旧样式上（首页换了、它没换，肉眼只看到"不一样"）。
-        for f, up in (('docs/index.html', ''),
-                      ('docs/hero.html', ''),
-                      ('docs/zh-TW/index.html', '../'),
-                      ('docs/en/index.html', '../')):
+        for f in ('docs/index.html', 'docs/zh-TW/index.html', 'docs/en/index.html'):
             s = read(f)
+            up = '' if f == 'docs/index.html' else '../'
             chk('%s : hero 星球层就位、旧面板已撤' % f,
                 'id="planetCanvas"' in s and 'class="planet-fallback"' in s
                 and 'id="heroTelemetry"' in s and 'class="hero-stat"' in s
@@ -386,17 +381,27 @@ def main():
                 and '%sjs/planet-3d.js?v=' % up in s
                 and 'data-stats="%sstats.json"' % up in s
                 and 'data-updated="%s"' % stats['updatedIso'] in s)
-        # 三语首页 + 单独页必须链接同一个版本号；线上已缓存过旧值，所以要求 >= 2
+        # 三语首页必须链接同一个版本号；线上已缓存过旧值，所以要求 >= 2
         flat = sorted({v for pair in vers for v in pair})
-        chk('hero-3d 资源版本（三语 + 单独页）一致且 >=2',
-            len(flat) == 1 and int(flat[0]) >= 2, flat)
-    # 单独页的骨架判据：它就该只有 hero 这一块。哪天有人「顺手把整页复制过去再删」
-    # （导航 / 页脚 / 其它 section 一起带进来），这里当场报 —— 那正是这页唯一要守的事；
-    # 顺带盯住它别把 hero-3d.css 丢了（丢了星球那层就没有取景与变量，整块错位）。
-    hp = read('docs/hero.html')
-    chk('hero 单独页只有 hero 一块（无导航 / 无页脚 / 无其它 section）',
-        hp.count('<section') == 1 and 'class="nav"' not in hp
-        and '<footer' not in hp and 'css/hero-3d.css?v=' in hp)
+        chk('hero-3d 资源版本三语一致且 >=2', len(flat) == 1 and int(flat[0]) >= 2, flat)
+        # `docs/hero.html` = 把首页那块 hero 抽出来改成的**故事页**：同一颗星球、
+        # 同一个数字、同一套 hero-3d 资源，但没有下载那一块（这页不摆下载入口）。
+        #
+        # 它不跟三语首页同构（少了 hero-cta，下面还多出一串故事段落），所以不能
+        # 混进上面那个循环；但两件事必须守：
+        #   * hero-3d 的版本与首页同一个值 —— 各写各的，单独页会**静静地**停在
+        #     旧样式上（首页换了、它没换，肉眼只看到"这页跟首页不太一样"）；
+        #   * 这页不许再长出下载那一块 —— 那是它唯一被交代过的边界。
+        hp = read('docs/hero.html')
+        hv = set(re.findall(r'hero-3d\.css\?v=(\d+)', hp) +
+                 re.findall(r'planet-3d\.js\?v=(\d+)', hp))
+        chk('hero 故事页与首页同一版 hero-3d 资源', hv == set(flat), (sorted(hv), flat))
+        chk('hero 故事页：星球与读数在、下载那一块不在（无导航 / 页脚 / Releases 链接）',
+            hp.count('id="planetCanvas"') == 1 and 'class="hero-stat"' in hp
+            and 'id="tlPackets"' in hp and 'class="section-head' in hp
+            and not any(x in hp for x in ('hero-cta', 'hero-actions', 'hero-release',
+                                          'heroDownload', 'heroDlText', 'releases'))
+            and 'class="nav"' not in hp and '<footer' not in hp)
     # 降级链路：没有 WebGL 时不能把 hero 那块留成空白。
     # 只看「页面里有 canvas」是不够的，真会坏的是脚本早期 return 之后什么都
     # 没画，所以要求 CSS 有 .no-3d 分支、脚本有失败回落。

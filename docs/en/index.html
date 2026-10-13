@@ -55,7 +55,7 @@
 <link rel="canonical" href="https://aprslocus.theez.top/en/">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
 <link rel="stylesheet" href="../css/style.css?v=8">
-<link rel="stylesheet" href="../css/hero-3d.css?v=10">
+<link rel="stylesheet" href="../css/hero-3d.css?v=11">
 <link rel="stylesheet" href="../css/motion.css?v=1">
 <link rel="stylesheet" href="../css/nav.css?v=2">
 <link rel="stylesheet" href="../css/features.css?v=2">
@@ -131,13 +131,19 @@ html{overflow-x:hidden}
 
 <!-- ═══════════ HERO ═══════════ -->
 <section class="hero" id="hero">
-  <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
-  <div class="hero-grid"></div>
+  <!-- Decoration layer: grid, star dust, the 3D planet and the static fallback
+       planet all live here. It takes no pointer events (the planet asks for them
+       back, so dragging still spins it), which leaves the hero with three
+       children only: decor → copy → scroll cue. -->
+  <div class="hero-decor">
+    <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+    <div class="hero-grid"></div>
 
-  <!-- 3D planet: a transparent point-cloud layer on the hero itself (no frame, no backdrop) -->
-  <canvas class="planet-canvas" id="planetCanvas" tabindex="0" role="img"
-          aria-label="Draggable 3D planet: APRS stations, ring bands and a satellite orbit"></canvas>
-  <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
+    <!-- 3D planet: a transparent point-cloud layer on the hero itself (no frame, no backdrop) -->
+    <canvas class="planet-canvas" id="planetCanvas" tabindex="0" role="img"
+            aria-label="Draggable 3D planet: APRS stations, ring bands and a satellite orbit"></canvas>
+    <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
+  </div>
 
   <div class="hero-inner">
 
@@ -2007,7 +2013,7 @@ html{overflow-x:hidden}
 </a>
 
 <script src="../js/main.js?v=8"></script>
-<script src="../js/planet-3d.js?v=10"></script>
+<script src="../js/planet-3d.js?v=11"></script>
 <script src="../js/motion.js?v=1"></script>
 <script src="../js/nav.js?v=1"></script>
 </body>

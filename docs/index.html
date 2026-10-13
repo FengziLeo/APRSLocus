@@ -56,7 +56,7 @@
 <link rel="canonical" href="https://aprslocus.theez.top/">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="stylesheet" href="css/style.css?v=8">
-<link rel="stylesheet" href="css/hero-3d.css?v=10">
+<link rel="stylesheet" href="css/hero-3d.css?v=11">
 <link rel="stylesheet" href="css/motion.css?v=1">
 <link rel="stylesheet" href="css/nav.css?v=2">
 <link rel="stylesheet" href="css/features.css?v=2">
@@ -133,13 +133,18 @@ html{overflow-x:hidden}
 
 <!-- ═══════════ HERO ═══════════ -->
 <section class="hero" id="hero">
-  <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
-  <div class="hero-grid"></div>
+  <!-- 装饰层：网格、星尘、3D 星球、以及没有 WebGL 时的静态球，全都在这一层。
+       这一层不吃指针事件（星球自己再把事件要回来，横向拖动照旧转星球），
+       hero 的直接子元素就只剩三块：装饰层 → 文案 → 向下那个箭头。 -->
+  <div class="hero-decor">
+    <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+    <div class="hero-grid"></div>
 
-  <!-- 3D 星球：直接长在 hero 上的一层透明点云（无边框、无底色），可拖动旋转 -->
-  <canvas class="planet-canvas" id="planetCanvas" tabindex="0" role="img"
-          aria-label="可拖动的 3D 星球：APRS 台站分布、环带与卫星轨道示意"></canvas>
-  <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
+    <!-- 3D 星球：直接长在 hero 上的一层透明点云（无边框、无底色），可拖动旋转 -->
+    <canvas class="planet-canvas" id="planetCanvas" tabindex="0" role="img"
+            aria-label="可拖动的 3D 星球：APRS 台站分布、环带与卫星轨道示意"></canvas>
+    <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
+  </div>
 
   <div class="hero-inner">
 
@@ -2031,7 +2036,7 @@ html{overflow-x:hidden}
 </a>
 
 <script src="js/main.js?v=8"></script>
-<script src="js/planet-3d.js?v=10"></script>
+<script src="js/planet-3d.js?v=11"></script>
 <script src="js/motion.js?v=1"></script>
 <script src="js/nav.js?v=1"></script>
 </body>

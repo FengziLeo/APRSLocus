@@ -41,18 +41,35 @@ class WebEmbed extends StatelessWidget {
   /// 圆角半径。[height] 传 `double.infinity`（整页内嵌）时一般传 0。
   final double radius;
 
+  /// 内嵌内容建好之后回传控制器（可空）。
+  ///
+  /// 给**需要在离开这一页之前跟页面说话**的地方用：故事页自带背景音乐，退栈前
+  /// 要先把它按停（见 `story_page.dart`）。[WebViewController] 本身没有
+  /// `dispose()`，`WebViewWidget` 也只管渲染 —— 「页面里的状态」（声音、定时器）
+  /// 得由调用方自己收拾。多数调用方用不到，保持 null。
+  ///
+  /// 注意：它是在 [_MobileEmbed] 的 `initState` 里被调用的，**回调里不要 setState**。
+  final void Function(WebViewController controller)? onCreated;
+
   const WebEmbed({
     super.key,
     required this.url,
     this.html,
     this.height = 220,
     this.radius = 12,
+    this.onCreated,
   });
 
   @override
   Widget build(BuildContext context) {
     if (!webEmbedSupported) return _FallbackCard(url: url, height: height);
-    return _MobileEmbed(url: url, html: html, height: height, radius: radius);
+    return _MobileEmbed(
+      url: url,
+      html: html,
+      height: height,
+      radius: radius,
+      onCreated: onCreated,
+    );
   }
 }
 
@@ -82,11 +99,13 @@ class _MobileEmbed extends StatefulWidget {
   final String? html;
   final double height;
   final double radius;
+  final void Function(WebViewController controller)? onCreated;
   const _MobileEmbed({
     required this.url,
     this.html,
     required this.height,
     this.radius = 12,
+    this.onCreated,
   });
 
   @override
@@ -113,6 +132,9 @@ class _MobileEmbedState extends State<_MobileEmbed> {
           },
         ),
       );
+    // 控制器先交出去，再开始加载：调用方（故事页）要在离开这一页之前用它把
+    // 页面里的声音按停。
+    widget.onCreated?.call(_controller);
     final html = widget.html;
     if (html != null) {
       // baseUrl 给一个合法 https 源，避免相对资源/编码在某些 WebView 上被判非法。

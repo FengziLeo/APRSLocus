@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>帮助中心 — APRSlocus 常见问题与使用指南</title>
 <meta name="description" content="APRSlocus 帮助中心：连接与 Passcode、四种数据来源与网关 iGate、定位与信标、界面与离线地图、桌面小组件与短波传播、备份恢复与安装更新，共 23 个常见问题。">
-<meta name="theme-color" content="#f3f6fd">
+<meta name="theme-color" content="#0a0e12">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="APRSlocus">
 <meta property="og:title" content="帮助中心 — APRSlocus 常见问题与使用指南">
@@ -26,19 +26,18 @@
     <link rel="alternate" hreflang="en" href="https://aprslocus.theez.top/en/faq.html">
     <link rel="alternate" hreflang="x-default" href="https://aprslocus.theez.top/faq.html">
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="stylesheet" href="css/style.css?v=7">
+<link rel="stylesheet" href="css/style.css?v=8">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <script>
-/* 主题：localStorage 优先，否则跟随系统。必须在首帧前执行，
-   否则深色偏好用户会先闪一下白屏（CSS 键在 <html data-theme> 上）。 */
+/* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）。
+   必须在首帧前执行，否则会闪一下亮底（token 的键在 <html data-theme> 上）。 */
 (function () {
   try {
     var t = localStorage.getItem('theme');
-    if (t !== 'dark' && t !== 'light')
-      t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (t !== 'dark' && t !== 'light') t = 'dark';
     document.documentElement.setAttribute('data-theme', t);
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#0b1220' : '#f3f6fd');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
   } catch (e) {}
 })();
 </script>
@@ -439,7 +438,7 @@
   <svg class="backtop-arrow" viewBox="0 0 24 24"><path d="M12 5l7 7-1.4 1.4L13 8.8V20h-2V8.8l-4.6 4.6L5 12l7-7z"/></svg>
 </a>
 
-<script src="js/main.js?v=7"></script>
+<script src="js/main.js?v=8"></script>
 <script>
 /* 帮助中心专属：客户端搜索 + 全部展开/收起（无 JS 时题目仍是原生 details，可正常使用） */
 (function () {

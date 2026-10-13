@@ -1,0 +1,169 @@
+/* ════════════════════════════════════════════════════════════════════
+   APRSlocus · 调色板与基础（css/theme.css）
+
+   给"不挂 style.css"的独立页用：promo / card / badge / member-card /
+   memorial / terms ×3。它们各自带一套自己的排版，只缺这套 token。
+
+   两块 token 是从 css/style.css 里**原样抽出**的（script 见 .scratch/），
+   两边必须逐字一致 —— tool/check_site.py 有一道守卫比对这两处 token 文本，
+   改调色板就改 style.css，然后把这里重新抽一遍，别手写第二份。
+
+   深色是默认：<head> 里那段内联脚本在首帧前把 data-theme 写到 <html> 上
+   （localStorage 优先，没存过就是 dark）。
+   ════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* 面：白天是近乎实心的白（本站不用毛玻璃） */
+  --surface-1: rgba(255, 255, 255, .96);
+  --surface-2: rgba(255, 255, 255, .88);
+  --surface-3: rgba(255, 255, 255, .72);
+  --surface-4: rgba(240, 244, 250, .92);
+  --surface-hi: #ffffff;
+  --glass: var(--surface-1);
+  --code-bg: #0d1526;
+  --on-code: #eef3fa;
+  --bg-1: #f4f7fc;
+  --bg-2: #e9eff9;
+  /* 线：铝白体系里的极细边框 */
+  --line: rgba(148, 160, 178, .34);
+  --line-soft: rgba(148, 160, 178, .20);
+  --line-strong: rgba(148, 160, 178, .52);
+  --line-cool: rgba(29, 111, 208, .30);
+  --line-warn: rgba(180, 120, 0, .34);
+  --line-ok: rgba(30, 143, 99, .30);
+  --line-bad: rgba(192, 48, 39, .30);
+  /* 文字：白天的下限是墨色（#5b6b85 = 4.99，过 AA） */
+  --text: #0f172a;
+  --text-dim: #4b5a75;
+  --text-faint: #5b6b85;
+  /* 强调：冷蓝 = 数据高亮（链接 / 数值 / 图表），安全橙 = 主号召（CTA / 编号 / 标线） */
+  --cyan-deep: #0369a1;
+  --cyan: #1d6fd0;
+  --cyan-bright: #2490e6;
+  --blue: #2563eb;
+  --accent: #e25700;
+  --accent-deep: #b34700;
+  --on-accent: #1a1207;
+  /* 状态 */
+  --green: #1e8f63;
+  --green-deep: #047857;
+  --amber: #b47800;
+  --amber-deep: #92400e;
+  --red: #c03027;
+  /* 光晕 / 淡染层（背景光斑、选中态、代码底） */
+  --halo-cool: rgba(45, 122, 200, .14);
+  --halo-warm: rgba(226, 87, 0, .10);
+  --halo-ok: rgba(30, 143, 99, .10);
+  --halo-bad: rgba(192, 48, 39, .10);
+  /* 投影：哑光，不发光 */
+  --shadow-color: rgba(23, 42, 74, .12);
+  --shadow-cool: rgba(29, 111, 208, .26);
+  --shadow-warm: rgba(226, 87, 0, .22);
+  --shadow-ok: rgba(30, 143, 99, .20);
+  --shadow: 0 14px 34px var(--shadow-color);
+  --shadow-hover: 0 22px 48px var(--shadow-color);
+  /* 渐变：主号召一律橙底 + 深墨字（白字压橙只有 2.9:1，过不了 AA） */
+  --grad: linear-gradient(120deg, #ff6a00, #cf5200);
+  --grad-text: linear-gradient(120deg, #b34700, #8f3800);
+  --grad-rule: linear-gradient(120deg, #ff6a00, #4da3ff);
+  /* 字体：正文无衬线，数据 / 编号走等宽（栈里全是系统字体，不额外拉网络字体） */
+  --font-sans: Inter, "IBM Plex Sans", "SF Pro Text", system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
+  /* 微圆角：工业面板是切角，不是药丸 */
+  --radius: 10px;
+  --radius-sm: 6px;
+  --ease: cubic-bezier(.22, .8, .24, 1);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-1: #1c2228;          /* 面板灰 */
+  --surface-2: #171d23;
+  --surface-3: #12181d;
+  --surface-4: #0f1519;
+  --surface-hi: #232a31;
+  --glass: var(--surface-1);
+  --code-bg: #05080f;
+  --on-code: #d8dde3;
+  --bg-1: #0a0e12;               /* 深空黑 */
+  --bg-2: #090c10;
+  --line: rgba(216, 221, 227, .14);
+  --line-soft: rgba(216, 221, 227, .09);
+  --line-strong: rgba(216, 221, 227, .26);
+  --line-cool: rgba(77, 163, 255, .32);
+  --line-warn: rgba(255, 176, 0, .32);
+  --line-ok: rgba(61, 220, 151, .28);
+  --line-bad: rgba(224, 60, 49, .34);
+  --text: #d8dde3;               /* 铝白 */
+  --text-dim: #98a2ac;
+  --text-faint: #868f9a;
+  --cyan-deep: #2e7fd1;
+  --cyan: #4da3ff;               /* 冷蓝：数据高亮 */
+  --cyan-bright: #8cc5ff;
+  --blue: #4da3ff;
+  --accent: #ff6a00;             /* 安全橙 */
+  --accent-deep: #ff8a3d;
+  --on-accent: #0a0e12;
+  --green: #3ddc97;              /* 信号绿：正常 */
+  --green-deep: #2aae77;
+  --amber: #ffb000;              /* 琥珀：注意 */
+  --amber-deep: #c98a00;
+  --red: #e03c31;                /* 警告红：故障 */
+  --halo-cool: rgba(77, 163, 255, .10);
+  --halo-warm: rgba(255, 106, 0, .08);
+  --halo-ok: rgba(61, 220, 151, .06);
+  --halo-bad: rgba(224, 60, 49, .08);
+  --shadow-color: rgba(0, 0, 0, .55);
+  --shadow-cool: rgba(77, 163, 255, .18);
+  --shadow-warm: rgba(255, 106, 0, .16);
+  --shadow-ok: rgba(61, 220, 151, .14);
+  --shadow: 0 14px 34px var(--shadow-color);
+  --shadow-hover: 0 22px 48px var(--shadow-color);
+  --grad: linear-gradient(120deg, #ff6a00, #c2410c);
+  --grad-text: linear-gradient(120deg, #ffb000, #ff6a00);
+  --grad-rule: linear-gradient(120deg, #ff6a00, #4da3ff);
+}
+
+/* ── 主题切换按钮 ──
+   首页那颗在 style.css 里（那边走 style.css 的 token），这 8 页共用这一份：
+   同一套尺寸与细线图标，深浅切换只靠 CSS 换图标（js/theme.js 只管行为）。
+   按钮落在各页已有的语言胶囊 / 导航条里，那里往往有一条 `.langs button` /
+   `.lang button` 的胶囊样式，所以这里用 (0,2,0) 的选择器压过它们，
+   把尺寸、底色、圆角、投影都拿回来 —— 否则会被当成语言胶囊画歪。 */
+.theme-toggle,
+.langs .theme-toggle, .lang .theme-toggle, .navlinks .theme-toggle, .bar .theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; min-width: 34px; padding: 0; margin: 0;
+  border-radius: var(--radius); cursor: pointer; box-shadow: none;
+  color: var(--text-dim); background: transparent; border: 1px solid transparent;
+  transition: color .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
+}
+.theme-toggle:hover,
+.langs .theme-toggle:hover, .lang .theme-toggle:hover,
+.navlinks .theme-toggle:hover, .bar .theme-toggle:hover {
+  color: var(--cyan); background: var(--surface-2); border-color: var(--line);
+}
+.theme-toggle:focus-visible { outline: 2px solid var(--line-cool); outline-offset: 2px; }
+.theme-toggle svg {
+  width: 18px; height: 18px; fill: none; stroke: currentColor;
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
+.theme-toggle .tic-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .tic-sun { display: inline; }
+:root[data-theme="dark"] .theme-toggle .tic-moon { display: none; }
+
+/* ── 基础：页面底色 / 字体 / 选中态 ── */
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(1100px 640px at 85% -10%, var(--halo-cool), transparent 62%),
+    radial-gradient(900px 560px at 0% 34%, var(--halo-warm), transparent 62%),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  background-attachment: fixed;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--halo-cool); }
+code, pre, kbd, samp { font-family: var(--font-mono); }
+a { color: inherit; }

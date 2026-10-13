@@ -1,7 +1,7 @@
 /* ══════════════════════════════════════════════════════════════════════
    Hero：3D 星球直接长在 hero 上 + 首屏一个累计报文数字（三语首页共用）
    ──────────────────────────────────────────────────────────────────────
-   为什么单独一个文件：style.css 被 46 个页面以 ?v=7 引用，动它就得全站改
+   为什么单独一个文件：style.css 被 46 个页面以 ?v=8 引用，动它就得全站改
    版本号；这块只有三语首页 hero 用到，独立文件 + 独立 ?v 更省事。
 
    这一版的关键点：星球不是"面板"，而是一层**透明**的全幅画布
@@ -31,7 +31,7 @@
   will-change: transform, opacity;
 }
 .hero.grabbing .planet-canvas { cursor: grabbing; }
-.planet-canvas:focus-visible { outline: 2px solid rgba(3, 105, 161, .6); outline-offset: -6px; }
+.planet-canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -6px; }
 /* 文案在最上层。hero-inner 自己不拦指针事件，好让右半边的拖动落到画布上，
    只有文案栏恢复接收（链接、选中文字照常）。 */
 .hero-inner { grid-template-columns: minmax(0, 1fr); pointer-events: none; }
@@ -62,9 +62,10 @@
   transform: translate3d(0, var(--hero-3d-next, 0px), 0);
 }
 
-/* 文案底下铺一层很淡的同色晕，长句子压在点云上也读得清（不出边框感） */
+/* 文案底下铺一层很淡的同色晕，长句子压在点云上也读得清（不出边框感）。
+   两套值分别贴着 --bg-1 的白 / 深空黑，换了底色记得跟着改这里。 */
 .hero { --hero-veil: rgba(244, 247, 253, .9); }
-:root[data-theme="dark"] .hero { --hero-veil: rgba(9, 14, 26, .84); }
+:root[data-theme="dark"] .hero { --hero-veil: rgba(10, 14, 18, .86); }
 .hero-copy::before, .hero-copy-next::before {
   content: ""; position: absolute; z-index: -1; pointer-events: none;
   inset: -18% -34%;
@@ -100,10 +101,10 @@
   font-size: clamp(64px, 11vw, 148px);
   font-weight: 800; line-height: .92;
   letter-spacing: -.04em; font-variant-numeric: tabular-nums;
-  /* 不上渐变、不上彩：就是正文墨色。跳动靠"抬起 + 换成站点那一支青再退回来"，
-     整条读数里只有这一处强调色，也就不会跟旁边的玻璃、按钮抢色。 */
+   /* 不上渐变、不上彩：就是铝白 / 墨色。跳动靠"抬起 + 换成数据那一支冷蓝再退回来"，
+     整条读数里只有这一处强调色，不会跟旁边的按钮抢色。 */
   color: var(--text);
-  filter: drop-shadow(0 10px 24px rgba(15, 23, 42, .14));
+  filter: drop-shadow(0 10px 24px var(--shadow-color));
 }
 /* 每跳一格：数字轻轻上浮一下、辉光一闪、渐变扫过一整轮 —— 看上去是「亮了一下」，
    而不是「换了一张图」。 */
@@ -113,13 +114,13 @@
   0% {
     transform: translateY(-3px) scale(1.035);
     color: var(--cyan);
-    filter: drop-shadow(0 0 16px rgba(3, 105, 161, .38));
+    filter: drop-shadow(0 0 16px var(--shadow-cool));
   }
   55% { transform: translateY(0) scale(1); }
   100% {
     transform: none;
     color: var(--text);
-    filter: drop-shadow(0 10px 24px rgba(15, 23, 42, .14));
+    filter: drop-shadow(0 10px 24px var(--shadow-color));
   }
 }
 
@@ -150,16 +151,17 @@
 .planet-fallback .pf-globe {
   position: absolute; left: 71.5%; top: 47.5%; width: 65vh; aspect-ratio: 1;
   transform: translate(-50%, -50%); border-radius: 50%;
+  /* 降级星球也只用那一族蓝：亮面 → 冷蓝 → 深空黑的地平线 */
   background:
-    radial-gradient(circle at 36% 32%, #dbeafe 0%, #93c5fd 22%, #3b82f6 54%, #1d4ed8 82%, #0f172a 100%);
-  box-shadow: 0 0 140px rgba(37, 99, 235, .26);
+    radial-gradient(circle at 36% 32%, var(--cyan-bright) 0%, var(--cyan) 26%, var(--cyan-deep) 62%, var(--bg-1) 100%);
+  box-shadow: 0 0 140px var(--shadow-cool);
   opacity: .92;
 }
 .planet-fallback .pf-ring {
   position: absolute; left: 71.5%; top: 47.5%; width: 116vh; height: 40vh;
   transform: translate(-50%, -50%) rotate(-13deg); border-radius: 50%;
-  border: 2px solid rgba(37, 99, 235, .45);
-  box-shadow: 0 0 40px rgba(37, 99, 235, .22);
+  border: 2px solid var(--line-cool);
+  box-shadow: 0 0 40px var(--shadow-cool);
 }
 
 /* ── 底部的「往下拉」提示：一根渐隐的细线 + 一颗往下走的点。没有圆环、没有
@@ -175,12 +177,12 @@
 .hero-scroll span {
   position: absolute; left: 50%; top: 0; width: 1.5px; height: 100%;
   margin-left: -.75px; border-radius: 2px;
-  background: linear-gradient(180deg, rgba(3, 105, 161, 0), rgba(3, 105, 161, .5) 45%, rgba(3, 105, 161, 0));
+  background: linear-gradient(180deg, rgba(77, 163, 255, 0), rgba(77, 163, 255, .55) 45%, rgba(77, 163, 255, 0));
 }
 .hero-scroll span::after {
   content: ""; position: absolute; left: 50%; top: 0; width: 6px; height: 6px;
   margin-left: -3px; border-radius: 50%; background: var(--cyan);
-  box-shadow: 0 0 14px rgba(3, 105, 161, .55);
+  box-shadow: 0 0 14px rgba(77, 163, 255, .55);
   animation: heroCueDrop 2.8s var(--ease) infinite;
 }
 @keyframes heroCueFloat {

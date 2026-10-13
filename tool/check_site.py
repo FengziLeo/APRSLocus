@@ -232,12 +232,15 @@ def main():
             for f in ['docs/faq.html', 'docs/zh-TW/faq.html', 'docs/en/faq.html',
                       'docs/manual/start.html', 'docs/zh-TW/manual/start.html',
                       'docs/en/manual/start.html', 'docs/guide.html', 'docs/promo.html']))
-    chk('功能清单 CSS 自洽（括号 / 六个部件 / 深浅两套发丝线 / 自己不写卡片样式）',
+    # 深浅两套不再各写一遍：这一层把颜色全指到共享 token，主题切换自己就跟着走。
+    # 所以判据也改了 —— 不再数 [data-theme="dark"] 的条数，改成「一个颜色字面量都没有」。
+    chk('功能清单 CSS 自洽（括号 / 六个部件 / 全走 token / 自己不写卡片样式）',
         feat_css.count('{') == feat_css.count('}') and
         all(x in feat_css for x in ('.feat-list', '.feat-group', '.feat-no', '.feat-ico',
                                     '.feat-main', '.feat-tags')) and
-        ':root[data-theme="dark"] .feat-list' in feat_css and
-        '--feat-rule' in feat_css and '.card' not in feat_css)
+        '--feat-rule' in feat_css and
+        not re.search(r'#[0-9a-fA-F]{3,8}\b|rgba?\(|(?<![\w-])(?:white|black|silver)(?![\w-])', feat_css) and
+        not re.search(r'^\s*\.card\b', feat_css, re.M))
 
     print('[home nav]')
     # 首页导航：13 个链接横排一行 → 收成一个「更多」面板（docs/css/nav.css + nav.js）。
@@ -278,8 +281,10 @@ def main():
         '.nav-more { display: contents; }' in nav_css and
         '.nav-more-btn { display: none; }' in nav_css)
     chk('导航层只挂首页（三语有、别的页没有，且同一个 ?v=）',
-        all(read(f).count('nav.css?v=1') == 1 and read(f).count('nav.js?v=1') == 1
-            for f in homes) and
+        all(len(re.findall(r'nav\.css\?v=\d+', read(f))) == 1 and
+            len(re.findall(r'nav\.js\?v=\d+', read(f))) == 1 for f in homes) and
+        len(set(re.findall(r'nav\.css\?v=(\d+)', read(f))[0] for f in homes)) == 1 and
+        len(set(re.findall(r'nav\.js\?v=(\d+)', read(f))[0] for f in homes)) == 1 and
         all('nav.css' not in read(f) and 'nav.js' not in read(f)
             for f in ['docs/faq.html', 'docs/zh-TW/faq.html', 'docs/en/faq.html',
                       'docs/manual/start.html', 'docs/zh-TW/manual/start.html',
@@ -696,12 +701,45 @@ def main():
     css = read('docs/css/style.css')
     cssb = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
     chk('css braces balanced', cssb.count('{') == cssb.count('}'))
+    # 对比度那条判据以前点的是几个写死的颜色值，现在颜色都收进 token 了，
+    # 所以改成点 token 本身：浅色那套里必须还在（值可以对不上，名字不许丢）。
     chk('contrast fixes present',
-        all(x in css for x in ['--text-faint: #5b6b85', '--cyan: #0369a1',
-                               '--grad-text', 'font-size: 16px; color']))
-    chk('dark theme rules >= 40', css.count('[data-theme="dark"]') >= 40,
-        css.count('[data-theme="dark"]'))
-    chk('new card grads c15-c18', all(('.c%d {' % i) in css for i in (15, 16, 17, 18)))
+        all(x in css for x in ['--text-faint: #5b6b85', '--cyan: #1d6fd0',
+                               '--cyan-deep: #0369a1', '--accent: #e25700',
+                               '--on-accent: #1a1207', '--font-mono', '--grad-text']))
+
+    # ── 调色板只有一个源头：style.css 里那两块 token ────────────────────
+    # 深色收成「一块 token 覆盖」之后，"深色规则数 >= 40" 这种数数的判据就
+    # 失效了（越数越少，但页面其实是对的）。真正要钉的是两件事：
+    #   1) 浅色那套 token 里每个**颜色**，深色块都必须重新定义 —— 漏一个就会
+    #      在深底上露出浅色值（当年就是这么漏出白底描边的）；
+    #   2) token 声明之外一个颜色字面量都不许有 —— 有也就意味着某处写死了
+    #      颜色，切到另一套主题必成亮斑。唯一放行的是 mask 里的 #000。
+    def _tok_decl(text):
+        return dict(re.findall(r'^\s*(--[a-z0-9-]+)\s*:\s*([^;]+);', text, re.M))
+
+    _blocks = {}
+    for _m in re.finditer(r'(:root(?:\[data-theme="dark"\])?)\s*\{(.*?)\n\}', cssb, re.S):
+        _blocks[_m.group(1)] = _m.group(2)
+    light_tok = _tok_decl(_blocks.get(':root', ''))
+    dark_tok = _tok_decl(_blocks.get(':root[data-theme="dark"]', ''))
+    colourish = re.compile(r'#[0-9a-fA-F]{3,8}\b|rgba?\(|(?<![\w-])(?:white|black|silver|gray|grey)(?![\w-])')
+    need_dark = [k for k, v in light_tok.items() if colourish.search(v)]
+    chk('深色 token 覆盖浅色 token（%d 个颜色 token）' % len(need_dark),
+        bool(need_dark) and all(k in dark_tok for k in need_dark),
+        [k for k in need_dark if k not in dark_tok][:6])
+    # 颜色字面量只允许出现在 token 声明行、和 mask 的那两行 #000 里
+    literals = []
+    for i, line in enumerate(cssb.split('\n')):
+        if re.match(r'^\s*--[a-z0-9-]+\s*:', line):
+            continue
+        if re.search(r'#[0-9a-fA-F]{3,8}\b|rgba?\(', line):
+            literals.append('L%d %s' % (i + 1, line.strip()[:70]))
+    chk('token 之外无颜色字面量（mask 的 #000 除外）',
+        all('#000' in x and 'mask-image' in x for x in literals), literals[:4])
+    # 深色下必须用 token，不许写死 Colors.white 那种（这页是 CSS，同类问题是写死值）
+    chk('style.css 里没有老卡片样式（功能清单在 features.css）',
+        not re.search(r'^\s*\.cards?\s*[,{]', cssb, re.M))
     chk('help-center styles', all(x in css for x in ['.skip-link', '.faq-search', '.faq-group']))
     chk('manual multi-page styles',
         all(x in css for x in ['.doc-crumb', '.doc-pager', '.set-table',
@@ -725,10 +763,52 @@ def main():
     chk('跨页搜索容器 + 脚本',
         all('manualResults' in read(b0 + '/start.html')
             and "fetch('_index.json')" in read(b0 + '/start.html') for b0, _ in BASES))
-    chk('css 缓存版本 v7、无 v6 残留',
-        'style.css?v=7' in read('docs/manual/start.html')
-        and 'style.css?v=6' not in read('docs/manual/start.html')
-        and 'style.css?v=7' in read('docs/index.html'))
+    # 版本号一改就得全站同步（浏览器缓存认这个），所以不只点两页，
+    # 而是把 docs 下所有 html 扫一遍：每个文件只能有一种 style.css / main.js 版本。
+    def _pins(pattern):
+        got = {}
+        for dirpath, _dirs, files in os.walk(os.path.join(ROOT, 'docs')):
+            for fn in files:
+                if fn.endswith('.html'):
+                    s = io.open(os.path.join(dirpath, fn), encoding='utf-8').read()
+                    for v in re.findall(pattern, s):
+                        got.setdefault(v, []).append(os.path.relpath(
+                            os.path.join(dirpath, fn), ROOT))
+        return got
+
+    css_pins, js_pins = _pins(r'style\.css\?v=(\d+)'), _pins(r'main\.js\?v=(\d+)')
+    chk('css 缓存版本全站一致（style.css %s）' % ','.join(sorted(css_pins)),
+        list(css_pins) == ['8'] and 'style.css?v=8' in read('docs/index.html'))
+    chk('js 缓存版本全站一致（main.js %s）' % ','.join(sorted(js_pins)),
+        list(js_pins) == ['8'])
+    # 只挂独立页的 theme.css 也必须跟 style.css 同名版本
+    STANDALONE = ("docs/promo.html", "docs/card.html", "docs/badge.html",
+                  "docs/member-card.html", "docs/memorial.html", "docs/terms.html",
+                  "docs/zh-TW/terms.html", "docs/en/terms.html")
+    chk('theme.css 一版到底',
+        len(set(re.findall(r'theme\.css\?v=(\d+)', read(f))[0] for f in STANDALONE)) == 1)
+    # 这 8 页不挂 main.js，主题切换是另一份 js/theme.js。
+    # 判据两层：这 8 页一处不多不少、版本还一致；别处的页面一根都不许碰。
+    chk('独立页各一颗主题切换按钮（theme.js 同一版）',
+        all(read(f).count('js/theme.js?v=') == 1 and 'id="themeToggle"' in read(f)
+            and 'class="theme-toggle"' in read(f) and 'class="tic-sun"' in read(f)
+            for f in STANDALONE) and
+        len(set(re.findall(r'theme\.js\?v=(\d+)', read(f))[0] for f in STANDALONE)) == 1)
+    chk('theme.js 只服务独立页（首页 / 文档页不碰）',
+        all('theme.js' not in read(f) for f in
+            ('docs/index.html', 'docs/zh-TW/index.html', 'docs/en/index.html',
+             'docs/faq.html', 'docs/manual/start.html', 'docs/guide.html')))
+    # 两块 token 在 style.css 和 theme.css 里各存了一份（独立页不挂 style.css），
+    # 双份就得逐字比对，不然改一边忘一边 —— 这类漂移肉眼看不出来。
+    _tb = {}
+    for rel in ('docs/css/style.css', 'docs/css/theme.css'):
+        t = re.sub(r'/\*.*?\*/', '', read(rel), flags=re.S)
+        _tb[rel] = dict((m.group(1), m.group(2)) for m in
+                        re.finditer(r'(:root(?:\[data-theme="dark"\])?)\s*\{(.*?)\n\}', t, re.S))
+    chk('theme.css 的 token 与 style.css 逐字一致',
+        _tb['docs/css/style.css'] == _tb['docs/css/theme.css'],
+        [k for k in _tb['docs/css/style.css']
+         if _tb['docs/css/theme.css'].get(k) != _tb['docs/css/style.css'][k]])
     chk('永久链接文案三语',
         '本节永久链接' in read('docs/manual/start.html')
         and '本節永久連結' in read('docs/zh-TW/manual/start.html')

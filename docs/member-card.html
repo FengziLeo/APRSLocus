@@ -7,117 +7,129 @@
 <meta name="description" content="APRSlocus 荣誉墙 — 成员徽章与成就">
 <meta property="og:title" content="APRSlocus 荣誉墙">
 <meta property="og:image" content="https://aprslocus.theez.top/assets/logo.png">
+<link rel="stylesheet" href="css/theme.css?v=1">
+<script>
+/* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）。
+   必须在首帧前执行，否则会闪一下亮底（token 的键在 <html data-theme> 上）。 */
+(function () {
+  try {
+    var t = localStorage.getItem('theme');
+    if (t !== 'dark' && t !== 'light') t = 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
+  } catch (e) {}
+})();
+</script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  body{min-height:100vh;font-family:"Inter","PingFang SC","Microsoft YaHei","Noto Sans SC",-apple-system,"Segoe UI",Roboto,sans-serif;
-    background:linear-gradient(165deg,#fafbfe,#f0f2f8 55%,#e9ecf4);color:#131c30;
-    -webkit-font-smoothing:antialiased}
+  body{min-height:100vh;color:var(--text);-webkit-font-smoothing:antialiased}
   .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
-    padding:12px 18px;background:rgba(244,246,251,.72);backdrop-filter:blur(8px);border-bottom:1px solid rgba(30,50,90,.06)}
+    padding:12px 18px;background:var(--surface-2);border-bottom:1px solid var(--line-cool)}
   .brand{display:flex;align-items:center;gap:9px;text-decoration:none}
-  .brand img{width:26px;height:26px;border-radius:7px;background:#fff;box-shadow:0 4px 10px rgba(20,30,60,.12)}
-  .brand b{font-size:14.5px;color:#141c30}
+  .brand img{width:26px;height:26px;border-radius:7px;background:var(--surface-1);box-shadow:0 4px 10px var(--shadow-color)}
+  .brand b{font-size:14.5px;color:var(--text)}
   .langs{display:flex;gap:3px}
-  .langs button{font:inherit;font-size:12.5px;color:#7b879d;background:transparent;border:0;border-radius:8px;padding:4px 10px;cursor:pointer}
-  .langs button.on{color:#10192e;font-weight:700;background:#fff;box-shadow:0 2px 8px rgba(20,35,70,.07)}
+  .langs button{font:inherit;font-size:12.5px;color:var(--text-dim);background:transparent;border:0;border-radius:8px;padding:4px 10px;cursor:pointer}
+  .langs button.on{color:var(--text);font-weight:700;background:var(--surface-1);box-shadow:0 2px 8px var(--shadow-color)}
   .wrap{max-width:1000px;margin:0 auto;padding:clamp(24px,5vh,52px) 16px 10px}
   /* hero */
   .hero{text-align:center;margin-bottom:34px}
-  .hero .st{display:inline-block;font-size:11px;letter-spacing:3px;color:#b08a34;border:1px solid rgba(176,138,52,.35);border-radius:999px;padding:5px 16px;margin-bottom:14px}
+  .hero .st{display:inline-block;font-size:11px;letter-spacing:3px;color:var(--accent-deep);border:1px solid var(--line-warn);border-radius:999px;padding:5px 16px;margin-bottom:14px}
   .hero h1{font-size:clamp(26px,5vw,44px);font-weight:900;letter-spacing:-.02em}
-  .hero h1 em{font-style:normal;background:linear-gradient(90deg,#0c2f7a,#0ea5c4);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .hero p{color:#7b879d;font-size:14px;margin-top:8px}
+  .hero h1 em{font-style:normal;background:var(--grad-text);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{color:var(--text-dim);font-size:14px;margin-top:8px}
   /* 荣誉墙工具条：搜索 + 概览 */
   .bar{display:flex;align-items:center;gap:12px;margin:0 0 18px;flex-wrap:wrap}
-  .search{flex:1 1 220px;min-width:200px;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e4e8f1;
-    border-radius:13px;padding:9px 14px;box-shadow:0 6px 18px -14px rgba(20,35,70,.5);transition:.2s}
-  .search:focus-within{border-color:#bccbe6;box-shadow:0 10px 24px -16px rgba(20,35,70,.55)}
-  .search svg{width:16px;height:16px;color:#9aa4b8;flex:0 0 auto}
-  .search input{flex:1;min-width:0;font:inherit;font-size:14px;color:#1a2338;background:transparent;border:0;outline:0}
-  .search input::placeholder{color:#a3adc0}
-  .wct{font-size:12.5px;color:#7b879d;white-space:nowrap}
-  .wct b{color:#1a2338;font-weight:800}
+  .search{flex:1 1 220px;min-width:200px;display:flex;align-items:center;gap:9px;background:var(--surface-1);border:1px solid var(--line);
+    border-radius: var(--radius);padding:9px 14px;box-shadow:0 6px 18px -14px var(--shadow-color);transition:.2s}
+  .search:focus-within{border-color:var(--line-cool);box-shadow:0 10px 24px -16px var(--shadow-color)}
+  .search svg{width:16px;height:16px;color:var(--text-dim);flex:0 0 auto}
+  .search input{flex:1;min-width:0;font:inherit;font-size:14px;color:var(--text);background:transparent;border:0;outline:0}
+  .search input::placeholder{color:var(--text-dim)}
+  .wct{font-size:12.5px;color:var(--text-dim);white-space:nowrap}
+  .wct b{color:var(--text);font-weight:800}
   /* 图例：一键跳到某枚徽章 */
   .legend{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 14px;margin:0 -2px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
-  .legend button{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:12.5px;font-weight:700;color:#43506b;
-    background:#fff;border:1px solid #e7ebf3;border-radius:999px;padding:6px 13px;cursor:pointer;white-space:nowrap;transition:.18s}
-  .legend button:hover{border-color:#c8d3e8;transform:translateY(-1px)}
+  .legend button{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:12.5px;font-weight:700;color:var(--cyan);
+    background:var(--surface-1);border:1px solid var(--line);border-radius:999px;padding:6px 13px;cursor:pointer;white-space:nowrap;transition:.18s}
+  .legend button:hover{border-color:var(--line);transform:translateY(-1px)}
   .legend button .ld{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
-  .legend button .ln{color:#9aa4b8;font-weight:800}
+  .legend button .ln{color:var(--text-dim);font-weight:800}
   /* 分组区 */
   .group{margin:0 0 34px;scroll-margin-top:84px}
   .group:last-child{margin-bottom:12px}
-  .gh{display:flex;align-items:center;gap:11px;margin-bottom:16px;padding-bottom:11px;border-bottom:1px solid rgba(30,50,90,.07)}
+  .gh{display:flex;align-items:center;gap:11px;margin-bottom:16px;padding-bottom:11px;border-bottom:1px solid var(--line-cool)}
   .gh .dot{width:10px;height:10px;border-radius:3px;flex:0 0 auto;transform:rotate(45deg)}
   .gh h3{font-size:16px;font-weight:800;letter-spacing:.4px}
-  .gh .gh-sub{color:#a3adc0;font-size:12px;margin-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .gh .gh-n{color:#7b879d;font-size:12.5px;font-weight:800;margin-left:auto;background:#eef1f8;border-radius:999px;padding:2px 11px;flex:0 0 auto}
+  .gh .gh-sub{color:var(--text-dim);font-size:12px;margin-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gh .gh-n{color:var(--text-dim);font-size:12.5px;font-weight:800;margin-left:auto;background:var(--surface-1);border-radius:999px;padding:2px 11px;flex:0 0 auto}
   .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
-  .mcard{position:relative;overflow:hidden;background:#fff;border:1px solid #e9ecf4;border-radius:20px;padding:20px 14px 16px;text-align:center;cursor:pointer;
-    transition:.24s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 30px -24px rgba(20,35,70,.55)}
-  .mcard::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--accent,#3b6ef5);opacity:.9}
-  .mcard:hover{transform:translateY(-5px);border-color:#cdd8ec;box-shadow:0 24px 44px -26px rgba(20,35,70,.6)}
-  .mcard:focus-visible{outline:2px solid #3b6ef5;outline-offset:3px}
+  .mcard{position:relative;overflow:hidden;background:var(--surface-1);border:1px solid var(--line);border-radius: var(--radius);padding:20px 14px 16px;text-align:center;cursor:pointer;
+    transition:.24s cubic-bezier(.2,.8,.2,1);box-shadow:0 12px 30px -24px var(--shadow-color)}
+  .mcard::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--accent,var(--cyan));opacity:.9}
+  .mcard:hover{transform:translateY(-5px);border-color:var(--line);box-shadow:0 24px 44px -26px var(--shadow-color)}
+  .mcard:focus-visible{outline:2px solid var(--line-cool);outline-offset:3px}
   .mcard.grp{cursor:default}
-  .mcard.grp:hover{transform:none;box-shadow:0 12px 30px -26px rgba(20,35,70,.5)}
-  .av{width:56px;height:56px;border-radius:18px;margin:2px auto 12px;display:flex;align-items:center;justify-content:center;
-    font-size:21px;font-weight:900;color:#fff;background:linear-gradient(140deg,var(--accent,#3b6ef5),color-mix(in srgb,var(--accent,#3b6ef5) 70%,#0b1226));
-    box-shadow:0 10px 20px -6px var(--accent,rgba(20,35,70,.18)),inset 0 0 0 1px rgba(255,255,255,.35)}
-  .mcard .call{font-size:15.5px;font-weight:900;letter-spacing:1px;font-family:ui-monospace,'SF Mono',Consolas,monospace;color:#141e38}
-  .mcard .who{font-size:12.5px;color:#6a7590;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .mcard .role{display:inline-block;margin-top:10px;font-size:10.5px;font-weight:700;color:var(--accent,#54617c);background:color-mix(in srgb,var(--accent,#54617c) 12%,#fff);
-    border:1px solid color-mix(in srgb,var(--accent,#54617c) 26%,#fff);border-radius:999px;padding:3px 11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-  .mcard .tag2{display:inline-block;margin-top:10px;font-size:10.5px;font-weight:700;color:#0e7a4d;background:#e6f6ee;border:1px solid #c7ecda;border-radius:999px;padding:3px 11px}
+  .mcard.grp:hover{transform:none;box-shadow:0 12px 30px -26px var(--shadow-color)}
+  .av{width:56px;height:56px;border-radius: var(--radius);margin:2px auto 12px;display:flex;align-items:center;justify-content:center;
+    font-size:21px;font-weight:900;color:#fff;background:linear-gradient(140deg,var(--accent,var(--cyan)),color-mix(in srgb,var(--accent,var(--cyan)) 70%,var(--code-bg)));
+    box-shadow:0 10px 20px -6px var(--accent,var(--shadow-color)),inset 0 0 0 1px var(--shadow-color)}
+  .mcard .call{font-size:15.5px;font-weight:900;letter-spacing:1px;font-family: var(--font-mono);color:var(--text)}
+  .mcard .who{font-size:12.5px;color:var(--text-dim);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mcard .role{display:inline-block;margin-top:10px;font-size:10.5px;font-weight:700;color:var(--accent,var(--cyan-deep));background:color-mix(in srgb,var(--accent,var(--cyan-deep)) 12%,var(--surface-1));
+    border:1px solid color-mix(in srgb,var(--accent,var(--line-cool)) 26%,var(--line));border-radius:999px;padding:3px 11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .mcard .tag2{display:inline-block;margin-top:10px;font-size:10.5px;font-weight:700;color:var(--green-deep);background:var(--surface-1);border:1px solid var(--line);border-radius:999px;padding:3px 11px}
   .mcard .heart{margin-top:8px;font-size:13px}
-  .nores{grid-column:1/-1;text-align:center;color:#9aa3b6;font-size:13.5px;padding:22px 0 6px}
+  .nores{grid-column:1/-1;text-align:center;color:var(--text-dim);font-size:13.5px;padding:22px 0 6px}
   .hidden{display:none!important}
   /* 会员卡预览 */
   .prehead{display:flex;align-items:center;gap:10px;margin:8px 0 16px}
-  .prehead::after{content:"";flex:1;height:1px;background:rgba(30,50,90,.08)}
+  .prehead::after{content:"";flex:1;height:1px;background:var(--halo-cool)}
   .prehead b{font-size:14px;letter-spacing:1px}
   .pre{max-width:720px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
-  canvas{display:block;width:100%;height:auto;border-radius:22px;
-    box-shadow:0 30px 70px -32px rgba(20,35,70,.45),0 2px 10px rgba(20,35,70,.05)}
-  .profile{margin-top:26px;width:100%;background:rgba(255,255,255,.9);border:1px solid rgba(30,50,90,.08);
-    border-radius:20px;padding:clamp(20px,4vw,32px);box-shadow:0 18px 44px -30px rgba(20,35,70,.4)}
+  canvas{display:block;width:100%;height:auto;border-radius: var(--radius);
+    box-shadow:0 30px 70px -32px var(--shadow-color),0 2px 10px var(--shadow-color)}
+  .profile{margin-top:26px;width:100%;background:var(--surface-1);border:1px solid var(--line-cool);
+    border-radius: var(--radius);padding:clamp(20px,4vw,32px);box-shadow:0 18px 44px -30px var(--shadow-color)}
   .p-top{display:flex;gap:18px;align-items:center}
-  .p-av{flex:0 0 auto;width:72px;height:72px;border-radius:22px;color:#fff;font:900 28px Consolas,monospace;
-    display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -8px rgba(20,35,70,.4)}
+  .p-av{flex:0 0 auto;width:72px;height:72px;border-radius: var(--radius);color:#fff;font:900 28px Consolas,monospace;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -8px var(--shadow-color)}
   .p-id{min-width:0;flex:1}
-  .p-call{font-size:clamp(24px,4vw,34px);font-weight:900;letter-spacing:1.5px;font-family:ui-monospace,Consolas,monospace;line-height:1.1}
-  .p-who{color:#6a7590;font-size:14.5px;margin-top:6px}
+  .p-call{font-size:clamp(24px,4vw,34px);font-weight:900;letter-spacing:1.5px;font-family: var(--font-mono);line-height:1.1}
+  .p-who{color:var(--text-dim);font-size:14.5px;margin-top:6px}
   .p-honors{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
   .p-honors .honor{display:inline-flex;text-decoration:none;align-items:center;gap:6px;font-size:12.5px;font-weight:700;
-    background:#fff;border:1px solid;border-radius:999px;padding:4px 12px;box-shadow:0 2px 8px rgba(20,35,70,.05)}
+    background:var(--surface-1);border:1px solid;border-radius:999px;padding:4px 12px;box-shadow:0 2px 8px var(--shadow-color)}
   .p-honors .honor .hd{width:8px;height:8px;border-radius:50%}
-  .p-hr{height:1px;background:rgba(30,50,90,.08);margin:22px 0}
-  .p-sec h4{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:2.5px;color:#8b95a9;font-weight:700;margin-bottom:10px}
-  .p-sec h4::after{content:"";flex:1;height:1px;background:rgba(30,50,90,.06)}
-  .p-sec p{color:#303d58;font-size:15.5px;line-height:1.95}
-  .p-quote{display:flex;gap:12px;margin-top:20px;padding:16px 20px;border-radius:14px;background:#f7f9fd;border-left:3px solid}
-  .p-quote .qm{font-size:24px;line-height:1;color:#c9d0dd;font-family:Georgia,serif}
-  .p-quote p{color:#44506b;font-size:14.5px;line-height:1.8;font-style:italic}
+  .p-hr{height:1px;background:var(--halo-cool);margin:22px 0}
+  .p-sec h4{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:2.5px;color:var(--text-dim);font-weight:700;margin-bottom:10px}
+  .p-sec h4::after{content:"";flex:1;height:1px;background:var(--halo-cool)}
+  .p-sec p{color:var(--text-dim);font-size:15.5px;line-height:1.95}
+  .p-quote{display:flex;gap:12px;margin-top:20px;padding:16px 20px;border-radius: var(--radius);background:var(--surface-1);border-left:3px solid}
+  .p-quote .qm{font-size:24px;line-height:1;color:var(--text-faint);font-family:Georgia,serif}
+  .p-quote p{color:var(--text-dim);font-size:14.5px;line-height:1.8;font-style:italic}
   .p-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
-  .tag{font-size:12px;font-weight:600;color:#54617c;background:#eef1f8;border-radius:999px;padding:5px 13px}
-  .tag{font-size:12px;font-weight:600;color:#54617c;background:#eef1f8;border-radius:999px;padding:5px 13px}
+  .tag{font-size:12px;font-weight:600;color:var(--text-dim);background:var(--surface-1);border-radius:999px;padding:5px 13px}
+  .tag{font-size:12px;font-weight:600;color:var(--text-dim);background:var(--surface-1);border-radius:999px;padding:5px 13px}
   .ctrl{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:24px;flex-wrap:wrap}
-  .ct{font:inherit;font-size:14px;color:#39435e;background:transparent;border:0;border-radius:11px;padding:10px 17px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
-  .ct:hover{background:#fff;box-shadow:0 4px 12px rgba(20,35,70,.08)}
+  .ct{font:inherit;font-size:14px;color:var(--text);background:transparent;border:0;border-radius: var(--radius);padding:10px 17px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .ct:hover{background:var(--surface-1);box-shadow:0 4px 12px var(--shadow-color)}
   .ct svg{width:15px;height:15px}
-  .ct.prim{font-weight:700;color:#fff;background:#16213b;box-shadow:0 12px 24px -14px rgba(20,30,55,.8)}
-  .sep{width:1px;height:20px;background:#d7dbe6;margin:0 8px}
+  .ct.prim{font-weight:700;color:var(--on-code);background:var(--code-bg);box-shadow:0 12px 24px -14px var(--shadow-color)}
+  .sep{width:1px;height:20px;background:var(--surface-1);margin:0 8px}
   .calls{display:inline-flex;gap:3px;flex-wrap:wrap;justify-content:center}
-  .calls button{font:inherit;font-size:12.5px;font-family:ui-monospace,Consolas,monospace;color:#98a1b4;background:transparent;border:0;border-radius:9px;padding:6px 9px;cursor:pointer}
-  .calls button.on{color:#10192e;background:#fff;font-weight:700;box-shadow:0 3px 10px rgba(20,35,70,.1)}
-  .foot{margin:34px 0 26px;color:#9aa3b6;font-size:12.5px;text-align:center}
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(90px);background:#16213b;color:#fff;font-size:13px;padding:10px 20px;border-radius:11px;opacity:0;transition:.28s;z-index:60;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+  .calls button{font:inherit;font-size:12.5px;font-family: var(--font-mono);color:var(--text-dim);background:transparent;border:0;border-radius:9px;padding:6px 9px;cursor:pointer}
+  .calls button.on{color:var(--text);background:var(--surface-1);font-weight:700;box-shadow:0 3px 10px var(--shadow-color)}
+  .foot{margin:34px 0 26px;color:var(--text-dim);font-size:12.5px;text-align:center}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(90px);background:var(--code-bg);color:var(--on-code);font-size:13px;padding:10px 20px;border-radius: var(--radius);opacity:0;transition:.28s;z-index:60;box-shadow:0 12px 30px var(--shadow-color)}
   .toast.show{opacity:1;transform:translateX(-50%)}
   @media(max-width:520px){.p-role{margin-left:0}}
   @media(max-width:560px){
     .wrap{padding-left:13px;padding-right:13px}
     .cards{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:11px}
-    .mcard{padding:16px 10px 13px;border-radius:17px}
-    .av{width:48px;height:48px;border-radius:15px;font-size:18px;margin-bottom:10px}
+    .mcard{padding:16px 10px 13px;border-radius: var(--radius)}
+    .av{width:48px;height:48px;border-radius: var(--radius);font-size:18px;margin-bottom:10px}
     .gh h3{font-size:15px}
   }
 </style>
@@ -129,6 +141,7 @@
     <button data-lang="zh" onclick="setLang('zh')">简</button>
     <button data-lang="zh-TW" onclick="setLang('zh-TW')">繁</button>
     <button data-lang="en" onclick="setLang('en')">EN</button>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切换深色模式" title="切换深色模式" data-label-dark="切换浅色模式" data-label-light="切换深色模式"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="tic-sun" d="M12 6.6a5.4 5.4 0 1 0 0 10.8 5.4 5.4 0 0 0 0-10.8zM12 1.6v2.4M12 20v2.4M4.6 12H2.2M21.8 12h-2.4M6.75 6.75 5.05 5.05M18.95 18.95l-1.7-1.7M17.25 6.75l1.7-1.7M5.05 18.95l1.7-1.7"/><path class="tic-moon" d="M20.2 14.6A8.6 8.6 0 0 1 9.4 3.8a8.6 8.6 0 1 0 10.8 10.8z"/></svg></button>
   </div>
 </div>
 
@@ -185,7 +198,7 @@ let PEOPLE=[
            en:"Founded and built APRSlocus end-to-end — APRS-IS feed, map engines, messaging and beacon systems — for Android and Windows, then opened it to hams worldwide."},
   quote:{zh:"愿这串呼号，永远在地图上闪着光。","zh-TW":"願這串呼號，永遠在地圖上閃著光。",en:"May this callsign always shine on the map."},
   tags:{zh:["全栈开发","APRS 接入","开源"],"zh-TW":["全棧開發","APRS 接入","開源"],en:["Full-stack","APRS feed","Open source"]},
-  c:"#3b6ef5",grp:"core",honors:["kaishan","developer","earlyMember","sower","jadeGift"],primary:"kaishan"},
+  c:"#1d4f8f",grp:"core",honors:["kaishan","developer","earlyMember","sower","jadeGift"],primary:"kaishan"},
  {call:"BG2HCB",who:{zh:"清零","zh-TW":"清零",en:"Qing Ling"},
   role:{zh:"设置页代码优化","zh-TW":"設置頁代碼優化",en:"Settings optimization"},
   brief:{zh:"把设置收束成顺手的样子","zh-TW":"把設置收束成順手的樣子",en:"Tamed the settings into something intuitive"},
@@ -194,7 +207,7 @@ let PEOPLE=[
            en:"Rebuilt the settings experience and its code so every toggle, tab and hint feels clear on phone and desktop — and much easier to get started."},
   quote:{zh:"把复杂留给自己，把简单留给同好。","zh-TW":"把複雜留給自己，把簡單留給同好。",en:"Keep complexity to yourself; leave simplicity to the community."},
   tags:{zh:["设置体验","代码重构"],"zh-TW":["設置體驗","代碼重構"],en:["Settings UX","Refactor"]},
-  c:"#0e9f8b",grp:"core",honors:["kaishan","developer","earlyMember","sower"],primary:"kaishan"},
+  c:"#047857",grp:"core",honors:["kaishan","developer","earlyMember","sower"],primary:"kaishan"},
  {call:"BA4UAX",who:{zh:"BA4UAX","zh-TW":"BA4UAX",en:"BA4UAX"},
   role:{zh:"繁体中文翻译","zh-TW":"繁體中文翻譯",en:"Traditional Chinese translation"},
   brief:{zh:"让繁体中文同好读懂它","zh-TW":"讓繁體中文同好讀懂它",en:"Made it readable for Traditional-Chinese hams"},
@@ -203,7 +216,7 @@ let PEOPLE=[
            en:"Delivered the full Traditional-Chinese translation and localization polish, so hams in Hong Kong, Taiwan and beyond can use APRSlocus with ease."},
   quote:{zh:"多一种语言，就多一群在电波里相逢的朋友。","zh-TW":"多一種語言，就多一群在電波裡相逢的朋友。",en:"One more language, one more circle of friends on the air."},
   tags:{zh:["繁体中文","本地化"],"zh-TW":["繁體中文","本地化"],en:["Traditional Chinese","L10n"]},
-  c:"#6269e6",grp:"core"},
+  c:"#1d4f8f",grp:"core"},
  {call:"BD3QID",who:{zh:"BD3QID","zh-TW":"BD3QID",en:"BD3QID"},
   role:{zh:"英文翻译 · 测试","zh-TW":"英文翻譯 · 測試",en:"English · Testing"},
   brief:{zh:"把 APRSlocus 讲给世界","zh-TW":"把 APRSlocus 講給世界",en:"Told APRSlocus' story to the world"},
@@ -212,7 +225,7 @@ let PEOPLE=[
            en:"Drove English internationalization and rounds of hands-on testing, filing detailed feedback that shaped stations and messaging flows."},
   quote:{zh:"让世界听见我们的信标。","zh-TW":"讓世界聽見我們的信標。",en:"Let the world hear our beacons."},
   tags:{zh:["英文翻译","质量测试"],"zh-TW":["英文翻譯","品質測試"],en:["English","QA"]},
-  c:"#8a5cf0",grp:"core"},
+  c:"#1d4f8f",grp:"core"},
  {call:"BA7KSM",who:{zh:"BA7KSM","zh-TW":"BA7KSM",en:"BA7KSM"},
   role:{zh:"翻译","zh-TW":"翻譯",en:"Translation"},
   brief:{zh:"把 APRSlocus 说给更多同好听","zh-TW":"把 APRSlocus 說給更多同好聽",en:"Told APRSlocus' story in one more language"},
@@ -221,7 +234,7 @@ let PEOPLE=[
            en:"Translated the interface copy so hams in one more language can use APRSlocus in their mother tongue."},
   quote:{zh:"多一种语言，就多一群能听懂的朋友。","zh-TW":"多一種語言，就多一群能聽懂的朋友。",en:"One more language, one more circle of friends who understand."},
   tags:{zh:["翻译","本地化"],"zh-TW":["翻譯","本地化"],en:["Translation","L10n"]},
-  c:"#0ea5e9",grp:"core"},
+  c:"#0e566b",grp:"core"},
  {call:"BG7PGW",who:{zh:"BG7PGW","zh-TW":"BG7PGW",en:"BG7PGW"},
   role:{zh:"功能测试 · 赞助","zh-TW":"功能測試 · 贊助",en:"Testing · Sponsor"},
   brief:{zh:"一遍遍把 bug 揪出来，也为项目送来蜜雪冰城 🧋","zh-TW":"一遍遍把 bug 揪出來，也為項目送來蜜雪冰城 🧋",en:"Flushed bugs from every corner — and bought the dev a Mixue 🧋"},
@@ -230,7 +243,7 @@ let PEOPLE=[
            en:"Long-time on-air tester for GPS, maps and connectivity — and a Mixue sponsor cheering the dev on."},
   quote:{zh:"每一份 bug 报告，都是让产品变好的电波。","zh-TW":"每一份 bug 報告，都是讓產品變好的電波。",en:"Every bug report is a signal that makes the product better."},
   tags:{zh:["功能测试","蜜雪赞助","Bug 反馈"],"zh-TW":["功能測試","蜜雪贊助","Bug 回饋"],en:["Testing","Sponsor","Bug reports"]},
-  c:"#0da46b",grp:"test"},
+  c:"#047857",grp:"test"},
  {call:"BG7LMW",who:{zh:"BG7LMW","zh-TW":"BG7LMW",en:"BG7LMW"},
   role:{zh:"功能测试","zh-TW":"功能測試",en:"Functional testing"},
   brief:{zh:"在真实电台上验证功能","zh-TW":"在真實電台上驗證功能",en:"Validated every feature on real gear"},
@@ -239,7 +252,7 @@ let PEOPLE=[
            en:"Validated beaconing, mobility and messaging across real devices — guarding quality before every release."},
   quote:{zh:"用真实电台说话，用认真态度测试。","zh-TW":"用真實電台說話，用認真態度測試。",en:"Speak with real radios; test with real care."},
   tags:{zh:["功能测试","实机验证"],"zh-TW":["功能測試","實機驗證"],en:["Testing","On-device"]},
-  c:"#0a9fb4",grp:"test"},
+  c:"#0e566b",grp:"test"},
  {call:"BG7OSL",who:{zh:"BG7OSL","zh-TW":"BG7OSL",en:"BG7OSL"},
   role:{zh:"功能测试","zh-TW":"功能測試",en:"Functional testing"},
   brief:{zh:"事无巨细推动它变好","zh-TW":"鉅細靡遺推動它變好",en:"Pushed it forward with meticulous feedback"},
@@ -248,7 +261,7 @@ let PEOPLE=[
            en:"Covered fixes, messages, groups and map details with meticulous notes that kept the whole experience improving."},
   quote:{zh:"细节见真章，较真见热爱。","zh-TW":"細節見真章，較真見熱愛。",en:"Details reveal craft; diligence reveals love."},
   tags:{zh:["功能测试","体验打磨"],"zh-TW":["功能測試","體驗打磨"],en:["Testing","UX polish"]},
-  c:"#e0568f",grp:"test"},
+  c:"#8f1d5a",grp:"test"},
  {call:"BG4LZY",who:{zh:"BG4LZY","zh-TW":"BG4LZY",en:"BG4LZY"},
   role:{zh:"Bug 提交与反馈","zh-TW":"Bug 提交與反饋",en:"Bug reports & feedback"},
   brief:{zh:"认真报障，推动一次次修复","zh-TW":"認真報障，推動一次次修復",en:"Reported issues that drove real fixes"},
@@ -257,7 +270,7 @@ let PEOPLE=[
            en:"Filing steady bug reports — filter, exit and other edge cases — gave the release process crucial signal."},
   quote:{zh:"发现并说出问题，就是在帮忙。","zh-TW":"發現並說出問題，就是在幫忙。",en:"Finding and voicing issues is helping."},
   tags:{zh:["Bug 反馈","发版测试"],"zh-TW":["Bug 回饋","發版測試"],en:["Bug reports","Release QA"]},
-  c:"#ef5252",grp:"test"},
+  c:"#b3271e",grp:"test"},
  {call:"BA3RZL",who:{zh:"BA3RZL","zh-TW":"BA3RZL",en:"BA3RZL"},
   role:{zh:"AI 算力支持","zh-TW":"AI 算力支持",en:"AI compute support"},
   brief:{zh:"用算力托起开发的路","zh-TW":"用算力托起開發的路",en:"Carried the build on a different signal"},
@@ -266,7 +279,7 @@ let PEOPLE=[
            en:"Provided AI compute for development and testing, accelerating prototypes, debugging and multilingual content."},
   quote:{zh:"算力无形，善意有迹。","zh-TW":"算力無形，善意有跡。",en:"Compute is invisible; kindness leaves a trace."},
   tags:{zh:["AI 算力","开发支持"],"zh-TW":["AI 算力","開發支持"],en:["AI compute","Dev support"]},
-  c:"#df7a36",grp:"support"},
+  c:"#c2410c",grp:"support"},
  /* BG2EFX：赠我以琼琚（与 members.json v52 对齐；本名单是「取不到 JSON」时的兜底，
     因此只列精选成员，不是全量）。
     ⚠️ `honors` 必须显式写出 —— 只给 grp:"support" 会被上面 honorDefsOf 的
@@ -274,7 +287,7 @@ let PEOPLE=[
  {call:"BG2EFX",who:{zh:"BG2EFX","zh-TW":"BG2EFX",en:"BG2EFX"},
   role:{zh:"赞助支持","zh-TW":"贊助支持",en:"Sponsorship support"},
   brief:{zh:"以一份心意相赠，让这盏灯火照得更远。","zh-TW":"以一份心意相贈，讓這盞燈火照得更遠。",en:"A gift from the heart, so this beacon can shine farther."},
-  honors:["jadeGift"],primary:"jadeGift",c:"#0EA5B7",grp:"support"},
+  honors:["jadeGift"],primary:"jadeGift",c:"#0e566b",grp:"support"},
  /* BH7GZB：开发人员（与 members.json v53 对齐；本名单是「取不到 JSON」时的兜底，
     因此只列精选成员，不是全量）。
     ⚠️ `honors` 必须显式写出 —— 只给 grp:"core" 会被上面 honorDefsOf 的兜底映射成
@@ -282,7 +295,7 @@ let PEOPLE=[
  {call:"BH7GZB",who:{zh:"BH7GZB","zh-TW":"BH7GZB",en:"BH7GZB"},
   role:{zh:"贡献代码","zh-TW":"貢獻程式碼",en:"Code contribution"},
   brief:{zh:"让每一帧报文都说清自己","zh-TW":"讓每一幀報文都說清自己",en:"Made every packet speak for itself"},
-  honors:["developer"],primary:"developer",c:"#1D6FF2",grp:"core"},
+  honors:["developer"],primary:"developer",c:"#1d4f8f",grp:"core"},
  /* BA7NFI：播种（与 members.json v55 对齐；本名单是「取不到 JSON」时的兜底，
     因此只列精选成员，不是全量）。
     ⚠️ `honors` 必须显式写出 —— 只给 grp:"support" 会被上面 honorDefsOf 的
@@ -290,7 +303,7 @@ let PEOPLE=[
  {call:"BA7NFI",who:{zh:"BA7NFI","zh-TW":"BA7NFI",en:"BA7NFI"},
   role:{zh:"分享传播","zh-TW":"分享傳播",en:"Community sharing"},
   brief:{zh:"把这份热爱讲给更多人听，让电波的种子随风散开。","zh-TW":"把這份熱愛講給更多人聽，讓電波的種子隨風散開。",en:"Sharing this passion far and wide, letting seeds of radio drift on the wind."},
-  honors:["sower"],primary:"sower",c:"#2E9E5B",grp:"support"},
+  honors:["sower"],primary:"sower",c:"#047857",grp:"support"},
  /* BG2WX：赠我以琼琚（与 members.json v59 对齐；本名单是「取不到 JSON」时的兜底，
     因此只列精选成员，不是全量）。
     ⚠️ `honors` 必须显式写出 —— 只给 grp:"support" 会被上面 honorDefsOf 的
@@ -298,7 +311,7 @@ let PEOPLE=[
  {call:"BG2WX",who:{zh:"BG2WX","zh-TW":"BG2WX",en:"BG2WX"},
   role:{zh:"赞助支持","zh-TW":"贊助支持",en:"Sponsorship support"},
   brief:{zh:"以琼琚相赠，让这束电波行得更远。","zh-TW":"以瓊琚相贈，讓這束電波行得更遠。",en:"Gifted with jade, so this signal may reach farther."},
-  honors:["jadeGift"],primary:"jadeGift",c:"#0EA5B7",grp:"support"},
+  honors:["jadeGift"],primary:"jadeGift",c:"#0e566b",grp:"support"},
  /* BD4TYW：赠我以琼琚（与 members.json v60 对齐；本名单是「取不到 JSON」时的兜底，
     因此只列精选成员，不是全量）。
     ⚠️ `honors` 必须显式写出 —— 只给 grp:"support" 会被上面 honorDefsOf 的
@@ -306,7 +319,7 @@ let PEOPLE=[
  {call:"BD4TYW",who:{zh:"BD4TYW","zh-TW":"BD4TYW",en:"BD4TYW"},
   role:{zh:"赞助支持","zh-TW":"贊助支持",en:"Sponsorship support"},
   brief:{zh:"以琼琚相赠，为这束电波添一分续航。","zh-TW":"以瓊琚相贈，為這束電波添一分續航。",en:"Gifted with jade, adding a little more range to this signal."},
-  honors:["jadeGift"],primary:"jadeGift",c:"#0EA5B7",grp:"support"},
+  honors:["jadeGift"],primary:"jadeGift",c:"#0e566b",grp:"support"},
  /* BH2WIX：赠我以琼琚（与 members.json v62 对齐；本名单是「取不到 JSON」时的兜底，
     因此只列精选成员，不是全量）。
     ⚠️ `honors` 必须显式写出 —— 只给 grp:"support" 会被上面 honorDefsOf 的
@@ -314,23 +327,23 @@ let PEOPLE=[
  {call:"BH2WIX",who:{zh:"BH2WIX","zh-TW":"BH2WIX",en:"BH2WIX"},
   role:{zh:"赞助支持","zh-TW":"贊助支持",en:"Sponsorship support"},
   brief:{zh:"以琼琚寄意，愿这束电波抵达更远的天际。","zh-TW":"以瓊琚寄意，願這束電波抵達更遠的天際。",en:"Sending jade with good will — may this signal reach farther horizons."},
-  honors:["jadeGift"],primary:"jadeGift",c:"#0EA5B7",grp:"support"}
+  honors:["jadeGift"],primary:"jadeGift",c:"#0e566b",grp:"support"}
 ];
 /* 团体/赞助项（无呼号） */
 let GROUPS=[
  {name:{zh:"STUDENT HAMS 群组","zh-TW":"STUDENT HAMS 群組",en:"STUDENT HAMS"},
   role:{zh:"学生火腿群体 · 资金赞助","zh-TW":"學生火腿群體 · 資金贊助",en:"Student hams · financial support"},
   note:{zh:"感谢群组的资金赞助，支持 APRSlocus 持续开发与运营。","zh-TW":"感謝群組的資金贊助，支持 APRSlocus 持續開發與營運。",en:"Thanks to the group for financial support that keeps APRSlocus building."},
-  c:"#7c5cff",heart:"true"},
+  c:"#1d4f8f",heart:"true"},
  {name:{zh:"APRS.TV","zh-TW":"APRS.TV",en:"APRS.TV"},
   role:{zh:"中文 APRS 实时地图 · 同行团体","zh-TW":"中文 APRS 即時地圖 · 同行團體",en:"Chinese-language APRS live map · peer community"},
   note:{zh:"实时信标、轨迹回放、在线报文解码。","zh-TW":"即時信標、軌跡回放、線上報文解碼。",en:"Live beacons, track replay, packet decoding."},
   tag:{zh:"同行团体","zh-TW":"同行團體",en:"Peer community"},
-  c:"#0891b2"},
+  c:"#0e566b"},
  {name:{zh:"每一位支持者","zh-TW":"每一位支持者",en:"Every supporter"},
   role:{zh:"匿名赞助 · 陪伴与鼓励","zh-TW":"匿名贊助 · 陪伴與鼓勵",en:"Anonymous · encouragement"},
   note:{zh:"你们的每一份支持，都是 APRSlocus 继续发光的动力。","zh-TW":"你們的每一份支持，都是 APRSlocus 繼續發光的動力。",en:"Every bit of support keeps APRSlocus glowing."},
-  c:"#e67a9a",heart:"true"}
+  c:"#b3271e",heart:"true"}
 ];
 const GRP_META={
  core:{zh:"核心 · 开发","zh-TW":"核心 · 開發",en:"Core · Development"},
@@ -376,13 +389,13 @@ function T(obj){return obj?(obj[lang]||obj.zh||""):"";}
 function TArr(o){const v=T(o);return Array.isArray(v)?v:[];}
 /* 称号：members.json honors 定义 + 每人 honors 推导（内置兜底，联网后覆盖） */
 let HONOR_DEFS={
- kaishan:{zh:"开山","zh-TW":"開山",en:"Founding pioneer",color:"#E67E22"},
- developer:{zh:"开发人员","zh-TW":"開發人員",en:"Developer",color:"#1D6FF2"},
- earlyMember:{zh:"早期成员","zh-TW":"早期成員",en:"Early member",color:"#B08A34"},
- mostBrain:{zh:"最强大脑","zh-TW":"最強大腦",en:"Brightest mind",color:"#0EA5C4"},
- firstFix:{zh:"FIRST FIX · 至高荣誉","zh-TW":"FIRST FIX · 至高榮譽",en:"FIRST FIX · Supreme Honor",color:"#C9A227"},
- jadeGift:{zh:"赠我以琼琚","zh-TW":"贈我以瓊琚",en:"Gifted with Jade",color:"#0EA5B7"},
- sower:{zh:"播种","zh-TW":"播種",en:"Sower",color:"#2E9E5B"},
+ kaishan:{zh:"开山","zh-TW":"開山",en:"Founding pioneer",color:"#c2410c"},
+ developer:{zh:"开发人员","zh-TW":"開發人員",en:"Developer",color:"#1d4f8f"},
+ earlyMember:{zh:"早期成员","zh-TW":"早期成員",en:"Early member",color:"#c2410c"},
+ mostBrain:{zh:"最强大脑","zh-TW":"最強大腦",en:"Brightest mind",color:"#0e566b"},
+ firstFix:{zh:"FIRST FIX · 至高荣誉","zh-TW":"FIRST FIX · 至高榮譽",en:"FIRST FIX · Supreme Honor",color:"#92400e"},
+ jadeGift:{zh:"赠我以琼琚","zh-TW":"贈我以瓊琚",en:"Gifted with Jade",color:"#0e566b"},
+ sower:{zh:"播种","zh-TW":"播種",en:"Sower",color:"#047857"},
  iSelfReliant:{zh:"i力更生","zh-TW":"i力更生",en:"iSelf-Reliant",color:"#8E8E93"}
 };
 let FIRSTFIX_HOLDERS=new Set();
@@ -430,7 +443,7 @@ function wallSection(hkey, people){
    </div>`).join("")}
   </div></section>`;}
 function groupSection(groups){
- return `<section class="group" data-h="__group"><div class="gh"><span class="dot" style="background:#7c5cff"></span>
+ return `<section class="group" data-h="__group"><div class="gh"><span class="dot" style="background:#1d4f8f"></span>
   <h3>${TX[lang].groupT}</h3><span class="gh-sub">${TX[lang].sponsor}</span><span class="gh-n">${groups.length}</span></div>
   <div class="cards">${groups.map(g=>`
    <div class="mcard grp" style="--accent:${g.c}" tabindex="0" onclick="pick(${PEOPLE.length+GROUPS.indexOf(g)})">
@@ -453,7 +466,7 @@ function jump(hk){
 function buildLegend(){
  const el=document.getElementById("legend"); if(!el) return;
  const order=["kaishan","developer","earlyMember","mostBrain","firstFix","jadeGift","sower","iSelfReliant"];
- let html=`<button onclick="jump('top')"><span class="ld" style="background:linear-gradient(140deg,#0c2f7a,#0ea5c4)"></span>${TX[lang].allBadges}</button>`;
+ let html=`<button onclick="jump('top')"><span class="ld" style="background:linear-gradient(140deg,#1d4f8f,#12325c)"></span>${TX[lang].allBadges}</button>`;
  for(const hk of order){
    const n=PEOPLE.filter(p=>honorDefsOf(p).includes(hk)).length;
    if(!n) continue;
@@ -614,7 +627,7 @@ function applyRemote(d){
  const merged=dev.concat(early);
  if(merged.length>0) PEOPLE=merged;
  if(Array.isArray(d.groups)&&d.groups.length>0){
-   GROUPS=d.groups.map(g=>({name:g.name,role:g.role,note:g.note,tag:g.tag||null,c:g.c||"#7c5cff"}));
+   GROUPS=d.groups.map(g=>({name:g.name,role:g.role,note:g.note,tag:g.tag||null,c:g.c||"#1d4f8f"}));
  }
  rebuildCards();
  // 尽量保留当前 ?call 选中
@@ -643,5 +656,6 @@ fetch("firstfix.json").then(r=>r.ok?r.json():null).then(d=>{
   }
 }).catch(()=>{});
 </script>
+<script src="js/theme.js?v=1" defer></script>
 </body>
 </html>

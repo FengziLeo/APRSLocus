@@ -5,23 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>APRSLocus 软件名片 · Software Card</title>
 <meta name="description" content="APRSLocus 软件简介名片（横版）：供友链 / 项目主页引用，或一键导出 PNG。">
+<link rel="stylesheet" href="css/theme.css?v=1">
+<script>
+/* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）。
+   必须在首帧前执行，否则会闪一下亮底（token 的键在 <html data-theme> 上）。 */
+(function () {
+  try {
+    var t = localStorage.getItem('theme');
+    if (t !== 'dark' && t !== 'light') t = 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
+  } catch (e) {}
+})();
+</script>
 <style>
   :root{
-    --ink:#1b2233;
-    --sub:#5b6478;
-    --line:#e8ebf3;
-    --brand:#3b6ef5;
-    --brand2:#0ea5b7;
-    --card:#ffffff;
-    --bg0:#eef2f9;
-    --bg1:#e2e8f4;
+    /* 全部指向共享 token（theme.css）：这里只留名字，颜色不写在页面里。
+       --line 故意不再定义 —— 直接用共享的那个，否则深色下会露出浅色描边。 */
+    --ink:var(--text);
+    --sub:var(--text-dim);
+    --brand:var(--cyan);
+    --brand2:var(--cyan-deep);
+    --card:var(--surface-1);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0}
   body{
     min-height:100vh;display:flex;flex-direction:column;align-items:center;
     justify-content:center;gap:18px;padding:26px 16px;
-    background:radial-gradient(1400px 700px at 50% -10%,var(--bg0),var(--bg1));
     font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",
                 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans SC",
                 "Noto Sans CJK SC",sans-serif;
@@ -31,15 +43,15 @@
   /* ---------- 横版名片 ---------- */
   .card{
     position:relative;width:760px;max-width:100%;
-    background:var(--card);border-radius:18px;overflow:hidden;
-    box-shadow:0 22px 55px -18px rgba(29,45,90,.28),
-               0 6px 16px -8px rgba(29,45,90,.14);
+    background:var(--card);border-radius: var(--radius);overflow:hidden;
+    box-shadow:0 22px 55px -18px var(--shadow-color),
+               0 6px 16px -8px var(--shadow-color);
   }
   .accent{height:5px;background:linear-gradient(90deg,var(--brand),var(--brand2))}
   .row{display:flex;align-items:center;gap:16px;padding:18px 24px}
 
-  .blogo{width:40px;height:40px;border-radius:11px;object-fit:cover;flex:0 0 auto;
-    box-shadow:0 8px 18px -9px rgba(56,189,248,.75)}
+  .blogo{width:40px;height:40px;border-radius: var(--radius);object-fit:cover;flex:0 0 auto;
+    box-shadow:0 8px 18px -9px var(--shadow-cool)}
   .name{display:flex;flex-direction:column;gap:2px;flex:0 0 auto}
   .app{font-size:19px;font-weight:800;letter-spacing:.2px;line-height:1.1}
   .sub{font-size:11.5px;color:var(--sub)}
@@ -47,33 +59,33 @@
   .chips{display:flex;gap:7px;flex:1 1 auto;justify-content:center;flex-wrap:wrap}
   .chip{
     font-size:12px;font-weight:700;border-radius:999px;padding:6px 12px;line-height:1;
-    border:1px solid var(--line);color:var(--sub);background:#f7f9fc;white-space:nowrap;
+    border:1px solid var(--line);color:var(--sub);background:var(--surface-1);white-space:nowrap;
   }
-  .chip.hot{color:var(--brand);background:#eef3fe;border-color:#dbe5fd}
+  .chip.hot{color:var(--brand);background:var(--surface-1);border-color:var(--line)}
 
   .site{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:0 0 auto}
-  .plat{font-size:10.5px;font-weight:700;letter-spacing:.4px;color:#98a1b5}
+  .plat{font-size:10.5px;font-weight:700;letter-spacing:.4px;color:var(--text-dim)}
   .url{font-size:13px;font-weight:800;color:var(--brand);letter-spacing:.1px;white-space:nowrap}
 
   /* ---------- 操作条 ---------- */
   .bar{width:760px;max-width:100%;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .bar button{
     font:inherit;font-size:14px;font-weight:700;cursor:pointer;
-    border:0;border-radius:12px;padding:11px 19px;color:#fff;
-    background:linear-gradient(140deg,var(--brand),var(--brand2));
-    box-shadow:0 10px 22px -12px rgba(59,110,245,.9);
+    border:0;border-radius: var(--radius-sm);padding:11px 19px;color:var(--on-accent);
+    background:var(--grad);
+    box-shadow:0 10px 22px -12px var(--shadow-cool);
   }
-  .bar button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:0 6px 16px -12px rgba(29,45,90,.5)}
+  .bar button.ghost{background:var(--surface-1);color:var(--ink);border:1px solid var(--line);box-shadow:0 6px 16px -12px var(--shadow-color)}
   .bar button:active{transform:translateY(1px)}
   .lang{margin-left:auto;display:flex;gap:6px}
-  .lang button{padding:9px 12px;font-size:13px;background:#fff;color:var(--sub);border:1px solid var(--line);box-shadow:none}
-  .lang button.on{color:var(--brand);border-color:#c9d8fb;background:#eef3fe}
-  .hint{margin:0;font-size:12px;color:#8a93a8;text-align:center}
+  .lang button{padding:9px 12px;font-size:13px;background:var(--surface-1);color:var(--sub);border:1px solid var(--line);box-shadow:none}
+  .lang button.on{color:var(--brand);border-color:var(--line-cool);background:var(--surface-1)}
+  .hint{margin:0;font-size:12px;color:var(--text-dim);text-align:center}
 
   .toast{
     position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);
-    background:#1b2233;color:#fff;font-size:13.5px;font-weight:600;
-    padding:11px 18px;border-radius:12px;opacity:0;pointer-events:none;
+    background:var(--code-bg);color:var(--on-code);font-size:13.5px;font-weight:600;
+    padding:11px 18px;border-radius: var(--radius);opacity:0;pointer-events:none;
     transition:opacity .22s,transform .22s;
   }
   .toast.on{opacity:1;transform:translate(-50%,0)}
@@ -119,6 +131,7 @@
     <button id="save">保存图片</button>
     <button id="copy" class="ghost">复制图片</button>
     <div class="lang">
+    <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切换深色模式" title="切换深色模式" data-label-dark="切换浅色模式" data-label-light="切换深色模式"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="tic-sun" d="M12 6.6a5.4 5.4 0 1 0 0 10.8 5.4 5.4 0 0 0 0-10.8zM12 1.6v2.4M12 20v2.4M4.6 12H2.2M21.8 12h-2.4M6.75 6.75 5.05 5.05M18.95 18.95l-1.7-1.7M17.25 6.75l1.7-1.7M5.05 18.95l1.7-1.7"/><path class="tic-moon" d="M20.2 14.6A8.6 8.6 0 0 1 9.4 3.8a8.6 8.6 0 1 0 10.8 10.8z"/></svg></button>
       <button data-lang="zh" class="on">中</button>
       <button data-lang="zh-TW">繁</button>
       <button data-lang="en">EN</button>
@@ -137,8 +150,11 @@
    套字体栈，不会变豆腐块。
    ====================================================================== */
 var S = 3;
-var BRAND = "#3b6ef5";
-var BRAND2 = "#0ea5b7";
+/* 导出的 PNG 跟屏幕上看到的一致：颜色从 token 里读，深色下导出的就是深色名片 */
+function tok(name, fb){
+  var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fb;
+}
 
 function roundRect(c, x, y, w, h, r){
   r = Math.min(r, w / 2, h / 2);
@@ -221,9 +237,12 @@ function render(){
   var c = cv.getContext("2d");
   c.scale(S, S);
 
-  // 白色圆角底
-  roundRect(c, 0, 0, W, H, 18);
-  c.fillStyle = "#ffffff";
+  // 圆角底 = 页面底 + 卡片底两层，跟屏幕上看到的一致（导出即所见，深色也是深色）
+  roundRect(c, 0, 0, W, H, 12);
+  c.fillStyle = tok("--bg-1", "#f4f7fc");
+  c.fill();
+  roundRect(c, 0, 0, W, H, 12);
+  c.fillStyle = tok("--surface-1", "#ffffff");
   c.fill();
 
   // 顶部渐变条（裁进圆角）
@@ -231,11 +250,11 @@ function render(){
   if (ac){
     var ar = rectOf(ac, base);
     c.save();
-    roundRect(c, 0, 0, W, H, 18);
+    roundRect(c, 0, 0, W, H, 12);
     c.clip();
     var g = c.createLinearGradient(0, 0, W, 0);
-    g.addColorStop(0, BRAND);
-    g.addColorStop(1, BRAND2);
+    g.addColorStop(0, tok("--accent", "#ff6a00"));
+    g.addColorStop(1, tok("--accent-deep", "#c2410c"));
     c.fillStyle = g;
     c.fillRect(ar.x, ar.y, ar.w, ar.h);
     c.restore();
@@ -306,5 +325,6 @@ document.querySelectorAll(".lang button").forEach(function(btn){
   });
 });
 </script>
+<script src="js/theme.js?v=1" defer></script>
 </body>
 </html>

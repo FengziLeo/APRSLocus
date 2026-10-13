@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>用户协议 — APRSlocus 使用条款与免责声明</title>
 <meta name="description" content="APRSlocus 使用条款与免责声明（V1.2）：关于 APRS 协议、APRS-IS、合法使用与呼号、数据存储与隐私、第三方服务、知识产权、免责声明等。">
-<meta name="theme-color" content="#f3f6fd">
+<meta name="theme-color" content="#0a0e12">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="APRSlocus">
 <meta property="og:title" content="用户协议 — APRSlocus 使用条款与免责声明">
@@ -21,24 +21,38 @@
 <link rel="alternate" hreflang="zh-CN" href="https://aprslocus.theez.top/terms.html">
 <link rel="alternate" hreflang="en" href="https://aprslocus.theez.top/en/terms.html">
 <link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/theme.css?v=1">
+<script>
+/* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）。
+   必须在首帧前执行，否则会闪一下亮底（token 的键在 <html data-theme> 上）。 */
+(function () {
+  try {
+    var t = localStorage.getItem('theme');
+    if (t !== 'dark' && t !== 'light') t = 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
+  } catch (e) {}
+})();
+</script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, Helvetica, Arial, sans-serif; background: linear-gradient(160deg,#f3f6fd 0%,#eaf0fa 100%); color: #253044; line-height: 1.9; min-height: 100vh; }
-  .topbar { background: rgba(255,255,255,.82); backdrop-filter: blur(10px); border-bottom: 1px solid #e5e9f0; position: sticky; top: 0; z-index: 10; }
+  body {   color: var(--text); line-height: 1.9; min-height: 100vh; }
+  .topbar { background: var(--surface-1);border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
   .topbar-inner { max-width: 880px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #253044; font-weight: 800; font-size: 15px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-weight: 800; font-size: 15px; }
   .brand img { width: 30px; height: 30px; border-radius: 8px; }
   .lang { font-size: 13px; display: flex; gap: 6px; }
-  .lang a { text-decoration: none; color: #2563eb; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #eaf1fe; }
-  .lang a:hover { background: #dbe7fd; }
+  .lang a { text-decoration: none; color: var(--cyan); font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--halo-cool); }
+  .lang a:hover { background: var(--surface-2); }
   .wrap { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
-  .card { background: #fff; border: 1px solid #e5e9f0; border-radius: 18px; padding: 30px 32px; box-shadow: 0 8px 30px rgba(37,99,235,.05); }
+  .card { background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px 32px; box-shadow: var(--shadow); }
   h1 { font-size: 24px; margin-bottom: 4px; }
-  .sub { font-size: 13px; color: #637083; margin-bottom: 20px; }
-  pre.terms { white-space: pre-wrap; word-break: break-word; font-family: inherit; font-size: 14px; color: #253044; }
-  .foot { max-width: 860px; margin: 24px auto 0; padding: 0 20px 40px; text-align: center; font-size: 12px; color: #94a0b2; }
-  .foot a { color: #637083; text-decoration: none; }
-  .foot a:hover { color: #2563eb; }
+  .sub { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; }
+  pre.terms { white-space: pre-wrap; word-break: break-word; font-family: inherit; font-size: 14px; color: var(--text); }
+  .foot { max-width: 860px; margin: 24px auto 0; padding: 0 20px 40px; text-align: center; font-size: 12px; color: var(--text-dim); }
+  .foot a { color: var(--text-dim); text-decoration: none; }
+  .foot a:hover { color: var(--cyan); }
   @media (max-width: 640px){ .card{ padding: 22px 18px; } h1{ font-size: 20px; } pre.terms{ font-size: 13px; } }
 </style>
 </head>
@@ -54,6 +68,7 @@
       <a href="terms.html">中文</a>
       <a href="zh-TW/terms.html">繁體</a>
       <a href="en/terms.html">English</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切换深色模式" title="切换深色模式" data-label-dark="切换浅色模式" data-label-light="切换深色模式"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="tic-sun" d="M12 6.6a5.4 5.4 0 1 0 0 10.8 5.4 5.4 0 0 0 0-10.8zM12 1.6v2.4M12 20v2.4M4.6 12H2.2M21.8 12h-2.4M6.75 6.75 5.05 5.05M18.95 18.95l-1.7-1.7M17.25 6.75l1.7-1.7M5.05 18.95l1.7-1.7"/><path class="tic-moon" d="M20.2 14.6A8.6 8.6 0 0 1 9.4 3.8a8.6 8.6 0 1 0 10.8 10.8z"/></svg></button>
     </div>
   </div>
 </div>
@@ -79,5 +94,6 @@
     .catch(function () { document.getElementById('terms').textContent = '加载失败，请刷新重试或稍后再来。'; });
   document.getElementById('year').textContent = new Date().getFullYear();
 </script>
+<script src="js/theme.js?v=1" defer></script>
 </body>
 </html>

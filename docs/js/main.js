@@ -147,7 +147,7 @@
       document.documentElement.setAttribute("data-theme", next);
       try { localStorage.setItem("theme", next); } catch (e) {}
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute("content", next === "dark" ? "#0b1220" : "#f3f6fd");
+      if (meta) meta.setAttribute("content", next === "dark" ? "#0a0e12" : "#f4f7fc");
       syncTheme();
     });
   }
@@ -219,7 +219,7 @@
         const d2 = dx * dx + dy * dy;
         if (d2 < maxDist * maxDist) {
           const a = (1 - Math.sqrt(d2) / maxDist) * 0.5;
-          ctx.strokeStyle = `rgba(14, 165, 233, ${a * 0.3})`;
+          ctx.strokeStyle = `rgba(45, 122, 200, ${a * 0.3})`;
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
@@ -228,7 +228,7 @@
         }
       }
       const glow = 0.4 + Math.sin(performance.now() / 1200 + i) * 0.3;
-      ctx.fillStyle = `rgba(56, 189, 248, ${glow * 0.7})`;
+      ctx.fillStyle = `rgba(77, 163, 255, ${glow * 0.7})`;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
@@ -287,14 +287,16 @@
     if (!box) return;
     const lang = box.getAttribute("data-lang") || "zh";
 
-    // 按赞助类型给头像底色（与页面既有渐变风格一致）
-    const GRAD = {
-      group: "linear-gradient(135deg,#6366f1,#4338ca)",
-      coffee: "linear-gradient(135deg,#f59e0b,#b45309)",
-      jade: "linear-gradient(135deg,#c9a227,#8a6d1f)",
-      school: "linear-gradient(135deg,#0ea5b7,#0b7285)",
-      api: "linear-gradient(135deg,#0891b2,#164e63)",
-      everyone: "linear-gradient(135deg,#ec4899,#be185d)",
+    // 赞助类型只决定头像那条细线的颜色（见 style.css 的 .avatar.k-*）。
+    // 以前这里给每种类型配一块彩色渐变，一屏六种色相 —— 与「一个强调色」冲突，
+    // 也过不了对比度（白字压琥珀只有 2.2:1）。现在走类名 + token。
+    const KIND = {
+      group: "k-group",
+      coffee: "k-coffee",
+      jade: "k-jade",
+      school: "k-school",
+      api: "k-api",
+      everyone: "k-everyone",
     };
 
     // 头像里那个字：呼号取「地区号后面的字母」（BG7ORC → O），其余取首字。
@@ -326,10 +328,13 @@
           .map((sp) => {
             const name = pick(sp.names, sp.name);
             const desc = pick(sp.descs, sp.desc);
-            const grad = GRAD[sp.kind] || GRAD.everyone;
+            // 只认白名单里的类型：sponsors.json 是外部数据，别让它决定类名
+            const kind = Object.prototype.hasOwnProperty.call(KIND, sp.kind)
+              ? KIND[sp.kind]
+              : KIND.everyone;
             return (
               '<span class="contributor">' +
-              '<span class="avatar" style="background:' + grad + '">' +
+              '<span class="avatar ' + kind + '">' +
               esc(initial(name)) + "</span>" +
               '<span><span class="c-name">' + esc(name) +
               '</span><span class="c-role">' + esc(desc) + "</span></span>" +

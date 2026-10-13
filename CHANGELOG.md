@@ -8,10 +8,9 @@
   那五秒里谁也分不清这是彩蛋还是卡住了 —— **现在点下去就是一次激活**：抖动、
   翻面、粒子一起发生，翻牌动画刚走完，那一页故事就递到眼前。反悔随时可以：
   再点一下，它翻回正面，故事也不再打开。
-- 故事在哪儿打开，看包里有没有带着它：**带着就在应用内翻开**（整屏内嵌），
-  没带就交给系统浏览器 —— 那一页本来就是写给浏览器看的网站，不该被塞进一个
-  没有地址栏、也没有返回键的壳里。应用内翻开的那一份，右上角另留了「在浏览器
-  打开」。
+- 故事在哪儿打开：**能内嵌的平台（Android / iOS / macOS）直接在应用内整屏翻开**
+  —— 那一页本来就是给一块屏幕看的；Windows / Linux / Web 没有可用的内嵌后端，
+  才交给系统浏览器。应用内那一页右上角另留了「在浏览器打开」。
 
 ---
 
@@ -24,10 +23,10 @@
   **A tap is the activation now**: the shudder, the flip and the particles happen
   together, and the moment the flip lands, the story is handed over. Changed your mind?
   One more tap turns the cover back, and the story stays closed.
-- Where it opens depends on whether the app carries a copy: **bundled → inside the
-  app** (full-screen embed), otherwise the system browser. That page is a website
-  written for a browser; it does not belong in a shell without an address bar or a back
-  button. The in-app copy keeps an "open in browser" action in its top bar.
+- Where it opens: **platforms with an embedder (Android / iOS / macOS) open it
+  full-screen inside the app** — that page was written for a screen; only Windows /
+  Linux / Web, which have no embedder available, hand it to the system browser. The
+  in-app copy keeps an "open in browser" action in its top bar.
 
 ---
 

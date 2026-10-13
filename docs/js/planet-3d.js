@@ -26,7 +26,11 @@
    不需要任何后端与定时任务。
    入场：一进页面，点云不是一下就摆好——每个点带一个相位，从上方散落着被「拉」下来，错峰聚成一颗球；
    相机同时从更近的机位缓缓退到取景位，线框球比点云慢半步收拢到位。
-   滚动：往下拉时星球退得比页面慢半步（视差）并缓缓淡出，文案上浮隐去，滚回顶部一切复原。
+   动感：星面有三层不同方向的浪在跑（波峰亮一档，所以浪看得见），小流星从外面
+   斜插进球面、落点荡开一圈冲击波；读数每跳一次星面再闪一批点。
+   滚动：往下拉时星球退得比页面慢半步（视差）并缓缓淡出，文案轻缩上浮隐去，
+   折线之下那一屏淡淡地追上——滚动量在 JS 里被缓动过（每帧向目标靠近一档），
+   所以是滑上去的，不是跟着滚轮一格一格跳。滚回顶部一切复原。
 
    ══════════════════════════════════════════════════════════════════════ */
 (function () {
@@ -46,24 +50,22 @@
     if (!root) return;
     var elVal = document.getElementById("tlPackets");
     if (!elVal) return;
-    var elRate = document.getElementById("tlRateNum");
 
     function digits(s) { return String(s == null ? "" : s).replace(/[^0-9]/g, ""); }
     function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
 
     // 首屏先信 HTML 里的静态快照（无 JS / 抓取失败也能看）；stats.json 到手后覆盖。
     var packets = parseInt(digits(root.getAttribute("data-packets") || elVal.textContent), 10);
-    var rate = parseInt(digits(root.getAttribute("data-rate") || (elRate ? elRate.textContent : "")), 10);
+    var rate = parseInt(digits(root.getAttribute("data-rate")), 10);
     var t0 = Date.parse(root.getAttribute("data-updated") || "") || Date.now();
     var src = root.getAttribute("data-stats") || "stats.json";
     if (!isFinite(packets)) packets = 0;
     if (!isFinite(rate)) rate = 0;
 
     var shown = -1;
-    if (elRate) elRate.textContent = "+" + fmt(rate);
 
     // 外推上限：快照越旧，"基线 + 速率 × 经过时间"离真值越远。超过 12 小时就停止
-    // 推算（数字冻结在上限值，LIVE 点变色 + 悬停给解释）—— 宁可保守一点，
+    // 推算（数字冻结在上限值、压暗一档，说明挂在 title 上）—— 宁可保守一点，
     // 也不要让一个月后打开页面的人看到一个凭空多出 15% 的"累计"。
     var MAX_DRIFT_MIN = 720, wasStale = false;
 
@@ -102,7 +104,6 @@
           if (typeof d.packetsPerMinute === "number") rate = d.packetsPerMinute;
           var ts = Date.parse(d.updatedIso || "");
           if (ts) t0 = ts;
-          if (elRate) elRate.textContent = "+" + fmt(rate);
           shown = -1;
           tick();
         })["catch"](function () {});
@@ -242,7 +243,7 @@
     var rings = [[RING_IN, 1100, 0.34], [1.52, 1200, 0.46], [1.74, 1300, 0.60]];
     for (i = 0; i < rings.length; i++) {
       var rad = rings[i][0], cnt = rings[i][1], bright = rings[i][2];
-      var rate = 0.06 * Math.pow(RING_IN / rad, 1.5);   // 内圈 3.4°/s → 外圈 2.2°/s
+      var rate = 0.085 * Math.pow(RING_IN / rad, 1.5);  // 内圈 4.9°/s → 外圈 3.2°/s
       for (j = 0; j < cnt; j++) {
         ang = rnd() * Math.PI * 2;
         ex = Math.cos(ang); ez = Math.sin(ang);
@@ -301,6 +302,10 @@
     "uniform float uPxScale; uniform float uMaxSize; uniform float uMinPx;",
     "uniform float uTime; uniform float uBurst; uniform float uSeed;",
     "uniform float uGather;",                          // 入场进度 0 → 1
+    "uniform float uWave;",                            // 星面海浪（0 = 关：降级动效）
+    "uniform vec3 uImpDir0; uniform float uImpAge0;",  // 撞击落点 + 命中后经过的秒数
+    "uniform vec3 uImpDir1; uniform float uImpAge1;",  //   （负数 = 这一槽在等下一颗）
+    "uniform vec3 uImpDir2; uniform float uImpAge2;",
     "uniform vec2 uCenter; uniform vec3 uTint; uniform vec3 uStn;",
     "varying vec3 vCol;",
     "varying float vFade;",
@@ -321,12 +326,32 @@
     "  hn = vec3(hn.x, hn.y * uCosP - hn.z * uSinP, hn.y * uSinP + hn.z * uCosP);",
     "  vec3 p = vec3(loc.x * cy + loc.z * sy, loc.y, loc.z * cy - loc.x * sy);",
     "  p = vec3(p.x, p.y * uCosP - p.z * uSinP, p.y * uSinP + p.z * uCosP);",
+    // 星面上的浪：三层不同方向、不同快慢的波叠起来；只有本体跟着起伏
+    // （|aPos| ≈ 1），环带在外圈不动，线框球也不动 —— 浪只在这颗"海"上跑。
+    "  float body = 1.0 - smoothstep(1.02, 1.14, length(aPos));",
+    "  float wv = sin(hn.y * 8.0 + uTime * 0.95) * 0.45",
+    "           + sin(hn.x * 6.5 - uTime * 1.35) * 0.34",
+    "           + sin(hn.z * 5.5 + uTime * 0.75) * 0.28;",
+    // 撞击：从落点往外扩一圈环（距离球面角距做环、指数衰减收尾）。
+    // age < 0 表示这一槽空着：step() 直接把它乘没，不用分支。
+    // 注意用 q*q 而不是 pow(q, 2.0)：GLSL 里 pow() 的底数为负是"未定义"，
+    // q 在环内外都会取负，写得顺手就出一片 NaN（整片点凭空消失）。
+    "  float qa = (distance(hn, uImpDir0) - uImpAge0 * 1.25) * 3.4;",
+    "  float qb = (distance(hn, uImpDir1) - uImpAge1 * 1.25) * 3.4;",
+    "  float qc = (distance(hn, uImpDir2) - uImpAge2 * 1.25) * 3.4;",
+    "  float rip = 0.0;",
+    "  rip += step(0.0, uImpAge0) * (1.0 - step(1.20, uImpAge0)) * exp(-qa * qa) * exp(-uImpAge0 * 1.10);",
+    "  rip += step(0.0, uImpAge1) * (1.0 - step(1.20, uImpAge1)) * exp(-qb * qb) * exp(-uImpAge1 * 1.10);",
+    "  rip += step(0.0, uImpAge2) * (1.0 - step(1.20, uImpAge2)) * exp(-qc * qc) * exp(-uImpAge2 * 1.10);",
+    "  rip = min(rip, 1.5);",
+    "  p += hn * body * uWave * (wv * 0.021 + rip * 0.070);",
     "  float d = uDist - p.z;",
     "  gl_Position = vec4(p.x * uProj / uAspect + uCenter.x, p.y * uProj + uCenter.y, d - uDist, d);",
     "  vec3 L = normalize(vec3(-0.45, 0.42, 0.79));",   // 左上偏前的一束光
     "  float lam = 0.58 + 0.52 * max(dot(normalize(hn), L), 0.0);",
     "  float tw = 0.5 + 0.5 * sin(uTime * aMeta.y + aPos.x * 9.0 + aPos.z * 5.0 + aPos.y * 3.0);",
     "  float k = mix(1.0, 0.34 + 1.20 * tw, aMeta.z) * lam;",
+    "  k *= 1.0 + body * uWave * (max(wv, 0.0) * 0.75 + rip * 3.0);",    // 波峰亮、撞击那圈最亮
     "  float pick = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719)) + uSeed) * 43758.5453);",
     "  float flare = uBurst * step(0.95, pick);",
     "  k *= 1.0 + 1.6 * flare;",
@@ -334,7 +359,7 @@
     "  float isStn = step(0.5, aMeta.z);",              // 台站 / 卫星：比本体亮一大截的那一类
     "  vec3 base = mix(aCol, uStn * (0.72 + 0.62 * aCol.b), isStn);",
     "  vCol = base * uTint * k;",
-    "  vFade = ((0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6) * (0.10 + 0.90 * gp);",
+    "  vFade = ((0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6 + rip * 0.9 * uWave) * (0.10 + 0.90 * gp);",
     "}"
   ].join("\n");
 
@@ -444,6 +469,23 @@
   var satArr = new Float32Array(SAT_PTS * 10);
   var satBuf = gl.createBuffer();
 
+  /* ── 撞击：小流星从外面斜插进球面，落点荡开一圈冲击波（上面顶点着色器那三段）。 ──
+     三个槽轮转：等一会儿 → 飞进来（带尾迹）→ 命中（环在星面上扩开、1.2s 收干净）。
+     方向与等待时间来自**另一条**随机流 rnd2 —— 星球几何那条流一点没动，
+     所以同一颗星还是每次刷新都一模一样。 ── */
+  var rnd2 = mulberry32(0x41505254);
+  var IMP_SLOTS = 3, IMP_TAIL = 9, IMP_FLY = 1.35, IMP_AGE = 1.20;
+  var IMP_WAIT_MIN = 2.4, IMP_WAIT_VAR = 3.6;
+  var IMP_R0 = 3.30, IMP_R1 = 1.015, IMP_PTS = 0;
+  var imps = [], iq;
+  for (iq = 0; iq < IMP_SLOTS; iq++) {
+    imps.push({ phase: "wait", t: 0, wait: 0.9 + iq * 1.9, dir: [0, 0, 1], age: -1 });
+    IMP_PTS += 1 + IMP_TAIL;
+  }
+  var impArr = new Float32Array(IMP_PTS * 10);
+  var impBuf = gl.createBuffer();
+  var impCount = 0;
+
   var A = {
     pos: gl.getAttribLocation(prog, "aPos"),
     col: gl.getAttribLocation(prog, "aCol"),
@@ -452,7 +494,8 @@
   };
   var U = {};
   ["uCosY", "uSinY", "uCosP", "uSinP", "uSpinT", "uDist", "uProj", "uAspect", "uPxScale",
-    "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uStn", "uAlpha", "uBurst", "uSeed", "uGather"
+    "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uStn", "uAlpha", "uBurst", "uSeed", "uGather",
+    "uWave", "uImpDir0", "uImpAge0", "uImpDir1", "uImpAge1", "uImpDir2", "uImpAge2"
   ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
 
   function bindPointers() {
@@ -497,7 +540,7 @@
 
   /* ── 相机 / 交互状态 ── */
   var yaw = 0.55, pitch = -0.10, tYaw = yaw, tPitch = pitch;
-  var spin = reduce ? 0 : 0.055;                   // rad/s 自转
+  var spin = reduce ? 0 : 0.075;                   // rad/s 自转：比上一版快一档，闲不住
   var dragging = false, lastX = 0, lastY = 0;
   var running = false, paused = false, raf = 0, last = 0;
 
@@ -530,9 +573,16 @@
   }
   function camDist(h) { return U_PROJ * h / (2 * Math.max(1, view.r)); }
 
+  /* ── 动画时钟 animT ──
+     所有"看时间"的效果（浪、撞击、自转、卫星、读数闪点）都吃这一刻钟，它只在
+     真正画帧的时候往前走。用绝对的 performance.now() 的话，页面滚出视口暂停
+     再滚回来、或者切走标签页回来，时间一下子跳过去 —— 浪会闪一下位置、卫星会
+     瞬移。animT 没这个问题：回来时从离开的那一秒接着演。 ── */
+  var animT = 0;
+
   /* 每来一条报文就挑一批点窜一下：读数一跳，星面跟着亮一片（uBurst 从 1 衰减） */
-  var burstAt = -1e9, burstSeed = 0, BURST_MS = 900;
-  function flash(seed) { burstAt = Date.now(); burstSeed = (seed || 0) * 0.618 % 1; if (!running) start(); }
+  var burstAtT = -1e9, burstSeed = 0, BURST_S = 0.9;
+  function flash(seed) { burstAtT = animT; burstSeed = (seed || 0) * 0.618 % 1; if (!running) start(); }
 
   function draw(now) {
     var w = canvas.width, h = canvas.height;
@@ -542,7 +592,7 @@
     var zoom = reduce ? 1 : 1 + 0.20 * (1 - gather);   // 入场：从更近的机位缓缓退回
     var dist = camDist(h) / zoom;
     var cp = Math.cos(TILT + pitch), sp = Math.sin(TILT + pitch);
-    var age = reduce ? 1 : (Date.now() - burstAt) / BURST_MS;
+    var age = reduce ? 1 : (animT - burstAtT) / BURST_S;
     var burst = (age < 0 || age > 1) ? 0 : Math.pow(1 - age, 2);
     gl.viewport(0, 0, w, h);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -567,6 +617,17 @@
     gl.uniform1f(U.uBurst, burst);
     gl.uniform1f(U.uSeed, burstSeed);
     gl.uniform1f(U.uGather, gather);
+    gl.uniform1f(U.uWave, reduce ? 0 : 1);            // 星面海浪（降级动效下关掉）
+    // 撞击落点：物体空间的单位向量，按当前的 yaw / pitch 转成与顶点同一套坐标系
+    // （顶点着色器里的 hn 就是转过的），否则拖动星球时冲击环会从落点上滑走。
+    var cyv = Math.cos(yaw), syv = Math.sin(yaw);
+    for (var ic = 0; ic < IMP_SLOTS; ic++) {
+      var im = imps[ic];
+      var dx = im.dir[0] * cyv + im.dir[2] * syv;
+      var dz = im.dir[2] * cyv - im.dir[0] * syv;
+      gl.uniform3f(U["uImpDir" + ic], dx, im.dir[1] * cp - dz * sp, im.dir[1] * sp + dz * cp);
+      gl.uniform1f(U["uImpAge" + ic], reduce ? -1 : im.age);
+    }
 
     // 线框球先画：点云自己写深度，正面那一半自然把线压住
     gl.useProgram(wProg);
@@ -598,6 +659,72 @@
     gl.bufferData(gl.ARRAY_BUFFER, satArr, gl.DYNAMIC_DRAW);
     bindPointers();
     gl.drawArrays(gl.POINTS, 0, SAT_PTS);
+
+    // 撞进来的小流星（命中那一刻它已经飞完了，剩下的交给星面上的冲击环）
+    impCount = reduce ? 0 : buildImpacts();
+    if (impCount) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, impBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, impArr, gl.DYNAMIC_DRAW);
+      bindPointers();
+      gl.drawArrays(gl.POINTS, 0, impCount);
+    }
+  }
+
+  /* 落点方向：球面上随机取一个，再往正面（+Z）偏一点 —— 撞在背面观众是看不到的。
+     单位向量，且是**物体空间**的：着色器会按当前的 yaw / pitch 一起转过去。 */
+  function pickImpactDir() {
+    var u = rnd2() * 2 - 1, th = rnd2() * Math.PI * 2, s2 = Math.sqrt(1 - u * u);
+    var x = s2 * Math.cos(th), y = u * 0.7 + 0.26, z = s2 * Math.sin(th);
+    var n = Math.sqrt(x * x + y * y + z * z) || 1;
+    x = x / n; y = y / n; z = z / n;
+    z = z * 0.72 + 0.46;
+    z = Math.max(-1, Math.min(1, z));
+    n = Math.sqrt(x * x + y * y + z * z) || 1;
+    return [x / n, y / n, z / n];
+  }
+
+  /* 槽的状态机：wait → fly → hit → wait。age < 0 就是"这一槽空着"。 */
+  function stepImpacts(dt) {
+    for (var i = 0; i < imps.length; i++) {
+      var o = imps[i];
+      o.t += dt;
+      if (o.phase === "wait") {
+        if (o.t >= o.wait) { o.phase = "fly"; o.t = 0; o.dir = pickImpactDir(); }
+      } else if (o.phase === "fly") {
+        if (o.t >= IMP_FLY) { o.phase = "hit"; o.t = 0; }
+      } else if (o.t >= IMP_AGE) {
+        o.phase = "wait"; o.t = 0;
+        o.wait = IMP_WAIT_MIN + rnd2() * IMP_WAIT_VAR;
+      }
+      o.age = o.phase === "hit" ? o.t : -1;
+    }
+  }
+
+  /* 流星本体 + 尾迹：头在最里（最接近球面），尾点拖着往外排、越远越暗越小。
+     跟卫星一样每帧现算，aSpin 给 0（位置不受球体自转影响）。 */
+  function buildImpacts() {
+    var o = 0, k, j, s2, d, f, rr, t2, rj, g, sz;
+    for (k = 0; k < imps.length; k++) {
+      s2 = imps[k];
+      if (s2.phase !== "fly") continue;
+      f = Math.min(1, s2.t / IMP_FLY);
+      f = f * f * (3 - 2 * f);
+      rr = IMP_R0 + (IMP_R1 - IMP_R0) * f;
+      d = s2.dir;
+      for (j = 0; j <= IMP_TAIL; j++) {
+        t2 = j / (IMP_TAIL + 1);
+        rj = rr + t2 * 0.44;
+        g = j === 0 ? 1 : Math.max(0, 1 - t2 * 1.3); g = g * g;
+        sz = 0.0165 * (j === 0 ? 1 : 0.30 + 0.70 * g);
+        impArr[o++] = d[0] * rj; impArr[o++] = d[1] * rj; impArr[o++] = d[2] * rj;
+        impArr[o++] = g; impArr[o++] = g; impArr[o++] = g;
+        impArr[o++] = sz;
+        impArr[o++] = 0.4 + 0.2 * k;         // 呼吸频率
+        impArr[o++] = 0.55;                  // 幅度 > 0.5 → 着色器当成"台站 / 卫星"那一类
+        impArr[o++] = 0;
+      }
+    }
+    return o / 10;
   }
 
   /* 把每颗卫星（含尾迹）的位置算进 satArr：head 在最前，后面一串点按角距往回
@@ -640,7 +767,9 @@
     yaw += (tYaw - yaw) * k;
     pitch += (tPitch - pitch) * k;
     if (!dragging && spin) { tYaw += spin * dt; yaw += spin * dt; }
-    draw(now / 1000);
+    animT += dt;                                   // 动画时钟：只在这里走
+    stepImpacts(dt);                               // 撞击槽：wait → fly → hit
+    draw(animT);
     // 降级动效（prefers-reduced-motion）：静止后停掉循环，只保留可拖动
     if (reduce && !dragging && Math.abs(tYaw - yaw) < 0.002 && Math.abs(tPitch - pitch) < 0.002) {
       running = false;
@@ -664,7 +793,7 @@
     if (w === canvas.width && h === canvas.height) return;
     canvas.width = w;
     canvas.height = h;
-    draw(reduce ? 0 : (window.performance && performance.now ? performance.now() / 1000 : 0));
+    draw(animT);
     applyScroll();
     start();
   }
@@ -735,29 +864,48 @@
   start();
   hooks.flash = flash;                             // 遥测那边每跳一次就调它
 
-  /* ── 滚动：往下拉时星球退得比页面慢半步（视差）并缓缓淡出，文案上浮隐去；
-        滚回顶部一切复原。变量写在 .hero 上，位移 / 透明度全交给 hero-3d.css。
+  /* ── 滚动：往下拉时星球退得比页面慢半步（视差）并缓缓淡出，数字轻缩着上浮
+        隐去、折线之下那一屏淡淡追上来；滚回顶部一切复原。变量写在 .hero 上，
+        位移 / 缩放 / 透明度全交给 hero-3d.css。
+        这里的"丝滑"靠缓动：滚动量不直接写进样式，而是每帧朝目标挪一档
+        （约 200ms 到位）—— 滚轮一格一格地跳、触摸屏的甩动，都被抹成一段滑行，
+        而且 JS 里只缓一道、CSS 那边不写 transition，免得两套缓动叠在一起发涩。
         降级动效（prefers-reduced-motion）下不接这个监听，CSS 保持原样。 ── */
-  var scrollP = 0, scrollQueued = false;
-  function applyScroll() {
-    scrollQueued = false;
-    if (reduce) return;
-    var h = window.innerHeight || hero.offsetHeight || 1;   // 以"一屏"为准
-    var y = window.pageYOffset || document.documentElement.scrollTop || 0;
-    var p = Math.max(0, Math.min(1, y / (h * 0.8)));
-    if (p === scrollP) return;
-    scrollP = p;
-    var e = p * p * (3 - 2 * p);                    // 缓入缓出：起手不出戏，收尾不突兀
+  var scrollP = 0, scrollTarget = 0, scrollRaf = 0;
+  var SCROLL_EASE = 0.17;                           // 每帧向目标靠近的比例
+  function writeScroll(e) {
     hero.style.setProperty("--hero-3d-y", (e * 30).toFixed(2) + "px");
     hero.style.setProperty("--hero-3d-scale", (1 + e * 0.06).toFixed(4));
     hero.style.setProperty("--hero-3d-fade", (1 - e * 0.62).toFixed(3));
-    hero.style.setProperty("--hero-3d-copy", (-e * 34).toFixed(2) + "px");
-    hero.style.setProperty("--hero-3d-copy-fade", (1 - e * 0.88).toFixed(3));
+    hero.style.setProperty("--hero-3d-copy", (-e * 46).toFixed(2) + "px");
+    hero.style.setProperty("--hero-3d-copy-scale", (1 - e * 0.06).toFixed(4));
+    hero.style.setProperty("--hero-3d-copy-fade", (1 - e * 0.94).toFixed(3));
+    hero.style.setProperty("--hero-3d-next", (-e * 20).toFixed(2) + "px");
+  }
+  function readScroll() {
+    var h = window.innerHeight || hero.offsetHeight || 1;   // 以"一屏"为准
+    var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+    scrollTarget = Math.max(0, Math.min(1, y / (h * 0.8)));
+    return scrollTarget;
+  }
+  function easeScroll(p) { return p * p * (3 - 2 * p); }    // 缓入缓出：起手不出戏、收尾不突兀
+  function applyScroll() {                          // 立刻对齐（首屏 / 尺寸变化后用）
+    scrollRaf = 0;
+    scrollP = readScroll();
+    writeScroll(easeScroll(scrollP));
+  }
+  function glide() {                                // 每帧朝目标挪一档
+    scrollRaf = 0;
+    var d = scrollTarget - scrollP;
+    if (Math.abs(d) < 0.0006) scrollP = scrollTarget;
+    else scrollP += d * SCROLL_EASE;
+    writeScroll(easeScroll(scrollP));
+    if (scrollP !== scrollTarget) scrollRaf = requestAnimationFrame(glide);
   }
   function onScroll() {
-    if (scrollQueued) return;
-    scrollQueued = true;
-    requestAnimationFrame(applyScroll);
+    if (reduce) return;
+    readScroll();
+    if (!scrollRaf) scrollRaf = requestAnimationFrame(glide);
   }
   if (!reduce) {
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -770,7 +918,7 @@
       var was = dark;
       syncMode();
       if (was !== dark) {
-        draw(reduce ? 0 : (window.performance ? performance.now() / 1000 : 0));
+        draw(animT);
         start();
       }
     }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -780,7 +928,7 @@
         CI 截图都靠它读像素，不需要目测（draw + readPixels 必须同一任务内）。 ── */
   window.__planet3d = {
     pixelStats: function () {
-      draw(reduce ? 0 : (window.performance ? performance.now() / 1000 : 0));
+      draw(animT);
       var w = canvas.width, h = canvas.height;
       var px = new Uint8Array(w * h * 4);
       gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
@@ -819,6 +967,9 @@
         gate: gatherT0 > 0,
         gather: +gather.toFixed(3),
         scroll: +scrollP.toFixed(3),
+        animT: +animT.toFixed(2),
+        impacts: imps.filter(function (o) { return o.age >= 0; }).length,
+        impCount: impCount,
         running: running
       };
     },

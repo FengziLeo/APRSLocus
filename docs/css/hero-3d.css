@@ -43,9 +43,12 @@
   pointer-events: auto; position: relative; max-width: 620px;
   min-height: calc(100vh - 150px);
   display: flex; align-items: center; justify-content: flex-start;
-  /* 往下拉：数字比星球走得快一点、先淡掉，hero 交给下一屏 */
-  transform: translate3d(0, var(--hero-3d-copy, 0px), 0);
+  /* 往下拉：数字比星球走得快一点、先淡掉、再轻缩一档，hero 交给下一屏。
+     位移 / 缩放 / 透明度都是脚本按"缓动后的滚动量"每帧写进来的变量 ——
+     缓动在 JS 里做，所以这里不写 transition（两套缓动叠一起会发涩）。 */
+  transform: translate3d(0, var(--hero-3d-copy, 0px), 0) scale(var(--hero-3d-copy-scale, 1));
   opacity: var(--hero-3d-copy-fade, 1);
+  will-change: transform, opacity;
 }
 
 /* ── 折线之下：这是什么（说明）→ 真正要动手的那一块 ──
@@ -55,6 +58,8 @@
 .hero-copy-next {
   pointer-events: auto; position: relative; max-width: 620px;
   padding-top: clamp(16px, 5vh, 64px);
+  /* 也吃一点滚动量：比页面慢一点点地升上来，接住上面退场的数字 */
+  transform: translate3d(0, var(--hero-3d-next, 0px), 0);
 }
 
 /* 文案底下铺一层很淡的同色晕，长句子压在点云上也读得清（不出边框感） */
@@ -88,24 +93,6 @@
   font-size: 12px; letter-spacing: .28em; text-transform: uppercase;
   color: var(--text-faint);
 }
-.hero-stat .hs-foot {
-  display: inline-flex; align-items: center; gap: 13px;
-  font-size: 13px; color: var(--text-dim);
-}
-.hero-stat .hs-foot b { color: var(--text); font-weight: 700; }
-.hs-live {
-  display: inline-flex; align-items: center; gap: 7px;
-  font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  letter-spacing: .16em; color: var(--cyan);
-}
-.hs-live i {
-  width: 7px; height: 7px; border-radius: 50%; background: var(--cyan);
-  position: relative;
-}
-.hs-live i::after {
-  content: ""; position: absolute; inset: -4px; border-radius: 50%;
-  border: 1.5px solid rgba(3, 105, 161, .75); animation: pulse 1.8s ease-out infinite;
-}
 .hero-stat .tl-value {
   display: block;
   /* 站点正文那一族字（不是等宽）：摆得进 hero 的字形体系，但数字必须
@@ -136,10 +123,9 @@
   }
 }
 
-/* 快照过期（> 12h）：停止外推，LIVE 点转琥珀并停掉呼吸 */
-.hero-stat.stale .hs-live { color: var(--text-faint); }
-.hero-stat.stale .hs-live i { background: var(--text-faint); box-shadow: none; }
-.hero-stat.stale .hs-live i::after { display: none; }
+/* 快照过期（> 12h 不再外推）：整块读数里不该有第二处动画，所以不做心跳点，
+   只把数字压暗一档，"为什么"挂在 title 上（悬停可见）。 */
+.hero-stat.stale .tl-value { color: var(--text-dim); }
 
 /* ── 往下滑才出现的那一块：真正要动手的东西（版本卡 + 下载按钮 + 来源）。
       hero 上面只负责说清"这是什么、这个数字是什么"；动手的部分等在下面，
@@ -226,13 +212,12 @@
   .hero-stat { gap: 12px; margin-top: 0; }
   .hero-stat .hs-label { font-size: 11px; letter-spacing: .2em; }
   .hero-stat .tl-value { font-size: clamp(54px, 19vw, 88px); }
-  .hero-stat .hs-foot { font-size: 12px; gap: 10px; }
   .hero-invite { font-size: 13.5px; line-height: 1.9; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   /* style.css 里整站 animation:none !important；动画被关掉后必须把这些收回来，
      否则星球那一层永远是隐形的。脚本那边也不会写滚动变量，所以这里直接归位。 */
-  .planet-canvas, .planet-fallback, .hero-copy { opacity: 1; transform: none; }
+  .planet-canvas, .planet-fallback, .hero-copy, .hero-copy-next { opacity: 1; transform: none; }
   .hero-scroll { display: none; }
 }

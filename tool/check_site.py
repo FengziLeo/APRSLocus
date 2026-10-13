@@ -182,18 +182,20 @@ def main():
                 and 'class="hero-grid"' in s)
             chk('%s : 读数静态值 = stats.json' % f,
                 'data-packets="%d"' % stats['packets'] in s
-                and 'data-rate="%d"' % stats['packetsPerMinute'] in s
-                and 'id="tlPackets">%s<' % pk in s
-                and 'id="tlRateNum">+%d<' % stats['packetsPerMinute'] in s)
-            # 只报数字：上限/时间戳/进度条这类"像上传面板"的元信息都不要再出现
-            chk('%s : 只留跳动数字（无时间戳/进度条）' % f,
-                not any(x in s for x in ('tlStamp', 'tlInc', 'tlBar', 'tlNext', 'tl-bar')))
+                and 'data-rate="%d"' % stats['packetsPerMinute'] in s   # 速率还在用：数字按它往上跳，只是不再写出来
+                and 'id="tlPackets">%s<' % pk in s)
+            # 只报数字：上限/时间戳/进度条这类"像上传面板"的元信息都不要再出现；
+            # 每分钟速率那行小注与 LIVE 心跳点也一并撤了（读写数只要一个数）。
+            chk('%s : 只留那个数字（无速率小注 / 无心跳点 / 无时间戳）' % f,
+                not any(x in s for x in ('tlStamp', 'tlInc', 'tlBar', 'tlNext', 'tl-bar',
+                                         'tlRateNum', 'hs-live', 'hs-foot')))
             # 读数竖排三级：标签（这是什么）→ 数字 → 一行小注。顺序是这里唯一的
             # 信息层级 —— 标签写在数字之后，就又变成"数字后面跟一行小字注释"了。
             lb = s.find('class="hs-label"')
             pk_i = s.find('id="tlPackets"')
-            chk('%s : 读数标签排在数字之前、小注收尾' % f,
-                lb > 0 and pk_i > lb and s.find('class="hs-foot"') > pk_i)
+            chk('%s : 读数只有标签 + 数字（标签在数字之前）' % f,
+                lb > 0 and pk_i > lb
+                and s.count('class="hs-label"') == 1 and s.count('id="tlPackets"') == 1)
             # 首屏只摆那个数字：读数必须在 .hero-copy-next（说明 + 下载）之前，
             # 且自己独占 .hero-copy。两块一旦回到同一个盒子里，滚动退场那套淡出
             # 就会把折线之下的说明连坐成半透明（滚过 0.8 屏只剩 12%）。
@@ -236,6 +238,56 @@ def main():
     # 透明画布是"没有面板感"的根：底色一写回去就又变成一块方框了
     chk('hero 画布保持透明 (alpha:true + clearColor alpha 0)',
         'alpha: true' in hero_js and 'clearColor(0, 0, 0, 0)' in hero_js)
+    # 动感：星面三层浪 + 小流星撞进来荡开冲击波。这里守的是"还在不在"，
+    # 而 pow(负数, 2.0) 在 GLSL 里是未定义 —— 那行一旦被写回去，冲击环会整片
+    # 变成 NaN（点凭空消失），所以顺手把正确写法也钉住。
+    chk('hero 星球动感：海浪 + 粒子对撞',
+        all(x in hero_js for x in ('uWave', 'uImpDir0', 'uImpAge2', 'IMP_SLOTS', 'IMP_AGE',
+                                   'buildImpacts', 'stepImpacts', 'pickImpactDir'))
+        and 'exp(-qa * qa)' in hero_js and 'pow((distance(' not in hero_js
+        and 'uWave' in hero_js and '.hero-stat.stale .tl-value' in hero_css)
+    # 动画时钟 + 读数之后的滑行：随时间演的一切都吃 animT（暂停回来不跳），
+    # 滚动量在 JS 里缓动过（每帧朝目标挪一档），CSS 那边不写 transition。
+    chk('hero 滚动丝滑（JS 缓动 + animT 时钟）',
+        all(x in hero_js for x in ('animT', 'SCROLL_EASE', 'glide', 'scrollTarget', 'writeScroll'))
+        and all(x in hero_css + hero_js for x in ('--hero-3d-copy-scale', '--hero-3d-next'))
+        and all(x in hero_css for x in ('--hero-3d-copy-scale', '--hero-3d-next', 'will-change: transform')))
+    # 着色器与脚本之间的名字必须对得上。名字打错的话 getUniformLocation 返回
+    # null，uniform 调用静默失效 —— 浏览器不报任何错，只是那个效果凭空不见，
+    # 是最难查的一类问题（这类错误只有真跑起来、且真的盯着看才发现）。
+    def shader_src(tag):
+        i = hero_js.index('var %s = [' % tag)
+        j = hero_js.index('].join("\\n")', i)
+        out = []
+        for ln in hero_js[i:j].split('\n'):
+            m = re.match(r'\s*"((?:[^"\\\\]|\\\\.)*)"', ln)
+            if m:
+                out.append(m.group(1))
+        return '\n'.join(out)
+
+    def shader_uniforms(src):
+        got = set()
+        for m in re.finditer(r'\buniform\s+\w+\s+([^;]+);', src):
+            for n in m.group(1).split(','):
+                got.add(n.strip())
+        return got
+
+    def lookup_names(var):
+        i = hero_js.index('var %s = {};' % var)
+        j = hero_js.index('].forEach(function (k)', i)
+        return set(re.findall(r'"([A-Za-z_]\w*)"', hero_js[i:j]))
+
+    for tag in ('VS', 'FS', 'WVS', 'WFS'):
+        src = shader_src(tag)
+        chk('hero 着色器 %s 括号配平' % tag,
+            src.count('(') == src.count(')') and src.count('{') == src.count('}'))
+    for lst, vert, frag in (('U', 'VS', 'FS'), ('WU', 'WVS', 'WFS')):
+        names = lookup_names(lst)
+        declared = shader_uniforms(shader_src(vert)) | shader_uniforms(shader_src(frag))
+        chk('hero 着色器 uniform 与 %s 名单一致' % lst,
+            not (names - declared) and not (shader_uniforms(shader_src(vert)) - names),
+            'extra=%s missing=%s' % (sorted(names - declared),
+                                     sorted(shader_uniforms(shader_src(vert)) - names)))
     chk('hero 读数跳动三件 (bump / 闪点 / 无旧控件)',
         '.tl-value.bump' in hero_css
         and all(x in hero_js for x in ('tlPackets', 'hooks.flash'))

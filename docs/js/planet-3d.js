@@ -600,9 +600,24 @@
   /* 入场的发令枪：等启动遮罩走开（body.loaded）再开演 —— 遮罩还在就开演的话，
      整段动画在遮罩后面自己演完，用户什么都没看到。但遮罩要是因为任何原因不
      消失（main.js 的外链资源卡住），最多等 3.6s 就直接开场：宁可早一步，
-     也不要 hero 一直停在"还没聚拢"的状态。（main.js 自己 3.2s 有兜底。） */
+     也不要 hero 一直停在"还没聚拢"的状态。（main.js 自己 3.2s 有兜底。）
+
+     发令枪的第二道门（只有彩蛋页会用上）：那页在星球上面还有一屏开场白，
+     人还在读招呼的时候，星球已经在后台把"聚成球"整段演完了 —— 等他翻下来，
+     只剩一颗早就在转的球，入场那一下白演了。所以这里再等一手：这一屏真的
+     进过画面才开演。首页上 hero 本来就在最顶上，这道门第一帧就开着，
+     行为与以前一个字不差。 */
+  var heroSeen = reduce || !window.IntersectionObserver;
+  if (!heroSeen) {
+    new IntersectionObserver(function (entries, ob) {
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) { heroSeen = true; ob.disconnect(); }
+      }
+    }, { threshold: 0.15 }).observe(hero);
+  }
   function gatherGate() {
     if (!gateAt) gateAt = nowMs() + 3600;
+    if (!heroSeen) return false;
     if (document.body && document.body.classList.contains("loaded")) return true;
     return nowMs() >= gateAt;
   }
@@ -925,7 +940,11 @@
   function readScroll() {
     var h = window.innerHeight || hero.offsetHeight || 1;   // 以"一屏"为准
     var y = window.pageYOffset || document.documentElement.scrollTop || 0;
-    scrollTarget = Math.max(0, Math.min(1, y / (h * 0.8)));
+    /* 进度按"这一屏离视口顶多远"算，不是整页滚了多少：彩蛋页在它上面还有一屏
+       开场白，拿整页滚动量当进度的话，人还没翻到星球，它就已经按"滚过一屏"
+       淡掉一半了。首页上两者算出来一模一样（hero 就在最顶上），行为没变。 */
+    var passed = y - (hero.getBoundingClientRect().top + y);
+    scrollTarget = Math.max(0, Math.min(1, passed / (h * 0.8)));
     return scrollTarget;
   }
   function easeScroll(p) { return p * p * (3 - 2 * p); }    // 缓入缓出：起手不出戏、收尾不突兀

@@ -25,7 +25,7 @@
 })();
 </script>
 <link rel="stylesheet" href="css/style.css?v=8">
-<link rel="stylesheet" href="css/hero-3d.css?v=19">
+<link rel="stylesheet" href="css/hero-3d.css?v=20">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
 /* 这页没有导航栏，主题按钮固定贴在右上角（只这一页用到，不进共享样式表；
@@ -45,9 +45,15 @@
 }
 .story-bgm iframe { display: block; width: 100%; height: 86px; border: 0; }
 @media (max-width: 520px) { .story-bgm { left: 12px; right: 12px; bottom: 12px; width: auto; } }
-/* 首屏那句邀请（读者按下的第一下 = 一次发射）：数字下面一行小字，按过之后
-   换一句话，再自己退场 —— 这页只有这一处要人动手。 */
-.hero-press { margin: 4px 0 0; font-size: 13.5px; color: var(--text-faint);
+/* ── 开场那一屏 ──
+   这页从一句招呼开始：一屏高、垂直居中，只放招呼与标语；星球与那个数字在
+   下面一屏，要往下翻才到 —— 所以这一屏自己不带任何画面。 */
+.intro { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; }
+.intro .section-head { margin-bottom: 0; }
+.intro .section-body { margin-top: 22px; }
+/* 开场那句邀请（读者按下的第一下 = 一次发射）：按过之后换一句话，再自己退场 ——
+   整页只有这一处要人动手。 */
+.hero-press { margin: 0; font-size: 13.5px; color: var(--text-faint);
   transition: opacity .9s var(--ease), visibility .9s; }
 .hero-press.done { opacity: 0; visibility: hidden; }
 
@@ -92,10 +98,30 @@
 
 <main id="main">
 
-<!-- ═══════════ HERO ═══════════
-     与三语首页同一段画面（装饰层 → 那个数字），按这页的处境收掉了三样东西：
+<!-- ═══════════ 开场 ═══════════
+     这页从一个招呼开始，不是从一个数字开始。第一屏只放招呼与标语，**往下翻
+     才到地图**（那颗星球与累计报文那一屏）。它同时是整页的 h1（下面各章都是
+     h2），也是唯一一处请读者动手的地方 —— 按一下，BGM 就起来（见页尾脚本）。
+     底色不另起一套：`.intro` 只把这一屏撑到一屏高、内容居中，别的一律走
+     `.section` / `.section-head` 现成的那套。 -->
+<section class="section intro" id="hello">
+  <div class="section-head reveal">
+    <h1>你好，很高兴认识你。</h1>
+    <p>保持你的好奇心，探索世界。</p>
+  </div>
+  <div class="section-body">
+    <div class="reveal" data-delay="3">
+      <p class="hero-press" id="heroPress">点一下，音乐就起来了 —— 再往下翻，是一颗星球。</p>
+    </div>
+  </div>
+  <a class="hero-scroll" href="#hero" aria-label="往下翻，去看那颗星球"><span></span></a>
+</section>
+
+<!-- ═══════════ 地图 · HERO ═══════════
+     地图那一屏：与三语首页同一段画面（装饰层 → 那个数字），按这页的处境收掉了
+     三样东西：
      · 首页折线之下那一整块（徽标 / TOUCH SKY / 口号 / 自我介绍）不留 ——
-       彩蛋页不自我介绍，讲完故事才轮到你动手；
+       彩蛋页不自我介绍，一句招呼在上一屏，讲完故事才轮到你动手；
      · 页面唯一的主题按钮从导航里挪到右上角（这页没有导航栏）；
      · 「向下箭头」指向下面的故事，不再是首页的 #features。 -->
 <section class="hero" id="hero">
@@ -115,16 +141,14 @@
   <div class="hero-inner">
 
     <div class="hero-copy">
-      <!-- 第一屏只有这一件事：那个数字（APRSlocus 累计转发报文总量，数值源 stats.json）。
-           它是什么、为什么会一直往上走，全在下面的故事里 —— 首屏不再插一句注解。 -->
+      <!-- 这一屏只有这一件事：那个数字（APRSlocus 累计转发报文总量，数值源
+           stats.json）。它是什么、为什么会一直往上走，全在下面的故事里。
+           注意它不再是第一屏 —— 上面还有一屏招呼（.intro），往下翻才到这儿。 -->
       <div class="hero-stat" id="heroTelemetry"
            data-stats="stats.json" data-packets="509260" data-rate="18"
            data-updated="2026-10-13T16:06:00+08:00">
         <span class="hs-label">APRSlocus 累计转发报文</span>
         <span class="tl-value" id="tlPackets">509,260</span>
-        <!-- 这页唯一要人动手的地方：按一下 = 一次发射（音乐起来、球面闪一批点、
-             这个数字像刚收到一条报文那样亮一下）。按过就退场，不再打扰。 -->
-        <p class="hero-press" id="heroPress">按一下屏幕 —— 这一下，就是一次发射。</p>
       </div>
     </div>
 
@@ -134,13 +158,12 @@
 </section>
 
 <!-- ═══════════ 一 · 那个数字是谁的 ═══════════
-     这一页只做一件事：把第一屏那颗球和那个数字讲成人话。全篇叙情，不介绍产品 ——
+     这一页只做一件事：把地图上那颗球和那个数字讲成人话。全篇叙情，不介绍产品 ——
      所以这里没有数据源文件名、没有外推公式、没有接口与协议名（那些在首页与文档里）。
-     页面唯一的 h1 落在这里：这页没有品牌徽标可当下标题，故事自己开篇
-     （.section-head h1 与 h2 同一套度量，见 style.css）。 -->
+     页面唯一的 h1 在开场那一屏，从这里开始都是 h2。 -->
 <section class="section" id="story">
   <div class="section-head reveal">
-    <h1>那个数字是谁的</h1>
+    <h2>那个数字是谁的</h2>
     <p>它在第一屏上一直往上走。不是刻度，是此刻天空里正在发生的应答。</p>
   </div>
   <div class="section-body">
@@ -341,9 +364,9 @@
           这一步当场就响；
        ② 还没响，就借读者在这页上的**第一次交互**（点一下 / 按一下键 / 滚一下）
           把播放器重新载入一次：在手势之后加载的播放器才有出声的资格。
-     同一次交互顺手在这页留个回响 —— 球面闪一批点（和收到一条报文时同一个钩子），
-     那个数字亮一下（同一段 bump 动画）：你按的这一下，看上去就是一次真实的上报。
-     全部一次性，触发完就撤监听。 -->
+     同一次交互顺手在这页留个回响：开场那句邀请换一句回话，球面闪一批点
+     （和收到一条报文时同一个钩子），那个数字亮一下（同一段 bump 动画）——
+     你按的这一下，看上去就是一次真实的上报。全部一次性，触发完就撤监听。 -->
 <script>
 (function () {
   var press = document.getElementById("heroPress");
@@ -373,7 +396,7 @@
     if (frame && src) frame.setAttribute("src", src + "&_r=" + Date.now());  // 手势后再载一次
     echo();
     if (press) {
-      press.textContent = "这一下也算数了 —— 你已经在广播里。";
+      press.textContent = "听见了吗 —— 这一下也算数了，你已经在广播里。";
       setTimeout(function () { press.classList.add("done"); }, 1500);
     }
   }
@@ -391,6 +414,6 @@
      gatherMs 2400 → 4400：开场那点云慢慢聚成一颗球，不是一下摆好；
      scrollEase 0.17 → 0.085：滚动缓动慢一倍，往下拉是滑过去的。 -->
 <script>window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085 };</script>
-<script src="js/planet-3d.js?v=19"></script>
+<script src="js/planet-3d.js?v=20"></script>
 </body>
 </html>

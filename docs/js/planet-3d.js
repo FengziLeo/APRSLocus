@@ -15,6 +15,8 @@
    · 一束左上偏前的光：正面亮、背面暗，球才有体积；
    · 相机固定在 +Z，靠 uDist 缩放；打开深度测试（写深度），背面点被正面
      挡住，星球才有实体感，否则只是一团发光的雾。
+   · 机位固定为「侧看、画面轻 roll 到左上」（VIEW_ELEV + VIEW_ROLL）——
+     星球是只看不摸的，机位就是唯一的机位，不接指针也不接键盘。
    页面皮肤（底色、字体、色标、导航）不在这里 —— hero 还是浅色玻璃那一套，
    所以浅色主题走正常混合（蓝墨点），深色主题走加色混合（霓虹辉光）。
 
@@ -304,6 +306,7 @@
     "uniform float uCosP; uniform float uSinP;",
     "uniform float uSpinT;",
     "uniform float uDist; uniform float uProj; uniform float uAspect;",
+    "uniform float uCosR; uniform float uSinR;",        // 画面 roll（机位斜着摆）
     "uniform float uPxScale; uniform float uMaxSize; uniform float uMinPx;",
     "uniform float uTime; uniform float uBurst; uniform float uSeed;",
     "uniform float uGather;",                          // 入场进度 0 → 1
@@ -362,7 +365,11 @@
     "  rip = min(rip, 1.5);",
     "  p += hn * body * uWave * (wv * 0.021 + rip * 0.070);",
     "  float d = uDist - p.z;",
-    "  gl_Position = vec4(p.x * uProj / uAspect + uCenter.x, p.y * uProj + uCenter.y, d - uDist, d);",
+    // 画面 roll：先把投影摆进屏幕空间（含 aspect 修正）再整体转 uCosR/uSinR ——
+    // 在除以 aspect 之前转会变成拉伸而不是旋转；在加 uCenter 之前转，星球才不会跑位。
+    "  vec2 sc = vec2(p.x * uProj / uAspect, p.y * uProj);",
+    "  gl_Position = vec4(sc.x * uCosR - sc.y * uSinR + uCenter.x,",
+    "                      sc.x * uSinR + sc.y * uCosR + uCenter.y, d - uDist, d);",
     "  vec3 L = normalize(vec3(-0.45, 0.42, 0.79));",   // 左上偏前的一束光
     "  float lam = 0.58 + 0.52 * max(dot(normalize(hn), L), 0.0);",
     "  float tw = 0.5 + 0.5 * sin(uTime * aMeta.y + aPos.x * 9.0 + aPos.z * 5.0 + aPos.y * 3.0);",
@@ -397,6 +404,7 @@
     "attribute vec3 aPos;",
     "uniform float uAngle; uniform float uCosP; uniform float uSinP;",
     "uniform float uDist; uniform float uProj; uniform float uAspect;",
+    "uniform float uCosR; uniform float uSinR;",        // 同点云：画面 roll
     "uniform vec2 uCenter;",
     "uniform float uGather;",
     "varying float vFace;",
@@ -408,7 +416,9 @@
     "  vec3 p = vec3(a.x * cy + a.z * sy, a.y, a.z * cy - a.x * sy);",
     "  p = vec3(p.x, p.y * uCosP - p.z * uSinP, p.y * uSinP + p.z * uCosP);",
     "  float d = uDist - p.z;",
-    "  gl_Position = vec4(p.x * uProj / uAspect + uCenter.x, p.y * uProj + uCenter.y, d - uDist, d);",
+    "  vec2 sc = vec2(p.x * uProj / uAspect, p.y * uProj);",   // 与点云同一套 roll
+    "  gl_Position = vec4(sc.x * uCosR - sc.y * uSinR + uCenter.x,",
+    "                      sc.x * uSinR + sc.y * uCosR + uCenter.y, d - uDist, d);",
     "  vFace = clamp(p.z * 1.1 + 0.5, 0.0, 1.0);",      // 背面的线更淡
     "}"
   ].join("\n");
@@ -468,7 +478,8 @@
   if (!gl.getProgramParameter(wProg, gl.LINK_STATUS)) { fail("link"); return; }
   var WA = { pos: gl.getAttribLocation(wProg, "aPos") };
   var WU = {};
-  ["uAngle", "uCosP", "uSinP", "uDist", "uProj", "uAspect", "uCenter", "uColor", "uAlpha", "uGather"
+  ["uAngle", "uCosP", "uSinP", "uDist", "uProj", "uAspect", "uCosR", "uSinR",
+    "uCenter", "uColor", "uAlpha", "uGather"
   ].forEach(function (k) { WU[k] = gl.getUniformLocation(wProg, k); });
   var wire = buildWire();
   var wBuf = gl.createBuffer();
@@ -509,7 +520,8 @@
     spin: gl.getAttribLocation(prog, "aSpin")
   };
   var U = {};
-  ["uCosY", "uSinY", "uCosP", "uSinP", "uSpinT", "uDist", "uProj", "uAspect", "uPxScale",
+  ["uCosY", "uSinY", "uCosP", "uSinP", "uSpinT", "uDist", "uProj", "uAspect", "uCosR", "uSinR",
+    "uPxScale",
     "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uStn", "uAlpha", "uBurst", "uSeed", "uGather",
     "uWave", "uImpDir0", "uImpAge0", "uImpDir1", "uImpAge1", "uImpDir2", "uImpAge2"
   ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
@@ -554,14 +566,20 @@
   }
   syncMode();
 
-  /* ── 相机状态 ──
-     星球是**只看不摸**的：不能拖动、也没了键盘转动，默认机位就是唯一的机位。
-     它停在一张标准侧视图上：机位落在赤道平面里（相对赤道的仰角 0），纬带水平、
-     极轴正立。想要一点俯角就调 VIEW_ELEV（0.12 ≈ 7°）；可拖动那一版的默认机位
-     是 VIEW_ELEV = 0.31（约 17.7° 俯角，即 TILT 减掉当年的拖动偏移）。 ── */
-  var VIEW_ELEV = 0;                               // 机位相对赤道平面的仰角（rad）
+  /* ── 机位摆位 ──
+     星球是只看不摸的：不能拖动，机位就是唯一的机位。两个常量各管一件事：
+     · VIEW_ELEV：机位相对赤道平面的仰角。0 = 正侧视（三圈环带会被压成一条
+       横线），可拖动那一版是 0.31（约 17.7°）。现在取 0.26（约 15°）：还是
+       侧看，但环带留出一点椭圆、纬带带一点弧度。
+     · VIEW_ROLL：画面自己转一点点（**正数 = 极轴往左上倒**）——「从左上往
+       下看」这层意思就靠它 + 左上那束光给出来；0 = 极轴笔直向上。
+     两者都只做整体摆位，不参与自转：yaw 只管星球自己转。roll 写在**屏幕
+     空间**（投影之后、加 uCenter 之前），否则除以 aspect 会把它压成椭圆变形。 ── */
+  var VIEW_ELEV = 0.26;                            // 0 = 正侧视，越大越俯视
+  var VIEW_ROLL = 0.12;                            // 0 = 极轴向上，正数 = 往左上倒
   var yaw = 0.55, tYaw = yaw;                      // yaw 只在自转里往前走
   var pitch = VIEW_ELEV - TILT;                    // 着色器吃的是 TILT + pitch
+  var ROLL_C = Math.cos(VIEW_ROLL), ROLL_S = Math.sin(VIEW_ROLL);
   var spin = reduce ? 0 : 0.075;                   // rad/s 自转：比上一版快一档，闲不住
   var running = false, paused = false, raf = 0, last = 0;
 
@@ -627,6 +645,8 @@
     gl.uniform1f(U.uSinY, Math.sin(yaw));
     gl.uniform1f(U.uCosP, cp);
     gl.uniform1f(U.uSinP, sp);
+    gl.uniform1f(U.uCosR, ROLL_C);
+    gl.uniform1f(U.uSinR, ROLL_S);
     gl.uniform1f(U.uSpinT, reduce ? 0 : now);
     gl.uniform1f(U.uDist, dist);
     gl.uniform1f(U.uProj, U_PROJ);
@@ -656,6 +676,8 @@
     gl.uniform1f(WU.uAngle, yaw);
     gl.uniform1f(WU.uCosP, cp);
     gl.uniform1f(WU.uSinP, sp);
+    gl.uniform1f(WU.uCosR, ROLL_C);
+    gl.uniform1f(WU.uSinR, ROLL_S);
     gl.uniform1f(WU.uDist, dist);
     gl.uniform1f(WU.uProj, U_PROJ);
     gl.uniform1f(WU.uAspect, w / h);

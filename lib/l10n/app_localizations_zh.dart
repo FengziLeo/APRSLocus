@@ -8870,6 +8870,39 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get agentStreamReplyDesc => "模型边生成边显示。后端不支持流式时自动退回整段显示，不会少一句回复。";
 
+  @override
+  String get agentToolHistory => "工具操作历史";
+
+  @override
+  String get agentToolHistoryEmpty => "还没有工具操作记录。让智能体帮你做点事，这里会一条条记下来。";
+
+  @override
+  String agentToolWorking(String tool) => "正在操作：$tool";
+
+  @override
+  String get agentToolDenied => "已拒绝";
+
+  @override
+  String get agentToolFailed => "失败";
+
+  @override
+  String get phgTitle => "PHG 天线信息";
+
+  @override
+  String get phgPower => "功率";
+
+  @override
+  String get phgHeight => "天线高度";
+
+  @override
+  String get phgGain => "增益";
+
+  @override
+  String get phgDirection => "方向";
+
+  @override
+  String get phgOmni => "全向";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -17736,5 +17769,38 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get agentStreamReplyDesc => "模型邊生成邊顯示。後端不支援串流時自動退回整段顯示，不會少一句回覆。";
+
+  @override
+  String get agentToolHistory => "工具操作歷史";
+
+  @override
+  String get agentToolHistoryEmpty => "還沒有工具操作記錄。讓智慧代理幫你做點事，這裡會一條條記下來。";
+
+  @override
+  String agentToolWorking(String tool) => "正在操作：$tool";
+
+  @override
+  String get agentToolDenied => "已拒絕";
+
+  @override
+  String get agentToolFailed => "失敗";
+
+  @override
+  String get phgTitle => "PHG 天線資訊";
+
+  @override
+  String get phgPower => "功率";
+
+  @override
+  String get phgHeight => "天線高度";
+
+  @override
+  String get phgGain => "增益";
+
+  @override
+  String get phgDirection => "方向";
+
+  @override
+  String get phgOmni => "全向";
 
 }

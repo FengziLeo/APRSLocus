@@ -8971,4 +8971,37 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get agentStreamReplyDesc => "モデルの生成に合わせて順次表示します。バックエンドがストリーム非対応なら一括表示に切り替わります（返答が減ることはありません）。";
 
+  @override
+  String get agentToolHistory => "ツール操作履歴";
+
+  @override
+  String get agentToolHistoryEmpty => "ツール操作の履歴はまだありません。エージェントに何か頼むと、ここに記録されます。";
+
+  @override
+  String agentToolWorking(String tool) => "実行中：$tool";
+
+  @override
+  String get agentToolDenied => "拒否";
+
+  @override
+  String get agentToolFailed => "失敗";
+
+  @override
+  String get phgTitle => "PHG アンテナ";
+
+  @override
+  String get phgPower => "出力";
+
+  @override
+  String get phgHeight => "高さ";
+
+  @override
+  String get phgGain => "利得";
+
+  @override
+  String get phgDirection => "方向";
+
+  @override
+  String get phgOmni => "無指向";
+
 }

@@ -9260,4 +9260,37 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get agentStreamReplyDesc => "Tampilkan teks selagi model menulisnya. Jika backend tidak mendukung streaming, balasan penuh ditampilkan sekaligus — jumlah balasan tidak berkurang.";
 
+  @override
+  String get agentToolHistory => "Riwayat alat";
+
+  @override
+  String get agentToolHistoryEmpty => "Belum ada riwayat alat. Minta agen melakukan sesuatu dan setiap panggilan akan muncul di sini.";
+
+  @override
+  String agentToolWorking(String tool) => "Sedang berjalan: $tool";
+
+  @override
+  String get agentToolDenied => "Ditolak";
+
+  @override
+  String get agentToolFailed => "Gagal";
+
+  @override
+  String get phgTitle => "Antena PHG";
+
+  @override
+  String get phgPower => "Daya";
+
+  @override
+  String get phgHeight => "Tinggi";
+
+  @override
+  String get phgGain => "Penguatan";
+
+  @override
+  String get phgDirection => "Arah";
+
+  @override
+  String get phgOmni => "Omni";
+
 }

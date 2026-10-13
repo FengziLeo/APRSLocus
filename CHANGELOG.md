@@ -1,5 +1,105 @@
 # 更新日志
 
+## [2.0.67] - 2026-10-13
+
+### 新功能：智能体「逐字回复」（流式优先，打字机兜底）
+
+- 智能体回复不再是「转半天 → 整段蹦出来」，而是**边生成边逐字显示**，长回答
+  尤其明显。设置页「接口」折里新增「逐字回复」开关，默认开，旧配置按开兜底。
+- 真流式优先：请求带 `stream:true`，后端按 SSE 增量推 token 就即时上屏；
+  `tool_calls` 是**分片**下发的（id / name 在首片、arguments 是逐段拼的 JSON
+  片段），按 `index` 归并，重复带 name 的后端不会拼成 `xxx_xxx`。
+- 后端不支持时不会少一句回复：忽略了 `stream:true`（回一整段普通 JSON）、或
+  平台不支持流式（Web）时，自动退回整段式请求，再用打字机效果补上逐字观感
+  （总时长压在 ~1.2 秒内，不按字符线性累加）。
+- 流式期间隐藏「思考中」转圈、列表直接跳到最新（原来的平滑滚动动画会被每
+  60ms 的新内容不断打断重启，长回答会「在屏幕外写」）；正在生成、尚未定稿的
+  文字用独立气泡显示，**不并入对话历史** —— 免得模型读到自己的半截话。
+- 新增单测 `test/agent_stream_test.dart`（并挂进 CI）：分片拼装、交错 index、
+  心跳 / 空行 / `[DONE]`、流内 error、非 SSE 响应识别为空流。
+
+### 新功能：智能体「工具操作历史」+ 工作状态冒泡
+
+- 聊天框标题栏新增「工具操作历史」按钮：记下智能体**每一次**工具调用 ——
+  工具、参数摘要、结果摘要、时间、成功 / 被拒 / 失败，最新在前、可一键清空，
+  按钮上带数字角标，一眼看出它这一轮动过多少次手。
+- 有活儿时按钮旁边冒一个**状态气泡**：「正在操作：xxx」（当前正在跑的工具）
+  或「思考中…」。不用盯着对话猜它在干嘛。
+- 记录随对话落盘，与「任务执行历史」同类 —— 可再生的诊断日志，**不随备份**
+  搬走（换机后带上旧记录只会误导）。
+
+### 优化：台站详情 PHG 显示更明显更清晰
+
+- PHG（功率 / 天线高度 / 增益 / 方向）从原来的一行灰字（`4W · 6.1m · 2dB · omni`）
+  改成一张橙色小卡片，四项各自带标签与单位，一眼可读。
+- 方位为全向时显示「全向」，不再露出 `360°` 这种半英半数的写法。
+
+### 优化：数据包查看页更清晰
+
+- 每条的「呼号 → 目标」**单独成行** —— 原来和类型 / 来源徽标、时间挤在同一行，
+  窄屏上会被省略号截掉，反而看不清「谁发给谁」。
+- 「原始模式」不再把报文截到两行加省略号：**完整显示**、可换行、长按复制。
+  报文的尾巴（中继路径 / 数据扩展 / 备注）正是排障要看的地方，不能被吃掉。
+
+---
+
+## [2.0.67] - 2026-10-13 (English)
+
+### New: the agent now replies character-by-character (streaming first, typewriter fallback)
+
+- Agent replies are no longer "wait, then the whole block appears" but are shown
+  **as the model writes them**, which matters most for long answers. A new
+  "Stream replies" switch lives in the Settings → Interface section (on by
+  default; older configs fall back to on).
+- Real streaming first: the request sends `stream:true`, and SSE tokens are put on
+  screen as they arrive. `tool_calls` come down **in fragments** (id / name in the
+  first piece, arguments as concatenated JSON fragments) and are merged by
+  `index`, so backends that repeat the name do not produce `xxx_xxx`.
+- When the backend cannot stream, you still never lose a reply: if it ignores
+  `stream:true` (returns one plain JSON blob) or the platform has no streaming
+  (Web), the app falls back to the whole-answer request and adds a typewriter
+  effect for the same character-by-character feel (capped at ~1.2s total, not
+  linear in length).
+- While streaming, the "thinking" spinner is hidden and the list jumps straight
+  to the newest line (the old smooth-scroll animation kept being restarted by the
+  60ms updates, so long answers "wrote off-screen"); the in-progress, not-yet-final
+  text shows in its own bubble and is **kept out of the conversation history**, so
+  the model never reads its own half-finished sentence.
+- New unit test `test/agent_stream_test.dart` (wired into CI): fragment assembly,
+  interleaved indexes, heartbeat / blank lines / `[DONE]`, in-stream errors, and
+  non-SSE responses recognised as an empty stream.
+
+### New: agent "tool activity" history + a live working bubble
+
+- A new "Tool activity" button in the chat header records **every** tool call the
+  agent makes — tool, argument summary, result summary, time, and whether it
+  succeeded, was denied, or failed — newest first and clearable with one tap. A
+  numeric badge on the button shows how many actions it has taken.
+- While it works, a status bubble appears next to the button: "Working: xxx" (the
+  tool currently running) or "Thinking…", so you never have to guess what it is
+  doing.
+- The history is persisted with the conversation and, like the task-run history,
+  is a regenerable diagnostic log that is **kept out of backups** (restoring old
+  records on a new device would only mislead).
+
+### Improved: clearer PHG display in station details
+
+- PHG (power / antenna height / gain / direction) was one grey line
+  (`4W · 6.1m · 2dB · omni`); it is now an orange card with each of the four
+  values labelled and unit-tagged, readable at a glance.
+- An omnidirectional pattern now reads "Omni" instead of the half-English `360°`.
+
+### Improved: clearer packet-viewer page
+
+- Each row's "call → target" now sits **on its own line** — it used to be crammed
+  in with the type/source badges and the time, so on narrow screens it was
+  ellipsised away and you could not tell who sent to whom.
+- "Raw mode" no longer clips the packet to two lines with an ellipsis: it shows
+  the **full** frame, wraps, and copies on long-press. The tail mattering most
+  for debugging (digipeater path / data extensions / comment) is no longer cut.
+
+---
+
 ## [2.0.66] - 2026-10-13
 
 ### 新功能：智能体可操作「策略地图」（与队友共享标点 / 划线 / 圈 / 集合点）

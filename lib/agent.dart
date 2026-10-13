@@ -412,6 +412,47 @@ class AgentTaskRun {
   }
 }
 
+/// 一次工具执行的历史记录（智能体页「工具操作历史」用）。
+///
+/// 记的是「智能体替用户做了什么」：工具、参数摘要、结果摘要、时间、是否成功。
+/// [ok] = 既没被用户拒绝、结果也不是错误（工具层用 `ERROR:` 前缀表示失败）。
+class AgentToolRun {
+  final String name;
+  final String args; // 参数摘要（已截断，人类可读）
+  final String result; // 结果摘要（已截断）
+  final DateTime at;
+  final bool ok;
+
+  AgentToolRun({
+    required this.name,
+    required this.args,
+    required this.result,
+    required this.at,
+    required this.ok,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'args': args,
+        'result': result,
+        'at': at.toIso8601String(),
+        'ok': ok,
+      };
+
+  static AgentToolRun? fromJson(Object? j) {
+    if (j is! Map) return null;
+    final at = DateTime.tryParse('${j['at'] ?? ''}');
+    if (at == null) return null;
+    return AgentToolRun(
+      name: '${j['name'] ?? ''}',
+      args: '${j['args'] ?? ''}',
+      result: '${j['result'] ?? ''}',
+      at: at,
+      ok: j['ok'] == true,
+    );
+  }
+}
+
 /// 用户没自定义系统提示时用的默认提示。
 ///
 /// 用英文写：各家用模型对英文系统提示的遵循度最稳；但明确要求它**用用户的语言
@@ -538,6 +579,7 @@ class AgentService extends ChangeNotifier {
   static const _kHistory = 'agentChatHistoryJson';
   static const _kTasks = 'agentTasksJson';
   static const _kTaskRuns = 'agentTaskRunsJson';
+  static const _kToolRuns = 'agentToolRunsJson';
   static const _kMemory = 'agentMemoryJson';
   static const _kSummary = 'agentHistorySummary';
 
@@ -573,6 +615,15 @@ class AgentService extends ChangeNotifier {
   /// 任务执行记录（最新在前，最多 [_kMaxTaskRuns] 条）。
   final List<AgentTaskRun> taskRuns = [];
   static const int _kMaxTaskRuns = 100;
+
+  /// 工具执行历史（最新在前，最多 [_kMaxToolRuns] 条）。智能体页「工具操作历史」
+  /// 读它 —— 与 [taskRuns]（后台定时任务）不同，这是**当前对话里**每一次工具
+  /// 调用，用来回答「它刚才到底动了什么」。
+  final List<AgentToolRun> toolRuns = [];
+  static const int _kMaxToolRuns = 120;
+
+  /// 正在执行的工具名（null = 没有工具在跑）。UI 用它冒泡显示「正在操作什么」。
+  String? currentTool;
 
   bool loaded = false;
   bool busy = false;
@@ -630,6 +681,16 @@ class AgentService extends ChangeNotifier {
           for (final r in list) {
             final run = AgentTaskRun.fromJson(r);
             if (run != null) taskRuns.add(run);
+          }
+        }
+      }
+      final urn = p.getString(_kToolRuns);
+      if (urn != null && urn.isNotEmpty) {
+        final list = jsonDecode(urn);
+        if (list is List) {
+          for (final r in list) {
+            final run = AgentToolRun.fromJson(r);
+            if (run != null) toolRuns.add(run);
           }
         }
       }
@@ -710,6 +771,42 @@ class AgentService extends ChangeNotifier {
   Future<void> clearMemories() async {
     memories.clear();
     await _saveMemories();
+    notifyListeners();
+  }
+
+  Future<void> _saveToolRuns() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString(
+          _kToolRuns, jsonEncode(toolRuns.map((r) => r.toJson()).toList()));
+    } catch (_) {}
+  }
+
+  /// 记一次工具执行（最新在前；超出 [_kMaxToolRuns] 丢最旧的）。
+  ///
+  /// [ok] = 既没被拒绝、结果也不是错误（工具层以 `ERROR:` 前缀表示失败）。
+  Future<void> recordToolRun(String name, String args, String result,
+      {required bool ok}) async {
+    toolRuns.insert(
+      0,
+      AgentToolRun(
+        name: name,
+        args: _brief(args),
+        result: _brief(result),
+        at: DateTime.now(),
+        ok: ok,
+      ),
+    );
+    while (toolRuns.length > _kMaxToolRuns) {
+      toolRuns.removeLast();
+    }
+    await _saveToolRuns();
+    notifyListeners();
+  }
+
+  Future<void> clearToolRuns() async {
+    toolRuns.clear();
+    await _saveToolRuns();
     notifyListeners();
   }
 
@@ -1151,26 +1248,38 @@ class AgentService extends ChangeNotifier {
             continue;
           }
           var result = '';
+          var denied = false;
           // 免确认判定交给上层（它知道工具表）：只读工具、navigate，或用户已在
           // 「始终允许」名单里放行的工具，都直接执行。
           final needsAsk =
               needsConfirm(call.name) && !config.alwaysAllow.contains(call.name);
-          if (needsAsk) {
-            final decision = await confirm(call.name, call.arguments);
-            if (decision == AgentConfirmResult.deny) {
-              result = 'User denied this action.';
-            } else {
-              if (decision == AgentConfirmResult.allowAlways) {
-                config.alwaysAllow.add(call.name);
-                unawaited(saveConfig());
+          // 「正在操作什么」的冒泡：从执行开始到出结果为止 [currentTool] 非空。
+          currentTool = call.name;
+          notifyListeners();
+          try {
+            if (needsAsk) {
+              final decision = await confirm(call.name, call.arguments);
+              if (decision == AgentConfirmResult.deny) {
+                result = 'User denied this action.';
+                denied = true;
+              } else {
+                if (decision == AgentConfirmResult.allowAlways) {
+                  config.alwaysAllow.add(call.name);
+                  unawaited(saveConfig());
+                }
+                final outcome = await execute(call.name, call.arguments);
+                result = outcome.text;
               }
+            } else {
               final outcome = await execute(call.name, call.arguments);
               result = outcome.text;
             }
-          } else {
-            final outcome = await execute(call.name, call.arguments);
-            result = outcome.text;
+          } finally {
+            currentTool = null;
           }
+          // 记入工具操作历史：ok = 既非被拒绝、也不是错误结果。
+          unawaited(recordToolRun(call.name, call.arguments, result,
+              ok: !denied && !result.startsWith('ERROR:')));
           messages.add(AgentMessage(
             role: 'tool',
             content: result,

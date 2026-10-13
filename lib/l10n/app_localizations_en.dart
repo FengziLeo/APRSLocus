@@ -9250,4 +9250,37 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get agentStreamReplyDesc => "Show the text while the model is still writing it. If the backend cannot stream, the whole reply is shown at once instead — never fewer replies.";
 
+  @override
+  String get agentToolHistory => "Tool activity";
+
+  @override
+  String get agentToolHistoryEmpty => "No tool activity yet. Ask the agent to do something and each call will show up here.";
+
+  @override
+  String agentToolWorking(String tool) => "Working: $tool";
+
+  @override
+  String get agentToolDenied => "Denied";
+
+  @override
+  String get agentToolFailed => "Failed";
+
+  @override
+  String get phgTitle => "PHG antenna";
+
+  @override
+  String get phgPower => "Power";
+
+  @override
+  String get phgHeight => "Height";
+
+  @override
+  String get phgGain => "Gain";
+
+  @override
+  String get phgDirection => "Direction";
+
+  @override
+  String get phgOmni => "Omni";
+
 }

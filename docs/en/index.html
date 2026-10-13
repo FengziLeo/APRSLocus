@@ -576,6 +576,18 @@
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.67</span>
+        <span class="cl-date">2026-10-13</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot new"></span><b>The agent now replies character-by-character</b>. Replies are no longer "wait, then the whole block appears" but are shown as the model writes them, which matters most for long answers. Real streaming (SSE tokens) is used first; when the backend cannot stream (it ignores <code>stream</code>, or on the Web) the app falls back to a whole-answer request plus a typewriter effect for the same feel — <b>never fewer replies</b>. A switch in Settings → Interface (on by default) controls it.</div>
+        <div class="cl-item"><span class="cl-dot new"></span><b>Agent "tool activity" history + a live working bubble</b>: a new button in the chat header records <b>every</b> tool call (tool / arguments / result / time / success · denied · failed), newest first and clearable with one tap, carrying a numeric badge. While it works, a status bubble appears next to it — "Working: xxx" or "Thinking…" — so you never have to guess what it is doing.</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>Clearer PHG in station details</b>: power / antenna height / gain / direction went from one grey line to an <b>orange card</b> with each value labelled and unit-tagged, readable at a glance; an omni pattern now reads "Omni" instead of <code>360°</code>.</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>Clearer packet viewer</b>: each frame's "call → target" now sits on its own line instead of being crammed with the badges and time and ellipsised away; "raw mode" no longer truncates — the full frame (path / data extensions / comment) is shown, wraps, and copies on long-press.</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.66</span>
         <span class="cl-date">2026-10-13</span>
       </div>

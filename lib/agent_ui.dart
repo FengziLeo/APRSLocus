@@ -1162,6 +1162,23 @@ class _AgentOverlayState extends State<AgentOverlay> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis),
         ),
+        // 智能体干活时在旁边冒一个状态气泡：「正在操作：xxx」/「思考中…」，
+        // 用户一眼能看到它此刻在做什么（逐字流式时正文已在屏上，不再重复）。
+        if (svc.currentTool != null || (svc.busy && svc.streamText.isEmpty))
+          _workBubble(s),
+        // 工具操作历史入口（有记录时带数字角标）。
+        Badge(
+          isLabelVisible: svc.toolRuns.isNotEmpty,
+          label: Text('${svc.toolRuns.length}'),
+          backgroundColor: C.purple,
+          textColor: Colors.white,
+          child: IconButton(
+            tooltip: s.agentToolHistory,
+            onPressed: () => _openToolHistory(),
+            icon: Icon(Icons.history_rounded, size: 18, color: C.grey),
+            visualDensity: VisualDensity.compact,
+          ),
+        ),
         IconButton(
           tooltip: s.agentClear,
           onPressed: () => setState(() => _clearPending = true),
@@ -1190,6 +1207,52 @@ class _AgentOverlayState extends State<AgentOverlay> {
           visualDensity: VisualDensity.compact,
         ),
       ]),
+    );
+  }
+
+  /// 状态气泡：智能体正在「操作某个工具」或「思考中」时显示在标题旁边。
+  Widget _workBubble(S s) {
+    final tool = svc.currentTool;
+    final text =
+        tool != null ? s.agentToolWorking(s.agentToolLabel(tool)) : s.agentThinking;
+    return Tooltip(
+      message: text,
+      child: Container(
+        margin: const EdgeInsets.only(right: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        // 顶部一行还有标题和 4 个图标按钮，气泡必须能窄下来，否则窄屏会溢出；
+        // 长文案截断，悬停/长按用 Tooltip 看全。
+        constraints: const BoxConstraints(maxWidth: 96),
+        decoration: BoxDecoration(
+          color: C.purpleBg,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          SizedBox(
+            width: 10,
+            height: 10,
+            child: CircularProgressIndicator(strokeWidth: 1.8, color: C.purple),
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              style: ts(10, c: C.purple),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  void _openToolHistory() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _ToolHistorySheet(),
     );
   }
 
@@ -1585,6 +1648,145 @@ class _AgentOverlayState extends State<AgentOverlay> {
     }
     return null;
   }
+}
+
+/// 「工具操作历史」底部弹层：按时间倒序列出智能体每一次工具调用。
+///
+/// 数据源是 [AgentService.toolRuns]（内存 + 落盘，最新在前）。用监听包住 ——
+/// 打开着的时候智能体还在干活，新记录会实时冒出来。
+class _ToolHistorySheet extends StatelessWidget {
+  const _ToolHistorySheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final svc = AgentService.instance;
+    return ListenableBuilder(
+      listenable: svc,
+      builder: (context, _) {
+        final runs = svc.toolRuns;
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
+          ),
+          decoration: BoxDecoration(
+            color: C.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 抓手
+                Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 10, bottom: 4),
+                  decoration: BoxDecoration(
+                    color: C.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 6, 8, 6),
+                  child: Row(children: [
+                    Icon(Icons.history_rounded, size: 18, color: C.purple),
+                    const SizedBox(width: 8),
+                    Text(s.agentToolHistory, style: ts(14, w: FontWeight.w700)),
+                    const SizedBox(width: 8),
+                    Text('${runs.length}', style: ts(12, c: C.grey)),
+                    const Spacer(),
+                    if (runs.isNotEmpty)
+                      IconButton(
+                        tooltip: s.agentClear,
+                        onPressed: () => svc.clearToolRuns(),
+                        icon: Icon(Icons.delete_outline_rounded,
+                            size: 18, color: C.grey),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    IconButton(
+                      tooltip: s.close,
+                      onPressed: () => Navigator.of(context).maybePop(),
+                      icon: Icon(Icons.close_rounded, size: 18, color: C.grey),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ]),
+                ),
+                Divider(height: 1, color: C.border),
+                if (runs.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      s.agentToolHistoryEmpty,
+                      style: ts(12, c: C.grey, h: 1.5),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                else
+                  Flexible(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(12),
+                      itemCount: runs.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
+                      itemBuilder: (_, i) => _toolRunRow(runs[i], s),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _toolRunRow(AgentToolRun r, S s) {
+    final color = r.ok ? C.green : C.red;
+    final status = r.result.startsWith('ERROR:')
+        ? s.agentToolFailed
+        : s.agentToolDenied;
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: C.bgSoft,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(
+            r.ok ? Icons.check_circle_rounded : Icons.cancel_rounded,
+            size: 14,
+            color: color,
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(s.agentToolLabel(r.name),
+                style: ts(12, w: FontWeight.w700),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+          ),
+          if (!r.ok) ...[
+            Text(status, style: ts(9, c: C.red, w: FontWeight.w700)),
+            const SizedBox(width: 6),
+          ],
+          Text(_clock(r.at), style: ts(10, c: C.grey)),
+        ]),
+        if (r.args.trim().isNotEmpty) ...[
+          const SizedBox(height: 5),
+          Text(r.args,
+              style: mono(10, c: C.slate),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis),
+        ],
+      ]),
+    );
+  }
+
+  String _clock(DateTime t) =>
+      '${t.hour.toString().padLeft(2, '0')}:'
+      '${t.minute.toString().padLeft(2, '0')}:'
+      '${t.second.toString().padLeft(2, '0')}';
 }
 
 /// 工具名 → 人类可读称呼。

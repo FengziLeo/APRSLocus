@@ -655,6 +655,18 @@ html{overflow-x:hidden}
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.67</span>
+        <span class="cl-date">2026-10-13</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot new"></span><b>智能体可以「逐字回复」了</b>：回复不再是「转半天整段蹦出来」，而是边生成边逐字上屏，长回答尤其明显。优先走真流式（SSE 逐块增量）；后端不支持流式（忽略 <code>stream</code>、或 Web 平台）时自动退回整段请求，再用打字机效果补上逐字观感 —— <b>不会少一句回复</b>。设置页「接口」折里可开关（默认开）。</div>
+        <div class="cl-item"><span class="cl-dot new"></span><b>智能体「工具操作历史」+ 工作状态冒泡</b>：聊天框标题栏新增「工具操作历史」按钮，记下它<b>每一次</b>工具调用（工具 / 参数 / 结果 / 时间 / 成功 · 被拒 · 失败），最新在前、可一键清空，按钮带数字角标。有活儿时旁边还会冒一个状态气泡：「正在操作：xxx」或「思考中…」，不用盯着对话猜它在干嘛。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>台站详情 PHG 更清楚</b>：功率 / 天线高度 / 增益 / 方向从一行灰字改成一张<b>橙色小卡片</b>，四项各自带标签与单位，一眼可读；全向方位显示为「全向」，不再露出 <code>360°</code>。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>数据包页更清晰</b>：每条报文的「呼号 → 目标」单独成行，不再和徽标、时间挤在一起被省略号截掉；「原始模式」不再截断，完整显示整条报文（路径 / 数据扩展 / 备注不再被吃掉），可换行、长按复制。</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.66</span>
         <span class="cl-date">2026-10-13</span>
       </div>

@@ -581,6 +581,18 @@
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.67</span>
+        <span class="cl-date">2026-10-13</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot new"></span><b>智慧代理可以「逐字回覆」了</b>：回覆不再是「轉半天整段跳出來」，而是邊生成邊逐字上螢幕，長回答尤其明顯。優先走真串流（SSE 逐塊增量）；後端不支援串流（忽略 <code>stream</code>、或 Web 平台）時自動退回整段請求，再用打字機效果補上逐字觀感 —— <b>不會少一句回覆</b>。設定頁「介面」摺裡可開關（預設開）。</div>
+        <div class="cl-item"><span class="cl-dot new"></span><b>智慧代理「工具操作歷史」+ 工作狀態冒泡</b>：聊天框標題列新增「工具操作歷史」按鈕，記下它<b>每一次</b>工具呼叫（工具 / 參數 / 結果 / 時間 / 成功 · 被拒 · 失敗），最新在前、可一鍵清空，按鈕帶數字角標。有活兒時旁邊還會冒一個狀態氣泡：「正在操作：xxx」或「思考中…」，不用盯著對話猜它在幹嘛。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>台站詳情 PHG 更清楚</b>：功率 / 天線高度 / 增益 / 方向從一行灰字改成<b>橙色小卡片</b>，四項各自帶標籤與單位，一眼可讀；全向方位顯示為「全向」，不再露出 <code>360°</code>。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>資料包頁更清晰</b>：每條報文的「呼號 → 目標」單獨成行，不再和徽標、時間擠在一起被省略號截掉；「原始模式」不再截斷，完整顯示整條報文（路徑 / 資料擴展 / 備註不再被吃掉），可換行、長按複製。</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.66</span>
         <span class="cl-date">2026-10-13</span>
       </div>

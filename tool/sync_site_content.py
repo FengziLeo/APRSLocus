@@ -204,6 +204,69 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.0.67', 'date': '2026-10-13',
+        'items': [
+            ('new',
+             T('**智能体可以「逐字回复」了**：回复不再是「转半天整段蹦出来」，'
+               '而是边生成边逐字上屏，长回答尤其明显。优先走真流式（SSE 逐块'
+               '增量）；后端不支持流式（忽略 `stream`、或 Web 平台）时自动退回'
+               '整段请求，再用打字机效果补上逐字观感 —— **不会少一句回复**。'
+               '设置页「接口」折里可开关（默认开）。',
+               '**智慧代理可以「逐字回覆」了**：回覆不再是「轉半天整段跳出來」，'
+               '而是邊生成邊逐字上螢幕，長回答尤其明顯。優先走真串流（SSE 逐塊'
+               '增量）；後端不支援串流（忽略 `stream`、或 Web 平台）時自動退回'
+               '整段請求，再用打字機效果補上逐字觀感 —— **不會少一句回覆**。'
+               '設定頁「介面」摺裡可開關（預設開）。',
+               '**The agent now replies character-by-character**. Replies are no '
+               'longer "wait, then the whole block appears" but are shown as the '
+               'model writes them, which matters most for long answers. Real '
+               'streaming (SSE tokens) is used first; when the backend cannot '
+               'stream (it ignores `stream`, or on the Web) the app falls back to '
+               'a whole-answer request plus a typewriter effect for the same feel '
+               '— **never fewer replies**. A switch in Settings → Interface (on '
+               'by default) controls it.')),
+            ('new',
+             T('**智能体「工具操作历史」+ 工作状态冒泡**：聊天框标题栏新增「工具'
+               '操作历史」按钮，记下它**每一次**工具调用（工具 / 参数 / 结果 / 时间 / '
+               '成功 · 被拒 · 失败），最新在前、可一键清空，按钮带数字角标。有活儿时'
+               '旁边还会冒一个状态气泡：「正在操作：xxx」或「思考中…」，不用盯着'
+               '对话猜它在干嘛。',
+               '**智慧代理「工具操作歷史」+ 工作狀態冒泡**：聊天框標題列新增「工具'
+               '操作歷史」按鈕，記下它**每一次**工具呼叫（工具 / 參數 / 結果 / 時間 / '
+               '成功 · 被拒 · 失敗），最新在前、可一鍵清空，按鈕帶數字角標。有活兒時'
+               '旁邊還會冒一個狀態氣泡：「正在操作：xxx」或「思考中…」，不用盯著'
+               '對話猜它在幹嘛。',
+               '**Agent "tool activity" history + a live working bubble**: a new button '
+               'in the chat header records **every** tool call (tool / arguments / '
+               'result / time / success · denied · failed), newest first and clearable '
+               'with one tap, carrying a numeric badge. While it works, a status bubble '
+               'appears next to it — "Working: xxx" or "Thinking…" — so you never have '
+               'to guess what it is doing.')),
+            ('up',
+             T('**台站详情 PHG 更清楚**：功率 / 天线高度 / 增益 / 方向从一行灰字'
+               '改成一张**橙色小卡片**，四项各自带标签与单位，一眼可读；全向方位'
+               '显示为「全向」，不再露出 `360°`。',
+               '**台站詳情 PHG 更清楚**：功率 / 天線高度 / 增益 / 方向從一行灰字'
+               '改成**橙色小卡片**，四項各自帶標籤與單位，一眼可讀；全向方位'
+               '顯示為「全向」，不再露出 `360°`。',
+               '**Clearer PHG in station details**: power / antenna height / gain / '
+               'direction went from one grey line to an **orange card** with each value '
+               'labelled and unit-tagged, readable at a glance; an omni pattern now '
+               'reads "Omni" instead of `360°`.')),
+            ('up',
+             T('**数据包页更清晰**：每条报文的「呼号 → 目标」单独成行，不再和徽标、'
+               '时间挤在一起被省略号截掉；「原始模式」不再截断，完整显示整条报文'
+               '（路径 / 数据扩展 / 备注不再被吃掉），可换行、长按复制。',
+               '**資料包頁更清晰**：每條報文的「呼號 → 目標」單獨成行，不再和徽標、'
+               '時間擠在一起被省略號截掉；「原始模式」不再截斷，完整顯示整條報文'
+               '（路徑 / 資料擴展 / 備註不再被吃掉），可換行、長按複製。',
+               '**Clearer packet viewer**: each frame\'s "call → target" now sits on its '
+               'own line instead of being crammed with the badges and time and ellipsised '
+               'away; "raw mode" no longer truncates — the full frame (path / data '
+               'extensions / comment) is shown, wraps, and copies on long-press.')),
+        ],
+    },
+    {
         'ver': 'v2.0.66', 'date': '2026-10-13',
         'items': [
             ('new',

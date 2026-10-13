@@ -16104,6 +16104,72 @@ abstract class AppLocalizations {
   /// **'模型边生成边显示。后端不支持流式时自动退回整段显示，不会少一句回复。'**
   String get agentStreamReplyDesc;
 
+  /// No description provided for @agentToolHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'工具操作历史'**
+  String get agentToolHistory;
+
+  /// No description provided for @agentToolHistoryEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'还没有工具操作记录。让智能体帮你做点事，这里会一条条记下来。'**
+  String get agentToolHistoryEmpty;
+
+  /// No description provided for @agentToolWorking.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在操作：{tool}'**
+  String agentToolWorking(String tool);
+
+  /// No description provided for @agentToolDenied.
+  ///
+  /// In zh, this message translates to:
+  /// **'已拒绝'**
+  String get agentToolDenied;
+
+  /// No description provided for @agentToolFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'失败'**
+  String get agentToolFailed;
+
+  /// No description provided for @phgTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'PHG 天线信息'**
+  String get phgTitle;
+
+  /// No description provided for @phgPower.
+  ///
+  /// In zh, this message translates to:
+  /// **'功率'**
+  String get phgPower;
+
+  /// No description provided for @phgHeight.
+  ///
+  /// In zh, this message translates to:
+  /// **'天线高度'**
+  String get phgHeight;
+
+  /// No description provided for @phgGain.
+  ///
+  /// In zh, this message translates to:
+  /// **'增益'**
+  String get phgGain;
+
+  /// No description provided for @phgDirection.
+  ///
+  /// In zh, this message translates to:
+  /// **'方向'**
+  String get phgDirection;
+
+  /// No description provided for @phgOmni.
+  ///
+  /// In zh, this message translates to:
+  /// **'全向'**
+  String get phgOmni;
+
 }
 
 class _AppLocalizationsDelegate

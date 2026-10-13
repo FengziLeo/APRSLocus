@@ -505,28 +505,36 @@ class _PacketsPageState extends State<PacketsPage> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            p.src,
-                            style: ts(12, c: C.blue, w: FontWeight.w700),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Text(' → ', style: ts(12, c: C.greyLight)),
-                        Flexible(
-                          child: Text(
-                            p.dest,
-                            style: ts(12, c: C.slate),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        SizedBox(width: 6),
+                        const Spacer(),
                         Text(_fmt(p.time), style: ts(10, c: C.grey)),
                       ],
                     ),
+                    const SizedBox(height: 8),
+                    // 呼号 → 目标单独一行：原来和徽标、时间挤在同一行，窄屏上
+                    // src/dest 会被省略号吃掉，反而看不清「谁发给谁」。
+                    Row(children: [
+                      Flexible(
+                        child: Text(
+                          p.src,
+                          style: ts(13, c: C.blue, w: FontWeight.w700),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        child: Icon(Icons.arrow_forward_rounded,
+                            size: 13, color: C.greyLight),
+                      ),
+                      Flexible(
+                        child: Text(
+                          p.dest,
+                          style: ts(13, c: C.slate),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ]),
                     if (p.info != null) ...[
                       SizedBox(height: 8),
                       Container(
@@ -585,11 +593,12 @@ class _PacketsPageState extends State<PacketsPage> {
                 ),
                 SizedBox(width: 10),
                 Expanded(
+                  // 原始报文**完整可读**：以前截到两行加省略号，正好把报文的
+                  // 关键尾巴（路径 / 数据扩展 / 备注）吃掉 —— 这是「原始模式」
+                  // 存在的意义，不能省略。长报文换行显示，长按复制。
                   child: Text(
                     p.raw,
                     style: mono(11, c: C.green),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],

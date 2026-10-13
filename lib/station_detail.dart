@@ -556,26 +556,11 @@ class _StationDetailState extends State<StationDetail> {
                           ],
                         ),
                         // PHG（功率 / 天线高度 / 增益 / 方向）：报文里带了才出现。
-                        // 放成**独立一行**而不是塞进上面三列 —— 四列会挤坏指标行的节奏
-                        // （上一版就是那样，被说"不好看"）。
+                        // 做成一张**独立小卡片**、四项各自带标签 —— 上一版是一行
+                        // 灰字（`4W · 6.1m · 2dB · omni`），不显眼也不好读。
                         if (AprsPhg.decode(s.comment ?? '') case final phg?) ...[
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Icon(Icons.bolt_rounded,
-                                  size: 14, color: C.orange),
-                              const SizedBox(width: 6),
-                              Flexible(
-                                child: Text(
-                                  'PHG  ${phg.watts}W · ${phg.heightM}m · '
-                                  '${phg.gainDb}dB · ${phg.dir}',
-                                  style: ts(11, c: C.slate),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
+                          const SizedBox(height: 12),
+                          _phgCard(S.of(context), phg),
                         ],
                         const SizedBox(height: 12),
                         // 快捷操作（Wrap 自动换行，窄屏不溢出）
@@ -1653,6 +1638,52 @@ class _StationDetailState extends State<StationDetail> {
       builder: (_) => StationDetail(state: widget.state, station: target),
     );
   }
+
+  /// PHG 卡片：一张橙色小卡，四项（功率 / 高度 / 增益 / 方向）各自带标签。
+  Widget _phgCard(S l, ({int watts, int heightM, int gainDb, String dir}) phg) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+      decoration: BoxDecoration(
+        color: C.orangeBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: C.orange.withValues(alpha: 0.25)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.bolt_rounded, size: 15, color: C.orange),
+          const SizedBox(width: 6),
+          Text(l.phgTitle,
+              style: ts(12, c: C.orange, w: FontWeight.w800, ls: 0.3)),
+        ]),
+        const SizedBox(height: 10),
+        Row(children: [
+          Expanded(child: _phgCell(l.phgPower, '${phg.watts} W')),
+          Expanded(child: _phgCell(l.phgHeight, '${phg.heightM} m')),
+          Expanded(child: _phgCell(l.phgGain, '${phg.gainDb} dB')),
+          Expanded(
+            child: _phgCell(
+              l.phgDirection,
+              phg.dir == '360°' ? l.phgOmni : phg.dir,
+            ),
+          ),
+        ]),
+      ]),
+    );
+  }
+
+  /// PHG 卡片里的一格：上面小标签、下面加粗数值。
+  Widget _phgCell(String label, String value) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: ts(9, c: C.slate, ls: 0.2)),
+          const SizedBox(height: 2),
+          Text(value,
+              style: ts(13, c: C.orange, w: FontWeight.w700),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis),
+        ],
+      );
 
   Widget _metric(String label, String value, IconData icon, Color c) {
     return SoftCard(

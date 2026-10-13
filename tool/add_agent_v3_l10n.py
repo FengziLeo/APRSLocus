@@ -41,9 +41,28 @@ DATA = {
         'se muestra la respuesta completa de una vez (nunca menos respuestas).',
         'Tampilkan teks selagi model menulisnya. Jika backend tidak mendukung streaming, '
         'balasan penuh ditampilkan sekaligus — jumlah balasan tidak berkurang.'),
+    # ── 工具操作历史（智能体页的「工具操作历史」按钮 + 状态冒泡）──
+    'agentToolHistory': ('工具操作历史', '工具操作歷史', 'Tool activity',
+                         'ツール操作履歴', 'Historial de herramientas',
+                         'Riwayat alat'),
+    'agentToolHistoryEmpty': (
+        '还没有工具操作记录。让智能体帮你做点事，这里会一条条记下来。',
+        '還沒有工具操作記錄。讓智慧代理幫你做點事，這裡會一條條記下來。',
+        'No tool activity yet. Ask the agent to do something and each call will show up here.',
+        'ツール操作の履歴はまだありません。エージェントに何か頼むと、ここに記録されます。',
+        'Aún no hay actividad de herramientas. Pídele algo al agente y cada llamada aparecerá aquí.',
+        'Belum ada riwayat alat. Minta agen melakukan sesuatu dan setiap panggilan akan muncul di sini.'),
+    'agentToolWorking': ('正在操作：{tool}', '正在操作：{tool}', 'Working: {tool}',
+                         '実行中：{tool}', 'En curso: {tool}',
+                         'Sedang berjalan: {tool}'),
+    'agentToolDenied': ('已拒绝', '已拒絕', 'Denied', '拒否', 'Denegado',
+                        'Ditolak'),
+    'agentToolFailed': ('失败', '失敗', 'Failed', '失敗', 'Falló', 'Gagal'),
 }
 
-META = {}
+META = {
+    'agentToolWorking': '{"placeholders": {"tool": {"type": "String"}}}',
+}
 
 ANCHOR = '"codeContributionTranslation"'
 

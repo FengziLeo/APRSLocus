@@ -109,8 +109,10 @@ def main() -> int:
                 continue
             page = read(page_rel)
             want_head = NS.render_head(lang)
-            want_body = ('<div class="announce-body">\n'
-                         + NS.render_body(read(md_rel)) + '\n    </div>')
+            # 缩进不在这儿写死：wrapper 由 sync_notice_site.py 的
+            # BODY_OPEN / BODY_CLOSE 给出（那是唯一生成处），这里只比内容。
+            want_body = (NS.BODY_OPEN.lstrip() + NS.render_body(read(md_rel))
+                         + NS.BODY_CLOSE.rstrip('\n'))
             if want_head not in page:
                 errors.append(f'{page_rel} 公告头部与 {md_rel} 不一致 —— '
                               '跑 `python3 tool/sync_notice_site.py`')

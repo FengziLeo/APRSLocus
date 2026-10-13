@@ -99,3 +99,19 @@
    只做「回到原样」，不加任何新样式 —— 所以放在首页自己的文件里：style.css 被
    46 个页面共用，动它就得全站改版本号。 */
 ol.steps { list-style: none; padding: 0; }
+
+/* ═══════════════ 首页 section 骨架：section-head + section-body ═══════════════
+   三语首页的每个 <section class="section"> 都收成同一个形状：
+
+       section.section  >  .section-head（可选）  +  .section-body
+
+   .section-body 本身不带任何视觉 —— 它只是"内容那一半"的位置。以前内容直接挂在
+   section 下面，一条 section 里有几个孩子全看写的时候手气（有的 1 个、有的 3 个，
+   还有两层 .community-inner 的），谁也说不出"头"到哪儿为止。
+
+   .section.narrow 是配套的那一条：把头和身各自居中到 1100px。原来 #community /
+   #contributors 靠外面再包一层 .community-inner / .contributors-inner 来实现，
+   包装层拆掉之后由这一条承担（值是照抄的 1100px）。
+   ── */
+.section.narrow > .section-head,
+.section.narrow > .section-body { max-width: 1100px; margin-left: auto; margin-right: auto; }

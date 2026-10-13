@@ -3496,6 +3496,28 @@ def strip_block(s, open_m, close_m):
     return pat.sub('', s)
 
 
+def div_end(s, at):
+    """at 是某个 <div ...> 开标签的起点 → 返回它配对的那个 </div> 的起点。
+
+    为什么要数：首页每个 section 收成 .section-head + .section-body 之后，
+    "这一节最后一个 </div>" 已经不是 .feat-list 了（变成了 .section-body），
+    旧锚点会把整表写到列表容器外面去。
+    """
+    depth, i = 0, at
+    while True:
+        o, c = s.find('<div', i), s.find('</div>', i)
+        if c < 0:
+            raise ValueError('div 不闭合：%r' % s[at:at + 60])
+        if 0 <= o < c:
+            depth += 1
+            i = o + 4
+        else:
+            depth -= 1
+            if depth == 0:
+                return c
+            i = c + 6
+
+
 def md_inline(s):
     """将内联 markdown（`代码`、**粗体**、*斜体*）转换为 HTML 标签。"""
     if not s:
@@ -3614,8 +3636,9 @@ def main():
         # 2) 功能清单：写进 #features 的 .feat-list 容器（整表生成）
         s = strip_block(s, F_OPEN, F_CLOSE)
         fi = s.index('id="features"')
-        close = s.index('\n  </div>\n</section>', fi)
-        s = s[:close] + '\n' + render_cards(lang) + s[close:]
+        # 插到 .feat-list 收尾 </div> 那一行的行首（整表必须留在容器里）。
+        close = s.rindex('\n', 0, div_end(s, s.index('<div class="feat-list">', fi))) + 1
+        s = s[:close] + render_cards(lang) + '\n' + s[close:]
 
         # 3) 更新日志：插到 changelog-list 容器开头（新的在前）
         s = strip_block(s, C_OPEN, C_CLOSE)

@@ -76,6 +76,13 @@ HEAD = {
     },
 }
 
+# 公告正文两层 wrapper 的缩进：页面里它在 .section-body 里（首页 section 统一收成
+# section-head + section-body 之后多了一层）。check_notice.py 也读这两个常量来比
+# 对页面，别在别处再抄一份缩进 —— 抄了就会漂。
+BODY_OPEN = '      <div class="announce-body">\n'
+BODY_CLOSE = '\n      </div>\n\n'
+
+
 VIDEO_TPL = (
     '<div style="position:relative;width:100%;max-width:760px;margin:6px auto;'
     'aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000">\n'
@@ -113,15 +120,15 @@ def inline(s):
 
 def render_head(lang):
     h = HEAD[lang]
-    return ('    <header class="announce-head">\n'
-            '      <p class="announce-kicker">%s</p>\n'
-            '      <h2 class="announce-title">%s<span class="announce-en">%s</span></h2>\n'
-            '      <p class="announce-sub">%s</p>\n'
-            '    </header>' % (esc(h['kicker']), esc(h['title']), esc(h['en']), esc(h['sub'])))
+    return ('      <header class="announce-head">\n'
+            '        <p class="announce-kicker">%s</p>\n'
+            '        <h2 class="announce-title">%s<span class="announce-en">%s</span></h2>\n'
+            '        <p class="announce-sub">%s</p>\n'
+            '      </header>' % (esc(h['kicker']), esc(h['title']), esc(h['en']), esc(h['sub'])))
 
 
 def render_body(md_text):
-    """公告 Markdown → 卡片正文 HTML（缩进 6 空格，与页面既有排版一致）。"""
+    """公告 Markdown → 卡片正文 HTML（缩进 8 空格，与页面既有排版一致）。"""
     lines = md_text.replace('\r\n', '\n').split('\n')
     out = []
     i = 0
@@ -163,8 +170,8 @@ def render_body(md_text):
             continue
         out.append('<p>%s</p>' % inline(s))
         i += 1
-    # 每个块整体缩进 6 空格（多行块逐行加，避免只缩进首行）
-    return '\n'.join('\n'.join('      ' + ln for ln in b.split('\n')) for b in out)
+    # 每个块整体缩进 8 空格（多行块逐行加，避免只缩进首行）
+    return '\n'.join('\n'.join('        ' + ln for ln in b.split('\n')) for b in out)
 
 
 # 旧版简中页曾有过 2.0 倒计时脚本：公告改为「已上线」后不再需要，同步时顺手清掉。
@@ -193,8 +200,7 @@ def sync_page(lang, page_rel, md_rel):
     b1 = page.index('<div class="announce-actions">')
     av = page.rfind('\n', 0, b1) + 1
     body = render_body(md_text)
-    page = (page[:bs] + '    <div class="announce-body">\n' + body
-            + '\n    </div>\n\n' + page[av:])
+    page = (page[:bs] + BODY_OPEN + body + BODY_CLOSE + page[av:])
 
     # 3) 清掉旧倒计时脚本（幂等：没有就什么都不做）
     page = _COUNTDOWN_RE.sub('', page)

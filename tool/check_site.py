@@ -242,6 +242,20 @@ def main():
         not re.search(r'#[0-9a-fA-F]{3,8}\b|rgba?\(|(?<![\w-])(?:white|black|silver)(?![\w-])', feat_css) and
         not re.search(r'^\s*\.card\b', feat_css, re.M))
 
+    # #ui2 那一层同理只挂首页（docs/css/ui2.css）。为什么独立一个文件：它本来就有
+    # 自己的固定色，而 features.css 的判据是「一个颜色字面量都没有」—— 两边混在一起
+    # 就只能放松判据。另外页面里不该再有自己的 <style> 块（前两个是 noscript 降级
+    # 与导航那一层，属于共用层）。
+    chk('ui2 样式只挂首页（三语有、子页没有、同一个 ?v=，页面里不再自带 <style>）',
+        all(read(f).count('ui2.css?v=') == 1 for f in homes) and
+        len(set(re.findall(r'ui2\.css\?v=(\d+)', read(f))[0] for f in homes)) == 1 and
+        all('ui2.css' not in read(f)
+            for f in ['docs/faq.html', 'docs/manual/start.html', 'docs/guide.html',
+                      'docs/promo.html', 'docs/terms.html']) and
+        '.ui2one' in read('docs/css/ui2.css') and
+        '.ui2one' not in feat_css and
+        all(len(re.findall(r'<style>', read(f))) == 2 for f in homes))
+
     print('[home nav]')
     # 首页导航：13 个链接横排一行 → 收成一个「更多」面板（docs/css/nav.css + nav.js）。
     #

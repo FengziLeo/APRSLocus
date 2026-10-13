@@ -1,0 +1,32 @@
+/* ═══════════════ 首页 #ui2「2.0 界面 · 渲染预览」（ui2.css） ═══════════════
+   只挂首页（三语 index.html 各一行 <link>）。为什么单开一个文件而不是塞进
+   features.css：那个文件的判据是「一个颜色字面量都没有、全走 token」，而这一层
+   本来就有自己的固定色（手机壳的深灰渐变、屏幕底的浅灰、列表前的小方块），
+   混进去要么把判据放松、要么把颜色改掉 —— 两个都不该做。
+
+   来历：这一节的区块头是唯一居中、字号略小的一版，值原先写在三页的 inline
+   style 上；.ui2one 那套规则原先塞在三页各自 body 里的 <style> 块中（三页一字
+   不差），现在合到这一份、跟着 ?v 走缓存。顺手纠掉一处重复：头里那个 42px 的
+   小横条和 .section-head::before 画的是同一根，标签里那根去掉了。
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── #ui2「2.0 界面 · 渲染预览」 ──
+   这一节的区块头是唯一居中、字号略小的一版：值原来写在三页的 inline style 上。
+   顺手纠掉一处重复 —— 头里那个 42px 的小横条和 .section-head::before 画的是
+   同一根，标签里那根去掉了，现在只剩 CSS 这一根。
+   下面的 .ui2one 那套规则原先塞在三页各自 body 里的 <style> 块中（内容三页
+   一字不差），现在合到这一份、跟着 ?v 走缓存。 */
+#ui2 .section-head { max-width: 760px; margin: 0 auto 44px; text-align: center; }
+#ui2 .section-head h2 { font-size: clamp(28px, 4.4vw, 44px); }
+#ui2 .section-head p { margin-top: 12px; }
+#ui2 .section-head a { color: var(--cyan); font-weight: 700; }
+
+.ui2one{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:56px;align-items:center}
+.ui2one-img{display:flex;justify-content:center}
+.ui2one-img .dev{display:block;width:300px;padding:10px;border-radius:44px;background:linear-gradient(150deg,#525b6e,#2b3242 40%,#0c0f16);box-shadow:0 34px 80px rgba(45,70,120,.3);box-sizing:border-box}
+.ui2one-img img{display:block;width:280px;height:591px;object-fit:contain;border-radius:36px;background:#F4F7FC}
+.ui2one-txt h3{font-size:clamp(22px,2.6vw,30px);font-weight:800;margin-bottom:16px}
+.ui2one-txt ul{list-style:none;display:grid;gap:10px;margin-bottom:24px}
+.ui2one-txt li{position:relative;padding-left:26px;color:var(--text-dim);font-size:15.5px}
+.ui2one-txt li::before{content:"";position:absolute;left:0;top:9px;width:12px;height:12px;border-radius:4px;background:linear-gradient(135deg,#38bdf8,#0284c7)}
+@media(max-width:900px){.ui2one{grid-template-columns:1fr;gap:32px}.ui2one-img img{width:min(300px,72vw)}}

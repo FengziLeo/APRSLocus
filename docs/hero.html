@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero 单独页 · APRSlocus</title>
+<meta name="description" content="APRSlocus 官网首屏（3D 星球 + 累计转发报文数字）的单独一页：只有 hero 这一块，没有导航与其余栏目，用来单独查看这一段。">
+<meta name="theme-color" content="#0a0e12">
+<!-- 这一页与首页 hero 是同一段内容（重复内容），不进 sitemap、也不给搜索引擎收录 -->
+<meta name="robots" content="noindex, follow">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<script>
+/* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）。
+   必须在首帧前执行，否则会闪一下亮底（token 的键在 <html data-theme> 上）。 */
+(function () {
+  try {
+    var t = localStorage.getItem('theme');
+    if (t !== 'dark' && t !== 'light') t = 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="css/style.css?v=8">
+<link rel="stylesheet" href="css/hero-3d.css?v=17">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<style>
+/* 这页没有导航栏，主题按钮自己贴在 hero 右上角（只这一页用到，不进共享样式表；
+   按钮本体还是 style.css 里的 .theme-toggle，样子与首页那颗完全一样）。 */
+.hero-toggle { position: absolute; top: 22px; right: clamp(20px, 6vw, 96px); z-index: 3; }
+</style>
+</head>
+<body>
+
+<!-- main.js 是整站共用的那一份（首屏粒子、滚入显形、主题切换都靠它），它开头就会
+     取导航那几个元素并直接 .classList / .setAttribute —— 四个里缺一个就当场抛错，
+     而 IIFE 里没有 try，后面那些代码（含 body.loaded）全都不执行。这页只有 hero、
+     没有导航栏，所以留一组不显示、也不占位的空壳把这一段走过去。 -->
+<div id="nav" hidden></div>
+<div id="backTop" hidden></div>
+<button id="navBurger" type="button" hidden aria-label="菜单"></button>
+<div id="navLinks" hidden></div>
+
+<!-- 全屏漂浮渐变色块（毛玻璃背后的光斑）：与首页同一层背景 -->
+<div class="bg-blobs" aria-hidden="true">
+  <span class="blob b1"></span>
+  <span class="blob b2"></span>
+  <span class="blob b3"></span>
+  <span class="blob b4"></span>
+</div>
+<noscript><style>.hero-copy>*,.planet-canvas{opacity:1!important;transform:none!important}</style></noscript>
+
+<main id="main">
+
+<!-- ═══════════ HERO ═══════════
+     与三语首页的 hero 是同一块（装饰层 → 文案 → 数字），只有两处按这页的处境改：
+     · 页面唯一的主题按钮从导航里挪到 hero 右上角（这页没有导航栏）；
+     · 「向下箭头」撤了 —— 它指向 #features，这页没有那一节，留着是个点不动的死锚；
+     · 按钮行最后一条改为「回首页」（原本指向首页的 #getting-started）。 -->
+<section class="hero" id="hero">
+  <button class="theme-toggle hero-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切换深色模式" title="切换深色模式" data-label-dark="切换浅色模式" data-label-light="切换深色模式"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
+  <!-- 装饰层：网格、星尘、3D 星球、以及没有 WebGL 时的静态球，全都在这一层。
+       整层不吃指针事件（星球是只看不摸的画面，不接拖动、不接焦点）。 -->
+  <div class="hero-decor">
+    <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+    <div class="hero-grid"></div>
+
+    <!-- 3D 星球：直接长在 hero 上的一层透明点云（无边框、无底色），只看不摸 -->
+    <canvas class="planet-canvas" id="planetCanvas" role="img"
+            aria-label="3D 星球：APRS 台站分布、环带与卫星轨道示意"></canvas>
+    <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
+  </div>
+
+  <div class="hero-inner">
+
+    <div class="hero-copy">
+      <!-- 第一屏只有这一件事：那个数字（APRSlocus 累计转发报文总量，数值源 stats.json）；"这是什么"的说明在折线之下 -->
+        <div class="hero-stat" id="heroTelemetry"
+             data-stats="stats.json" data-packets="509260" data-rate="18"
+             data-updated="2026-10-13T16:06:00+08:00"
+             data-stale-title="数据快照超过 12 小时，已停止外推（显示上限估算）">
+          <span class="hs-label">APRSlocus 累计转发报文</span>
+          <span class="tl-value" id="tlPackets">509,260</span>
+        </div>
+    </div>
+
+    <div class="hero-copy-next">
+      <!-- 折线之下才是「这是什么」：滚上来才淡出（站点的 .reveal） -->
+      <div class="hero-intro reveal" data-delay="0">
+        <!-- 页面唯一的 h1：品牌名（连版本与口号）。下面那句巨型主题字是同一句口号的
+             放大版，重复一遍对读屏没有信息量，标成装饰。 -->
+        <h1 class="hero-badge"><span class="pulse-dot" aria-hidden="true"></span><b>APRSlocus 2.0</b><span class="sep" aria-hidden="true"></span><span class="rel-tag">TOUCH SKY</span></h1>
+        <div class="hero-wordmark" aria-hidden="true">TOUCH SKY</div>
+        <p class="hero-slogan">APRS <span class="grad">定位追踪</span> 与 <span class="grad">地图</span></p>
+        <p class="hero-sub">
+          一个业余无线电爱好者用的 APRS 客户端 —— 在本机运行的工具。<br>
+          不提供、也不预置任何服务器地址：要联网请自行填写 APRS-IS 服务器，
+          或改用蓝牙 TNC / 声卡音频 / Icom 电台直连。
+        </p>
+        <p class="hero-invite">
+          <span class="hi-mark" aria-hidden="true">✦</span>上面那个数字，是全世界 APRS 台站累计转发过的报文总量 —— 电波穿过夜空，最后都落在这颗星球上，下一格等你来补。
+        </p>
+      </div>
+
+      <!-- 再往下：真正要动手的那一块（版本卡 + 下载按钮 + 来源） -->
+        <div class="hero-cta reveal" data-delay="0">
+          <p class="hero-release">
+            <span class="hr-icon" aria-hidden="true">✅</span>
+            <span class="hr-body">
+              <b class="hr-name">APRSlocus 2.0 <span class="hr-state">已发布</span></b>
+              <span class="hr-note">2.0 已发布 · <a class="hr-link" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">立即下载 →</a></span>
+            </span>
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" id="heroDownload" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
+              <i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>
+              <span id="heroDlText">下载 2.0 最新版</span>
+            </a>
+            <a class="btn btn-ghost" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
+              <i class="fa-solid fa-desktop" aria-hidden="true"></i>
+              Windows 安装包
+            </a>
+            <a class="btn btn-text" href="promo.html">2.0 宣传页<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a>
+            <a class="btn btn-text" href="index.html">回首页<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a>
+          </div>
+          <div class="hero-meta">
+            <span>APRS-IS · TNC · 音频 · PKWDWPL 四种来源</span>
+            <span>Android / Windows</span>
+          </div>
+        </div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<!-- 与首页同一份脚本：main.js 负责 body.loaded / 显形 / 主题 / 首屏粒子，
+     planet-3d.js 负责星球与那个会跳的数字。两个 ?v= 与三语首页保持一致。 -->
+<script src="js/main.js?v=8"></script>
+<script src="js/planet-3d.js?v=17"></script>
+</body>
+</html>

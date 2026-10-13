@@ -1,24 +1,25 @@
 /* ══════════════════════════════════════════════════════════════════════
-   APRSlocus 官网 Hero：观测台底纹 + 3D 星球 + 累计报文遥测
+   APRSlocus 官网 Hero：3D 星球 + 累计报文遥测
    ──────────────────────────────────────────────────────────────────────
    为什么手写 WebGL 而不是引 three.js：
    官网是零构建、零依赖的静态站（唯一外链资源是 Font Awesome），为一个
-   两万点的星球塞进 900 KB 的渲染库不划算。这里只用原生 WebGL1：
-   三个着色器、三个缓冲，几何在加载时一次性生成。
+   一万七千点的星球塞进 900 KB 的渲染库不划算。这里只用原生 WebGL1：
+   两个 program（点云 + 线框球）、三个缓冲，几何在加载时一次性生成。
 
-   参考设计：NASA-Punk Observatory（deep navy + 测绘图底纹 + 线框球）。
-   抄的是"调子"，不是代码：
-   · 第 3 节把噪声场的等值线画成底纹（等高线 + 120px 网格 + 150 颗星点）；
-   · 星球本体是一族蓝色的点云，横条带来自纬向拉伸的噪声（y 放大 6 倍），
-     另外套一层 12 条经线 + 7 条纬线的线框球（gl.LINES）——点云是实体，
+   星球的模样照参考设计（NASA-Punk Observatory 的海王星）做，只动星球：
+   · 本体是一族蓝色的点云，横条带来自纬向拉伸的噪声（y 放大 6 倍），
+     再套一层 12 条经线 + 7 条纬线的线框球（gl.LINES）——点云是实体，
      线框是仪表感；
-   · 92 颗台站点点在球面上闪（琥珀 / 橙），环带三圈按开普勒比例 ω ∝ r^-1.5
+   · 90 颗台站点点在球面上闪（琥珀 / 橙），环带三圈按开普勒比例 ω ∝ r^-1.5
      各转各的，卫星沿轨道跑；
-   · 相机固定在 +Z，靠 uDist 缩放；打开深度测试（加色混合 + 写深度），
-     背面点被正面挡住，星球才有实体感，否则只是一团发光的雾。
+   · 一束左上偏前的光：正面亮、背面暗，球才有体积；
+   · 相机固定在 +Z，靠 uDist 缩放；打开深度测试（写深度），背面点被正面
+     挡住，星球才有实体感，否则只是一团发光的雾。
+   页面皮肤（底色、字体、色标、导航）不在这里 —— hero 还是浅色玻璃那一套，
+   所以浅色主题走正常混合（蓝墨点），深色主题走加色混合（霓虹辉光）。
 
    降级：没有 WebGL 或着色器编译失败 → 给 .hero 加 .no-3d，用纯 CSS
-   的星球顶上；底纹与遥测数字照常（它们只依赖 2D canvas 与 DOM）。
+   的星球顶上；遥测数字照常跳动（它只依赖 DOM）。
 
    遥测：数值源头是 /stats.json（仓库里的静态快照，由 check_site.py 与页面
    静态值强制一致），页面按"基线 + 速率 × 经过分钟数"每秒本地推算，
@@ -141,94 +142,7 @@
     return (y0 + (y1 - y0) * w) * 2 - 1;          // → [-1, 1]
   }
 
-  /* ═════════════ 3. 观测台底纹：等高线 + 十字网格 + 星点 ═════════════
-     做法照着参考实现（NASA-Punk Observatory 的 topoRenderer）：把噪声场的
-     等值线画成 1.8px 细线，压一层 120px 测绘图网格与 150 颗星点。它是整块
-     hero 的底子 —— 深蓝绒面上只有航线图，没有卡片、没有边框。 */
-  (function topo() {
-    var cv = document.getElementById("heroTopo");
-    if (!cv || !cv.getContext) return;
-    var ctx = cv.getContext("2d");
-    var LINE = "#3b4e6b", CELL = 5, SCALE = 0.0021, LEVELS = 6, GRID = 120, STARS = 150, PHASE = 41.5;
-
-    function paint() {
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var rect = cv.getBoundingClientRect();
-      var w = Math.round(rect.width), h = Math.round(rect.height);
-      if (w < 8 || h < 8) return;
-      cv.width = Math.round(w * dpr);
-      cv.height = Math.round(h * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, w, h);
-
-      // 1) 测绘图网格 + 交点十字
-      var x, y, i, j, k, lv, pts = [];
-      ctx.strokeStyle = LINE; ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.05;
-      ctx.beginPath();
-      for (x = 0; x <= w; x += GRID) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
-      for (y = 0; y <= h; y += GRID) { ctx.moveTo(0, y); ctx.lineTo(w, y); }
-      ctx.stroke();
-      ctx.globalAlpha = 0.125;
-      ctx.beginPath();
-      for (x = 0; x <= w; x += GRID) {
-        for (y = 0; y <= h; y += GRID) {
-          ctx.moveTo(x - 3, y); ctx.lineTo(x + 3, y);
-          ctx.moveTo(x, y - 3); ctx.lineTo(x, y + 3);
-        }
-      }
-      ctx.stroke();
-
-      // 2) 星点（种子固定：换窗口大小也不会重排）
-      var sr = mulberry32(0x4e415341);
-      ctx.fillStyle = "#ffffff";
-      for (i = 0; i < STARS; i++) {
-        var sx = sr() * w, sy = sr() * h, srad = sr() * 1.5 + 0.3;
-        ctx.globalAlpha = sr() * 0.6 + 0.1;
-        ctx.beginPath(); ctx.arc(sx, sy, srad, 0, Math.PI * 2); ctx.fill();
-      }
-
-      // 3) 等高线：噪声场按 5px 采样，逐格找等值线穿过的那条边
-      var cols = Math.ceil(w / CELL) + 1, rows = Math.ceil(h / CELL) + 1;
-      var f = new Float32Array(cols * rows);
-      for (i = 0; i < cols; i++) {
-        for (j = 0; j < rows; j++) {
-          f[j * cols + i] = (noise3(i * CELL * SCALE + PHASE, j * CELL * SCALE + PHASE, PHASE * 0.5) + 1) * 0.5;
-        }
-      }
-      ctx.globalAlpha = 0.5; ctx.strokeStyle = LINE; ctx.lineWidth = 1.8;
-      ctx.lineCap = "round"; ctx.lineJoin = "round";
-      var step = 1 / LEVELS;
-      for (lv = 0.2; lv < 0.8; lv += step) {
-        ctx.beginPath();
-        for (i = 0; i < cols - 1; i++) {
-          for (j = 0; j < rows - 1; j++) {
-            var a = f[j * cols + i], b = f[j * cols + i + 1],
-                c = f[(j + 1) * cols + i], d = f[(j + 1) * cols + i + 1];
-            if ((a < lv && b < lv && c < lv && d < lv) || (a > lv && b > lv && c > lv && d > lv)) continue;
-            pts.length = 0;
-            if ((a < lv) !== (b < lv)) pts.push(i + (lv - a) / (b - a), j);         // 上边
-            if ((b < lv) !== (d < lv)) pts.push(i + 1, j + (lv - b) / (d - b));     // 右边
-            if ((c < lv) !== (d < lv)) pts.push(i + (lv - c) / (d - c), j + 1);     // 下边
-            if ((a < lv) !== (c < lv)) pts.push(i, j + (lv - a) / (c - a));         // 左边
-            for (k = 0; k + 3 < pts.length; k += 4) {
-              ctx.moveTo(pts[k] * CELL, pts[k + 1] * CELL);
-              ctx.lineTo(pts[k + 2] * CELL, pts[k + 3] * CELL);
-            }
-          }
-        }
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    paint();
-    if (window.ResizeObserver) new ResizeObserver(paint).observe(cv);
-    else window.addEventListener("resize", paint, { passive: true });
-    window.__heroTopo = { paint: paint };          // 自检钩子：底纹能重画
-  })();
-
-  /* ═════════════ 4. 3D 星球 ═════════════ */
+  /* ═════════════ 3. 3D 星球 ═════════════ */
   var canvas = document.getElementById("planetCanvas");
   var hero = document.querySelector(".hero");
   if (!canvas || !hero || !canvas.getContext) return;
@@ -390,7 +304,7 @@
     "  float d = uDist - p.z;",
     "  gl_Position = vec4(p.x * uProj / uAspect + uCenter.x, p.y * uProj + uCenter.y, d - uDist, d);",
     "  vec3 L = normalize(vec3(-0.45, 0.42, 0.79));",   // 左上偏前的一束光
-    "  float lam = 0.45 + 0.65 * max(dot(normalize(p), L), 0.0);",
+    "  float lam = 0.58 + 0.52 * max(dot(normalize(p), L), 0.0);",
     "  float tw = 0.5 + 0.5 * sin(uTime * aMeta.y + aPos.x * 9.0 + aPos.z * 5.0 + aPos.y * 3.0);",
     "  float k = mix(1.0, 0.34 + 1.20 * tw, aMeta.z) * lam;",
     "  float pick = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719)) + uSeed) * 43758.5453);",
@@ -528,11 +442,12 @@
   gl.depthMask(true);
   gl.clearColor(0, 0, 0, 0);                       // 画布全透明：点之外什么都不画，所以没有"面板"
 
-  /* hero 现在两套主题都是深蓝台面，所以两边都用加色混合（点叠成辉光）；
-     深色主题再把色调与线框推亮一档，免得整块发闷。 */
+  /* 深浅主题共用同一份几何，只换混合函数、色调与线框：
+     浅底用正常混合（蓝墨点压在浅底上），深底用加色混合（同样的点变霓虹辉光）。
+     线框在浅底上要更实一点才看得见，颜色也往靛蓝收一档。 */
   var MODES = {
-    light: { add: true, tint: [1.06, 1.10, 1.20], alpha: 0.95, wire: 0.115 },
-    dark: { add: true, tint: [1.08, 1.12, 1.26], alpha: 0.88, wire: 0.075 }
+    light: { add: false, tint: [1.00, 1.00, 1.00], alpha: 1.00, wire: 0.42, wireCol: [0.15, 0.33, 0.68] },
+    dark: { add: true, tint: [1.08, 1.12, 1.26], alpha: 0.88, wire: 0.55, wireCol: [0.42, 0.62, 1.00] }
   };
   var dark = false;
   function syncMode() {
@@ -603,7 +518,7 @@
     gl.uniform1f(WU.uProj, U_PROJ);
     gl.uniform1f(WU.uAspect, w / h);
     gl.uniform2f(WU.uCenter, f.cx * 2 - 1, 1 - f.cy * 2);
-    gl.uniform3f(WU.uColor, 0.42, 0.62, 1.0);
+    gl.uniform3f(WU.uColor, m.wireCol[0], m.wireCol[1], m.wireCol[2]);
     gl.uniform1f(WU.uAlpha, m.wire);
     gl.bindBuffer(gl.ARRAY_BUFFER, wBuf);
     gl.vertexAttribPointer(WA.pos, 3, gl.FLOAT, false, 0, 0);

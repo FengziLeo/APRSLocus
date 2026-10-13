@@ -248,9 +248,7 @@
   const refreshVersion = (() => {
     const els = [
       document.querySelector(".nav-cta"),
-      // 只改徽章里那个 <b>：直接写徽章的 textContent 会把里面的
-      // 呼吸点 / 分隔线 / TOUCH SKY 标签一并抹掉，只剩一行裸文字。
-      document.querySelector(".hero-badge b"),
+      document.querySelector(".hero-badge"),
     ].filter(Boolean);
     if (!els.length) return;
     // 各语言页显示版本号文本形如 "v1.6.18"/"下载 v1.6.18"，只替换版本部分

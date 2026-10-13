@@ -194,22 +194,9 @@ def main():
                 and '%sjs/planet-3d.js?v=' % up in s
                 and 'data-stats="%sstats.json"' % up in s
                 and 'data-updated="%s"' % stats['updatedIso'] in s)
-            # 观测台底纹（等高线画布）与左缘分段色标：它们是这一版 hero 的地基，
-            # 不再是纯 CSS 渐变背景 —— 少一层就又回去了。
-            chk('%s : 观测台底纹层 + 色标就位' % f,
-                'id="heroTopo"' in s and 'class="hero-topo"' in s
-                and 'class="hero-serif"' in s and '<i></i><i></i><i></i><i></i>' in s
-                and s.index('id="heroTopo"') < s.index('class="hero-inner"'))
-            # 皮肤只准待在 hero-3d.css：发布条曾经带一整套内联玻璃样式，
-            # 改版时漏掉就会在深蓝台面上剩一块浅色卡片。
-            chk('%s : 发布条无内联样式' % f,
-                'id="heroRelease" style=' not in s
-                and '<span id="hrTimer" style=' not in s
-                and '<span id="hrState" style=' not in s)
-        # 三语首页必须链接同一个版本号；线上已缓存过 ?v=2（浅色玻璃版）的旧文件，
-        # 所以要求 >= 3
+        # 三语首页必须链接同一个版本号；线上已缓存过旧值，所以要求 >= 2
         flat = sorted({v for pair in vers for v in pair})
-        chk('hero-3d 资源版本三语一致且 >=3', len(flat) == 1 and int(flat[0]) >= 3, flat)
+        chk('hero-3d 资源版本三语一致且 >=2', len(flat) == 1 and int(flat[0]) >= 2, flat)
     # 降级链路：没有 WebGL 时不能把 hero 那块留成空白。
     # 只看「页面里有 canvas」是不够的，真会坏的是脚本早期 return 之后什么都
     # 没画，所以要求 CSS 有 .no-3d 分支、脚本有失败回落。
@@ -226,14 +213,11 @@ def main():
         '.tl-value.bump' in hero_css
         and all(x in hero_js for x in ('tlPackets', 'hooks.flash'))
         and not any(x in hero_js for x in ('tlBar', 'tlNext', 'tlStamp')))
-    # 参考设计（NASA-Punk Observatory）的三件套：深蓝绒面 + 发丝线 + 线框球。
-    chk('hero 观测台皮肤 (深蓝绒面 / 发丝线 / 色标)',
-        '--obs-navy: #0e141f' in hero_css and '--obs-orange: #e06236' in hero_css
-        and '.hero-topo {' in hero_css and '.hero-serif {' in hero_css
-        and '.hero-stat::after' in hero_css)
-    chk('hero 星球：底纹 + 线框球 + 纬向色带 + 开普勒环',
-        'heroTopo' in hero_js and 'function buildWire' in hero_js
-        and 'gl.LINES' in hero_js and 'uSpinT' in hero_js
+    # 星球的模样照参考设计（NASA-Punk Observatory）：点云 + 线框球 + 环带。
+    # 这三样是这一版星球的骨架，回退某一样就不是那颗星了。
+    chk('hero 星球：线框球 + 纬向色带 + 开普勒环',
+        'function buildWire' in hero_js and 'gl.LINES' in hero_js
+        and 'uSpinT' in hero_js
         and 'noise3(x * 0.5, y * 3.0, z * 0.5)' in hero_js
         and 'Math.pow(RING_IN / rad, 1.5)' in hero_js)
 

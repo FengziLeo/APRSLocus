@@ -10,6 +10,7 @@ import 'pos_quality.dart';
 import 'state.dart';
 import 'widgets.dart';
 import 'station_detail.dart';
+import 'station_note.dart';
 import 'tile_map.dart';
 import 'vector_map.dart';
 import 'immersive_page.dart';
@@ -1078,7 +1079,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           borderRadius: BorderRadius.circular(12),
           boxShadow: elev2(),
         ),
-        child: Text(
+        // 备注里常带网址（中继频点表 / 活动页），这里也交 StationNote 渲染，
+        // 让地图浮窗里的链接可直接点开 —— 与台站列表、详情页保持一致。
+        child: StationNote(
           info.toString(),
           style: ts(11, c: s.color, w: FontWeight.w700),
         ),

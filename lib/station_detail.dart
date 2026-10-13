@@ -12,6 +12,7 @@ import 'widgets.dart';
 import 'coord.dart';
 import 'early_member.dart';
 import 'honor_wall_page.dart';
+import 'station_note.dart';
 
 class StationDetail extends StatefulWidget {
   final AppState state;
@@ -238,9 +239,18 @@ class _StationDetailState extends State<StationDetail> {
                                   ),
                                   SizedBox(height: 3),
                                   Text(
-                                    '${localizedAprsSymbolName(context, s.symbol)} · ${s.comment ?? ''}',
+                                    localizedAprsSymbolName(context, s.symbol),
                                     style: ts(12, c: C.slate),
                                   ),
+                                  // 位置报文备注：**单独一行、可换行不截断**，且识别网址。
+                                  // 与台站列表保持一致的展示（列表那边见 stations_page）。
+                                  if ((s.comment ?? '').trim().isNotEmpty) ...[
+                                    SizedBox(height: 2),
+                                    StationNote(
+                                      (s.comment ?? '').trim(),
+                                      style: ts(12, c: C.slate),
+                                    ),
+                                  ],
                                   // 独立状态报文（DTI `>`）：与上面那行「位置报文备注」
                                   // 是两种报文，所以**分两行**显示、用紫色区分 ——
                                   // 中继台常把「设备来源」（Powered by …）写在状态报文里，

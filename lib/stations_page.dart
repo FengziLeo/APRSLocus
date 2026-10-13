@@ -10,6 +10,7 @@ import 'state.dart';
 import 'aprs_device.dart';
 import 'widgets.dart';
 import 'station_detail.dart';
+import 'station_note.dart';
 import 'stats_panel.dart';
 import 'material.dart';
 
@@ -954,7 +955,7 @@ class _StationsPageState extends State<StationsPage> {
                         children: [
                           Flexible(
                             child: Text(
-                              '${localizedAprsSymbolName(context, s.symbol)} · ${s.comment ?? ''}',
+                              localizedAprsSymbolName(context, s.symbol),
                               style: ts(11, c: C.slate),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -964,6 +965,17 @@ class _StationsPageState extends State<StationsPage> {
                           if (s.deviceName != null) ...[SizedBox(width: 6), _devicePill(s)],
                         ],
                       ),
+                      // 台站备注：**单独一行、可换行、不截断**。原来它和上面那行
+                      // 「符号名」挤在一起且 `maxLines: 1`，稍长的备注（中继频点 /
+                      // 天气 / 活动）就被省略号吃掉；现改由 StationNote 完整展示，
+                      // 并识别备注里的网址（可点、交系统浏览器打开）。
+                      if ((s.comment ?? '').trim().isNotEmpty) ...[
+                        SizedBox(height: 4),
+                        StationNote(
+                          (s.comment ?? '').trim(),
+                          style: ts(11, c: C.slate),
+                        ),
+                      ],
                       SizedBox(height: 6),
                       Wrap(
                         spacing: 14,

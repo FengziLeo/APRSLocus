@@ -365,11 +365,13 @@
     "  rip = min(rip, 1.5);",
     "  p += hn * body * uWave * (wv * 0.021 + rip * 0.070);",
     "  float d = uDist - p.z;",
-    // 画面 roll：先把投影摆进屏幕空间（含 aspect 修正）再整体转 uCosR/uSinR ——
-    // 在除以 aspect 之前转会变成拉伸而不是旋转；在加 uCenter 之前转，星球才不会跑位。
-    "  vec2 sc = vec2(p.x * uProj / uAspect, p.y * uProj);",
-    "  gl_Position = vec4(sc.x * uCosR - sc.y * uSinR + uCenter.x,",
-    "                      sc.x * uSinR + sc.y * uCosR + uCenter.y, d - uDist, d);",
+    // 画面 roll 是**绕视轴的旋转**，所以要在物体屏幕平面 (x,y) 上转，转完再除
+    // aspect 投到 NDC。反过来（先除 aspect、再在 NDC 里转）不是旋转：x 已经被
+    // 压过 1/aspect，转完等价于给整颗星做一次剪切 —— 16:9 屏在像素空间里会长出
+    // 一条 16% 的椭圆，21:9 时 20%，屏越宽星越扁。这就是"星球变鸡蛋"的真身。
+    "  vec2 rp = vec2(p.x * uCosR - p.y * uSinR, p.x * uSinR + p.y * uCosR);",
+    "  vec2 sc = vec2(rp.x * uProj / uAspect, rp.y * uProj);",
+    "  gl_Position = vec4(sc.x + uCenter.x, sc.y + uCenter.y, d - uDist, d);",
     "  vec3 L = normalize(vec3(-0.45, 0.42, 0.79));",   // 左上偏前的一束光
     "  float lam = 0.58 + 0.52 * max(dot(normalize(hn), L), 0.0);",
     "  float tw = 0.5 + 0.5 * sin(uTime * aMeta.y + aPos.x * 9.0 + aPos.z * 5.0 + aPos.y * 3.0);",
@@ -416,9 +418,10 @@
     "  vec3 p = vec3(a.x * cy + a.z * sy, a.y, a.z * cy - a.x * sy);",
     "  p = vec3(p.x, p.y * uCosP - p.z * uSinP, p.y * uSinP + p.z * uCosP);",
     "  float d = uDist - p.z;",
-    "  vec2 sc = vec2(p.x * uProj / uAspect, p.y * uProj);",   // 与点云同一套 roll
-    "  gl_Position = vec4(sc.x * uCosR - sc.y * uSinR + uCenter.x,",
-    "                      sc.x * uSinR + sc.y * uCosR + uCenter.y, d - uDist, d);",
+    // 与点云同一套 roll：先绕视轴转 (x,y)，再除 aspect
+    "  vec2 rp = vec2(p.x * uCosR - p.y * uSinR, p.x * uSinR + p.y * uCosR);",
+    "  vec2 sc = vec2(rp.x * uProj / uAspect, rp.y * uProj);",
+    "  gl_Position = vec4(sc.x + uCenter.x, sc.y + uCenter.y, d - uDist, d);",
     "  vFace = clamp(p.z * 1.1 + 0.5, 0.0, 1.0);",      // 背面的线更淡
     "}"
   ].join("\n");
@@ -577,8 +580,9 @@
        所以只给 0.10（约 6°）：环带是一道薄透镜，不再是那条横线，也不大口吃掉
        那颗球。真想要「从上往下看」，得同时把环带半径收进去 —— 那是改设计，
        先说一声再做。
-     两者都只做整体摆位，不参与自转：yaw 只管星球自己转。roll 写在**屏幕
-     空间**（投影之后、加 uCenter 之前），否则除以 aspect 会把它压成椭圆变形。 ── */
+     两者都只做整体摆位，不参与自转：yaw 只管星球自己转。roll 是绕视轴的旋转，
+     写在**物体屏幕平面 (x,y)、除 aspect 之前**（见顶点着色器里那段注）——
+     「先除 aspect、再在 NDC 里转」会把旋转变成剪切，屏越宽星越扁。 ── */
   var VIEW_ELEV = 0.10;                            // 0 = 正侧视；越大环带越扁、越像椭圆
   var VIEW_ROLL = 0.12;                            // 0 = 极轴向上，正数 = 往左上倒
   var yaw = 0.55, tYaw = yaw;                      // yaw 只在自转里往前走

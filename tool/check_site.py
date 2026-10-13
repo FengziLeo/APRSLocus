@@ -151,6 +151,53 @@ def main():
             '缺=%s 多=%s' % ([x for x in ref_nav if x not in nav],
                             [x for x in nav if x not in ref_nav]))
 
+    print('[hero 3d]')
+    # 首页 Hero：左侧 3D 星球（原生 WebGL 点云）+ 右侧累计报文遥测。
+    #
+    # 数值只该有一个源头：docs/stats.json。页面里的静态回退值（无 JS 或
+    # stats.json 抓取失败时显示的那个数）必须与它一致 —— 只判「页面上有数字」
+    # 是抓不到真问题的：改了 stats.json 忘了改页面，表现就是三语首页各显示
+    # 一个不同的累计量，而旧判据全绿。
+    try:
+        stats = json.loads(read('docs/stats.json'))
+        chk('docs/stats.json 可解析 + 字段齐',
+            all(k in stats for k in ('packets', 'packetsPerMinute', 'updated', 'updatedIso')))
+    except Exception as e:
+        stats = None
+        chk('docs/stats.json 可解析', False, e)
+    if stats:
+        pk = '{:,}'.format(stats['packets'])
+        for f in ('docs/index.html', 'docs/zh-TW/index.html', 'docs/en/index.html'):
+            s = read(f)
+            up = '' if f == 'docs/index.html' else '../'
+            chk('%s : hero 三件套齐、旧手机示意已撤' % f,
+                'class="hero-stage"' in s and 'id="planetCanvas"' in s
+                and 'id="heroTelemetry"' in s and 'hero-phone' not in s
+                and 'data-stale-title="' in s)
+            chk('%s : 遥测静态值 = stats.json' % f,
+                'data-packets="%d"' % stats['packets'] in s
+                and 'data-rate="%d"' % stats['packetsPerMinute'] in s
+                and 'id="tlPackets">%s<' % pk in s
+                and 'id="tlStamp">%s<' % stats['updated'] in s
+                and 'id="tlRateNum">+%d<' % stats['packetsPerMinute'] in s)
+            chk('%s : hero-3d 资源接线' % f,
+                '%scss/hero-3d.css?v=1' % up in s
+                and '%sjs/planet-3d.js?v=1' % up in s
+                and 'data-stats="%sstats.json"' % up in s
+                and 'data-updated="%s"' % stats['updatedIso'] in s)
+    # 降级链路：没有 WebGL 也不能在面板里留一块空白。
+    # 只看「页面里有 canvas」是不够的 —— 真会坏的是脚本早期 return 之后
+    # 舷窗里什么都没有，所以要求 CSS 有 .no-3d 分支、脚本有失败回落。
+    hero_css = read('docs/css/hero-3d.css')
+    hero_js = read('docs/js/planet-3d.js')
+    chk('hero-3d.css 大括号平衡', hero_css.count('{') == hero_css.count('}'))
+    chk('hero 降级链路 (no-3d / no-webgl)',
+        '.hero-stage.no-3d' in hero_css and 'no-webgl' in hero_js
+        and 'classList.add("no-3d")' in hero_js)
+    chk('hero 遥测跳动三件 (bump / bar / next)',
+        all(x in hero_css for x in ('.tl-value.bump', '.tl-bar i'))
+        and all(x in hero_js for x in ('tlPackets', 'tlBar', 'tlNext')))
+
     print('[help center x3]')
     for f in ['docs/faq.html', 'docs/zh-TW/faq.html', 'docs/en/faq.html']:
         s = read(f)

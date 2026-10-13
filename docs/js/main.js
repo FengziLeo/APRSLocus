@@ -244,20 +244,6 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  /* ── 手机模拟器：地图 / 聊天切换（悬停已支持，滚动到视口时更明显） ── */
-  const phone = document.querySelector(".hero-phone");
-  if (phone && "IntersectionObserver" in window) {
-    const pio = new IntersectionObserver((es) => {
-      es.forEach((e) => {
-        if (e.isIntersecting) {
-          phone.classList.add("in-view");
-          pio.unobserve(phone);
-        }
-      });
-    });
-    pio.observe(phone);
-  }
-
   /* ── 自动拉取 GitHub 最新版本号，替换页面上的静态版本（下载按钮 / Hero 徽章） ── */
   const refreshVersion = (() => {
     const els = [

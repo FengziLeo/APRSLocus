@@ -1,0 +1,267 @@
+/* ══════════════════════════════════════════════════════════════════════
+   Hero：3D 星球 + 累计报文遥测（首页三语共用）
+   ──────────────────────────────────────────────────────────────────────
+   为什么单独一个文件：style.css 被 46 个页面以 ?v=7 引用，动它就得全站
+   改版本号；这块只有三语首页 hero 用到，独立文件 + 独立 ?v=1 更省事，
+   回滚也只涉及两个 <link>/<script> 与 hero 里的一段 DOM。
+
+   面板在浅色 / 深色主题下都保持"深色舷窗"（NASApunk 控制台的原型就是
+   深色 CRT），所以这里的颜色不走 --glass / --line 那套变量，自成一组。
+   ══════════════════════════════════════════════════════════════════════ */
+
+.hero-inner {
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr);
+  grid-template-areas: "stage copy" "stage dock";
+  gap: 26px 54px;
+  align-items: center;
+}
+
+/* ── 星球舷窗 ── */
+.hero-stage {
+  grid-area: stage;
+  position: relative;
+  isolation: isolate;
+  padding: 16px;
+  border-radius: 22px;
+  background: radial-gradient(72% 62% at 50% 40%, #0d1c31 0%, #060b16 70%);
+  border: 1px solid rgba(125, 211, 252, .18);
+  box-shadow: 0 34px 80px rgba(6, 14, 30, .46), inset 0 0 70px rgba(23, 150, 216, .10);
+}
+.planet-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 540px;
+  border-radius: 14px;
+  background: #060b16;
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+.planet-canvas:focus-visible { box-shadow: 0 0 0 3px rgba(56, 189, 248, .55); }
+.hero-stage.grabbing .planet-canvas { cursor: grabbing; }
+
+/* 舷窗 HUD：四角括号 + 双侧标签 + 拖动提示（都是装饰，pointer-events 关闭） */
+.stage-frame { position: absolute; inset: 16px; z-index: 3; pointer-events: none; border-radius: 14px; }
+.stage-frame .c {
+  position: absolute; width: 20px; height: 20px;
+  border: 1.5px solid rgba(125, 211, 252, .55);
+}
+.stage-frame .c.tl { top: 6px; left: 6px; border-right: 0; border-bottom: 0; border-radius: 4px 0 0 0; }
+.stage-frame .c.tr { top: 6px; right: 6px; border-left: 0; border-bottom: 0; border-radius: 0 4px 0 0; }
+.stage-frame .c.bl { bottom: 6px; left: 6px; border-right: 0; border-top: 0; border-radius: 0 0 0 4px; }
+.stage-frame .c.br { bottom: 6px; right: 6px; border-left: 0; border-top: 0; border-radius: 0 0 4px 0; }
+.stage-tag {
+  position: absolute; top: 12px; left: 30px;
+  font: 700 10.5px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(147, 197, 253, .78);
+}
+.stage-tag.r { left: auto; right: 30px; color: rgba(148, 197, 253, .5); }
+.stage-hint {
+  position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  padding: 6px 14px; border-radius: 999px;
+  background: rgba(6, 14, 30, .72);
+  border: 1px solid rgba(125, 211, 252, .22);
+  color: rgba(198, 226, 250, .86);
+  font-size: 12px; font-weight: 600; letter-spacing: .02em;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: opacity .3s var(--ease);
+}
+.stage-hint i {
+  width: 14px; height: 9px; border-radius: 5px;
+  border: 1.4px solid currentColor; position: relative;
+}
+.stage-hint i::after {
+  content: ""; position: absolute; left: 50%; top: 1.2px; transform: translateX(-50%);
+  width: 1.4px; height: 3.4px; border-radius: 1px; background: currentColor;
+  animation: stageWheel 2.4s ease-in-out infinite;
+}
+@keyframes stageWheel { 0%, 100% { transform: translate(-50%, 0); opacity: .5; } 50% { transform: translate(-50%, 2.6px); opacity: 1; } }
+.hero-stage.grabbing .stage-hint { opacity: 0; }
+.stage-scan {
+  position: absolute; inset: 16px; z-index: 2; pointer-events: none; border-radius: 14px;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, .045) 0 1px, transparent 1px 4px);
+  opacity: .55;
+}
+
+/* 没有 WebGL：退回纯 CSS 星球（观感差一档，但不留空白） */
+.planet-fallback { display: none; }
+.hero-stage.no-3d .planet-canvas { display: none; }
+.hero-stage.no-3d .stage-hint { display: none; }
+.hero-stage.no-3d .planet-fallback {
+  display: block; position: relative; width: 100%; aspect-ratio: 1 / 1;
+  max-height: 540px; border-radius: 14px;
+  background: radial-gradient(circle at 50% 44%, #0e2b4a, #061020 72%);
+}
+.planet-fallback .pf-globe {
+  position: absolute; left: 50%; top: 45%; width: 50%; aspect-ratio: 1;
+  transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle at 36% 32%, #8be1ff, #1796d8 42%, #0b4776 72%, #07203a 100%);
+  box-shadow: 0 0 70px rgba(23, 150, 216, .55), inset -14px -10px 40px rgba(0, 0, 0, .55);
+}
+.planet-fallback .pf-ring {
+  position: absolute; left: 50%; top: 45%; width: 88%; height: 26%;
+  transform: translate(-50%, -50%) rotate(-15deg); border-radius: 50%;
+  border: 2px solid rgba(125, 211, 252, .5);
+  box-shadow: 0 0 26px rgba(125, 211, 252, .3);
+}
+
+/* ── 累计报文遥测（仪表条：读数一行、尾随三项横排，尽量矮） ── */
+.hero-telemetry {
+  grid-area: dock;
+  position: relative;
+  padding: 15px 18px 13px;
+  border-radius: 20px;
+  background: linear-gradient(150deg, rgba(9, 18, 34, .95), rgba(6, 11, 22, .92));
+  border: 1px solid rgba(125, 211, 252, .20);
+  box-shadow: 0 24px 54px rgba(6, 14, 30, .40);
+  color: #dff3ff;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+.hero-telemetry::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, #8be1ff, #1796d8 55%, transparent);
+}
+.tl-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tl-kicker {
+  font: 700 10.5px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: .18em; text-transform: uppercase; color: rgba(147, 197, 253, .8);
+}
+.tl-live {
+  display: inline-flex; align-items: center; gap: 7px;
+  font: 700 10.5px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: .16em; color: #8be1ff;
+}
+.tl-live i {
+  width: 7px; height: 7px; border-radius: 50%; background: #4ade80;
+  box-shadow: 0 0 10px rgba(74, 222, 128, .9); position: relative;
+}
+.tl-live i::after {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%;
+  border: 1.5px solid rgba(74, 222, 128, .85); animation: pulse 1.8s ease-out infinite;
+}
+.tl-main { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 10px 0 2px; }
+.tl-label { flex-basis: auto; margin-right: 2px; font-size: 12.5px; color: rgba(190, 220, 245, .72); letter-spacing: .02em; }
+.tl-value {
+  display: inline-block;
+  font: 800 clamp(26px, 2.9vw, 38px)/1.05 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: -.01em;
+  background: linear-gradient(120deg, #ffffff, #8be1ff 70%, #38bdf8);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 6px 22px rgba(56, 189, 248, .35));
+}
+.tl-value.bump { animation: tlBump .5s ease-out; }
+@keyframes tlBump {
+  0% { transform: translateY(-2px) scale(1.035); filter: drop-shadow(0 0 18px rgba(139, 225, 255, .85)); }
+  100% { transform: none; }
+}
+.tl-unit {
+  font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: .14em; text-transform: uppercase; color: rgba(147, 197, 253, .72);
+}
+.tl-rows {
+  display: flex; flex-wrap: wrap; gap: 2px 20px;
+  margin-top: 10px; padding-top: 4px;
+  border-top: 1px solid rgba(125, 211, 252, .14);
+}
+.tl-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 4px 0; font-size: 12px; color: rgba(190, 220, 245, .72);
+}
+/* 横排时的项间隔用竖细线；这一版不再用上边框，否则会变成一道横分割线 */
+.tl-row + .tl-row { position: relative; padding-left: 20px; }
+.tl-row + .tl-row::before {
+  content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 12px; background: rgba(125, 211, 252, .18);
+}
+.tl-row b {
+  font: 700 12.5px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #dff3ff; letter-spacing: .01em;
+}
+.tl-row b i { font-style: normal; color: #8be1ff; }
+.tl-bar {
+  position: relative; height: 3px; margin-top: 10px; border-radius: 3px;
+  background: rgba(125, 211, 252, .16); overflow: hidden;
+}
+.tl-bar i {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, #1796d8, #8be1ff);
+  box-shadow: 0 0 12px rgba(139, 225, 255, .7);
+  transition: width .9s linear;
+}
+.tl-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-top: 7px;
+  font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: .06em; color: rgba(148, 197, 253, .62);
+}
+.tl-foot b { color: #8be1ff; }
+
+/* 快照过期（> 12h）：停止推算，LIVE 点变琴色并停掉呼吸动画 */
+.hero-telemetry.stale .tl-live { color: rgba(190, 220, 245, .62); }
+.hero-telemetry.stale .tl-live i { background: #fbbf24; box-shadow: 0 0 10px rgba(251, 191, 36, .8); }
+.hero-telemetry.stale .tl-live i::after { display: none; }
+.hero-telemetry.stale .tl-bar i { background: rgba(148, 197, 253, .5); box-shadow: none; transition: none; }
+
+/* ── 两栏布局下的尺寸收窄（只影响三语首页：hero-3d.css 只有它们加载） ──
+   旧版 hero 是「文字在上、手机示意居中」的单栏叙事，改成「左星球 / 右文案 + 遥测」
+   两栏后右栏要同时装下文案与仪表：按原尺寸量出来 1046px，900 高的屏上遥测直接被
+   推到折线以下（读数看不见，这个功能就白做了）。这里只收窄、不重排版：
+   巨型字标从 96px 降到 72px（原来在 562px 宽的栏里会折成两行），段落与 meta 的
+   上下间距各减一档，hero 上下留白各减 20px；1440×900 实测 hero 总高 950、遥测底边 925（折线以下 25px），
+    于是再收一轮：上留白 118→88、下留白 62→46，段落与 meta 各再减几像素，
+    读数在 900 高的屏上就能完整看见。 */
+.hero { padding: 88px clamp(20px, 6vw, 96px) 46px; }
+.hero-wordmark { font-size: clamp(44px, 5vw, 72px); margin: 4px 0 10px; }
+.hero-sub { margin: 16px 0 20px; }
+.hero-meta { margin-top: 16px; }
+.hero-badge { margin-bottom: 14px; }
+
+/* 登场：跟 .hero-copy 的子元素同一套门控（预加载遮罩消失后才播） */
+.hero-stage, .hero-telemetry {
+  opacity: 0;
+  animation: heroPop 1s var(--ease) both;
+  animation-play-state: paused;
+}
+.hero-stage { animation-delay: .2s; }
+.hero-telemetry { animation-delay: .8s; }
+body.loaded .hero-stage, body.loaded .hero-telemetry { animation-play-state: running; }
+
+/* ── 响应式：窄屏改单列，星球在上、文字居中、遥测垫底 ── */
+@media (max-width: 1024px) {
+  .hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "stage" "copy" "dock";
+    gap: 34px;
+    justify-items: center;
+  }
+  .hero-stage, .hero-telemetry { width: 100%; max-width: 620px; }
+  .planet-canvas, .hero-stage.no-3d .planet-fallback { aspect-ratio: 5 / 4; max-height: 420px; }
+  .hero-copy { text-align: center; }
+  .hero-badge, .hero-actions, .hero-meta { justify-content: center; }
+  .hero-sub { margin-left: auto; margin-right: auto; }
+}
+@media (max-width: 620px) {
+  .hero-stage { padding: 11px; border-radius: 18px; }
+  .stage-frame, .stage-scan { inset: 11px; }
+  .stage-tag { font-size: 9.5px; letter-spacing: .12em; left: 24px; top: 10px; }
+  .stage-tag.r { display: none; }
+  .stage-hint { bottom: 16px; font-size: 11px; padding: 5px 11px; }
+  .planet-canvas, .hero-stage.no-3d .planet-fallback { aspect-ratio: 4 / 3; max-height: 320px; }
+  .hero-telemetry { padding: 14px 15px 12px; border-radius: 17px; }
+  /* 窄屏一行放不下三个读数：回到竖排，项间换回上边框 */
+  .tl-rows { display: block; gap: 0; }
+  .tl-row + .tl-row { padding-left: 0; border-top: 1px dashed rgba(125, 211, 252, .10); }
+  .tl-row + .tl-row::before { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* style.css 里整站 animation:none !important；入场动画被关掉后，
+     必须把 opacity 收回来，否则这两个块永远是隐形的 */
+  .hero-stage, .hero-telemetry { opacity: 1; transform: none; }
+  .stage-hint i::after { animation: none !important; }
+  .stage-hint { opacity: .92; }
+}

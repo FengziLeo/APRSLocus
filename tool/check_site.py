@@ -188,6 +188,12 @@ def main():
             # 只报数字：上限/时间戳/进度条这类"像上传面板"的元信息都不要再出现
             chk('%s : 只留跳动数字（无时间戳/进度条）' % f,
                 not any(x in s for x in ('tlStamp', 'tlInc', 'tlBar', 'tlNext', 'tl-bar')))
+            # 读数竖排三级：标签（这是什么）→ 数字 → 一行小注。顺序是这里唯一的
+            # 信息层级 —— 标签写在数字之后，就又变成"数字后面跟一行小字注释"了。
+            lb = s.find('class="hs-label"')
+            pk_i = s.find('id="tlPackets"')
+            chk('%s : 读数标签排在数字之前、小注收尾' % f,
+                lb > 0 and pk_i > lb and s.find('class="hs-foot"') > pk_i)
             # 读数之前要有一句邀请，并且**必须排在读数前面**：先说清这个数字是
             # 什么（累计报文总量），再让它跳。只判「有 hero-invite」抓不到顺序写反。
             inv = s.find('class="hero-invite"')

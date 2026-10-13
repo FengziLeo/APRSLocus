@@ -66,21 +66,23 @@
   color: var(--text-dim); letter-spacing: .01em;
 }
 .hero-invite .hi-mark { color: var(--cyan); margin-right: 8px; }
-.hero-invite em { font-style: normal; font-weight: 700; color: var(--text); }
-
-/* ── 一行读数：没有卡片、没有进度条，只有会跳的数字。
-      数字是这一屏的主角，所以它比周围大一整档，单位退到它下面当注释。 ── */
+/* ── 累计报文读数：竖排三级 —— 标签在上 / 数字在中 / 一行小注收尾。
+      为什么不再横着排一行：标签、数字、频率挤在同一条基线上，字号又小，整块
+      看上去像页脚的一行注释，压不住这一屏；竖排之后数字自己成一个体量，
+      "这是什么"（标签）也终于排在数字**前面**而不是后面小字里。 ── */
 .hero-stat {
-  display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px;
-  margin: 12px 0 0;
-  font-size: 13.5px; color: var(--text-dim);
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  margin: 30px 0 0;
 }
-.hero-stat .hs-item { display: inline-flex; align-items: baseline; gap: 7px; }
-.hero-stat .hs-item b { color: var(--text); font-weight: 700; }
-.hero-stat em {
-  font-style: normal; font-size: 11px; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--text-faint);
+.hero-stat .hs-label {
+  font-size: 11px; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--text-faint);
 }
+.hero-stat .hs-foot {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-size: 12.5px; color: var(--text-dim);
+}
+.hero-stat .hs-foot b { color: var(--text); font-weight: 700; }
 .hs-live {
   display: inline-flex; align-items: center; gap: 7px;
   font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -95,9 +97,12 @@
   border: 1.5px solid rgba(3, 105, 161, .75); animation: pulse 1.8s ease-out infinite;
 }
 .hero-stat .tl-value {
-  display: inline-block;
-  font: 800 clamp(30px, 3.4vw, 46px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+  display: block;
+  /* 站点正文那一族字（不是等宽）：摆得进 hero 的字形体系，但数字必须
+     tabular —— 每三秒换一位数字时，整块不能跟着抖。 */
+  font-size: clamp(46px, 6.6vw, 76px);
+  font-weight: 800; line-height: .95;
+  letter-spacing: -.035em; font-variant-numeric: tabular-nums;
   /* 不上渐变、不上彩：就是正文墨色。跳动靠"抬起 + 换成站点那一支青再退回来"，
      整条读数里只有这一处强调色，也就不会跟旁边的玻璃、按钮抢色。 */
   color: var(--text);
@@ -199,7 +204,7 @@
   .planet-fallback .pf-ring { left: 50%; top: 30%; width: 124vw; height: 44vw; }
   .hero-copy { max-width: 640px; margin: 0 auto; text-align: center; }
   .hero-badge, .hero-actions, .hero-meta, .hero-stat { justify-content: center; }
-  .hero-stat { display: flex; }
+  .hero-stat { display: flex; align-items: center; }
   .hero-sub, .hero-invite { margin-left: auto; margin-right: auto; }
   .hero-copy::before {
     inset: -10% -8%;
@@ -209,7 +214,9 @@
 @media (max-width: 620px) {
   .hero-stat { gap: 6px 12px; font-size: 12.5px; }
   /* 手机上也不把数字缩回小字：它是这一屏唯一的主角 */
-  .hero-stat .tl-value { font-size: clamp(28px, 8.4vw, 34px); }
+  .hero-stat { gap: 8px; margin-top: 24px; }
+  .hero-stat .tl-value { font-size: clamp(42px, 13vw, 58px); }
+  .hero-stat .hs-foot { font-size: 12px; gap: 10px; }
   .hero-invite { font-size: 13.5px; line-height: 1.9; }
 }
 

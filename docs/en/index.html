@@ -56,7 +56,7 @@
 <link rel="canonical" href="https://aprslocus.theez.top/en/">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
 <link rel="stylesheet" href="../css/style.css?v=7">
-<link rel="stylesheet" href="../css/hero-3d.css?v=5">
+<link rel="stylesheet" href="../css/hero-3d.css?v=6">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -140,17 +140,17 @@ html{overflow-x:hidden}
         Bluetooth TNC / sound card / direct Icom connection.
       </p>
       <p class="hero-invite">
-        <span class="hi-mark" aria-hidden="true">✦</span>Radio waves cross the sky and end up on this planet. <em>The number ticking below is every packet the world's APRS stations have relayed so far</em> — the next one is yours to send.
+        <span class="hi-mark" aria-hidden="true">✦</span>Radio waves cross the sky and end up on this planet — the next one is yours to send.
       </p>
 
-      <!-- Cumulative packets: numbers only, let it tick (source: stats.json) -->
+      <!-- Cumulative packets: label + number + one caption line (source: stats.json) -->
       <div class="hero-stat" id="heroTelemetry"
            data-stats="../stats.json" data-packets="509260" data-rate="18"
            data-updated="2026-10-13T16:06:00+08:00"
            data-stale-title="Snapshot older than 12 hours - extrapolation stopped (capped estimate shown)">
-        <span class="hs-live"><i></i>LIVE</span>
-        <span class="hs-item"><span class="tl-value" id="tlPackets">509,260</span><em>packets total</em></span>
-        <span class="hs-item">per minute <b><i id="tlRateNum">+18</i></b></span>
+        <span class="hs-label">Packets relayed</span>
+        <span class="tl-value" id="tlPackets">509,260</span>
+        <span class="hs-foot"><span class="hs-live"><i></i>LIVE</span><span><b><i id="tlRateNum">+18</i></b> per minute</span></span>
       </div>
 
       <!-- below the fold: the part you actually act on (release card + downloads + sources) -->
@@ -1941,6 +1941,6 @@ html{overflow-x:hidden}
 </a>
 
 <script src="../js/main.js?v=7"></script>
-<script src="../js/planet-3d.js?v=5"></script>
+<script src="../js/planet-3d.js?v=6"></script>
 </body>
 </html>

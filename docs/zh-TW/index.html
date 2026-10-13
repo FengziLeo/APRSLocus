@@ -58,7 +58,7 @@
 <link rel="canonical" href="https://aprslocus.theez.top/zh-TW/">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
 <link rel="stylesheet" href="../css/style.css?v=7">
-<link rel="stylesheet" href="../css/hero-3d.css?v=5">
+<link rel="stylesheet" href="../css/hero-3d.css?v=6">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -143,17 +143,17 @@ html{overflow-x:hidden}
         或改用藍牙 TNC / 音效卡音訊 / Icom 電台直連。
       </p>
       <p class="hero-invite">
-        <span class="hi-mark" aria-hidden="true">✦</span>電波穿過夜空，最後都落在這顆星球上。<em>下面跳動的數字，是全世界 APRS 台站累計轉發過的報文總量</em> —— 下一格，等你來補。
+        <span class="hi-mark" aria-hidden="true">✦</span>電波穿過夜空，最後都落在這顆星球上 —— 下一格，等你來補。
       </p>
 
-      <!-- 累計報文：只報數字，讓它自己跳（數值源 stats.json） -->
+      <!-- 累計報文：標籤（這是什麼）+ 數字（會自己跳）+ 一行小註；數值源 stats.json -->
       <div class="hero-stat" id="heroTelemetry"
            data-stats="../stats.json" data-packets="509260" data-rate="18"
            data-updated="2026-10-13T16:06:00+08:00"
            data-stale-title="資料快照已超過 12 小時，停止外推（顯示上限估算）">
-        <span class="hs-live"><i></i>LIVE</span>
-        <span class="hs-item"><span class="tl-value" id="tlPackets">509,260</span><em>累計報文總量</em></span>
-        <span class="hs-item">每分鐘 <b><i id="tlRateNum">+18</i></b></span>
+        <span class="hs-label">累計報文總量</span>
+        <span class="tl-value" id="tlPackets">509,260</span>
+        <span class="hs-foot"><span class="hs-live"><i></i>LIVE</span><span>每分鐘 <b><i id="tlRateNum">+18</i></b></span></span>
       </div>
 
       <!-- 往下滑才出現：真正要動手的那一塊（版本卡 + 下載按鈕 + 來源） -->
@@ -1943,6 +1943,6 @@ html{overflow-x:hidden}
 </a>
 
 <script src="../js/main.js?v=7"></script>
-<script src="../js/planet-3d.js?v=5"></script>
+<script src="../js/planet-3d.js?v=6"></script>
 </body>
 </html>

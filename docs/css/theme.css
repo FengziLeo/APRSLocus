@@ -8,120 +8,189 @@
    两边必须逐字一致 —— tool/check_site.py 有一道守卫比对这两处 token 文本，
    改调色板就改 style.css，然后把这里重新抽一遍，别手写第二份。
 
-   深色是默认：<head> 里那段内联脚本在首帧前把 data-theme 写到 <html> 上
-   （localStorage 优先，没存过就是 dark）。
+   浅色（银白铝）是默认：<head> 里那段内联脚本在首帧前把 data-theme 写到 <html> 上
+   （localStorage 优先，没存过就是 light；深色是「暗铝」备选）。
    ════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* 面：白天是近乎实心的白（本站不用毛玻璃） */
-  --surface-1: rgba(255, 255, 255, .96);
-  --surface-2: rgba(255, 255, 255, .88);
-  --surface-3: rgba(255, 255, 255, .72);
-  --surface-4: rgba(240, 244, 250, .92);
-  --surface-hi: #ffffff;
+  /* ── 铝制面板：机身 / 面板 / 高光 三档，靠 1px 拼缝与细倒角分开 ── */
+  --bg-1: #cfd6dd;               /* 机身铝（页面底） */
+  --bg-2: #c3cbd4;               /* 机身阴影侧（背景渐变的深端） */
+  --surface-1: #d8dde3;          /* 面板面：银白铝 */
+  --surface-2: #dee3e8;          /* 抬起一档（hover / 分组底） */
+  --surface-3: #e8ecf0;          /* 面板高光 / 内嵌凹槽 / 表头 */
+  --surface-4: #f1f4f7;          /* 最亮：凸起小件（标签 / 徽标） */
+  --surface-hi: #e8ecf0;
   --glass: var(--surface-1);
-  --code-bg: #0d1526;
-  --on-code: #eef3fa;
-  --bg-1: #f4f7fc;
-  --bg-2: #e9eff9;
-  /* 线：铝白体系里的极细边框 */
-  --line: rgba(148, 160, 178, .34);
-  --line-soft: rgba(148, 160, 178, .20);
-  --line-strong: rgba(148, 160, 178, .52);
-  --line-cool: rgba(29, 111, 208, .30);
-  --line-warn: rgba(180, 120, 0, .34);
-  --line-ok: rgba(30, 143, 99, .30);
-  --line-bad: rgba(192, 48, 39, .30);
-  /* 文字：白天的下限是墨色（#5b6b85 = 4.99，过 AA） */
-  --text: #0f172a;
-  --text-dim: #4b5a75;
-  --text-faint: #5b6b85;
-  /* 强调：冷蓝 = 数据高亮（链接 / 数值 / 图表），安全橙 = 主号召（CTA / 编号 / 标线） */
-  --cyan-deep: #0369a1;
-  --cyan: #1d6fd0;
-  --cyan-bright: #2490e6;
-  --blue: #2563eb;
-  --accent: #e25700;
-  --accent-deep: #b34700;
-  --on-accent: #1a1207;
-  /* 状态 */
-  --green: #1e8f63;
-  --green-deep: #047857;
-  --amber: #b47800;
-  --amber-deep: #92400e;
-  --red: #c03027;
-  /* 光晕 / 淡染层（背景光斑、选中态、代码底） */
-  --halo-cool: rgba(45, 122, 200, .14);
-  --halo-warm: rgba(226, 87, 0, .10);
-  --halo-ok: rgba(30, 143, 99, .10);
-  --halo-bad: rgba(192, 48, 39, .10);
-  /* 投影：哑光，不发光 */
-  --shadow-color: rgba(23, 42, 74, .12);
-  --shadow-cool: rgba(29, 111, 208, .26);
-  --shadow-warm: rgba(226, 87, 0, .22);
-  --shadow-ok: rgba(30, 143, 99, .20);
-  --shadow: 0 14px 34px var(--shadow-color);
-  --shadow-hover: 0 22px 48px var(--shadow-color);
-  /* 渐变：主号召一律橙底 + 深墨字（白字压橙只有 2.9:1，过不了 AA） */
-  --grad: linear-gradient(120deg, #ff6a00, #cf5200);
-  --grad-text: linear-gradient(120deg, #b34700, #8f3800);
-  --grad-rule: linear-gradient(120deg, #ff6a00, #4da3ff);
+  --seam: #a9b2bb;               /* 面板拼缝 */
+  --code-bg: #1c2228;            /* 数据块底：深灰 */
+  --on-code: #d8dde3;
+  /* ── 立体：上沿高光 + 下沿阴影（细倒角），哑光不发光 ── */
+  --bevel-hi: inset 0 1px 0 rgba(255, 255, 255, .72);
+  --bevel-lo: inset 0 -1px 0 rgba(28, 34, 40, .13);
+  --bevel-in-hi: inset 0 1px 0 rgba(28, 34, 40, .10);
+  --bevel-in-lo: inset 0 -1px 0 rgba(255, 255, 255, .60);
+  --brushed: repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, .26) 0 1px, rgba(28, 34, 40, .030) 1px 3px);
+  --rivet: radial-gradient(circle at 42% 36%,
+      #f4f6f9 0 24%, #bdc6cf 52%, #939da7 74%, rgba(28, 34, 40, .30) 100%);
+  --inset-face: linear-gradient(180deg, #ced5dc, #d7dde3);
+  /* ── 线 ── */
+  --line: rgba(28, 34, 40, .20);
+  --line-soft: rgba(28, 34, 40, .11);
+  --line-strong: rgba(28, 34, 40, .38);
+  --line-cool: rgba(29, 95, 176, .45);
+  --line-warn: rgba(138, 90, 0, .45);
+  --line-ok: rgba(21, 122, 82, .40);
+  --line-bad: rgba(179, 39, 30, .40);
+  /* ── 文字：墨色 #1C2228；dim/faint 是银底上的两级灰 ── */
+  --text: #1c2228;
+  --text-dim: #414b54;
+  --text-faint: #566069;
+  /* ── 冷蓝 = 数据链接：--cyan 是「压得住银底」的文字蓝，
+        --cyan-bright 是设计原色 #4DA3FF，只用于标线 / 灯 / 轨道 / 图表 ── */
+  --cyan: #1d5fb0;
+  --cyan-deep: #17457f;
+  --cyan-bright: #4da3ff;
+  --blue: #1d5fb0;
+  /* ── 安全橙 = 关键按钮 / 主号召；文字橙深一档 ── */
+  --accent: #ff6a00;
+  --accent-deep: #b34a00;
+  --on-accent: #1c2228;
+  /* ── 状态：--led-* 是设计原色（灯 / 条），无 --led 后缀的是文字色 ── */
+  --led-ok: #3ddc97;
+  --led-warn: #ffb000;
+  --led-bad: #e03c31;
+  --green: #157a52;
+  --green-deep: #0f5c3d;
+  --amber: #8a5a00;
+  --amber-deep: #6b4500;
+  --red: #b3271e;
+  /* ── 淡染层（hover / 选中 / 数据块底）：铝底上是「薄涂层」，不是光晕 ── */
+  --halo-cool: rgba(77, 163, 255, .16);
+  --halo-warm: rgba(255, 106, 0, .13);
+  --halo-ok: rgba(61, 220, 151, .18);
+  --halo-bad: rgba(224, 60, 49, .12);
+  /* ── 投影：接触阴影 + 上沿高光，工业产品摄影那味，不发光 ── */
+  --shadow-color: rgba(28, 34, 40, .22);
+  --shadow-cool: rgba(29, 95, 176, .22);
+  --shadow-warm: rgba(180, 74, 0, .20);
+  --shadow-ok: rgba(21, 122, 82, .18);
+  --shadow: 0 1px 0 rgba(255, 255, 255, .55), 0 1px 2px rgba(28, 34, 40, .16),
+            0 12px 22px -16px rgba(28, 34, 40, .45);
+  --shadow-hover: 0 1px 0 rgba(255, 255, 255, .60), 0 2px 4px rgba(28, 34, 40, .18),
+                  0 18px 30px -18px rgba(28, 34, 40, .50);
+  /* ── 渐变 ── */
+  --grad: linear-gradient(180deg, #ff7a1a, #ef5f00);
+  --grad-text: linear-gradient(120deg, #b34a00, #8a3a00);
+  --grad-rule: linear-gradient(90deg, #ff6a00, #4da3ff);
   /* 字体：正文无衬线，数据 / 编号走等宽（栈里全是系统字体，不额外拉网络字体） */
   --font-sans: Inter, "IBM Plex Sans", "SF Pro Text", system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
   /* 微圆角：工业面板是切角，不是药丸 */
-  --radius: 10px;
-  --radius-sm: 6px;
+  /* 结构色：只服务倒角 / 内影 / 斑马 / 指示灯外圈这类「零件细节」，
+     不参与语义配色 —— 但它们同样得有两套值，写死在规则里就成了另一套主题里的亮斑。 */
+  --alu-sheen: linear-gradient(180deg, rgba(255, 255, 255, .30), rgba(255, 255, 255, 0) 46%);
+  --tint-alt: rgba(28, 34, 40, .035);
+  --zebra: rgba(255, 255, 255, .28);
+  --base-gloss: inset 0 1px 0 rgba(255, 255, 255, .10);
+  --on-base-dim: rgba(216, 221, 227, .70);
+  --led-idle: #98a2ac;
+  --led-edge: rgba(28, 34, 40, .40);
+  --led-out: rgba(255, 255, 255, .35);
+  --dot-edge: rgba(28, 34, 40, .30);
+  --cta-edge: #c25200;
+  --cta-gloss: inset 0 1px 0 rgba(255, 255, 255, .38), inset 0 -1px 0 rgba(0, 0, 0, .18);
+  --cta-gloss-hi: inset 0 1px 0 rgba(255, 255, 255, .44), inset 0 -1px 0 rgba(0, 0, 0, .20);
+  --cta-shadow: 0 1px 2px rgba(28, 34, 40, .22);
+  --cta-shadow-hi: 0 2px 5px rgba(28, 34, 40, .26);
+  --bar-shadow: var(--bevel-hi), 0 1px 2px rgba(28, 34, 40, .14);
+  --bar-shadow-up: var(--bevel-hi), 0 2px 6px rgba(28, 34, 40, .18);
+  --radius: 6px;
+  --radius-sm: 3px;
   --ease: cubic-bezier(.22, .8, .24, 1);
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --surface-1: #1c2228;          /* 面板灰 */
-  --surface-2: #171d23;
-  --surface-3: #12181d;
-  --surface-4: #0f1519;
-  --surface-hi: #232a31;
+  /* 暗铝：同一套面板语汇，材质换成深色阳极氧化铝 */
+  --bg-1: #12171b;
+  --bg-2: #0d1114;
+  --surface-1: #1c2228;          /* 面板灰（深灰 #1C2228 在这里是「面」） */
+  --surface-2: #232a31;          /* 抬起一档 */
+  --surface-3: #2a323a;          /* 高光 / 表头 */
+  --surface-4: #333b44;          /* 最亮小件 */
+  --surface-hi: #2a323a;
   --glass: var(--surface-1);
+  --seam: #3a434c;
   --code-bg: #05080f;
   --on-code: #d8dde3;
-  --bg-1: #0a0e12;               /* 深空黑 */
-  --bg-2: #090c10;
+  --bevel-hi: inset 0 1px 0 rgba(255, 255, 255, .09);
+  --bevel-lo: inset 0 -1px 0 rgba(0, 0, 0, .45);
+  --bevel-in-hi: inset 0 1px 0 rgba(0, 0, 0, .50);
+  --bevel-in-lo: inset 0 -1px 0 rgba(255, 255, 255, .07);
+  --brushed: repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, .035) 0 1px, rgba(0, 0, 0, .055) 1px 3px);
+  --rivet: radial-gradient(circle at 42% 36%,
+      #4a545e 0 24%, #333b44 52%, #262d34 74%, rgba(0, 0, 0, .55) 100%);
+  --inset-face: linear-gradient(180deg, #161b20, #1c2228);
   --line: rgba(216, 221, 227, .14);
   --line-soft: rgba(216, 221, 227, .09);
   --line-strong: rgba(216, 221, 227, .26);
-  --line-cool: rgba(77, 163, 255, .32);
-  --line-warn: rgba(255, 176, 0, .32);
-  --line-ok: rgba(61, 220, 151, .28);
-  --line-bad: rgba(224, 60, 49, .34);
+  --line-cool: rgba(77, 163, 255, .40);
+  --line-warn: rgba(255, 176, 0, .38);
+  --line-ok: rgba(61, 220, 151, .34);
+  --line-bad: rgba(224, 60, 49, .40);
   --text: #d8dde3;               /* 铝白 */
   --text-dim: #98a2ac;
   --text-faint: #868f9a;
+  --cyan: #4da3ff;               /* 暗底上这一档就是文字色 */
   --cyan-deep: #2e7fd1;
-  --cyan: #4da3ff;               /* 冷蓝：数据高亮 */
   --cyan-bright: #8cc5ff;
   --blue: #4da3ff;
-  --accent: #ff6a00;             /* 安全橙 */
+  --accent: #ff6a00;
   --accent-deep: #ff8a3d;
   --on-accent: #0a0e12;
-  --green: #3ddc97;              /* 信号绿：正常 */
+  --led-ok: #3ddc97;
+  --led-warn: #ffb000;
+  --led-bad: #e03c31;
+  --green: #3ddc97;
   --green-deep: #2aae77;
-  --amber: #ffb000;              /* 琥珀：注意 */
+  --amber: #ffb000;
   --amber-deep: #c98a00;
-  --red: #e03c31;                /* 警告红：故障 */
-  --halo-cool: rgba(77, 163, 255, .10);
-  --halo-warm: rgba(255, 106, 0, .08);
-  --halo-ok: rgba(61, 220, 151, .06);
-  --halo-bad: rgba(224, 60, 49, .08);
+  --red: #e03c31;
+  --halo-cool: rgba(77, 163, 255, .12);
+  --halo-warm: rgba(255, 106, 0, .10);
+  --halo-ok: rgba(61, 220, 151, .10);
+  --halo-bad: rgba(224, 60, 49, .10);
   --shadow-color: rgba(0, 0, 0, .55);
-  --shadow-cool: rgba(77, 163, 255, .18);
-  --shadow-warm: rgba(255, 106, 0, .16);
-  --shadow-ok: rgba(61, 220, 151, .14);
-  --shadow: 0 14px 34px var(--shadow-color);
-  --shadow-hover: 0 22px 48px var(--shadow-color);
-  --grad: linear-gradient(120deg, #ff6a00, #c2410c);
+  --shadow-cool: rgba(77, 163, 255, .20);
+  --shadow-warm: rgba(255, 106, 0, .18);
+  --shadow-ok: rgba(61, 220, 151, .16);
+  --shadow: 0 1px 0 rgba(255, 255, 255, .04), 0 1px 2px rgba(0, 0, 0, .60),
+            0 14px 26px -18px rgba(0, 0, 0, .80);
+  --shadow-hover: 0 1px 0 rgba(255, 255, 255, .05), 0 2px 4px rgba(0, 0, 0, .65),
+                  0 20px 34px -20px rgba(0, 0, 0, .85);
+  /* 结构色：暗铝这一侧同样一份（漏一个，深底上就会露出一块浅色亮斑） */
+  --alu-sheen: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0) 46%);
+  --tint-alt: rgba(216, 221, 227, .04);
+  --zebra: rgba(255, 255, 255, .03);
+  --base-gloss: inset 0 1px 0 rgba(255, 255, 255, .05);
+  --on-base-dim: rgba(216, 221, 227, .62);
+  --led-idle: #7d868f;
+  --led-edge: rgba(0, 0, 0, .50);
+  --led-out: rgba(255, 255, 255, .12);
+  --dot-edge: rgba(0, 0, 0, .45);
+  --cta-edge: #c25200;
+  --cta-gloss: inset 0 1px 0 rgba(255, 255, 255, .30), inset 0 -1px 0 rgba(0, 0, 0, .35);
+  --cta-gloss-hi: inset 0 1px 0 rgba(255, 255, 255, .36), inset 0 -1px 0 rgba(0, 0, 0, .38);
+  --cta-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+  --cta-shadow-hi: 0 2px 5px rgba(0, 0, 0, .50);
+  --bar-shadow: var(--bevel-hi), 0 1px 2px rgba(0, 0, 0, .40);
+  --bar-shadow-up: var(--bevel-hi), 0 2px 6px rgba(0, 0, 0, .48);
+  --grad: linear-gradient(180deg, #ff7a1a, #ef5f00);
   --grad-text: linear-gradient(120deg, #ffb000, #ff6a00);
-  --grad-rule: linear-gradient(120deg, #ff6a00, #4da3ff);
+  --grad-rule: linear-gradient(90deg, #ff6a00, #4da3ff);
 }
 
 /* ── 主题切换按钮 ──
@@ -156,11 +225,12 @@
 html { -webkit-text-size-adjust: 100%; }
 body {
   font-family: var(--font-sans);
-  background:
-    radial-gradient(1100px 640px at 85% -10%, var(--halo-cool), transparent 62%),
-    radial-gradient(900px 560px at 0% 34%, var(--halo-warm), transparent 62%),
-    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
-  background-attachment: fixed;
+  background-color: var(--bg-1);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, .30), rgba(255, 255, 255, 0) 46%),
+    var(--brushed),
+    linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  background-attachment: fixed, fixed, fixed;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
 }

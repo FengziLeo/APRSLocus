@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>APRSlocus — APRS 定位追蹤與地圖</title>
 <meta name="description" content="APRSlocus —— 業餘無線電愛好者用的 APRS 用戶端，一個在本機執行的免費工具。它不提供、也不預置任何伺服器位址：要連網請自行填寫 APRS-IS 伺服器，或改用藍牙 / 序列埠 TNC、音效卡音訊與 Icom 電台直連。臺站、訊息與信標都在同一張地圖上，Android / Windows 可用。">
-<meta name="theme-color" content="#0a0e12">
+<meta name="theme-color" content="#cfd6dd">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="APRSlocus">
 <meta property="og:title" content="APRSlocus — APRS 定位追蹤與地圖">
@@ -22,15 +22,15 @@
 <meta name="twitter:description" content="APRSlocus —— 業餘無線電愛好者用的 APRS 用戶端（本機工具）。不提供、也不預置任何伺服器位址：伺服器與連線方式由你自己填寫。">
 <meta name="twitter:image" content="https://aprslocus.theez.top/assets/logo.png">
 <script>
-/* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）。
-   必须在首帧前执行，否则会闪一下亮底（token 的键在 <html data-theme> 上）。 */
+/* 主题：localStorage 优先，没存过就用浅色（本站默认皮肤 = 银白铝）。
+   必须在首帧前执行，否则会闪一下深底（token 的键在 <html data-theme> 上）。 */
 (function () {
   try {
     var t = localStorage.getItem('theme');
-    if (t !== 'dark' && t !== 'light') t = 'dark';
+    if (t !== 'dark' && t !== 'light') t = 'light';
     document.documentElement.setAttribute('data-theme', t);
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
+    if (m) m.setAttribute('content', t === 'dark' ? '#12171b' : '#cfd6dd');
   } catch (e) {}
 })();
 </script>
@@ -56,11 +56,11 @@
 <link rel="alternate" hreflang="en" href="https://aprslocus.theez.top/en/">
 <link rel="canonical" href="https://aprslocus.theez.top/zh-TW/">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
-<link rel="stylesheet" href="../css/style.css?v=8">
-<link rel="stylesheet" href="../css/hero-3d.css?v=10">
+<link rel="stylesheet" href="../css/style.css?v=9">
+<link rel="stylesheet" href="../css/hero-3d.css?v=11">
 <link rel="stylesheet" href="../css/motion.css?v=1">
-<link rel="stylesheet" href="../css/nav.css?v=2">
-<link rel="stylesheet" href="../css/features.css?v=2">
+<link rel="stylesheet" href="../css/nav.css?v=3">
+<link rel="stylesheet" href="../css/features.css?v=3">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -146,6 +146,11 @@ html{overflow-x:hidden}
 
     <div class="hero-copy">
       <!-- 第一屏只有這件事：那個數字（APRSlocus 累計轉發報文總量，數值源 stats.json）；「這是什麼」的說明在折線之下 -->
+      <div class="hero-console panel panel--riveted">
+        <div class="panel__head">
+          <span class="mono-label">APRS-IS · RELAY COUNTER</span>
+          <span class="panel__meta"><i class="led led--ok" aria-hidden="true"></i>NOMINAL</span>
+        </div>
         <div class="hero-stat" id="heroTelemetry"
              data-stats="../stats.json" data-packets="509260" data-rate="18"
              data-updated="2026-10-13T16:06:00+08:00"
@@ -153,12 +158,19 @@ html{overflow-x:hidden}
           <span class="hs-label">APRSlocus 累計轉發報文</span>
           <span class="tl-value" id="tlPackets">509,260</span>
         </div>
+        <div class="status-strip">
+          <span class="status-strip__item"><i class="led led--ok" aria-hidden="true"></i><b>STATUS</b> NOMINAL</span>
+          <span class="status-strip__item"><i class="led led--cool" aria-hidden="true"></i><b>LINK</b> APRS-IS</span>
+          <span class="status-strip__item"><i class="led led--idle" aria-hidden="true"></i><b>SOURCES</b> TNC · AUDIO · PKWDWPL</span>
+          <span class="status-strip__item"><i class="led led--idle" aria-hidden="true"></i><b>PLATFORMS</b> ANDROID · WINDOWS</span>
+        </div>
+      </div>
     </div>
 
     <div class="hero-copy-next">
       <!-- 折線之下才是「這是什麼」：滾上來才淡出（站點的 .reveal） -->
       <div class="hero-intro reveal" data-delay="0">
-        <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
+        <span class="hero-badge"><i class="led led--ok" aria-hidden="true"></i><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
         <div class="hero-wordmark">TOUCH SKY</div>
         <p class="hero-slogan">APRS <span class="grad">定位追蹤</span> 與 <span class="grad">地圖</span></p>
         <p class="hero-sub">
@@ -173,11 +185,11 @@ html{overflow-x:hidden}
 
       <!-- 再往下：真正要動手的那一塊（版本卡 + 下載按鈕 + 來源） -->
         <div class="hero-cta reveal" data-delay="0">
-          <div class="hero-release" id="heroRelease" style="display:inline-flex;align-items:center;gap:12px;margin:8px 0 6px;padding:12px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 30px rgba(45,70,120,.14);backdrop-filter:blur(14px)">
-            <span id="hrIcon" style="font-size:20px">✅</span>
-            <span>
-              <b style="font-size:14px">APRSlocus 2.0 <span id="hrState" style="color:var(--cyan)">已發佈</span></b>
-              <span id="hrTimer" style="display:block;font-size:12.5px;color:var(--text-faint)">2.0 已發佈 · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener" style="color:var(--cyan);font-weight:700">立即下載 →</a></span>
+          <div class="hero-release" id="heroRelease">
+            <i class="led led--ok" id="hrIcon" aria-hidden="true"></i>
+            <span class="hr-text">
+              <b>APRSlocus 2.0 <span id="hrState">已發佈</span></b>
+              <span id="hrTimer">2.0 已發佈 · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">立即下載 →</a></span>
             </span>
           </div>
           <div class="hero-actions">
@@ -287,7 +299,7 @@ html{overflow-x:hidden}
     .ui2one-txt h3{font-size:clamp(22px,2.6vw,30px);font-weight:800;margin-bottom:16px}
     .ui2one-txt ul{list-style:none;display:grid;gap:10px;margin-bottom:24px}
     .ui2one-txt li{position:relative;padding-left:26px;color:var(--text-dim);font-size:15.5px}
-    .ui2one-txt li::before{content:"";position:absolute;left:0;top:9px;width:12px;height:12px;border-radius:4px;background:linear-gradient(135deg,#38bdf8,#0284c7)}
+    .ui2one-txt li::before{content:"";position:absolute;left:0;top:9px;width:12px;height:12px;border-radius:2px;background:var(--surface-3);border:1px solid var(--line);box-shadow:var(--bevel-hi)}
     @media(max-width:900px){.ui2one{grid-template-columns:1fr;gap:32px}.ui2one-img img{width:min(300px,72vw)}}
   </style>
 </section>
@@ -1782,64 +1794,64 @@ html{overflow-x:hidden}
     </div>
 
     <div class="cgroup reveal">
-      <div class="cgroup-title"><span class="cgroup-dot" style="background:#2563eb"></span>開發</div>
+      <div class="cgroup-title"><span class="cgroup-dot"></span>開發</div>
       <div class="contributors">
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#2563eb,#1e40af)">D</span>
+          <span class="avatar">D</span>
           <span><span class="c-name">BG7LZQ (Darion)</span><span class="c-role">作者 · 全棧開發</span></span>
         </span>
       </div>
     </div>
 
     <div class="cgroup reveal">
-      <div class="cgroup-title"><span class="cgroup-dot" style="background:#f59e0b"></span>翻譯 / 國際化</div>
+      <div class="cgroup-title"><span class="cgroup-dot"></span>翻譯 / 國際化</div>
       <div class="contributors">
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706)">B</span>
+          <span class="avatar">B</span>
           <span><span class="c-name">BD3QID</span><span class="c-role">English 翻譯</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#14b8a6,#0d9488)">B</span>
+          <span class="avatar">B</span>
           <span><span class="c-name">BA4UAX</span><span class="c-role">繁體中文 翻譯</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#0ea5e9,#0369a1)">K</span>
+          <span class="avatar">K</span>
           <span><span class="c-name">BA7KSM</span><span class="c-role">翻譯</span></span>
         </span>
       </div>
     </div>
 
     <div class="cgroup reveal">
-      <div class="cgroup-title"><span class="cgroup-dot" style="background:#f97316"></span>代碼貢獻</div>
+      <div class="cgroup-title"><span class="cgroup-dot"></span>代碼貢獻</div>
       <div class="contributors">
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#8a5cf0,#6d3ee0)">B</span>
+          <span class="avatar">B</span>
           <span><span class="c-name">BD3QID</span><span class="c-role">WLAN 電台直連</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#f97316,#ea580c)">零</span>
+          <span class="avatar">零</span>
           <span><span class="c-name">清零 (BG2HCB)</span><span class="c-role">設置頁代碼優化</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#1d6ff2,#1348a8)">G</span>
+          <span class="avatar">G</span>
           <span><span class="c-name">BH7GZB</span><span class="c-role">貢獻程式碼</span></span>
         </span>
       </div>
     </div>
 
     <div class="cgroup reveal">
-      <div class="cgroup-title"><span class="cgroup-dot" style="background:#ec4899"></span>支持</div>
+      <div class="cgroup-title"><span class="cgroup-dot"></span>支持</div>
       <div class="contributors">
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#ec4899,#db2777)">B</span>
+          <span class="avatar">B</span>
           <span><span class="c-name">BA3RZL</span><span class="c-role">AI 算力支持</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#0891b2,#164e63)">N</span>
+          <span class="avatar">N</span>
           <span><span class="c-name">BH7NOR</span><span class="c-role">協定介面支援</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#0891b2,#164e63)">A</span>
+          <span class="avatar">A</span>
           <span><span class="c-name">APRS.TV</span><span class="c-role">APRS.TV 介面支援</span></span>
         </span>
       </div>
@@ -1847,93 +1859,93 @@ html{overflow-x:hidden}
 
 
     <div class="cgroup reveal">
-      <div class="cgroup-title"><span class="cgroup-dot" style="background:#10b981"></span>測試</div>
+      <div class="cgroup-title"><span class="cgroup-dot"></span>測試</div>
       <div class="contributors">
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#10b981,#047857)">P</span>
+          <span class="avatar">P</span>
           <span><span class="c-name">BG7PGW</span><span class="c-role">功能測試</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">L</span>
+          <span class="avatar">L</span>
           <span><span class="c-name">BG7LMW</span><span class="c-role">功能測試</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#06b6d4,#0891b2)">O</span>
+          <span class="avatar">O</span>
           <span><span class="c-name">BG7OSL</span><span class="c-role">功能測試</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#ef4444,#b91c1c)">I</span>
+          <span class="avatar">I</span>
           <span><span class="c-name">BG4LZY</span><span class="c-role">Bug 提交與反饋</span></span>
         </span>
       </div>
     </div>
 
     <div class="cgroup reveal">
-      <div class="cgroup-title"><span class="cgroup-dot" style="background:#e6c873"></span>贊助</div>
+      <div class="cgroup-title"><span class="cgroup-dot"></span>贊助</div>
       <div class="contributors" id="sponsorList" data-lang="zh-TW">
 <!-- sponsors-sync -->
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#6366f1,#4338ca)">S</span>
+          <span class="avatar">S</span>
           <span><span class="c-name">STUDENT HAMS 群組</span><span class="c-role">感謝群組的資金贊助，支持 APRSlocus 持續開發與營運。</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#f59e0b,#b45309)">P</span>
+          <span class="avatar">P</span>
           <span><span class="c-name">BG7PGW</span><span class="c-role">感謝贊助的蜜雪冰城一杯 🧋</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#c9a227,#8a6d1f)">O</span>
+          <span class="avatar">O</span>
           <span><span class="c-name">BG7ORC</span><span class="c-role">贈我以瓊琚 · 承君厚贈，藏之於心；唯有砥礪，以報清音</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#0ea5b7,#0b7285)">J</span>
+          <span class="avatar">J</span>
           <span><span class="c-name">BA4JLD</span><span class="c-role">青島科技大學業餘無線電俱樂部 · 贈我以瓊琚</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#c9a227,#8a6d1f)">I</span>
+          <span class="avatar">I</span>
           <span><span class="c-name">BA4IUD</span><span class="c-role">贈我以瓊琚 · 承君厚贈，藏之於心；唯有砥礪，以報清音</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#c9a227,#8a6d1f)">F</span>
+          <span class="avatar">F</span>
           <span><span class="c-name">BD1FEH</span><span class="c-role">贈我以瓊琚 · 承君厚贈，藏之於心；唯有砥礪，以報清音</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#c9a227,#8a6d1f)">R</span>
+          <span class="avatar">R</span>
           <span><span class="c-name">BA3RZL</span><span class="c-role">贈我以瓊琚 · 以算力為瓊琚，燃此長夜燈火</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#c9a227,#8a6d1f)">E</span>
+          <span class="avatar">E</span>
           <span><span class="c-name">BG2EFX</span><span class="c-role">贈我以瓊琚 · 承君厚贈，藏之於心；唯有砥礪，以報清音</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#c9a227,#8a6d1f)">W</span>
+          <span class="avatar">W</span>
           <span><span class="c-name">BG2WX</span><span class="c-role">贈我以瓊琚 · 承君厚贈，藏之於心；唯有砥礪，以報清音</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#c9a227,#8a6d1f)">A</span>
+          <span class="avatar">A</span>
           <span><span class="c-name">BA8AZJ</span><span class="c-role">贈我以瓊琚 · 承君厚贈，藏之於心；唯有砥礪，以報清音</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#c9a227,#8a6d1f)">L</span>
+          <span class="avatar">L</span>
           <span><span class="c-name">BG7LZQ</span><span class="c-role">贈我以瓊琚 · 承君厚贈，藏之於心；唯有砥礪，以報清音</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#c9a227,#8a6d1f)">T</span>
+          <span class="avatar">T</span>
           <span><span class="c-name">BD4TYW</span><span class="c-role">贈我以瓊琚 · 投我瓊琚，報以長波</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#c9a227,#8a6d1f)">W</span>
+          <span class="avatar">W</span>
           <span><span class="c-name">BH2WIX</span><span class="c-role">贈我以瓊琚 · 瓊琚有價，清音無價</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#0891b2,#164e63)">N</span>
+          <span class="avatar">N</span>
           <span><span class="c-name">BH7NOR</span><span class="c-role">協定介面支援</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#0891b2,#164e63)">A</span>
+          <span class="avatar">A</span>
           <span><span class="c-name">APRS.TV</span><span class="c-role">APRS.TV 介面支援</span></span>
         </span>
         <span class="contributor">
-          <span class="avatar" style="background:linear-gradient(135deg,#ec4899,#be185d)">每</span>
+          <span class="avatar">每</span>
           <span><span class="c-name">每一位支持者</span><span class="c-role">你們的每一份支持，都是 APRSlocus 繼續發光的動力。</span></span>
         </span>
       <!-- /sponsors-sync -->
@@ -2008,8 +2020,8 @@ html{overflow-x:hidden}
   <svg class="backtop-arrow" viewBox="0 0 24 24"><path d="M12 5l7 7-1.4 1.4L13 8.8V20h-2V8.8l-4.6 4.6L5 12l7-7z"/></svg>
 </a>
 
-<script src="../js/main.js?v=8"></script>
-<script src="../js/planet-3d.js?v=10"></script>
+<script src="../js/main.js?v=9"></script>
+<script src="../js/planet-3d.js?v=11"></script>
 <script src="../js/motion.js?v=1"></script>
 <script src="../js/nav.js?v=1"></script>
 </body>

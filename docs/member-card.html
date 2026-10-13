@@ -7,17 +7,17 @@
 <meta name="description" content="APRSlocus 荣誉墙 — 成员徽章与成就">
 <meta property="og:title" content="APRSlocus 荣誉墙">
 <meta property="og:image" content="https://aprslocus.theez.top/assets/logo.png">
-<link rel="stylesheet" href="css/theme.css?v=1">
+<link rel="stylesheet" href="css/theme.css?v=2">
 <script>
-/* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）。
-   必须在首帧前执行，否则会闪一下亮底（token 的键在 <html data-theme> 上）。 */
+/* 主题：localStorage 优先，没存过就用浅色（本站默认皮肤 = 银白铝）。
+   必须在首帧前执行，否则会闪一下深底（token 的键在 <html data-theme> 上）。 */
 (function () {
   try {
     var t = localStorage.getItem('theme');
-    if (t !== 'dark' && t !== 'light') t = 'dark';
+    if (t !== 'dark' && t !== 'light') t = 'light';
     document.documentElement.setAttribute('data-theme', t);
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
+    if (m) m.setAttribute('content', t === 'dark' ? '#12171b' : '#cfd6dd');
   } catch (e) {}
 })();
 </script>
@@ -518,9 +518,9 @@ function draw(){
  c2.fillStyle="#eef1f7";c2.fillRect(58,132,W-116,1);
  const cx=58,cy0=278;
  if(c.kind==="p"){
-  c2.fillStyle="#0d1426";c2.font="800 132px 'SF Mono','Consolas',ui-monospace,monospace";c2.fillText(c.p.call,cx,cy0+2);
+  c2.fillStyle="#1c2228";c2.font="800 132px 'SF Mono','Consolas',ui-monospace,monospace";c2.fillText(c.p.call,cx,cy0+2);
   c2.fillStyle=g;c2.fillRect(cx,cy0+56,72,4);
-  c2.fillStyle="#182238";c2.font="700 30px 'PingFang SC','Segoe UI',sans-serif";c2.fillText(c.p.who?(c.p.who[lang]||c.p.who.zh):"",cx,cy0+128);
+  c2.fillStyle="#414b54";c2.font="700 30px 'PingFang SC','Segoe UI',sans-serif";c2.fillText(c.p.who?(c.p.who[lang]||c.p.who.zh):"",cx,cy0+128);
   // 姓名下：渲染荣誉徽章（依次小胶囊）
   const hkeys=honorDefsOf(c.p);
   if(hkeys.length){
@@ -544,9 +544,9 @@ function draw(){
  } else {
   const gname=T(c.g.name);
   const fs=(gname.length>10)?52:96;
-  c2.fillStyle="#0d1426";c2.font="800 "+fs+"px 'PingFang SC','Segoe UI',sans-serif";c2.fillText(gname,cx,cy0+8);
+  c2.fillStyle="#1c2228";c2.font="800 "+fs+"px 'PingFang SC','Segoe UI',sans-serif";c2.fillText(gname,cx,cy0+8);
   c2.fillStyle=g;c2.fillRect(cx,cy0+70,72,4);
-  c2.fillStyle="#182238";c2.font="700 28px 'PingFang SC','Segoe UI',sans-serif";c2.fillText(T(c.g.role),cx,cy0+150);
+  c2.fillStyle="#414b54";c2.font="700 28px 'PingFang SC','Segoe UI',sans-serif";c2.fillText(T(c.g.role),cx,cy0+150);
   c2.fillStyle="#7c8699";c2.font="500 19px 'PingFang SC','Segoe UI',sans-serif";
   c2.fillText("“"+T(c.g.note)+"”",cx,cy0+220);
  }
@@ -656,6 +656,6 @@ fetch("firstfix.json").then(r=>r.ok?r.json():null).then(d=>{
   }
 }).catch(()=>{});
 </script>
-<script src="js/theme.js?v=1" defer></script>
+<script src="js/theme.js?v=2" defer></script>
 </body>
 </html>

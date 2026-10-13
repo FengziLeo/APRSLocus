@@ -1,6 +1,9 @@
 /* ════════════════════════════════════════════════════════════════
-   APRSlocus 官网样式 · NASApunk 任务控制风
-   调色板：深空黑 / 面板灰 / 铝白 / 安全橙 / 冷蓝（状态色另计）
+   APRSlocus 官网样式 · 现代 NASApunk 任务控制风
+   面板：银白铝制（机身 / 面板 / 高光三档 + 1px 拼缝 + 细倒角 + 轻微拉丝）
+   标色：安全橙 #FF6A00（主号召）· 冷蓝 #4DA3FF（数据链接 / 轨道）
+         琥珀 #FFB000（注意）· 信号绿 #3DDC97（正常）· 警告红 #E03C31（故障）
+   墨色：深灰 #1C2228（文字与图标）
    目录：
    01. 变量与基础（token：颜色 / 字体 / 圆角）
    02. 全屏光斑背景
@@ -22,79 +25,118 @@
    18. 贡献者
    19. 帮助中心（子页 faq.html）
    20. 主题切换按钮 + 跳转链接
-   21. 深色模式（默认皮肤）
-   22. 用户手册（docs/manual.html）
+   21. 铝制控制台：组件与重绘（面板 / 状态灯 / 数据表 / 时间线）
+   22. 深色模式（暗铝备选皮肤）
+   23. 用户手册（docs/manual.html）
    ════════════════════════════════════════════════════════════════ */
 
 /* ── 01. 变量与基础 ──
    调色板（任务控制室），比例是纪律：
-     背景 70%   深空黑 #0A0E12 / 面板灰 #1C2228
-     主体 20%   铝白 #D8DDE3
-     强调  8%   安全橙 #FF6A00 / 冷蓝 #4DA3FF
+     面板 70%   银白铝 #D8DDE3（机身 #CFD6DD / 高光 #E8ECF0）
+     墨色 20%   深灰 #1C2228 —— 文字与图标
+     标色  8%   安全橙 #FF6A00（关键按钮）/ 冷蓝 #4DA3FF（数据链接 · 轨道）
      状态  2%   琥珀 #FFB000（注意）/ 警告红 #E03C31（故障）/ 信号绿 #3DDC97（正常）
-   状态三色只在真的表示状态时出现，不做装饰；一屏只留一个主号召色。
-   下面这块是【白天变体】：同一套色相、同一套语义，深色（默认）在 21 节整体覆盖 token。
+   状态色只在真的表示状态时出现，不做装饰；一屏只留一个主号召色，不发光。
+   每种标色都有两档：--led-* / --cyan-bright 是设计原色（画线、点灯），
+   不带后缀的那档是文字色（深一档，压得住银底、过 AA）。
+   下面这块是【默认皮肤：铝光控制台】；深色（暗铝）在 21 节整体覆盖 token。
    规矩：规则里只写 token，不写死颜色 —— 写死一处就等于在另一套主题里埋一个亮斑。 */
 :root {
-  /* 面：白天是近乎实心的白（本站不用毛玻璃） */
-  --surface-1: rgba(255, 255, 255, .96);
-  --surface-2: rgba(255, 255, 255, .88);
-  --surface-3: rgba(255, 255, 255, .72);
-  --surface-4: rgba(240, 244, 250, .92);
-  --surface-hi: #ffffff;
+  /* ── 铝制面板：机身 / 面板 / 高光 三档，靠 1px 拼缝与细倒角分开 ── */
+  --bg-1: #cfd6dd;               /* 机身铝（页面底） */
+  --bg-2: #c3cbd4;               /* 机身阴影侧（背景渐变的深端） */
+  --surface-1: #d8dde3;          /* 面板面：银白铝 */
+  --surface-2: #dee3e8;          /* 抬起一档（hover / 分组底） */
+  --surface-3: #e8ecf0;          /* 面板高光 / 内嵌凹槽 / 表头 */
+  --surface-4: #f1f4f7;          /* 最亮：凸起小件（标签 / 徽标） */
+  --surface-hi: #e8ecf0;
   --glass: var(--surface-1);
-  --code-bg: #0d1526;
-  --on-code: #eef3fa;
-  --bg-1: #f4f7fc;
-  --bg-2: #e9eff9;
-  /* 线：铝白体系里的极细边框 */
-  --line: rgba(148, 160, 178, .34);
-  --line-soft: rgba(148, 160, 178, .20);
-  --line-strong: rgba(148, 160, 178, .52);
-  --line-cool: rgba(29, 111, 208, .30);
-  --line-warn: rgba(180, 120, 0, .34);
-  --line-ok: rgba(30, 143, 99, .30);
-  --line-bad: rgba(192, 48, 39, .30);
-  /* 文字：白天的下限是墨色（#5b6b85 = 4.99，过 AA） */
-  --text: #0f172a;
-  --text-dim: #4b5a75;
-  --text-faint: #5b6b85;
-  /* 强调：冷蓝 = 数据高亮（链接 / 数值 / 图表），安全橙 = 主号召（CTA / 编号 / 标线） */
-  --cyan-deep: #0369a1;
-  --cyan: #1d6fd0;
-  --cyan-bright: #2490e6;
-  --blue: #2563eb;
-  --accent: #e25700;
-  --accent-deep: #b34700;
-  --on-accent: #1a1207;
-  /* 状态 */
-  --green: #1e8f63;
-  --green-deep: #047857;
-  --amber: #b47800;
-  --amber-deep: #92400e;
-  --red: #c03027;
-  /* 光晕 / 淡染层（背景光斑、选中态、代码底） */
-  --halo-cool: rgba(45, 122, 200, .14);
-  --halo-warm: rgba(226, 87, 0, .10);
-  --halo-ok: rgba(30, 143, 99, .10);
-  --halo-bad: rgba(192, 48, 39, .10);
-  /* 投影：哑光，不发光 */
-  --shadow-color: rgba(23, 42, 74, .12);
-  --shadow-cool: rgba(29, 111, 208, .26);
-  --shadow-warm: rgba(226, 87, 0, .22);
-  --shadow-ok: rgba(30, 143, 99, .20);
-  --shadow: 0 14px 34px var(--shadow-color);
-  --shadow-hover: 0 22px 48px var(--shadow-color);
-  /* 渐变：主号召一律橙底 + 深墨字（白字压橙只有 2.9:1，过不了 AA） */
-  --grad: linear-gradient(120deg, #ff6a00, #cf5200);
-  --grad-text: linear-gradient(120deg, #b34700, #8f3800);
-  --grad-rule: linear-gradient(120deg, #ff6a00, #4da3ff);
+  --seam: #a9b2bb;               /* 面板拼缝 */
+  --code-bg: #1c2228;            /* 数据块底：深灰 */
+  --on-code: #d8dde3;
+  /* ── 立体：上沿高光 + 下沿阴影（细倒角），哑光不发光 ── */
+  --bevel-hi: inset 0 1px 0 rgba(255, 255, 255, .72);
+  --bevel-lo: inset 0 -1px 0 rgba(28, 34, 40, .13);
+  --bevel-in-hi: inset 0 1px 0 rgba(28, 34, 40, .10);
+  --bevel-in-lo: inset 0 -1px 0 rgba(255, 255, 255, .60);
+  --brushed: repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, .26) 0 1px, rgba(28, 34, 40, .030) 1px 3px);
+  --rivet: radial-gradient(circle at 42% 36%,
+      #f4f6f9 0 24%, #bdc6cf 52%, #939da7 74%, rgba(28, 34, 40, .30) 100%);
+  --inset-face: linear-gradient(180deg, #ced5dc, #d7dde3);
+  /* ── 线 ── */
+  --line: rgba(28, 34, 40, .20);
+  --line-soft: rgba(28, 34, 40, .11);
+  --line-strong: rgba(28, 34, 40, .38);
+  --line-cool: rgba(29, 95, 176, .45);
+  --line-warn: rgba(138, 90, 0, .45);
+  --line-ok: rgba(21, 122, 82, .40);
+  --line-bad: rgba(179, 39, 30, .40);
+  /* ── 文字：墨色 #1C2228；dim/faint 是银底上的两级灰 ── */
+  --text: #1c2228;
+  --text-dim: #414b54;
+  --text-faint: #566069;
+  /* ── 冷蓝 = 数据链接：--cyan 是「压得住银底」的文字蓝，
+        --cyan-bright 是设计原色 #4DA3FF，只用于标线 / 灯 / 轨道 / 图表 ── */
+  --cyan: #1d5fb0;
+  --cyan-deep: #17457f;
+  --cyan-bright: #4da3ff;
+  --blue: #1d5fb0;
+  /* ── 安全橙 = 关键按钮 / 主号召；文字橙深一档 ── */
+  --accent: #ff6a00;
+  --accent-deep: #b34a00;
+  --on-accent: #1c2228;
+  /* ── 状态：--led-* 是设计原色（灯 / 条），无 --led 后缀的是文字色 ── */
+  --led-ok: #3ddc97;
+  --led-warn: #ffb000;
+  --led-bad: #e03c31;
+  --green: #157a52;
+  --green-deep: #0f5c3d;
+  --amber: #8a5a00;
+  --amber-deep: #6b4500;
+  --red: #b3271e;
+  /* ── 淡染层（hover / 选中 / 数据块底）：铝底上是「薄涂层」，不是光晕 ── */
+  --halo-cool: rgba(77, 163, 255, .16);
+  --halo-warm: rgba(255, 106, 0, .13);
+  --halo-ok: rgba(61, 220, 151, .18);
+  --halo-bad: rgba(224, 60, 49, .12);
+  /* ── 投影：接触阴影 + 上沿高光，工业产品摄影那味，不发光 ── */
+  --shadow-color: rgba(28, 34, 40, .22);
+  --shadow-cool: rgba(29, 95, 176, .22);
+  --shadow-warm: rgba(180, 74, 0, .20);
+  --shadow-ok: rgba(21, 122, 82, .18);
+  --shadow: 0 1px 0 rgba(255, 255, 255, .55), 0 1px 2px rgba(28, 34, 40, .16),
+            0 12px 22px -16px rgba(28, 34, 40, .45);
+  --shadow-hover: 0 1px 0 rgba(255, 255, 255, .60), 0 2px 4px rgba(28, 34, 40, .18),
+                  0 18px 30px -18px rgba(28, 34, 40, .50);
+  /* ── 渐变 ── */
+  --grad: linear-gradient(180deg, #ff7a1a, #ef5f00);
+  --grad-text: linear-gradient(120deg, #b34a00, #8a3a00);
+  --grad-rule: linear-gradient(90deg, #ff6a00, #4da3ff);
   /* 字体：正文无衬线，数据 / 编号走等宽（栈里全是系统字体，不额外拉网络字体） */
   --font-sans: Inter, "IBM Plex Sans", "SF Pro Text", system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
   /* 微圆角：工业面板是切角，不是药丸 */
-  --radius: 10px;
-  --radius-sm: 6px;
+  /* 结构色：只服务倒角 / 内影 / 斑马 / 指示灯外圈这类「零件细节」，
+     不参与语义配色 —— 但它们同样得有两套值，写死在规则里就成了另一套主题里的亮斑。 */
+  --alu-sheen: linear-gradient(180deg, rgba(255, 255, 255, .30), rgba(255, 255, 255, 0) 46%);
+  --tint-alt: rgba(28, 34, 40, .035);
+  --zebra: rgba(255, 255, 255, .28);
+  --base-gloss: inset 0 1px 0 rgba(255, 255, 255, .10);
+  --on-base-dim: rgba(216, 221, 227, .70);
+  --led-idle: #98a2ac;
+  --led-edge: rgba(28, 34, 40, .40);
+  --led-out: rgba(255, 255, 255, .35);
+  --dot-edge: rgba(28, 34, 40, .30);
+  --cta-edge: #c25200;
+  --cta-gloss: inset 0 1px 0 rgba(255, 255, 255, .38), inset 0 -1px 0 rgba(0, 0, 0, .18);
+  --cta-gloss-hi: inset 0 1px 0 rgba(255, 255, 255, .44), inset 0 -1px 0 rgba(0, 0, 0, .20);
+  --cta-shadow: 0 1px 2px rgba(28, 34, 40, .22);
+  --cta-shadow-hi: 0 2px 5px rgba(28, 34, 40, .26);
+  --bar-shadow: var(--bevel-hi), 0 1px 2px rgba(28, 34, 40, .14);
+  --bar-shadow-up: var(--bevel-hi), 0 2px 6px rgba(28, 34, 40, .18);
+  --radius: 6px;
+  --radius-sm: 3px;
   --ease: cubic-bezier(.22, .8, .24, 1);
 }
 
@@ -912,7 +954,296 @@ body.loaded .hero-phone {
   .nav-links .theme-toggle { width: 100%; height: 44px; justify-content: flex-start; padding-left: 16px; gap: 10px; font-size: 16px; }
 }
 
-/* ── 21. 深色模式（默认皮肤） ──
+
+/* ════════════════════════════════════════════════════════════════
+   ── 21. 铝制控制台：组件与重绘 ──
+   设计语言：银白铝制面板为主，磨砂金属质感、轻微拉丝、细倒角与高光、
+   拼缝与铆钉；安全橙用于关键按钮与状态标识，冷蓝用于数据链接，
+   琥珀注意、信号绿正常、警告红故障；深灰 #1C2228 写字与图标。
+   模块化网格 / 数据表 / 状态灯 / 时间线 / 轨道图；等宽写数据，无发光。
+   这一节放在最后：同选择器的旧样式（玻璃、大投影、呼吸光）在这里被覆盖，
+   新零件（panel / led / data-table / timeline）也在这里定义。
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── 页面底：机身铝（无光斑、无发光，只有极轻的拉丝与一道斜向光泽） ── */
+body {
+  background-color: var(--bg-1);
+  background-image:
+    var(--alu-sheen),
+    var(--brushed),
+    linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  background-attachment: fixed, fixed, fixed;
+  color: var(--text);
+}
+.bg-blobs, .blob { display: none; }
+.hero::after, .section-head::before { display: none; }
+
+/* ── 零件：面板 ── */
+.panel {
+  position: relative;
+  background-color: var(--surface-1);
+  background-image: var(--brushed);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--bevel-hi), var(--bevel-lo), var(--shadow);
+}
+.panel--raise { background-color: var(--surface-2); }
+.panel--inset {
+  background-color: var(--surface-3);
+  background-image: var(--inset-face), var(--brushed);
+  border-color: var(--line-soft);
+  box-shadow: var(--bevel-in-hi), var(--bevel-in-lo);
+}
+/* 面板四角各一颗铆钉（拼装件的细节，别满屏撒） */
+.panel--riveted::before {
+  content: ""; position: absolute; inset: 7px; pointer-events: none; opacity: .85;
+  background-image: var(--rivet), var(--rivet), var(--rivet), var(--rivet);
+  background-size: 7px 7px; background-repeat: no-repeat;
+  background-position: left top, right top, left bottom, right bottom;
+}
+/* 面板头：一条丝印标题 + 右侧等宽读数，下面一条拼缝 */
+.panel__head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px; background: var(--surface-3);
+  border-bottom: 1px solid var(--line);
+  border-radius: var(--radius) var(--radius) 0 0;
+  box-shadow: var(--bevel-hi);
+}
+.panel__title { font-size: 13.5px; font-weight: 800; letter-spacing: .01em; }
+.panel__meta {
+  margin-left: auto; font-family: var(--font-mono); font-size: 11.5px;
+  color: var(--text-faint); font-variant-numeric: tabular-nums;
+}
+.panel__body { padding: 14px; }
+
+/* ── 零件：丝印文字 / 状态灯 / 状态条 ── */
+.mono-label {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--text-faint); font-weight: 700;
+}
+.mono-val { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; }
+.led {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto;
+  background: var(--led-idle);
+  box-shadow: inset 0 0 0 1px var(--led-edge), 0 0 0 1px var(--led-out);
+}
+.led--ok { background: var(--led-ok); }
+.led--warn { background: var(--led-warn); }
+.led--bad { background: var(--led-bad); }
+.led--cool { background: var(--cyan-bright); }
+.led--idle { background: var(--led-idle); }
+.status-strip {
+  display: flex; flex-wrap: wrap; align-items: stretch;
+  border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+  background-color: var(--surface-1); background-image: var(--brushed);
+  box-shadow: var(--bevel-hi), var(--bevel-lo), var(--shadow);
+}
+.status-strip__item {
+  display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+  border-left: 1px solid var(--line-soft); box-shadow: var(--bevel-hi);
+  font-size: 12.5px; color: var(--text-dim);
+}
+.status-strip__item:first-child { border-left: 0; }
+.status-strip__item b { color: var(--text); font-family: var(--font-mono); font-weight: 700; }
+
+/* ── 零件：数据表（等宽数字、发丝线、轻微斑马） ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th {
+  padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--line);
+  background: var(--surface-3); color: var(--text-faint);
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.data-table td { padding: 9px 12px; border-bottom: 1px solid var(--line-soft); }
+.data-table tbody tr:nth-child(even) { background: var(--zebra); }
+.data-table .num, .data-table td.num, .data-table th.num {
+  text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+}
+
+/* ── 零件：时间线（更新日志那条竖轨 + 节点） ── */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before {
+  content: ""; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 2px;
+  background: var(--line);
+}
+.timeline > li, .timeline > div { position: relative; }
+.timeline > li::before, .timeline > div::before {
+  content: ""; position: absolute; left: -24px; top: 16px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--surface-1); border: 2px solid var(--line-strong);
+}
+
+/* ── 重绘：区块与区块头（控制台分区，标题前一枚橙色标块） ── */
+.section { padding: 84px clamp(20px, 6vw, 96px); }
+.section.alt { background: var(--tint-alt); box-shadow: inset 0 1px 0 var(--line-soft), inset 0 -1px 0 var(--line-soft); }
+.section-head { max-width: 760px; margin: 0 0 40px; }
+.section-head h2 {
+  display: flex; align-items: baseline; gap: 12px;
+  font-size: clamp(24px, 3.2vw, 34px); font-weight: 850; letter-spacing: -.015em; line-height: 1.2;
+}
+.section-head h2::before {
+  content: ""; flex: 0 0 auto; width: 9px; height: 9px; border-radius: 1px;
+  background: var(--accent); box-shadow: var(--bevel-hi);
+  transform: translateY(-2px);
+}
+.section-head p { color: var(--text-dim); margin-top: 10px; font-size: 15px; }
+
+/* ── 重绘：按钮（橙面主号召 = 安全橙 + 细倒角；银面次级 = 面板 + 拼缝） ── */
+.btn {
+  border-radius: var(--radius); font-weight: 700; letter-spacing: .01em;
+  box-shadow: var(--bevel-hi), var(--bevel-lo), var(--shadow);
+  transition: transform .18s var(--ease), box-shadow .18s var(--ease),
+              border-color .18s var(--ease), color .18s var(--ease);
+}
+.btn-primary {
+  color: var(--on-accent); background: var(--grad);
+  border: 1px solid var(--cta-edge); animation: none;
+  box-shadow: var(--cta-gloss), var(--cta-shadow);
+}
+.btn-primary::after { display: none; }
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--cta-gloss-hi), var(--cta-shadow-hi);
+}
+.btn-ghost {
+  color: var(--text); background-color: var(--surface-1); background-image: var(--brushed);
+  border: 1px solid var(--line);
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--line-strong); transform: translateY(-1px); }
+.btn-text { box-shadow: none; color: var(--cyan); }
+.btn-text:hover { color: var(--cyan-deep); }
+
+/* ── 重绘：导航（一条铝制上盖 + 下沿拼缝） ── */
+.nav {
+  padding: 0; background-color: var(--surface-1); background-image: var(--brushed);
+  border-bottom: 1px solid var(--seam);
+  box-shadow: var(--bar-shadow);
+}
+.nav-inner { padding: 10px clamp(18px, 4vw, 54px); }
+.nav.scrolled { box-shadow: var(--bar-shadow-up); }
+.nav-links a { border-radius: var(--radius-sm); }
+.nav-links a::after { display: none; }
+.nav-links a:hover { background: var(--surface-2); box-shadow: var(--bevel-in-hi); }
+.nav-links a.active { color: var(--text); box-shadow: var(--bevel-in-hi), var(--bevel-in-lo); background: var(--surface-3); }
+.nav-links .nav-cta {
+  color: var(--on-accent); background: var(--grad); border: 1px solid var(--cta-edge);
+  box-shadow: var(--cta-gloss);
+}
+.nav-links .nav-cta:hover { color: var(--on-accent); background: var(--grad); filter: none; box-shadow: var(--cta-gloss-hi); }
+.theme-toggle, .nav-burger { border-radius: var(--radius-sm); }
+
+/* ── 重绘：Hero 之外的面板类零件（公告 / 平台 / 步骤 / 贡献者 / 友链） ── */
+.announce-card, .doc-card, .link-card, .step, .plat, .contributor, .faq-item, .cl-version {
+  background-color: var(--surface-1); background-image: var(--brushed);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--bevel-hi), var(--bevel-lo), var(--shadow);
+}
+.announce-card:hover, .doc-card:hover, .link-card:hover, .contributor:hover {
+  transform: translateY(-2px); border-color: var(--line-strong);
+  box-shadow: var(--bevel-hi), var(--bevel-lo), var(--shadow-hover);
+}
+/* 公告：控制台上的「系统消息」条 —— 左侧一条橙标 */
+.announce-card { border-left: 3px solid var(--accent); }
+/* 平台卡：等宽平台名 + 状态灯 */
+.plat b, .plat strong { font-family: var(--font-mono); }
+/* 步骤：编号做成冲压标牌 */
+.step-num {
+  background: var(--surface-3); color: var(--accent-deep);
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  box-shadow: var(--bevel-hi), var(--bevel-in-hi);
+  font-family: var(--font-mono); font-weight: 800;
+}
+/* 贡献者：头像块加一圈拼缝，名字与角色用数据体 */
+.c-name { font-weight: 800; }
+.c-role { color: var(--text-faint); font-family: var(--font-mono); font-size: 11.5px; }
+.cgroup-title { font-family: var(--font-mono); letter-spacing: .12em; text-transform: uppercase; font-size: 11.5px; color: var(--text-faint); }
+
+/* ── 重绘：更新日志 = 时间线（左侧竖轨 + 版本节点，中间是发丝线分隔的条目） ── */
+.changelog-list { position: relative; padding-left: 26px; max-width: 1000px; }
+.changelog-list::before {
+  content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 2px; background: var(--line);
+}
+.cl-version { position: relative; margin-bottom: 16px; padding: 0; overflow: visible; }
+.cl-version::before {
+  content: ""; position: absolute; left: -25px; top: 18px; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--surface-1); border: 2px solid var(--line-strong);
+  box-shadow: var(--bevel-hi);
+}
+.cl-version:first-child::before { border-color: var(--accent); background: var(--accent); }
+.cl-head { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-bottom: 1px solid var(--line); background: var(--surface-3); border-radius: var(--radius) var(--radius) 0 0; box-shadow: var(--bevel-hi); }
+.cl-tag {
+  font-family: var(--font-mono); font-weight: 800; font-size: 13px; letter-spacing: .02em;
+  color: var(--text); background: var(--surface-4); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: 2px 8px; box-shadow: var(--bevel-hi);
+}
+.cl-date { margin-left: auto; font-family: var(--font-mono); font-size: 11.5px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.cl-body { padding: 6px 14px 10px; }
+.cl-item { position: relative; padding: 9px 0 9px 18px; border-bottom: 1px solid var(--line-soft); font-size: 14px; color: var(--text-dim); line-height: 1.75; }
+.cl-item:last-child { border-bottom: 0; }
+.cl-dot { position: absolute; left: 0; top: 16px; width: 8px; height: 8px; border-radius: 2px; }
+.cl-dot.new { background: var(--cyan-bright); box-shadow: inset 0 0 0 1px var(--dot-edge); }
+.cl-dot.up { background: var(--led-ok); box-shadow: inset 0 0 0 1px var(--dot-edge); }
+.cl-dot.fix { background: var(--led-warn); box-shadow: inset 0 0 0 1px var(--dot-edge); }
+.cl-item b { color: var(--text); }
+
+/* ── 重绘：FAQ（面板 + 丝印问号 + 展开态橙标） ── */
+.faq-item { margin-bottom: 10px; overflow: hidden; }
+.faq-item > summary, .faq-item .q { font-weight: 700; }
+.faq-item[open] { border-color: var(--line-cool); }
+.faq-item[open] > summary { background: var(--surface-3); box-shadow: var(--bevel-hi); }
+.faq-item .chev { color: var(--text-faint); }
+
+/* ── 重绘：页脚 = 底座（深灰底，铝白字） ── */
+.footer {
+  background: var(--code-bg); color: var(--on-code);
+  border-top: 1px solid var(--seam);
+  box-shadow: var(--base-gloss);
+}
+.footer a { color: var(--on-code); }
+.footer a:hover { color: var(--cyan-bright); }
+.footer .foot-note, .footer small { color: var(--on-base-dim); }
+
+/* ── 重绘：内嵌代码 / 等宽数据（控制台读数） ── */
+code, pre, kbd, samp { border-radius: var(--radius-sm); }
+code { background: var(--surface-4); border: 1px solid var(--line-soft); color: var(--accent-deep); }
+:root[data-theme="dark"] code { background: var(--surface-3); color: var(--cyan-bright); border-color: var(--line); }
+pre { background: var(--code-bg); color: var(--on-code); border: 1px solid var(--seam); box-shadow: var(--bevel-hi); }
+pre code { background: none; border: 0; color: inherit; }
+
+/* ── 重绘：启动遮罩 = 上电自检（第 16 节那条「雷达 + 光斑」的旧皮在这里换掉） ── */
+.preloader {
+  background-color: var(--bg-1);
+  background-image: var(--alu-sheen), var(--brushed),
+    linear-gradient(180deg, var(--bg-1), var(--bg-2));
+}
+.pre-radar {
+  background-color: var(--surface-3); background-image: var(--brushed);
+  border-color: var(--line);
+  box-shadow: var(--bevel-hi), var(--bevel-in-hi);
+}
+.pre-radar::before { border-color: var(--line-soft); }
+.pre-radar::after { background: conic-gradient(from 0deg, var(--line-cool), transparent 70deg); }
+.pre-radar i::after { background: linear-gradient(90deg, var(--cyan), transparent); }
+.pre-logo { box-shadow: var(--bevel-hi); }
+.pre-brand { font-family: var(--font-mono); letter-spacing: .14em; }
+.pre-bar { background: var(--line); border-radius: 1px; }
+.pre-bar i { background: var(--accent); border-radius: 1px; }
+
+/* ── 重绘：零散余晖清零 ──
+   令牌换掉之后，下面这些位置的投影还是旧的「冷蓝辉光」（--shadow-cool 是蓝的）。
+   铝板上不发光：统一收成哑光投影 + 内倒角；冷蓝只留在描边与数据上。 */
+.brand-logo, .footer-brand img, .pre-logo { box-shadow: var(--bevel-hi), var(--shadow); }
+.copy-btn:hover, .cl-tag.beta, .link-card:hover, .plat:hover { box-shadow: var(--shadow); }
+.tag.ok { background: var(--surface-3); border-color: var(--line-ok); }
+.pl-logo, .sym-char, .cl-icon {
+  background-color: var(--surface-3); background-image: var(--brushed);
+  border-color: var(--line); box-shadow: var(--bevel-hi), var(--bevel-in-hi);
+}
+.clink:hover .cl-icon { transform: none; background-color: var(--surface-4); border-color: var(--line-cool); }
+.clink:hover .cl-icon svg { fill: var(--cyan-deep); }
+.nav-links .nav-cta:hover, .btn-primary:hover { filter: none; }
+
+/* ── 22. 深色模式（暗铝备选皮肤） ──
    深空黑底、面板灰面、铝白字；安全橙主号召、冷蓝数据高亮。
    键在 <html data-theme>，由 <head> 内联脚本在首帧前写入
    （没存过偏好 = dark，本站的招牌色就是深空黑；手动切过则 localStorage 优先）。
@@ -920,51 +1251,84 @@ body.loaded .hero-phone {
    所以不要在规则里写死颜色，否则另一套主题里就会出现一块亮斑。 */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --surface-1: #1c2228;          /* 面板灰 */
-  --surface-2: #171d23;
-  --surface-3: #12181d;
-  --surface-4: #0f1519;
-  --surface-hi: #232a31;
+  /* 暗铝：同一套面板语汇，材质换成深色阳极氧化铝 */
+  --bg-1: #12171b;
+  --bg-2: #0d1114;
+  --surface-1: #1c2228;          /* 面板灰（深灰 #1C2228 在这里是「面」） */
+  --surface-2: #232a31;          /* 抬起一档 */
+  --surface-3: #2a323a;          /* 高光 / 表头 */
+  --surface-4: #333b44;          /* 最亮小件 */
+  --surface-hi: #2a323a;
   --glass: var(--surface-1);
+  --seam: #3a434c;
   --code-bg: #05080f;
   --on-code: #d8dde3;
-  --bg-1: #0a0e12;               /* 深空黑 */
-  --bg-2: #090c10;
+  --bevel-hi: inset 0 1px 0 rgba(255, 255, 255, .09);
+  --bevel-lo: inset 0 -1px 0 rgba(0, 0, 0, .45);
+  --bevel-in-hi: inset 0 1px 0 rgba(0, 0, 0, .50);
+  --bevel-in-lo: inset 0 -1px 0 rgba(255, 255, 255, .07);
+  --brushed: repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, .035) 0 1px, rgba(0, 0, 0, .055) 1px 3px);
+  --rivet: radial-gradient(circle at 42% 36%,
+      #4a545e 0 24%, #333b44 52%, #262d34 74%, rgba(0, 0, 0, .55) 100%);
+  --inset-face: linear-gradient(180deg, #161b20, #1c2228);
   --line: rgba(216, 221, 227, .14);
   --line-soft: rgba(216, 221, 227, .09);
   --line-strong: rgba(216, 221, 227, .26);
-  --line-cool: rgba(77, 163, 255, .32);
-  --line-warn: rgba(255, 176, 0, .32);
-  --line-ok: rgba(61, 220, 151, .28);
-  --line-bad: rgba(224, 60, 49, .34);
+  --line-cool: rgba(77, 163, 255, .40);
+  --line-warn: rgba(255, 176, 0, .38);
+  --line-ok: rgba(61, 220, 151, .34);
+  --line-bad: rgba(224, 60, 49, .40);
   --text: #d8dde3;               /* 铝白 */
   --text-dim: #98a2ac;
   --text-faint: #868f9a;
+  --cyan: #4da3ff;               /* 暗底上这一档就是文字色 */
   --cyan-deep: #2e7fd1;
-  --cyan: #4da3ff;               /* 冷蓝：数据高亮 */
   --cyan-bright: #8cc5ff;
   --blue: #4da3ff;
-  --accent: #ff6a00;             /* 安全橙 */
+  --accent: #ff6a00;
   --accent-deep: #ff8a3d;
   --on-accent: #0a0e12;
-  --green: #3ddc97;              /* 信号绿：正常 */
+  --led-ok: #3ddc97;
+  --led-warn: #ffb000;
+  --led-bad: #e03c31;
+  --green: #3ddc97;
   --green-deep: #2aae77;
-  --amber: #ffb000;              /* 琥珀：注意 */
+  --amber: #ffb000;
   --amber-deep: #c98a00;
-  --red: #e03c31;                /* 警告红：故障 */
-  --halo-cool: rgba(77, 163, 255, .10);
-  --halo-warm: rgba(255, 106, 0, .08);
-  --halo-ok: rgba(61, 220, 151, .06);
-  --halo-bad: rgba(224, 60, 49, .08);
+  --red: #e03c31;
+  --halo-cool: rgba(77, 163, 255, .12);
+  --halo-warm: rgba(255, 106, 0, .10);
+  --halo-ok: rgba(61, 220, 151, .10);
+  --halo-bad: rgba(224, 60, 49, .10);
   --shadow-color: rgba(0, 0, 0, .55);
-  --shadow-cool: rgba(77, 163, 255, .18);
-  --shadow-warm: rgba(255, 106, 0, .16);
-  --shadow-ok: rgba(61, 220, 151, .14);
-  --shadow: 0 14px 34px var(--shadow-color);
-  --shadow-hover: 0 22px 48px var(--shadow-color);
-  --grad: linear-gradient(120deg, #ff6a00, #c2410c);
+  --shadow-cool: rgba(77, 163, 255, .20);
+  --shadow-warm: rgba(255, 106, 0, .18);
+  --shadow-ok: rgba(61, 220, 151, .16);
+  --shadow: 0 1px 0 rgba(255, 255, 255, .04), 0 1px 2px rgba(0, 0, 0, .60),
+            0 14px 26px -18px rgba(0, 0, 0, .80);
+  --shadow-hover: 0 1px 0 rgba(255, 255, 255, .05), 0 2px 4px rgba(0, 0, 0, .65),
+                  0 20px 34px -20px rgba(0, 0, 0, .85);
+  /* 结构色：暗铝这一侧同样一份（漏一个，深底上就会露出一块浅色亮斑） */
+  --alu-sheen: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0) 46%);
+  --tint-alt: rgba(216, 221, 227, .04);
+  --zebra: rgba(255, 255, 255, .03);
+  --base-gloss: inset 0 1px 0 rgba(255, 255, 255, .05);
+  --on-base-dim: rgba(216, 221, 227, .62);
+  --led-idle: #7d868f;
+  --led-edge: rgba(0, 0, 0, .50);
+  --led-out: rgba(255, 255, 255, .12);
+  --dot-edge: rgba(0, 0, 0, .45);
+  --cta-edge: #c25200;
+  --cta-gloss: inset 0 1px 0 rgba(255, 255, 255, .30), inset 0 -1px 0 rgba(0, 0, 0, .35);
+  --cta-gloss-hi: inset 0 1px 0 rgba(255, 255, 255, .36), inset 0 -1px 0 rgba(0, 0, 0, .38);
+  --cta-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+  --cta-shadow-hi: 0 2px 5px rgba(0, 0, 0, .50);
+  --bar-shadow: var(--bevel-hi), 0 1px 2px rgba(0, 0, 0, .40);
+  --bar-shadow-up: var(--bevel-hi), 0 2px 6px rgba(0, 0, 0, .48);
+  --grad: linear-gradient(180deg, #ff7a1a, #ef5f00);
   --grad-text: linear-gradient(120deg, #ffb000, #ff6a00);
-  --grad-rule: linear-gradient(120deg, #ff6a00, #4da3ff);
+  --grad-rule: linear-gradient(90deg, #ff6a00, #4da3ff);
 }
 /* 深空黑上不需要再加亮，光斑收敛 */
 :root[data-theme="dark"] .blob { opacity: .4; }
@@ -978,7 +1342,7 @@ body.loaded .hero-phone {
   }
 }
 
-/* ── 22. 用户手册（docs/manual.html，三语共用） ──
+/* ── 23. 用户手册（docs/manual.html，三语共用） ──
    左栏固定目录 + 右栏正文；移动端目录塌成顶部横排。 */
 #manual { padding-top: 132px; }
 .manual-tools { max-width: 1080px; margin: 0 auto 30px; display: grid; gap: 14px; }

@@ -1,14 +1,20 @@
 /* ══════════════════════════════════════════════════════════════════════
-   Hero：3D 星球直接长在 hero 上 + 首屏一个累计报文数字（三语首页共用）
+   Hero：3D 星球直接长在 hero 上 + 首屏一块铝制读数面板（三语首页共用）
    ──────────────────────────────────────────────────────────────────────
    为什么单独一个文件：style.css 被 46 个页面以 ?v=8 引用，动它就得全站改
    版本号；这块只有三语首页 hero 用到，独立文件 + 独立 ?v 更省事。
 
-   这一版的关键点：星球不是"面板"，而是一层**透明**的全幅画布
-   （js/planet-3d.js 里 clearColor 的 alpha = 0）。所以这里不写底色、不写
-   边框、不写内边距 —— 画布上除了点什么都没有，边缘自然消失，出界的环带
-   交给 hero 自己的 overflow 裁掉。浅色主题下点是彩色墨点，深色主题下同一
-   份几何切成加色混合变霓虹辉光（见脚本里的 MODES）。
+   设计语言（与 style.css 第 21 节同一套）：银白铝制面板、磨砂 + 轻微拉丝、
+   细倒角与高光、拼缝与铆钉；安全橙只给关键按钮与状态标识，冷蓝只给数据
+   链接，深灰 #1C2228 写字与图标；模块化网格 / 数据表 / 状态灯 / 时间线；
+   等宽字体写数据。**无发光、无全息、无扫描线** —— 所以这一节里看不到
+   drop-shadow 光晕、渐变彩字、呼吸心跳点，这几种是上一版的旧皮。
+
+   星球不是"面板"，而是一层**透明**的全幅画布（js/planet-3d.js 里
+   clearColor 的 alpha = 0）。所以这里不写底色、不写边框、不写内边距 ——
+   画布上除了点什么都没有，边缘自然消失，出界的环带交给 hero 的 overflow
+   裁掉。浅色（银白铝）是默认皮肤：蚀刻在铝面上的星座网；深色是「暗铝」
+   备选皮肤，同一份几何换混合模式与色调（见脚本里的 MODES）。
    ══════════════════════════════════════════════════════════════════════ */
 
 /* ── 星球层 ── */
@@ -23,9 +29,7 @@
   /* 这里不做 CSS 入场动画：「聚成球 + 机位退定」由 planet-3d.js 在 WebGL 里
      做（否则 CSS 的 transform 会盖掉滚动视差）。这一层只负责往下拉页面时
      慢慢退开 —— 位移 / 缩放 / 透明度都读 .hero 上的变量，脚本里每帧写一次；
-     没有脚本时这几个变量取默认值，也就是稳稳待在取景位。
-     反面教材：上一版在这里写 animation + opacity:0，遮罩因为任何原因没收到
-     .loaded（比如外链资源没加载完），星球就永远隐形，整层白给。 */
+     没有脚本时这几个变量取默认值，也就是稳稳待在取景位。 */
   transform: translate3d(0, var(--hero-3d-y, 0px), 0) scale(var(--hero-3d-scale, 1));
   opacity: var(--hero-3d-fade, 1);
   will-change: transform, opacity;
@@ -35,41 +39,154 @@
 /* 文案在最上层。hero-inner 自己不拦指针事件，好让右半边的拖动落到画布上，
    只有文案栏恢复接收（链接、选中文字照常）。 */
 .hero-inner { grid-template-columns: minmax(0, 1fr); pointer-events: none; }
-/* ── 第一屏只摆那个数字 ──
-   进来第一眼应该是一个数，不是一段自我介绍。所以首屏就是一个差不多一屏高的
-   盒子（hero 的上内边距是 140px，减 150 之后盒子正好压在折线上），数字在盒子
-   里垂直居中；说明与下载都在它下面，要滚上来。 */
+
+/* 背景那层中继网（main.js 画的）：一条极淡的冷蓝细线网，压在铝底上像图纸，
+   不能抢面板的读数 —— 所以整层压到 55%。 */
+.hero-canvas { opacity: .55; }
+/* 工程网格：48px 一格，两个方向各一条发丝线，边缘用遮罩化开。这里不用光斑、
+   不用彩色描线 —— 它就是绘图纸上的格。 */
+.hero-grid {
+  opacity: .8;
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 78% 68% at 62% 38%, #000 34%, transparent 80%);
+  mask-image: radial-gradient(ellipse 78% 68% at 62% 38%, #000 34%, transparent 80%);
+}
+
+/* ── 第一屏：一块铆上去的读数面板 ──
+   进来第一眼应该是一个数，不是一段自我介绍。数字装在一块铝面板里（面板头
+   是丝印标题 + 状态灯，读数在面板身上），下面接一条状态条 —— 这是控制台
+   上的「读数块」，不是卡片：没有大投影、没有圆角药丸、没有渐变。 */
 .hero-copy {
-  pointer-events: auto; position: relative; max-width: 620px;
+  pointer-events: auto; position: relative;
+  max-width: 560px;
   min-height: calc(100vh - 150px);
-  display: flex; align-items: center; justify-content: flex-start;
-  /* 往下拉：数字比星球走得快一点、先淡掉、再轻缩一档，hero 交给下一屏。
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  gap: 14px;
+  /* 往下拉：读数比星球走得快一点、先淡掉、再轻缩一档，hero 交给下一屏。
      位移 / 缩放 / 透明度都是脚本按"缓动后的滚动量"每帧写进来的变量 ——
      缓动在 JS 里做，所以这里不写 transition（两套缓动叠一起会发涩）。 */
   transform: translate3d(0, var(--hero-3d-copy, 0px), 0) scale(var(--hero-3d-copy-scale, 1));
   opacity: var(--hero-3d-copy-fade, 1);
   will-change: transform, opacity;
 }
+.hero-console { width: 100%; max-width: 460px; }
+.hero-console .panel__meta { display: inline-flex; align-items: center; gap: 7px; }
+.hero-console .hero-stat { padding: 20px 22px 24px; }
+/* 状态条与读数面板同宽：它是这块读数下面的「机况行」，不是独立一块 */
+.hero-copy > .status-strip { width: 100%; max-width: 460px; }
+
+/* 长句子压在铝底的点云上也读得清：文案底下铺一层很淡的同色晕（不出边框感）。
+   两套值分别贴着银白铝 / 暗铝，换了底色记得跟着改这里。 */
+.hero { --hero-veil: rgba(207, 214, 221, .92); }
+:root[data-theme="dark"] .hero { --hero-veil: rgba(18, 23, 27, .90); }
+.hero-copy-next::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  inset: -12% -26%;
+  background: radial-gradient(48% 46% at 30% 50%, var(--hero-veil), transparent 76%);
+}
 
 /* ── 折线之下：这是什么（说明）→ 真正要动手的那一块 ──
-   这两块**不放在 .hero-copy 里面**。滚动退场的淡出只该作用在首屏那个数字上 ——
+   这两块**不放在 .hero-copy 里面**。滚动退场的淡出只该作用在首屏那块读数上 ——
    老版把下载块和读数放在同一个会淡出的盒子里，滚过 0.8 屏之后整块只剩 12%
    不透明度（因为一直没人滚到那儿，这个坑没被发现）。 */
 .hero-copy-next {
   pointer-events: auto; position: relative; max-width: 620px;
   padding-top: clamp(16px, 5vh, 64px);
-  /* 也吃一点滚动量：比页面慢一点点地升上来，接住上面退场的数字 */
+  /* 也吃一点滚动量：比页面慢一点点地升上来，接住上面退场的读数 */
   transform: translate3d(0, var(--hero-3d-next, 0px), 0);
 }
 
-/* 文案底下铺一层很淡的同色晕，长句子压在点云上也读得清（不出边框感）。
-   两套值分别贴着 --bg-1 的白 / 深空黑，换了底色记得跟着改这里。 */
-.hero { --hero-veil: rgba(244, 247, 253, .9); }
-:root[data-theme="dark"] .hero { --hero-veil: rgba(10, 14, 18, .86); }
-.hero-copy::before, .hero-copy-next::before {
-  content: ""; position: absolute; z-index: -1; pointer-events: none;
-  inset: -18% -34%;
-  background: radial-gradient(46% 46% at 38% 50%, var(--hero-veil), transparent 74%);
+/* ── 累计报文读数：竖排两级 —— 丝印标签在上、数字在下 ──
+   标签是"这个数字是谁的、是什么"（品牌名必须留在这里，不许省成"累计报文总量"）；
+   数字是这一屏唯一的主角，所以给到最大字号、走等宽（数据体）、tabular 对齐，
+   每三秒换一位数字时整块不抖。 */
+.hero-stat {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  margin: 0;
+}
+.hero-stat .hs-label {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--text-faint); font-weight: 700;
+}
+.hero-stat .tl-value {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: clamp(46px, 7.4vw, 104px);
+  font-weight: 700; line-height: 1; letter-spacing: -.025em;
+  font-variant-numeric: tabular-nums;
+  /* 铝面上的冲压字：墨色 + 下面一道 1px 白高光，看着像刻进去的。
+     不上渐变、不发光 —— 这块面板上唯一的强调色留给面板头那颗状态灯。 */
+  color: var(--text);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .60);
+}
+:root[data-theme="dark"] .hero-stat .tl-value { text-shadow: 0 1px 0 rgba(0, 0, 0, .55); }
+/* 每跳一格：数字轻抬一下、颜色转到安全橙再退回墨色 —— 只闪色，不出光晕。 */
+.tl-value.bump { animation: tlBump .62s var(--ease); }
+@keyframes tlBump {
+  /* 起手与收尾都停在静止态：跳完不留色差，看不出是从哪一帧接上的 —— 只记得它闪了一下 */
+  0% { transform: translateY(-2px); color: var(--accent); }
+  55% { transform: translateY(0); color: var(--accent-deep); }
+  100% { transform: none; color: var(--text); }
+}
+
+/* 快照过期（> 12h 不再外推）：不做心跳点，只把数字压暗一档，
+   "为什么"挂在 title 上（悬停可见）。 */
+.hero-stat.stale .tl-value { color: var(--text-dim); }
+
+/* ── 往下滑才出现的那一块：真正要动手的东西（版本铭牌 + 下载按钮 + 来源）。
+      .reveal 是站点本来就有的机制（风格与其它 section 一致），这里只把它从
+      hero 的依次登场里摘出来 —— 否则遮罩一走开它就自己演完了。 ── */
+.hero-copy-next .hero-cta { margin-top: clamp(40px, 9vh, 96px); }
+
+/* 版本铭牌：一块小铝板 + 一颗绿状态灯，右侧写数据（等宽）。 */
+.hero-release {
+  display: inline-flex; align-items: center; gap: 12px;
+  margin: 8px 0 6px; padding: 11px 16px;
+  background-color: var(--surface-1); background-image: var(--brushed);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--bevel-hi), var(--bevel-lo), var(--shadow);
+}
+.hero-release .hr-text { display: flex; flex-direction: column; gap: 2px; }
+.hero-release b { font-size: 14px; font-weight: 800; letter-spacing: .01em; }
+.hero-release #hrState { font-family: var(--font-mono); color: var(--green); }
+.hero-release #hrTimer { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
+.hero-release #hrTimer a { color: var(--cyan); font-weight: 700; }
+
+/* ── 名字牌（徽章）：方形铝铭牌 + 一颗灯，不再用药丸胶囊 + 大投影 ── */
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 7px 12px; border-radius: var(--radius-sm);
+  background-color: var(--surface-3); background-image: var(--brushed);
+  border: 1px solid var(--line);
+  box-shadow: var(--bevel-hi), var(--bevel-in-hi);
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em;
+  color: var(--text); margin-bottom: 26px;
+}
+.hero-badge b { color: var(--text); font-weight: 800; font-family: var(--font-mono); }
+.hero-badge .sep { width: 1px; height: 13px; background: var(--line-strong); }
+.hero-badge .rel-tag {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .12em;
+  color: var(--text-dim); border: 1px solid var(--line); padding: 2px 7px;
+  border-radius: var(--radius-sm); background: var(--surface-4);
+}
+
+/* ── 主视觉主题字：铝面上的大字，不上渐变、不发光 ──
+   上一版这里是「墨 → 橙」渐变 + 蓝投影，属旧皮：标题字不是按钮，不该用号召色。 */
+.hero-wordmark {
+  font-size: clamp(44px, 6.2vw, 88px); font-weight: 900; letter-spacing: -.03em;
+  line-height: .96; margin: 6px 0 14px;
+  background: none; color: var(--text);
+  filter: none; text-shadow: 0 1px 0 rgba(255, 255, 255, .55);
+}
+:root[data-theme="dark"] .hero-wordmark { text-shadow: 0 1px 0 rgba(0, 0, 0, .50); }
+/* slogan 里被强调的那两个词：墨色字 + 底下一条安全橙标线（丝印条，不是彩字） */
+.hero-slogan .grad {
+  background: none; color: var(--text);
+  box-shadow: inset 0 -3px 0 var(--accent);
 }
 
 /* ── 读数之上的一句邀请：说清「这个数字是什么」，语气是邀请不是参数表。
@@ -79,66 +196,10 @@
   font-size: clamp(14px, 1.5vw, 16px); line-height: 1.95;
   color: var(--text-dim); letter-spacing: .01em;
 }
-.hero-invite .hi-mark { color: var(--cyan); margin-right: 8px; }
-/* ── 累计报文读数：竖排三级 —— 标签在上 / 数字在中 / 一行小注收尾。
-      为什么不再横着排一行：标签、数字、频率挤在同一条基线上，字号又小，整块
-      看上去像页脚的一行注释，压不住这一屏；竖排之后数字自己成一个体量，
-      "这是什么"（标签）也终于排在数字**前面**而不是后面小字里。 ── */
-.hero-stat {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
-  margin: 0;
-}
-/* 标签：这个数字是**谁的、是什么**。首屏只有数字加这一行小字，没有它就只剩
-   一个来路不明的计数器 —— 所以品牌名必须留在这里，不许省成"累计报文总量"。 */
-.hero-stat .hs-label {
-  font-size: 12px; letter-spacing: .28em; text-transform: uppercase;
-  color: var(--text-faint);
-}
-.hero-stat .tl-value {
-  display: block;
-  /* 站点正文那一族字（不是等宽）：摆得进 hero 的字形体系，但数字必须
-     tabular —— 每三秒换一位数字时，整块不能跟着抖。 */
-  font-size: clamp(64px, 11vw, 148px);
-  font-weight: 800; line-height: .92;
-  letter-spacing: -.04em; font-variant-numeric: tabular-nums;
-   /* 不上渐变、不上彩：就是铝白 / 墨色。跳动靠"抬起 + 换成数据那一支冷蓝再退回来"，
-     整条读数里只有这一处强调色，不会跟旁边的按钮抢色。 */
-  color: var(--text);
-  filter: drop-shadow(0 10px 24px var(--shadow-color));
-}
-/* 每跳一格：数字轻轻上浮一下、辉光一闪、渐变扫过一整轮 —— 看上去是「亮了一下」，
-   而不是「换了一张图」。 */
-.tl-value.bump { animation: tlBump .62s var(--ease); }
-@keyframes tlBump {
-  /* 起手与收尾都停在静止态：跳完不留色差，看不出是从哪一帧接上的 —— 只记得它亮过 */
-  0% {
-    transform: translateY(-3px) scale(1.035);
-    color: var(--cyan);
-    filter: drop-shadow(0 0 16px var(--shadow-cool));
-  }
-  55% { transform: translateY(0) scale(1); }
-  100% {
-    transform: none;
-    color: var(--text);
-    filter: drop-shadow(0 10px 24px var(--shadow-color));
-  }
-}
+.hero-invite .hi-mark { color: var(--accent); margin-right: 8px; }
 
-/* 快照过期（> 12h 不再外推）：整块读数里不该有第二处动画，所以不做心跳点，
-   只把数字压暗一档，"为什么"挂在 title 上（悬停可见）。 */
-.hero-stat.stale .tl-value { color: var(--text-dim); }
-
-/* ── 往下滑才出现的那一块：真正要动手的东西（版本卡 + 下载按钮 + 来源）。
-      hero 上面只负责说清"这是什么、这个数字是什么"；动手的部分等在下面，
-      滚到位才淡上来。.reveal 是站点本来就有的机制（风格与其它 section 一致），
-      这里只把它从 hero 的依次登场里摘出来 —— 否则遮罩一走开它就自己演完了，
-      也就不用"往下滑"了。 ── */
-.hero-copy-next .hero-cta { margin-top: clamp(40px, 9vh, 96px); }
-
-/* hero 背景那层网（main.js 画的）压一档：这一屏的主角是星球，不是噪点 */
-.hero-canvas { opacity: .5; }
-
-/* ── 没有 WebGL：退回纯 CSS 星球，位置与脚本里的取景对齐（偏右 / 窄屏居中） ── */
+/* ── 没有 WebGL：退回纯 CSS 星球，位置与脚本里的取景对齐（偏右 / 窄屏居中）。
+      降级件同样是铝做的：一颗带经纬蚀线的铝球 + 两道细轨道环，不出辉光。 ── */
 .planet-fallback { display: none; }
 .hero.no-3d .planet-canvas { display: none; }
 .hero.no-3d .planet-fallback {
@@ -151,38 +212,45 @@
 .planet-fallback .pf-globe {
   position: absolute; left: 71.5%; top: 47.5%; width: 65vh; aspect-ratio: 1;
   transform: translate(-50%, -50%); border-radius: 50%;
-  /* 降级星球也只用那一族蓝：亮面 → 冷蓝 → 深空黑的地平线 */
+  border: 1px solid var(--line);
+  /* 铝球：左上受光的高光 → 中灰 → 阴影侧的深灰，再叠一层 12° 一条的经线蚀纹 */
   background:
-    radial-gradient(circle at 36% 32%, var(--cyan-bright) 0%, var(--cyan) 26%, var(--cyan-deep) 62%, var(--bg-1) 100%);
-  box-shadow: 0 0 140px var(--shadow-cool);
-  opacity: .92;
+    repeating-conic-gradient(from 0deg,
+      var(--line-soft) 0deg .35deg, transparent .35deg 12deg),
+    radial-gradient(circle at 34% 30%,
+      var(--surface-4) 0%, var(--surface-2) 30%, var(--surface-1) 58%, var(--bg-2) 100%);
+  box-shadow: inset -18px -20px 46px rgba(28, 34, 40, .16), var(--shadow);
+  opacity: .95;
 }
 .planet-fallback .pf-ring {
   position: absolute; left: 71.5%; top: 47.5%; width: 116vh; height: 40vh;
   transform: translate(-50%, -50%) rotate(-13deg); border-radius: 50%;
-  border: 2px solid var(--line-cool);
-  box-shadow: 0 0 40px var(--shadow-cool);
+  border: 1.5px solid var(--line-cool);
+  border-top-color: var(--line-strong);
+  box-shadow: none;
 }
 
-/* ── 底部的「往下拉」提示：一根渐隐的细线 + 一颗往下走的点。没有圆环、没有
-      箭头图标、没有盒子 —— 它就是一条线，接住「继续往下看」这个动作；
-      真的往下拉之后，星球与文案的退场动画接上，提示自己也就随 hero 走掉了。 ── */
+/* ── 底部的「往下拉」提示：一根渐隐的墨线 + 一颗往下走的方点。没有圆环、没有
+      箭头图标、没有盒子、不发光 —— 它就是一条线，接住「继续往下看」这个动作；
+      真的往下拉之后，读数与星球的退场动画接上，提示自己也就随 hero 走掉了。 ── */
 .hero-scroll {
   display: block; position: absolute; left: 50%; top: calc(100vh - 76px); z-index: 3;
   width: 26px; height: 52px; margin-left: -13px;
-  opacity: .62; transition: opacity .4s var(--ease);
+  opacity: .55; transition: opacity .4s var(--ease);
   animation: heroCueFloat 2.8s var(--ease) infinite;
 }
 .hero-scroll:hover, .hero-scroll:focus-visible { opacity: 1; }
 .hero-scroll span {
-  position: absolute; left: 50%; top: 0; width: 1.5px; height: 100%;
-  margin-left: -.75px; border-radius: 2px;
-  background: linear-gradient(180deg, rgba(77, 163, 255, 0), rgba(77, 163, 255, .55) 45%, rgba(77, 163, 255, 0));
+  position: absolute; left: 50%; top: 0; width: 1px; height: 100%;
+  margin-left: -.5px;
+  background: linear-gradient(180deg, rgba(28, 34, 40, 0), rgba(28, 34, 40, .55) 45%, rgba(28, 34, 40, 0));
+}
+:root[data-theme="dark"] .hero-scroll span {
+  background: linear-gradient(180deg, rgba(216, 221, 227, 0), rgba(216, 221, 227, .55) 45%, rgba(216, 221, 227, 0));
 }
 .hero-scroll span::after {
-  content: ""; position: absolute; left: 50%; top: 0; width: 6px; height: 6px;
-  margin-left: -3px; border-radius: 50%; background: var(--cyan);
-  box-shadow: 0 0 14px rgba(77, 163, 255, .55);
+  content: ""; position: absolute; left: 50%; top: 0; width: 5px; height: 5px;
+  margin-left: -2.5px; border-radius: 1px; background: var(--text-dim);
   animation: heroCueDrop 2.8s var(--ease) infinite;
 }
 @keyframes heroCueFloat {
@@ -196,24 +264,27 @@
   100% { top: 34px; opacity: 0; }
 }
 
-/* ── 响应式：窄屏文案居中，星球挪到上三分之一（与脚本里的取景分支一致） ── */
+/* ── 响应式：窄屏读数与文案居中，星球挪到上三分之一（与脚本里的取景分支一致） ── */
 @media (max-width: 1024px) {
   .planet-fallback .pf-globe { left: 50%; top: 30%; width: 68vw; }
   .planet-fallback .pf-ring { left: 50%; top: 30%; width: 124vw; height: 44vw; }
   .hero-copy, .hero-copy-next { max-width: 640px; margin: 0 auto; text-align: center; }
-  .hero-badge, .hero-actions, .hero-meta, .hero-stat { justify-content: center; }
-  .hero-stat { display: flex; align-items: center; }
-  .hero-sub, .hero-invite { margin-left: auto; margin-right: auto; }
-  .hero-copy::before, .hero-copy-next::before {
-    inset: -10% -8%;
+  .hero-copy { align-items: center; }
+  .hero-copy-next::before {
+    inset: -8% -6%;
     background: radial-gradient(58% 58% at 50% 46%, var(--hero-veil), transparent 78%);
   }
+  .hero-console { max-width: 520px; }
+  .hero-stat { align-items: center; }
+  .hero-badge, .hero-actions, .hero-meta { justify-content: center; }
+  .hero-sub, .hero-invite { margin-left: auto; margin-right: auto; }
 }
 @media (max-width: 620px) {
   /* 手机上更不把数字缩回小字：这一屏就是它 */
-  .hero-stat { gap: 12px; margin-top: 0; }
-  .hero-stat .hs-label { font-size: 11px; letter-spacing: .2em; }
-  .hero-stat .tl-value { font-size: clamp(54px, 19vw, 88px); }
+  .hero-stat { gap: 8px; }
+  .hero-console .hero-stat { padding: 16px 16px 20px; }
+  .hero-stat .hs-label { font-size: 10px; letter-spacing: .16em; }
+  .hero-stat .tl-value { font-size: clamp(40px, 15vw, 72px); }
   .hero-invite { font-size: 13.5px; line-height: 1.9; }
 }
 

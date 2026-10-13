@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>介面導覽 — APRSlocus</title>
 <meta name="description" content="目標：認識五個頁籤與面板手勢，知道每個介面該幹什麼。">
-<meta name="theme-color" content="#0a0e12">
+<meta name="theme-color" content="#cfd6dd">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="APRSlocus">
 <meta property="og:title" content="介面導覽 — APRSlocus">
@@ -22,17 +22,17 @@
     <link rel="alternate" hreflang="en" href="https://aprslocus.theez.top/en/manual/interface.html">
     <link rel="alternate" hreflang="x-default" href="https://aprslocus.theez.top/manual/interface.html">
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
-<link rel="stylesheet" href="../../css/style.css?v=8">
+<link rel="stylesheet" href="../../css/style.css?v=9">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <script>
 /* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）；首帧前执行防闪底 */
 (function () {
   try {
     var t = localStorage.getItem('theme');
-    if (t !== 'dark' && t !== 'light') t = 'dark';
+    if (t !== 'dark' && t !== 'light') t = 'light';
     document.documentElement.setAttribute('data-theme', t);
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
+    if (m) m.setAttribute('content', t === 'dark' ? '#12171b' : '#cfd6dd');
   } catch (e) {}
 })();
 </script>
@@ -236,7 +236,7 @@
   <svg class="backtop-arrow" viewBox="0 0 24 24"><path d="M12 5l7 7-1.4 1.4L13 8.8V20h-2V8.8l-4.6 4.6L5 12l7-7z"/></svg>
 </a>
 
-<script src="../../js/main.js?v=8"></script>
+<script src="../../js/main.js?v=9"></script>
 <script>
 /* 手册页专属：小节搜索 + 侧栏 scrollspy（无 JS 时正文照常可读） */
 (function () {

@@ -328,12 +328,8 @@ def main():
     cssb = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
     chk('css braces balanced', cssb.count('{') == cssb.count('}'))
     chk('contrast fixes present',
-        all(x in css for x in ['--text-faint: #5c6885', '--cyan: #0f766e',
+        all(x in css for x in ['--text-faint: #5b6b85', '--cyan: #0369a1',
                                '--grad-text', 'font-size: 16px; color']))
-    # NASA 朋克皮肤：浅 / 深两套调色板 + 网格 / 星点背景层必须都在
-    chk('NASA 朋克皮肤层',
-        all(x in css for x in ['NASApunk skin', '--accent: #ff5330', '--accent: #c2321a',
-                               'body::before', 'body::after', '--star-c']))
     chk('dark theme rules >= 40', css.count('[data-theme="dark"]') >= 40,
         css.count('[data-theme="dark"]'))
     chk('new card grads c15-c18', all(('.c%d {' % i) in css for i in (15, 16, 17, 18)))
@@ -360,11 +356,10 @@ def main():
     chk('跨页搜索容器 + 脚本',
         all('manualResults' in read(b0 + '/start.html')
             and "fetch('_index.json')" in read(b0 + '/start.html') for b0, _ in BASES))
-    chk('css 缓存版本 v8、无 v6/v7 残留',
-        'style.css?v=8' in read('docs/manual/start.html')
+    chk('css 缓存版本 v7、无 v6 残留',
+        'style.css?v=7' in read('docs/manual/start.html')
         and 'style.css?v=6' not in read('docs/manual/start.html')
-        and 'style.css?v=7' not in read('docs/manual/start.html')
-        and 'style.css?v=8' in read('docs/index.html'))
+        and 'style.css?v=7' in read('docs/index.html'))
     chk('永久链接文案三语',
         '本节永久链接' in read('docs/manual/start.html')
         and '本節永久連結' in read('docs/zh-TW/manual/start.html')

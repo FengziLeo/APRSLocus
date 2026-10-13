@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>APRSlocus — APRS 定位追踪与地图</title>
 <meta name="description" content="APRSlocus —— 业余无线电爱好者用的 APRS 客户端，一个在本机运行的免费工具。它不提供、也不预置任何服务器地址：要联网请自行填写 APRS-IS 服务器，或改用蓝牙 / 串口 TNC、声卡音频与 Icom 电台直连。台站、消息与信标都在同一张地图上，Android / Windows 可用。">
-<meta name="theme-color" content="#060810">
+<meta name="theme-color" content="#f3f6fd">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="APRSlocus">
 <meta property="og:title" content="APRSlocus — APRS 定位追踪与地图">
@@ -27,10 +27,11 @@
 (function () {
   try {
     var t = localStorage.getItem('theme');
-    if (t !== 'light') t = 'dark'; /* 默认 NASA 朋克深色 */
+    if (t !== 'dark' && t !== 'light')
+      t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', t);
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#060810' : '#efe9db');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0b1220' : '#f3f6fd');
   } catch (e) {}
 })();
 </script>
@@ -55,7 +56,7 @@
 <link rel="alternate" hreflang="en" href="https://aprslocus.theez.top/en/">
 <link rel="canonical" href="https://aprslocus.theez.top/">
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="stylesheet" href="css/style.css?v=8">
+<link rel="stylesheet" href="css/style.css?v=7">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>

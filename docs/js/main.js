@@ -147,7 +147,7 @@
       document.documentElement.setAttribute("data-theme", next);
       try { localStorage.setItem("theme", next); } catch (e) {}
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute("content", next === "dark" ? "#060810" : "#efe9db");
+      if (meta) meta.setAttribute("content", next === "dark" ? "#0b1220" : "#f3f6fd");
       syncTheme();
     });
   }

@@ -71,6 +71,14 @@
   /* 标题卡：这一章要说什么（h2 + 引子）。抬头沿用 .section-head 那一套，
      只是它现在自己占一屏，底下不留空。 */
   .slide-inner .section-head { margin-bottom: 0; }
+  /* ── 字号：这一页读的是人话，不是参数表 ──
+     引子、名单、那一行 CTA 与页脚提示都偏小（11 ~ 16.5px），一屏只有一件事，
+     字太小就白占着一屏。这六个数只在本页生效 —— 站内别处（style.css）不动。 */
+  .slide-inner .section-head p { font-size: 18px; }
+  .slide-inner .cgroup-title { font-size: 15.5px; }
+  .slide-inner .contributor .c-name { font-size: 15.5px; }
+  .slide-inner .contributor .c-role { font-size: 12.5px; }
+  .slide-inner .cta-line { font-size: 15px; }
   .slide-inner h1 { margin: 0; font-size: clamp(32px, 4.8vw, 50px); font-weight: 800;
     letter-spacing: -.02em; line-height: 1.2; }
   /* 名单那一屏连标题一起端上来，末尾那点外边距不留 */
@@ -78,7 +86,7 @@
 
   /* 页脚那句「点一下继续」：第一下之后才出现，走到最后一屏自己退场。 */
   .deck-hint { position: fixed; left: 0; right: 0; bottom: 20px; z-index: 95;
-    text-align: center; font-size: 12.5px; letter-spacing: .08em; color: var(--text-faint);
+    text-align: center; font-size: 13.5px; letter-spacing: .08em; color: var(--text-faint);
     opacity: 0; transition: opacity .9s var(--ease); pointer-events: none; }
   .deck-hint.on { opacity: .72; }
 

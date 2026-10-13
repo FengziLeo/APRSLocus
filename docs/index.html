@@ -56,7 +56,7 @@
 <link rel="canonical" href="https://aprslocus.theez.top/">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="stylesheet" href="css/style.css?v=8">
-<link rel="stylesheet" href="css/hero-3d.css?v=14">
+<link rel="stylesheet" href="css/hero-3d.css?v=15">
 <link rel="stylesheet" href="css/motion.css?v=1">
 <link rel="stylesheet" href="css/nav.css?v=2">
 <link rel="stylesheet" href="css/features.css?v=3">
@@ -167,7 +167,7 @@ html{overflow-x:hidden}
       <div class="hero-intro reveal" data-delay="0">
         <!-- 页面唯一的 h1：品牌名（连版本与口号）。下面那句巨型主题字是同一句口号的
              放大版，重复一遍对读屏没有信息量，标成装饰。 -->
-        <h1 class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></h1>
+        <h1 class="hero-badge"><span class="pulse-dot" aria-hidden="true"></span><b>APRSlocus 2.0</b><span class="sep" aria-hidden="true"></span><span class="rel-tag">TOUCH SKY</span></h1>
         <div class="hero-wordmark" aria-hidden="true">TOUCH SKY</div>
         <p class="hero-slogan">APRS <span class="grad">定位追踪</span> 与 <span class="grad">地图</span></p>
         <p class="hero-sub">
@@ -182,24 +182,24 @@ html{overflow-x:hidden}
 
       <!-- 再往下：真正要动手的那一块（版本卡 + 下载按钮 + 来源） -->
         <div class="hero-cta reveal" data-delay="0">
-          <div class="hero-release" id="heroRelease" style="display:inline-flex;align-items:center;gap:12px;margin:8px 0 6px;padding:12px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 30px rgba(45,70,120,.14);backdrop-filter:blur(14px)">
-            <span id="hrIcon" style="font-size:20px">✅</span>
-            <span>
-              <b style="font-size:14px">APRSlocus 2.0 <span id="hrState" style="color:var(--cyan)">已发布</span></b>
-              <span id="hrTimer" style="display:block;font-size:12.5px;color:var(--text-faint)">2.0 已发布 · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener" style="color:var(--cyan);font-weight:700">立即下载 →</a></span>
+          <p class="hero-release">
+            <span class="hr-icon" aria-hidden="true">✅</span>
+            <span class="hr-body">
+              <b class="hr-name">APRSlocus 2.0 <span class="hr-state">已发布</span></b>
+              <span class="hr-note">2.0 已发布 · <a class="hr-link" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">立即下载 →</a></span>
             </span>
-          </div>
+          </p>
           <div class="hero-actions">
             <a class="btn btn-primary" id="heroDownload" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
               <i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>
               <span id="heroDlText">下载 2.0 最新版</span>
             </a>
             <a class="btn btn-ghost" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
-              <i class="fa-solid fa-desktop" aria-hidden="true" style="width:20px;height:20px"></i>
+              <i class="fa-solid fa-desktop" aria-hidden="true"></i>
               Windows 安装包
             </a>
-            <a class="btn btn-text" href="promo.html">2.0 宣传页<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
-            <a class="btn btn-text" href="#getting-started">开始使用<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
+            <a class="btn btn-text" href="promo.html">2.0 宣传页<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a>
+            <a class="btn btn-text" href="#getting-started">开始使用<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a>
           </div>
           <div class="hero-meta">
             <span>APRS-IS · TNC · 音频 · PKWDWPL 四种来源</span>
@@ -2043,7 +2043,7 @@ html{overflow-x:hidden}
 </a>
 
 <script src="js/main.js?v=8"></script>
-<script src="js/planet-3d.js?v=14"></script>
+<script src="js/planet-3d.js?v=15"></script>
 <script src="js/motion.js?v=1"></script>
 <script src="js/nav.js?v=1"></script>
 </body>

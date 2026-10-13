@@ -148,6 +148,24 @@
       也就不用"往下滑"了。 ── */
 .hero-copy-next .hero-cta { margin-top: clamp(40px, 9vh, 96px); }
 
+/* ── 版本卡：一行状态 + 一个去下载的入口 ──
+   这几个值以前是以 8 条 inline style 写在三个语言页的同一个标签上（hero 里
+   最后一处 inline 样式，也是全站样式里最散的一处）—— 页数一多必然走样。
+   现在挪到这里；页面那边只留 class。 */
+.hero-release {
+  display: inline-flex; align-items: center; gap: 12px;
+  margin: 8px 0 6px; padding: 12px 18px; border-radius: 16px;
+  background: var(--glass); border: 1px solid var(--line);
+  box-shadow: 0 12px 30px rgba(45,70,120,.14); backdrop-filter: blur(14px);
+}
+.hero-release .hr-icon { font-size: 20px; }
+.hero-release .hr-name { font-size: 14px; }
+.hero-release .hr-state { color: var(--cyan); }
+.hero-release .hr-note { display: block; font-size: 12.5px; color: var(--text-faint); }
+.hero-release .hr-link { color: var(--cyan); font-weight: 700; }
+/* 按钮里的桌面图标带自己的尺寸（原来写在标签上）：居中一个 20px 的方块 */
+.hero-actions .fa-desktop { width: 20px; height: 20px; }
+
 /* hero 背景那层网（main.js 画的）压一档：这一屏的主角是星球，不是噪点 */
 .hero-canvas { opacity: .5; }
 

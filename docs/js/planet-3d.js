@@ -202,7 +202,7 @@
 
   /* ── 几何：交错 10 float/点 = pos(3) + col(3) + meta(尺寸, 呼吸频率, 呼吸幅度) + spin
         meta.z > 0 的点会自己呼吸（大小与亮度一起抖）；spin 是自己的角速度，
-        0 = 跟着拖动走（星球本体），非 0 = 自己转（环带 / 卫星轨道）。 ── */
+        0 = 跟着星球整体走（星球本体），非 0 = 自己转（环带 / 卫星轨道）。 ── */
   function buildCloud() {
     var arr = [], col = [0, 0, 0], i, j, u, th, s, x, y, z, r, ang, ex, ez, live, fade, band, fine, g, c;
 
@@ -299,7 +299,7 @@
     "attribute vec3 aPos;",
     "attribute vec3 aCol;",
     "attribute vec3 aMeta;",              // 尺寸 / 呼吸频率 / 呼吸幅度
-    "attribute float aSpin;",             // 自己的角速度（0 = 跟着拖动走）
+    "attribute float aSpin;",             // 自己的角速度（0 = 只跟着星球整体自转）
     "uniform float uCosY; uniform float uSinY;",
     "uniform float uCosP; uniform float uSinP;",
     "uniform float uSpinT;",
@@ -554,10 +554,15 @@
   }
   syncMode();
 
-  /* ── 相机 / 交互状态 ── */
-  var yaw = 0.55, pitch = -0.10, tYaw = yaw, tPitch = pitch;
+  /* ── 相机状态 ──
+     星球是**只看不摸**的：不能拖动、也没了键盘转动，默认机位就是唯一的机位。
+     它停在一张标准侧视图上：机位落在赤道平面里（相对赤道的仰角 0），纬带水平、
+     极轴正立。想要一点俯角就调 VIEW_ELEV（0.12 ≈ 7°）；可拖动那一版的默认机位
+     是 VIEW_ELEV = 0.31（约 17.7° 俯角，即 TILT 减掉当年的拖动偏移）。 ── */
+  var VIEW_ELEV = 0;                               // 机位相对赤道平面的仰角（rad）
+  var yaw = 0.55, tYaw = yaw;                      // yaw 只在自转里往前走
+  var pitch = VIEW_ELEV - TILT;                    // 着色器吃的是 TILT + pitch
   var spin = reduce ? 0 : 0.075;                   // rad/s 自转：比上一版快一档，闲不住
-  var dragging = false, lastX = 0, lastY = 0;
   var running = false, paused = false, raf = 0, last = 0;
 
   /* 入场（聚成球）：gather 从 0 → 1，顶点着色器用 uGather 把点从「散开的一层」
@@ -635,7 +640,8 @@
     gl.uniform1f(U.uGather, gather);
     gl.uniform1f(U.uWave, reduce ? 0 : 1);            // 星面海浪（降级动效下关掉）
     // 撞击落点：物体空间的单位向量，按当前的 yaw / pitch 转成与顶点同一套坐标系
-    // （顶点着色器里的 hn 就是转过的），否则拖动星球时冲击环会从落点上滑走。
+    // （顶点着色器里的 hn 就是转过的）—— 两边不是同一套的话，球自转时冲击环
+    // 会从落点上滑走。
     var cyv = Math.cos(yaw), syv = Math.sin(yaw);
     for (var ic = 0; ic < IMP_SLOTS; ic++) {
       var im = imps[ic];
@@ -806,13 +812,12 @@
     }
     var k = Math.min(1, dt * 9);                   // 阻尼跟随（参考实现是每帧 0.1）
     yaw += (tYaw - yaw) * k;
-    pitch += (tPitch - pitch) * k;
-    if (!dragging && spin) { tYaw += spin * dt; yaw += spin * dt; }
+    if (spin) { tYaw += spin * dt; yaw += spin * dt; }
     animT += dt;                                   // 动画时钟：只在这里走
     stepImpacts(dt);                               // 撞击槽：wait → fly → hit
     draw(animT);
-    // 降级动效（prefers-reduced-motion）：静止后停掉循环，只保留可拖动
-    if (reduce && !dragging && Math.abs(tYaw - yaw) < 0.002 && Math.abs(tPitch - pitch) < 0.002) {
+    // 降级动效（prefers-reduced-motion）：自转本来就是 0，摆到位就停掉循环
+    if (reduce && Math.abs(tYaw - yaw) < 0.002) {
       running = false;
       return;
     }
@@ -838,41 +843,6 @@
     applyScroll();
     start();
   }
-
-  /* ── 拖动 / 键盘 ── */
-  canvas.addEventListener("pointerdown", function (e) {
-    dragging = true;
-    lastX = e.clientX; lastY = e.clientY;
-    hero.classList.add("grabbing");
-    if (canvas.setPointerCapture) { try { canvas.setPointerCapture(e.pointerId); } catch (err) {} }
-    start();
-  });
-  canvas.addEventListener("pointermove", function (e) {
-    if (!dragging) return;
-    tYaw += (e.clientX - lastX) * 0.0065;
-    tPitch = Math.max(-0.95, Math.min(0.95, tPitch + (e.clientY - lastY) * 0.005));
-    lastX = e.clientX; lastY = e.clientY;
-  });
-  function endDrag() {
-    if (!dragging) return;
-    dragging = false;
-    hero.classList.remove("grabbing");
-    start();
-  }
-  canvas.addEventListener("pointerup", endDrag);
-  canvas.addEventListener("pointercancel", endDrag);
-  canvas.addEventListener("pointerleave", endDrag);
-
-  canvas.addEventListener("keydown", function (e) {
-    var step = 0.22, used = true;
-    if (e.key === "ArrowLeft") tYaw -= step;
-    else if (e.key === "ArrowRight") tYaw += step;
-    else if (e.key === "ArrowUp") tPitch = Math.max(-0.95, tPitch - step * 0.6);
-    else if (e.key === "ArrowDown") tPitch = Math.min(0.95, tPitch + step * 0.6);
-    else if (e.key === "Home") { tYaw = 0.55; tPitch = -0.10; }
-    else used = false;
-    if (used) { e.preventDefault(); start(); }
-  });
 
   /* ── 视口内才画（省电，也让长页面滚动不卡） ── */
   if (window.IntersectionObserver) {
@@ -974,7 +944,7 @@
       var px = new Uint8Array(w * h * 4);
       gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
       var lit = 0, sum = 0, q = [0, 0, 0, 0], n = w * h, i;
-      // 4×4 网格均值：覆盖率这类宏观统计是**旋转不变**的，抓不到「拖了没反应」，
+      // 4×4 网格均值：覆盖率这类宏观统计是**旋转不变**的，抓不到「转了个角度但画面没变」，
       // 所以自检要比对网格指纹而不是只看 litRatio。
       var cell = [], grid = [];
       for (i = 0; i < 16; i++) cell.push([0, 0]);

@@ -14,12 +14,11 @@
 /* ── 装饰层 ──
    网格 / 星尘 / 星球 / 没有 WebGL 时的静态球，以前是 hero 的四个平级子元素，
    现在收进同一层：hero 的直接子元素只剩 装饰层 → 文案(hero-inner) → 向下箭头。
-   这一层自己不吃指针事件（横向拖动不该被网格或星尘截走），只有星球把事件要
-   回来。定位还是相对 .hero 的 inset:0 —— 里面四个子层的坐标一个没动。 */
+   整层都不吃指针事件 —— 星球是**只看不摸**的（不能拖动旋转），这一层没有例外。
+   定位还是相对 .hero 的 inset:0 —— 里面四个子层的坐标一个没动。 */
 .hero-decor {
   position: absolute; inset: 0; z-index: 0; pointer-events: none;
 }
-.hero-decor > .planet-canvas { pointer-events: auto; }
 
 /* ── 星球层 ── */
 .planet-canvas {
@@ -27,9 +26,7 @@
      跟着 hero 一起长，取景半径 h 会跟着变大，星球就被动地变大、变低。 */
   position: absolute; top: 0; left: 0; z-index: 1;
   width: 100%; height: 100vh; display: block;
-  cursor: grab;
-  touch-action: pan-y;            /* 手机上竖向滑动照样能滚页面，横向拖动才转星球 */
-  outline: none;
+  pointer-events: none;           /* 这层是画面不是控件：不接指针、不接焦点 */
   /* 这里不做 CSS 入场动画：「聚成球 + 机位退定」由 planet-3d.js 在 WebGL 里
      做（否则 CSS 的 transform 会盖掉滚动视差）。这一层只负责往下拉页面时
      慢慢退开 —— 位移 / 缩放 / 透明度都读 .hero 上的变量，脚本里每帧写一次；
@@ -40,10 +37,8 @@
   opacity: var(--hero-3d-fade, 1);
   will-change: transform, opacity;
 }
-.hero.grabbing .planet-canvas { cursor: grabbing; }
-.planet-canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -6px; }
-/* 文案在最上层。hero-inner 自己不拦指针事件，好让右半边的拖动落到画布上，
-   只有文案栏恢复接收（链接、选中文字照常）。 */
+/* 文案在最上层。hero-inner 自己不拦指针事件（整个 hero 只剩文案要接事件），
+   只有文案栏恢复接收：链接、选中文字照常。 */
 .hero-inner { grid-template-columns: minmax(0, 1fr); pointer-events: none; }
 /* ── 第一屏只摆那个数字 ──
    进来第一眼应该是一个数，不是一段自我介绍。所以首屏就是一个差不多一屏高的

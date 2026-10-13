@@ -204,6 +204,56 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.0.68', 'date': '2026-10-13',
+        'items': [
+            ('fix',
+             T('**智能体回复更快**：2.0.67 的「逐字回复」请求体里**漏了 `stream`**，'
+               '后端按普通请求回一整段 JSON，应用判定「没拿到流」后**又把同样的'
+               '请求发了一遍** —— 每轮白等一倍时间、白花一倍 token。现在流式请求'
+               '真的带 `stream`：一次请求、边收边显示；后端不认这个字段时照旧自动'
+               '退回整段式，**不会少一句回复**。',
+               '**智慧代理回覆更快**：2.0.67 的「逐字回覆」請求體裡**漏了 `stream`**，'
+               '後端按普通請求回一整段 JSON，應用判定「沒拿到串流」後**又把同樣的'
+               '請求發了一遍** —— 每輪白等一倍時間、白花一倍 token。現在串流請求'
+               '真的帶 `stream`：一次請求、邊收邊顯示；後端不認這個欄位時照舊自動'
+               '退回整段式，**不會少一句回覆**。',
+               '**Faster agent replies**: the "stream replies" request of 2.0.67 was '
+               '**missing `stream`**, so the backend answered with one plain JSON blob; '
+               'the app saw "no stream" and **sent the very same request a second '
+               'time** — every round waited twice as long and paid twice the tokens. '
+               'The streaming request now really carries `stream`: one request, shown '
+               'as it arrives, with the same automatic fallback when a backend does '
+               'not accept it — **never fewer replies**.')),
+            ('fix',
+             T('**智能体不再「调几次工具就断掉」**：单个工具出错不再带走整轮对话'
+               '（异常变成**这次调用的结果**回给模型）；一轮的工具往返次数用完后会'
+               '补一次**不带工具**的收尾请求，把结论说出来，而不是干停在最后一个'
+               '工具气泡上。',
+               '**智慧代理不再「呼叫幾次工具就斷掉」**：單個工具出錯不再帶走整輪'
+               '對話（例外變成**這次呼叫的結果**回給模型）；一輪的工具往返次數用完'
+               '後會補一次**不帶工具**的收尾請求，把結論說出來，而不是乾停在最後'
+               '一個工具氣泡上。',
+               '**The agent no longer "stops after a few tool calls"**: one failing '
+               'tool no longer takes down the whole turn (the exception becomes **the '
+               'result of that call** and goes back to the model), and when a turn '
+               'runs out of tool round-trips the app makes one more request **without '
+               'any tools** so the model puts its conclusion into words, instead of '
+               'stopping dead on the last tool bubble.')),
+            ('up',
+             T('**台站备注更完整**：备注单独成行、可换行、默认不限行数，长备注不再'
+               '被省略号吃掉；备注里的网址（`https://…` / `www.…`）自动变成**可点'
+               '链接**，台站列表 / 台站详情 / 地图信息浮窗三处一致。',
+               '**台站備註更完整**：備註單獨成行、可換行、預設不限行數，長備註不再'
+               '被省略號吃掉；備註裡的網址（`https://…` / `www.…`）自動變成**可點'
+               '連結**，台站列表 / 台站詳情 / 地圖資訊浮窗三處一致。',
+               '**More complete station comments**: comments get their own line, wrap, '
+               'and default to unlimited lines, so long ones are no longer eaten by an '
+               'ellipsis; URLs inside a comment (`https://…` / `www.…`) become '
+               '**tappable links**, consistently in the station list, the station '
+               'detail page and the map info window.')),
+        ],
+    },
+    {
         'ver': 'v2.0.67', 'date': '2026-10-13',
         'items': [
             ('new',

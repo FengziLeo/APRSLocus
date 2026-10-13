@@ -581,6 +581,17 @@
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.68</span>
+        <span class="cl-date">2026-10-13</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot fix"></span><b>智慧代理回覆更快</b>：2.0.67 的「逐字回覆」請求體裡<b>漏了 <code>stream</code></b>，後端按普通請求回一整段 JSON，應用判定「沒拿到串流」後<b>又把同樣的請求發了一遍</b> —— 每輪白等一倍時間、白花一倍 token。現在串流請求真的帶 <code>stream</code>：一次請求、邊收邊顯示；後端不認這個欄位時照舊自動退回整段式，<b>不會少一句回覆</b>。</div>
+        <div class="cl-item"><span class="cl-dot fix"></span><b>智慧代理不再「呼叫幾次工具就斷掉」</b>：單個工具出錯不再帶走整輪對話（例外變成<b>這次呼叫的結果</b>回給模型）；一輪的工具往返次數用完後會補一次<b>不帶工具</b>的收尾請求，把結論說出來，而不是乾停在最後一個工具氣泡上。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>台站備註更完整</b>：備註單獨成行、可換行、預設不限行數，長備註不再被省略號吃掉；備註裡的網址（<code>https://…</code> / <code>www.…</code>）自動變成<b>可點連結</b>，台站列表 / 台站詳情 / 地圖資訊浮窗三處一致。</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.67</span>
         <span class="cl-date">2026-10-13</span>
       </div>

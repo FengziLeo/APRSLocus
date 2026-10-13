@@ -1,5 +1,78 @@
 # 更新日志
 
+## [2.0.68] - 2026-10-13
+
+### 修复：智能体「回复过慢」的根子 —— 流式请求漏了 `stream:true`
+
+- 2.0.67 的「逐字回复」名义上走流式，实际请求体里**没有 `stream:true`**：后端按
+  普通请求回一整段 JSON，流里一个 `data:` 分片都没有，应用只能判定「没拿到流」，
+  **于是把一模一样的请求再发第二遍**。每轮白等一倍时间、白花一倍 token，而屏幕上
+  的「逐字」其实只是打字机兜底补的那层动画。现在流式请求真的带 `stream:true`：
+  一次请求、边收边显示；后端不认这个字段时照旧自动退回整段式，不会少一句回复。
+
+### 修复：智能体「调用下工具就断掉了」
+
+- **单个工具出错不再带走整轮对话。** 以前工具里抛的异常（参数畸形、偶发 bug）会
+  一路冒到最外层，用户看到的就是「调完工具突然没了下文」。现在异常变成**这次
+  调用的结果**（`ERROR: …`）回给模型：既保住 `tool_calls` ↔ `tool` 消息的配对，
+  也让模型有机会解释或换个做法。
+- **轮次用尽不再干停在最后一个工具气泡上。** 一轮对话最多 6 次工具往返，以前用完
+  就直接结束（看起来就是「断了」）。现在会补一次**不带工具、只准说话**的收尾请求，
+  把结论说出来；连这次都没有内容，才补一句提示：「已达到本轮的连续操作次数上限…
+  再发一句『继续』让它接着做。」（6 语言）
+- 模型偶尔回空正文时，不再往对话里塞一个空气泡，交由收尾请求补齐。
+
+### 优化：台站备注独立成行、完整不截断，并识别网址
+
+- 台站备注从「符号名 · 备注」挤在同一行、`maxLines: 1` 的写法里拆出来：**单独
+  一行、可换行、默认不限行数**，长备注不再被省略号吃掉。
+- 备注里的 `https://…` 与裸 `www.…` 自动识别成**可点链接**（尾部的中英文标点先
+  剔除，不会被一起带走），台站列表 / 台站详情 / 地图信息浮窗三处一致。
+
+---
+
+## [2.0.68] - 2026-10-13 (English)
+
+### Fixed: why agent replies felt slow — the streaming request was missing `stream:true`
+
+- The "stream replies" feature of 2.0.67 claimed to use streaming, but the request
+  body **never contained `stream:true`**: the backend answered with one plain JSON
+  blob, the stream parser saw not a single `data:` fragment, decided there was no
+  stream, and **sent the very same request a second time**. Every round waited
+  twice as long and paid twice the tokens, while the character-by-character effect
+  on screen was only the typewriter fallback. The streaming request now really
+  sends `stream:true`: one request, shown as it arrives. If a backend does not
+  accept the flag, the app still falls back to the whole-answer request — you never
+  lose a reply.
+
+### Fixed: the agent "stopping right after a tool call"
+
+- **One failing tool no longer takes down the whole turn.** An exception thrown
+  inside a tool (malformed arguments, an occasional bug) used to bubble all the way
+  out, which looks like "it called a tool and then went silent". It is now turned
+  into **the result of that call** (`ERROR: …`) and handed back to the model: the
+  `tool_calls` ↔ `tool` message pairing stays valid, and the model gets a chance to
+  explain or try another way.
+- **Running out of rounds no longer stops dead on the last tool bubble.** A turn
+  allows up to 6 tool round-trips; when they ran out, the turn simply ended (which
+  looks like "it broke"). The app now makes one more request with **no tools at
+  all**, so the model has to put its conclusion into words; only if that request
+  returns nothing either does it add a notice: "Reached the per-turn limit for tool
+  actions… Send 'continue' to let it carry on." (6 languages)
+- An occasional empty assistant message is no longer added as an empty bubble; the
+  closing request fills it in.
+
+### Improved: station comments on their own line, never truncated, with tappable URLs
+
+- Station comments are no longer squeezed into the same line as "symbol name ·
+  comment" with `maxLines: 1`: they get **their own line, wrap, and default to
+  unlimited lines**, so long comments are no longer eaten by an ellipsis.
+- `https://…` and bare `www.…` inside a comment are recognised as **tappable
+  links** (trailing Chinese/English punctuation is trimmed off first), consistently
+  in the station list, the station detail page, and the map info window.
+
+---
+
 ## [2.0.67] - 2026-10-13
 
 ### 新功能：智能体「逐字回复」（流式优先，打字机兜底）

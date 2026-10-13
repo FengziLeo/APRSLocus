@@ -655,6 +655,17 @@ html{overflow-x:hidden}
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.0.68</span>
+        <span class="cl-date">2026-10-13</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot fix"></span><b>智能体回复更快</b>：2.0.67 的「逐字回复」请求体里<b>漏了 <code>stream</code></b>，后端按普通请求回一整段 JSON，应用判定「没拿到流」后<b>又把同样的请求发了一遍</b> —— 每轮白等一倍时间、白花一倍 token。现在流式请求真的带 <code>stream</code>：一次请求、边收边显示；后端不认这个字段时照旧自动退回整段式，<b>不会少一句回复</b>。</div>
+        <div class="cl-item"><span class="cl-dot fix"></span><b>智能体不再「调几次工具就断掉」</b>：单个工具出错不再带走整轮对话（异常变成<b>这次调用的结果</b>回给模型）；一轮的工具往返次数用完后会补一次<b>不带工具</b>的收尾请求，把结论说出来，而不是干停在最后一个工具气泡上。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>台站备注更完整</b>：备注单独成行、可换行、默认不限行数，长备注不再被省略号吃掉；备注里的网址（<code>https://…</code> / <code>www.…</code>）自动变成<b>可点链接</b>，台站列表 / 台站详情 / 地图信息浮窗三处一致。</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.0.67</span>
         <span class="cl-date">2026-10-13</span>
       </div>

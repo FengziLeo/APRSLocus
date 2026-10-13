@@ -78,21 +78,34 @@
   .reveal.d1 { transition-delay: .35s; }
   .reveal.d2 { transition-delay: .70s; }
   .reveal.d3 { transition-delay: 1.05s; }
-  /* ── 一句一件事：正文不再整块浮上来 ──
-     原来一章的正文是「一个 .reveal 整块淡入」—— 三四句话一起出现，读者拿到的
-     是一大片。改成容器不飘、逐句到场：每句自己差半秒接上，一章读完，正好看见
-     下一章抬头。仍然只覆盖时长与延迟（缓动、位移、透明度还是共享那一套），
-     降级动效下整块不生效。 */
-  .story-text.reveal { opacity: 1; transform: none; }
-  .story-text.reveal > p {
+  /* ── 开场：这一屏先不自我介绍 ──
+     招呼等「第一声」才出来 —— 读者点 / 按 / 滚的那一下把音乐叫起来，页面的节拍
+     从那一刻起算，不从加载起算。两行一句一句落下（标题先，标语隔 .85s 跟上）。 */
+  .intro-head > h1, .intro-head > p {
     opacity: 0; transform: translateY(14px);
-    transition: opacity 1.4s var(--ease), transform 1.4s var(--ease);
+    transition: opacity 1.2s var(--ease), transform 1.2s var(--ease);
   }
-  .story-text.reveal.in > p { opacity: 1; transform: none; }
-  .story-text.reveal > p:nth-child(1) { transition-delay: .1s; }
-  .story-text.reveal > p:nth-child(2) { transition-delay: .6s; }
-  .story-text.reveal > p:nth-child(3) { transition-delay: 1.1s; }
-  .story-text.reveal > p:nth-child(4) { transition-delay: 1.6s; }
+  .intro-head > p { transition-delay: .85s; }
+  .intro-head.live > h1, .intro-head.live > p { opacity: 1; transform: none; }
+
+  /* ── 一句一句吐出 ──
+     到场单位是「一段」：每个自然段自己挂 .reveal，滚进画面才轮到它；段里每一句
+     再错开半个多拍（页尾脚本把段按句切成 .sn，节拍写在行内）—— 话是一句一句
+     落到纸上的。段自己不飘（只负责把这一段的句子叫起来），加粗那几个字原样包进
+     它所在的那一句，DOM 结构没被重排。降级动效下整块不生效。 */
+  .story-text p.reveal { opacity: 1; transform: none; }
+  .story-text .sn { opacity: 0; transition: opacity 1.1s var(--ease); }
+  .story-text p.reveal.in > .sn { opacity: 1; }
+
+  /* 章节抬头也是两拍：标题先立住，隔半秒那句引子跟上。 */
+  .section-head.reveal { opacity: 1; transform: none; }
+  .section-head.reveal > h1, .section-head.reveal > h2 {
+    opacity: 0; transform: translateY(14px);
+    transition: opacity 1.2s var(--ease), transform 1.2s var(--ease);
+  }
+  .section-head.reveal > p { opacity: 0; transition: opacity 1.2s var(--ease) .6s; }
+  .section-head.reveal.in > h1, .section-head.reveal.in > h2,
+  .section-head.reveal.in > p { opacity: 1; transform: none; }
   /* 那个数字的登场（style.css 的 heroUp / heroBoom）同样放慢一档：
      首页是「一亮就到位」，这里是「慢慢浮出来」。 */
   .hero-copy > * { animation-duration: 1.3s; }
@@ -118,7 +131,8 @@
   <span class="blob b3"></span>
   <span class="blob b4"></span>
 </div>
-<noscript><style>.hero-copy>*,.planet-canvas{opacity:1!important;transform:none!important}</style></noscript>
+<noscript><style>.hero-copy>*,.planet-canvas,.intro-head>*,.story-text .sn,
+.section-head.reveal>*{opacity:1!important;transform:none!important}</style></noscript>
 
 <main id="main">
 
@@ -126,10 +140,13 @@
      这页从一个招呼开始，不是从一个数字开始。第一屏只放招呼与标语，**往下翻
      才到地图**（那颗星球与累计报文那一屏）。它同时是整页的 h1（下面各章都是
      h2），也是唯一一处请读者动手的地方 —— 按一下，BGM 就起来（见页尾脚本）。
+     招呼与标语押在「第一声」上：音乐一起来，这两行才落下来（.live 由脚本挂上；
+     音乐这条路要是不通，六秒后也放行）—— 页面的节拍从读者那一下起算，
+     不从加载起算。所以第一屏先看见的，只有底下那句邀请。
      底色不另起一套：`.intro` 只把这一屏撑到一屏高、内容居中，别的一律走
      `.section` / `.section-head` 现成的那套。 -->
 <section class="section intro" id="hello">
-  <div class="section-head reveal">
+  <div class="section-head intro-head" id="introHead">
     <h1>你好，很高兴认识你。</h1>
     <p>保持你的好奇心，探索世界。</p>
   </div>
@@ -191,10 +208,10 @@
     <p>它在第一屏上一直往上走。不是刻度，是此刻天空里正在发生的应答。</p>
   </div>
   <div class="section-body">
-    <div class="story-text reveal" data-delay="1">
-      <p>它不是统计图上刻好的一格。它是此刻，全世界 APRS 台站转发过的每一次应答 —— 可能来自城里某辆车的车载台，也可能来自山头上的一台手台，海面上的一条船。</p>
-      <p>你盯久了会发现它并不匀速：有时一阵猛跳，有时半天不动。它不解释这些，只是一格一格往上走。</p>
-      <p>每跳一格，就是有人在某个地方按下了发射键 —— 你看不见他，他也不知道你在看。</p>
+    <div class="story-text">
+      <p class="reveal">它不是统计图上刻好的一格。它是此刻，全世界 APRS 台站转发过的每一次应答 —— 可能来自城里某辆车的车载台，也可能来自山头上的一台手台，海面上的一条船。</p>
+      <p class="reveal">你盯久了会发现它并不匀速：有时一阵猛跳，有时半天不动。它不解释这些，只是一格一格往上走。</p>
+      <p class="reveal">每跳一格，就是有人在某个地方按下了发射键 —— 你看不见他，他也不知道你在看。</p>
     </div>
   </div>
 </section>
@@ -206,10 +223,10 @@
     <p>一条报文到你眼前之前，先得有人把它送上天。</p>
   </div>
   <div class="section-body">
-    <div class="story-text reveal" data-delay="1">
-      <p>它可能起于一台手机，顺着网络绕回来；也可能从一根蓝牙线、一块声卡、一台直连的电台里进来。路有很多条，落点只有一个 —— 你面前这张地图。</p>
-      <p>最老的走法还是电波本身：从一根天线出去，被山头上的中继接住，再递给下一个听得见它的人。中间没有人审核，也没有人收钱，全靠一句老规矩 —— 我发了，你收到了，就替我说给下一个人听。</p>
-      <p>于是同一张地图上，你会看见不同来路的点：有人从网络里来，有人从电台上来。他们未必相识，却在同一片天空下被画在了一起 —— 有些点出发的时候，你这边还是深夜。电波没有昼夜，只有谁守在天线后面。</p>
+    <div class="story-text">
+      <p class="reveal">它可能起于一台手机，顺着网络绕回来；也可能从一根蓝牙线、一块声卡、一台直连的电台里进来。路有很多条，落点只有一个 —— 你面前这张地图。</p>
+      <p class="reveal">最老的走法还是电波本身：从一根天线出去，被山头上的中继接住，再递给下一个听得见它的人。中间没有人审核，也没有人收钱，全靠一句老规矩 —— 我发了，你收到了，就替我说给下一个人听。</p>
+      <p class="reveal">于是同一张地图上，你会看见不同来路的点：有人从网络里来，有人从电台上来。他们未必相识，却在同一片天空下被画在了一起 —— 有些点出发的时候，你这边还是深夜。电波没有昼夜，只有谁守在天线后面。</p>
     </div>
   </div>
 </section>
@@ -221,11 +238,11 @@
     <p>每一条电波，最后都落回上面那颗星球。</p>
   </div>
   <div class="section-body">
-    <div class="story-text reveal" data-delay="1">
-      <p>一万三千个点聚成一颗球，经纬线把它撑起来；球面上闪的那几粒，就是有人在回答。</p>
-      <p>三圈环带各转各的，越靠里走得越快；七颗卫星带着尾迹从球外划过；偶尔有流星斜插进来，在落点荡开一圈波纹，又慢慢化开。球面上还有三层浪在走。</p>
-      <p>它自转，它呼吸，却从不接受谁的拖动 —— 这层画面是给你看的，不是给你转的。</p>
-      <p>耐心看一会儿：流星会来，卫星会绕到球背后再出来，那个数字会在你不看它的时候自己跳一下。这里没有一个点是被画上去的 —— 它们都在自己走。</p>
+    <div class="story-text">
+      <p class="reveal">一万三千个点聚成一颗球，经纬线把它撑起来；球面上闪的那几粒，就是有人在回答。</p>
+      <p class="reveal">三圈环带各转各的，越靠里走得越快；七颗卫星带着尾迹从球外划过；偶尔有流星斜插进来，在落点荡开一圈波纹，又慢慢化开。球面上还有三层浪在走。</p>
+      <p class="reveal">它自转，它呼吸，却从不接受谁的拖动 —— 这层画面是给你看的，不是给你转的。</p>
+      <p class="reveal">耐心看一会儿：流星会来，卫星会绕到球背后再出来，那个数字会在你不看它的时候自己跳一下。这里没有一个点是被画上去的 —— 它们都在自己走。</p>
     </div>
   </div>
 </section>
@@ -240,10 +257,10 @@
     <p>球面上每一粒闪，背后都有一台开着的机器，和一个还没睡的人。</p>
   </div>
   <div class="section-body">
-    <div class="story-text reveal" data-delay="1">
-      <p>有的点在高速上，一路往北，天线比车顶高出一截；有的点守在山顶的中继站里，一整夜只重复一件事：把听见的往下传；有的点在船上、在货场、在离城区很远的地方，每隔几分钟说一句 —— 我还在，我还好。</p>
-      <p>白天它们散得到处都是，夜里反而更清楚：人少了，每一个点都更像一个人。</p>
-      <p>你未必认识他们。但当你看见一个点忽然往东挪了一格，你就知道：那边有人踩下了油门 —— 或者，刚刚按了一下发射键。</p>
+    <div class="story-text">
+      <p class="reveal">有的点在高速上，一路往北，天线比车顶高出一截；有的点守在山顶的中继站里，一整夜只重复一件事：把听见的往下传；有的点在船上、在货场、在离城区很远的地方，每隔几分钟说一句 —— 我还在，我还好。</p>
+      <p class="reveal">白天它们散得到处都是，夜里反而更清楚：人少了，每一个点都更像一个人。</p>
+      <p class="reveal">你未必认识他们。但当你看见一个点忽然往东挪了一格，你就知道：那边有人踩下了油门 —— 或者，刚刚按了一下发射键。</p>
     </div>
   </div>
 </section>
@@ -255,9 +272,9 @@
     <p>你还没开口，球面上就空着一格。</p>
   </div>
   <div class="section-body">
-    <div class="story-text reveal" data-delay="1">
-      <p>总有一天你也会按一次发射键：到那时，球面上会多一点光，是你在回答。</p>
-      <p>在那之前，先看一眼下面那份名单 —— 球面上已经亮着的那些点，不少是他们留下的。</p>
+    <div class="story-text">
+      <p class="reveal">总有一天你也会按一次发射键：到那时，球面上会多一点光，是你在回答。</p>
+      <p class="reveal">在那之前，先看一眼下面那份名单 —— 球面上已经亮着的那些点，不少是他们留下的。</p>
     </div>
   </div>
 </section>
@@ -364,9 +381,9 @@
       </div>
     </div>
     <p class="cta-line reveal">完整称号、简介与徽标在 <a href="member-card.html">荣誉墙</a>。</p>
-    <div class="story-text reveal">
-      <p>名单之外，还有一整片正在应答的天空。</p>
-      <p><a class="btn btn-text" href="index.html">回首页<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a></p>
+    <div class="story-text">
+      <p class="reveal">名单之外，还有一整片正在应答的天空。</p>
+      <p class="reveal"><a class="btn btn-text" href="index.html">回首页<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a></p>
     </div>
   </div>
 </section>
@@ -388,23 +405,29 @@
      不写 controls —— 开关就是上面那颗音符，播放器控件那一条不该出现在这里。 -->
 <audio id="bgm" loop preload="none" src="https://music.163.com/song/media/outer/url?id=1903408779.mp3"></audio>
 
-<!-- 让音乐真的响起来。浏览器只认一条规矩：声音必须在读者自己的那一下手势里起头。
-     原来那个网易云播放器是别人域里的 iframe，它的 <audio> 我们够不着、手势也传不
-     进去，所以「点一下就有声」永远得看它脸色；现在声音源在我们自己手里 —— 第一次
-     交互（点 / 按 / 滚）当场 play()，手势还没散，声音一定出得来。
+<!-- 让音乐真的响起来，并且让页面跟着音乐开口。浏览器只认一条规矩：声音必须在
+     读者自己的那一下手势里起头。第一次交互（点 / 按 / 滚）当场 play()，手势还没
+     散，声音就出得来；开场那两行招呼也押在这一下上 —— 音乐一起，页面才开口，节拍
+     从这一刻起算（音乐这条路要是不通，六秒后也照样放行，不把人扣在第一屏）。
      同一次交互顺手在这页留个回响：球面闪一批点（和收到一条报文时同一个钩子），
      那个数字亮一下（同一段 bump 动画）—— 你按的这一下，看上去就是一次真实的上报。
-     等声音真的起来了，开场那句邀请才换成回话；音源要是载不出来，退回网易云播放器。 -->
+     页尾还有一段：把每章正文按句切开，等这一章滚进画面，一句一句往下吐。 -->
 <script>
 (function () {
   var press = document.getElementById("heroPress");
+  var head = document.getElementById("introHead");
   var audio = document.getElementById("bgm");
   var btn = document.getElementById("bgmToggle");
   var box = document.getElementById("bgmBox");
   var val = document.getElementById("tlPackets");
   var TYPES = ["pointerdown", "touchstart", "keydown", "wheel"];
-  var want = false, said = false, dead = false, watch = 0;
+  var want = false, said = false, dead = false, watch = 0, lift = 0;
 
+  /* 「第一声」：招呼与两行开场白都等它。 */
+  function live() {
+    if (lift) { clearTimeout(lift); lift = 0; }
+    if (head && !head.classList.contains("live")) head.classList.add("live");
+  }
   /* 这一下的回响：与遥测每跳一格调的是同一套钩子（没有 WebGL 时不必勉强） */
   function react() {
     try {
@@ -412,14 +435,16 @@
     } catch (e) {}
     if (val) { val.classList.remove("bump"); void val.offsetWidth; val.classList.add("bump"); }
   }
-  /* 真出声了，才把开场那句邀请换成回话 —— 不然说完发现没响，就成了空话。 */
+  /* 真出声了，才把开场那句邀请换成回话 —— 不然说完发现没响，就成了空话。
+     招呼先落地（约 1.2s）再换这一句，两件事别挤在同一拍上。 */
   function say() {
     if (said) return;
     said = true;
-    if (press) {
+    if (!press) return;
+    setTimeout(function () {
       press.textContent = "听见了吗 —— 这一下也算数了，你已经在广播里。";
-      setTimeout(function () { press.classList.add("done"); }, 1500);
-    }
+      setTimeout(function () { press.classList.add("done"); }, 2600);
+    }, 1200);
   }
   function paint(on) {
     if (!btn) return;
@@ -440,6 +465,7 @@
         + ' frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86"'
         + ' src="//music.163.com/outchain/player?type=2&id=1903408779&auto=1&height=66"></iframe>';
     }
+    live();                                   // 音乐这条路走不通，页面也别停着
   }
   function start() {
     if (!audio || dead) return;
@@ -450,9 +476,10 @@
     if (!watch) watch = setTimeout(function () {      // 12s 还没动静，就当它载不出来
       if (audio && audio.paused) fallback();
     }, 12000);
+    if (!lift) lift = setTimeout(live, 6000);        // 六秒还没声，先让这一页开口
   }
   if (audio) {
-    audio.addEventListener("playing", function () { paint(true); say(); });
+    audio.addEventListener("playing", function () { paint(true); live(); say(); });
     audio.addEventListener("pause", function () { want = false; paint(false); });
     audio.addEventListener("error", fallback);
   }
@@ -470,6 +497,53 @@
   TYPES.forEach(function (t) {
     window.addEventListener(t, wake, { once: true, passive: true });
   });
+
+  /* ── 一句一句吐出 ──
+     这页的字是给人读的，不是给人扫的：把每一段按句切开（一句一个 .sn），每段自己
+     从 0 起算、一句隔 0.8s 往下吐 —— 这一段被滚进画面的那一刻，话才一句一句落到
+     纸上。
+     切句只碰文字节点，加粗那几个字（<b>）原样包进它所在的那一句，DOM 结构没被
+     重排。等这一章被滚进画面（容器拿到 .in），CSS 那边就按这些节拍依次放开。 */
+  var SENT = /[^。！？…!?]+[。！？…!?]*/g;
+  function wrapText(node) {
+    var parts = node.nodeValue.match(SENT) || [], out = [], i;
+    for (i = 0; i < parts.length; i++) {
+      if (!parts[i].trim()) continue;             // 纯排版空白不进句列
+      var sp = document.createElement("span");
+      sp.className = "sn";
+      sp.textContent = parts[i];
+      out.push(sp);
+    }
+    return out;
+  }
+  function pour() {
+    var boxes = document.querySelectorAll(".story-text"), b, i, j, k;
+    for (b = 0; b < boxes.length; b++) {
+      var ps = boxes[b].getElementsByTagName("p");
+      for (i = 0; i < ps.length; i++) {
+        var p = ps[i], kids = p.childNodes, out = [], beat = 0;   // 每段自己从 0 起算
+        for (j = 0; j < kids.length; j++) {
+          var nd = kids[j];
+          if (nd.nodeType === 3) {
+            out = out.concat(wrapText(nd));
+          } else {
+            var w = document.createElement("span");
+            w.className = "sn";
+            w.appendChild(nd.cloneNode(true));
+            out.push(w);
+          }
+        }
+        if (!out.length) continue;
+        while (p.firstChild) p.removeChild(p.firstChild);
+        for (k = 0; k < out.length; k++) {
+          out[k].style.transitionDelay = (0.25 + beat * 0.8).toFixed(2) + "s";
+          p.appendChild(out[k]);
+          beat++;
+        }
+      }
+    }
+  }
+  pour();
 })();
 </script>
 

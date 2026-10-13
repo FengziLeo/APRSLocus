@@ -180,20 +180,25 @@
 
   var RING_IN = 1.30;                 // 最内圈环半径：开普勒比例以它为准
 
-  /* ── 卫星：几颗小亮点各自绕在倾斜的轨道上**快速划过**。每颗后面拖一小串
-        逐渐变暗的点（不是发光线，还是点），看上去就是"嗖"地过去的那一下。
-        半径 / 倾角 / 相位 / 快慢 / 方向全部错开 —— 一组卫星，不是一串糖葫芦。
-        位置每帧由 JS 按绝对时间算（见 buildSats），所以 aSpin 给 0：它们不跟
-        球体自转走，各自在自己的轨道上跑。 ── */
+  /* ── 卫星：一组小亮点各自绕在倾斜的轨道上**快速划过**，一颗都不重样。
+        每颗分两截尾迹：
+        · tail：紧跟在头后面的亮点串（越远越暗越小）—— 就是"嗖"的那一下；
+        · wake：再接一段更淡更疏的弧（arc 弧度），把划过的那条**轨迹**留在天上，
+          慢慢化掉。只有头 + 尾巴是看不出轨迹的，看上去像凭空冒出来的光点。
+        半径 / 倾角 / 相位 / 快慢 / 方向 / 尾长全部错开，避免排成一串糖葫芦。
+        位置每帧由 JS 按 animT 算（见 buildSats），aSpin 给 0：它们不跟球体自转。 ── */
   var SATS = [
-    { r: 1.96, tilt: 0.40, ph: 0.00, w: 0.66, sz: 0.0130, tail: 11 },
-    { r: 2.16, tilt: -0.26, ph: 2.10, w: -0.80, sz: 0.0112, tail: 9 },
-    { r: 2.34, tilt: 0.94, ph: 4.00, w: 0.50, sz: 0.0142, tail: 13 },
-    { r: 2.04, tilt: -0.72, ph: 5.35, w: -1.02, sz: 0.0098, tail: 7 }
+    { r: 1.96, tilt: 0.40, ph: 0.00, w: 0.66, sz: 0.0130, tail: 14, wake: 22, arc: 1.90 },
+    { r: 2.16, tilt: -0.26, ph: 2.10, w: -0.80, sz: 0.0112, tail: 12, wake: 20, arc: 1.70 },
+    { r: 2.40, tilt: 0.94, ph: 4.00, w: 0.50, sz: 0.0142, tail: 16, wake: 24, arc: 2.10 },
+    { r: 2.04, tilt: -0.72, ph: 5.35, w: -1.02, sz: 0.0098, tail: 10, wake: 16, arc: 1.45 },
+    { r: 1.84, tilt: 0.18, ph: 1.25, w: 0.92, sz: 0.0106, tail: 12, wake: 18, arc: 1.60 },
+    { r: 2.30, tilt: -1.05, ph: 3.30, w: -0.42, sz: 0.0122, tail: 15, wake: 21, arc: 1.35 },
+    { r: 1.74, tilt: 0.62, ph: 5.95, w: 1.12, sz: 0.0092, tail: 9, wake: 14, arc: 1.25 }
   ];
-  var SAT_STEP = 0.038;               // 尾迹相邻两点的角距（rad）
+  var SAT_STEP = 0.038;               // 尾迹相邻两点的角距（rad，实际按速度缩放）
   var SAT_PTS = 0, si;
-  for (si = 0; si < SATS.length; si++) SAT_PTS += 1 + SATS[si].tail;
+  for (si = 0; si < SATS.length; si++) SAT_PTS += 1 + SATS[si].tail + SATS[si].wake;
 
   /* ── 几何：交错 10 float/点 = pos(3) + col(3) + meta(尺寸, 呼吸频率, 呼吸幅度) + spin
         meta.z > 0 的点会自己呼吸（大小与亮度一起抖）；spin 是自己的角速度，
@@ -332,17 +337,28 @@
     "  float wv = sin(hn.y * 8.0 + uTime * 0.95) * 0.45",
     "           + sin(hn.x * 6.5 - uTime * 1.35) * 0.34",
     "           + sin(hn.z * 5.5 + uTime * 0.75) * 0.28;",
-    // 撞击：从落点往外扩一圈环（距离球面角距做环、指数衰减收尾）。
-    // age < 0 表示这一槽空着：step() 直接把它乘没，不用分支。
+    // 撞击：从落点往外扩一圈环。收尾是这里最要紧的一件事 ——
+    //   · 环半径不是匀速线性扩，而是 1.55·(1-e^(-1.5t))：越走越慢，最后停在整个
+    //     可见半球上；匀速环到点被闸门切掉，看起来就是"啪"地断了。
+    //   · 环还会随着时间变宽（3.4 → 2.4），于是它是化开的，不是消失的。
+    //   · 亮度用 smoothstep 起手 + 长尾指数衰减（0.8）收到 1.9s 处正好为 0，
+    //     脚本到那一刻才把这一槽清空 —— 两边对上，切换处就没有跳。
+    // age < 0 表示这一槽空着：先 max 到 0，起手的 smoothstep 自然把它乘没。
     // 注意用 q*q 而不是 pow(q, 2.0)：GLSL 里 pow() 的底数为负是"未定义"，
     // q 在环内外都会取负，写得顺手就出一片 NaN（整片点凭空消失）。
-    "  float qa = (distance(hn, uImpDir0) - uImpAge0 * 1.25) * 3.4;",
-    "  float qb = (distance(hn, uImpDir1) - uImpAge1 * 1.25) * 3.4;",
-    "  float qc = (distance(hn, uImpDir2) - uImpAge2 * 1.25) * 3.4;",
+    "  float a0 = max(uImpAge0, 0.0);",
+    "  float a1 = max(uImpAge1, 0.0);",
+    "  float a2 = max(uImpAge2, 0.0);",
+    "  float ra0 = 1.55 * (1.0 - exp(-a0 * 1.5));",
+    "  float ra1 = 1.55 * (1.0 - exp(-a1 * 1.5));",
+    "  float ra2 = 1.55 * (1.0 - exp(-a2 * 1.5));",
+    "  float qa = (distance(hn, uImpDir0) - ra0) * (4.4 - 1.9 * min(a0, 1.2));",
+    "  float qb = (distance(hn, uImpDir1) - ra1) * (4.4 - 1.9 * min(a1, 1.2));",
+    "  float qc = (distance(hn, uImpDir2) - ra2) * (4.4 - 1.9 * min(a2, 1.2));",
     "  float rip = 0.0;",
-    "  rip += step(0.0, uImpAge0) * (1.0 - step(1.20, uImpAge0)) * exp(-qa * qa) * exp(-uImpAge0 * 1.10);",
-    "  rip += step(0.0, uImpAge1) * (1.0 - step(1.20, uImpAge1)) * exp(-qb * qb) * exp(-uImpAge1 * 1.10);",
-    "  rip += step(0.0, uImpAge2) * (1.0 - step(1.20, uImpAge2)) * exp(-qc * qc) * exp(-uImpAge2 * 1.10);",
+    "  rip += smoothstep(0.0, 0.06, a0) * (1.0 - smoothstep(0.6, 1.9, a0)) * exp(-qa * qa) * exp(-a0 * 0.8);",
+    "  rip += smoothstep(0.0, 0.06, a1) * (1.0 - smoothstep(0.6, 1.9, a1)) * exp(-qb * qb) * exp(-a1 * 0.8);",
+    "  rip += smoothstep(0.0, 0.06, a2) * (1.0 - smoothstep(0.6, 1.9, a2)) * exp(-qc * qc) * exp(-a2 * 0.8);",
     "  rip = min(rip, 1.5);",
     "  p += hn * body * uWave * (wv * 0.021 + rip * 0.070);",
     "  float d = uDist - p.z;",
@@ -474,8 +490,8 @@
      方向与等待时间来自**另一条**随机流 rnd2 —— 星球几何那条流一点没动，
      所以同一颗星还是每次刷新都一模一样。 ── */
   var rnd2 = mulberry32(0x41505254);
-  var IMP_SLOTS = 3, IMP_TAIL = 9, IMP_FLY = 1.35, IMP_AGE = 1.20;
-  var IMP_WAIT_MIN = 2.4, IMP_WAIT_VAR = 3.6;
+  var IMP_SLOTS = 3, IMP_TAIL = 9, IMP_FLY = 1.40, IMP_AGE = 1.90;
+  var IMP_WAIT_MIN = 1.5, IMP_WAIT_VAR = 2.4;
   var IMP_R0 = 3.30, IMP_R1 = 1.015, IMP_PTS = 0;
   var imps = [], iq;
   for (iq = 0; iq < IMP_SLOTS; iq++) {
@@ -653,7 +669,7 @@
     bindPointers();
     gl.drawArrays(gl.POINTS, 0, cloud.count);
 
-    // 卫星：几颗小亮点带着尾迹，各在自己的倾斜轨道上快速划过
+    // 卫星：一组小亮点带着尾迹与淡淡轨迹，各在自己的倾斜轨道上快速划过
     if (!reduce) buildSats(now);
     gl.bindBuffer(gl.ARRAY_BUFFER, satBuf);
     gl.bufferData(gl.ARRAY_BUFFER, satArr, gl.DYNAMIC_DRAW);
@@ -701,24 +717,32 @@
   }
 
   /* 流星本体 + 尾迹：头在最里（最接近球面），尾点拖着往外排、越远越暗越小。
-     跟卫星一样每帧现算，aSpin 给 0（位置不受球体自转影响）。 */
+     跟卫星一样每帧现算，aSpin 给 0（位置不受球体自转影响）。
+     衔接：进场淡入、**到达前淡掉**（最后那一下交给星面上的冲击环），
+     尾迹随俯冲被拉长（0.26 → 0.88）—— 于是"命中"是一个交接，不是一次切换。 */
+  function smooth01(a, b, x) {
+    var t = Math.max(0, Math.min(1, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  }
   function buildImpacts() {
-    var o = 0, k, j, s2, d, f, rr, t2, rj, g, sz;
+    var o = 0, k, j, s2, d, f, rr, t2, rj, g, sz, env, span;
     for (k = 0; k < imps.length; k++) {
       s2 = imps[k];
       if (s2.phase !== "fly") continue;
       f = Math.min(1, s2.t / IMP_FLY);
       f = f * f * (3 - 2 * f);
+      env = smooth01(0.0, 0.14, f) * (1.0 - smooth01(0.70, 1.0, f));
+      span = 0.26 + 0.62 * f;
       rr = IMP_R0 + (IMP_R1 - IMP_R0) * f;
       d = s2.dir;
       for (j = 0; j <= IMP_TAIL; j++) {
         t2 = j / (IMP_TAIL + 1);
-        rj = rr + t2 * 0.44;
-        g = j === 0 ? 1 : Math.max(0, 1 - t2 * 1.3); g = g * g;
-        sz = 0.0165 * (j === 0 ? 1 : 0.30 + 0.70 * g);
+        rj = rr + t2 * span;
+        g = (j === 0 ? 1 : Math.max(0, 1 - t2 * 1.3) * Math.max(0, 1 - t2 * 1.3)) * env;
+        sz = 0.0165 * env * (j === 0 ? 1 : 0.30 + 0.70 * g);
         impArr[o++] = d[0] * rj; impArr[o++] = d[1] * rj; impArr[o++] = d[2] * rj;
         impArr[o++] = g; impArr[o++] = g; impArr[o++] = g;
-        impArr[o++] = sz;
+        impArr[o++] = Math.max(0.0001, sz);
         impArr[o++] = 0.4 + 0.2 * k;         // 呼吸频率
         impArr[o++] = 0.55;                  // 幅度 > 0.5 → 着色器当成"台站 / 卫星"那一类
         impArr[o++] = 0;
@@ -727,18 +751,20 @@
     return o / 10;
   }
 
-  /* 把每颗卫星（含尾迹）的位置算进 satArr：head 在最前，后面一串点按角距往回
-     排、越往后越暗越小。角距 = SAT_STEP，尾点排在**运动方向的反面**，所以谁
-     快谁尾巴长都对得上。位置每帧重算，不需要 aSpin（顶点着色器里给 0）。 */
+  /* 把每颗卫星（头 + 尾迹 + 轨迹）的位置算进 satArr：head 在最前，后面一串点按
+     角距往回排、越往后越暗越小。角距随速度走（快的拖得更长），尾点排在**运动
+     方向的反面**；轨迹接着尾迹往后再铺一段弧，亮度压到两成多、越远越虚 ——
+     划过之后天上还剩一道淡淡的痕。位置每帧重算，不需要 aSpin（着色器里给 0）。 */
   function buildSats(t) {
-    var o = 0, k, j, s2, ct, st, base, dir, a, x, y, z, f, g, sz;
+    var o = 0, k, j, s2, ct, st, base, dir, a, x, y, z, f, g, sz, step, tf, off;
     for (k = 0; k < SATS.length; k++) {
       s2 = SATS[k];
       base = s2.ph + s2.w * t;
       dir = s2.w >= 0 ? 1 : -1;
       ct = Math.cos(s2.tilt); st = Math.sin(s2.tilt);
+      step = SAT_STEP * (0.62 + Math.abs(s2.w) * 0.85);   // 速度越快，尾迹点距得越开
       for (j = 0; j <= s2.tail; j++) {
-        a = base - dir * j * SAT_STEP;
+        a = base - dir * j * step;
         x = Math.cos(a) * s2.r; z = Math.sin(a) * s2.r;
         y = -z * st; z = z * ct;                 // 轨道面绕 X 轴倾斜 tilt
         f = j === 0 ? 1 : 1 - j / (s2.tail + 1);
@@ -750,6 +776,21 @@
         satArr[o++] = 0.35 + 0.20 * k;           // 呼吸频率：卫星也轻轻喘，很慢
         satArr[o++] = 0.55;                      // 幅度 > 0.5 → 着色器当成"台站 / 卫星"那一类
         satArr[o++] = 0;                         // aSpin = 0：位置自己算
+      }
+      for (j = 0; j < s2.wake; j++) {                     // 正好 s2.wake 个点（与 SAT_PTS 对齐）
+        tf = j / (s2.wake + 1);
+        off = (s2.tail + 1) * step + tf * s2.arc;        // 从尾迹末端再往后的角距
+        a = base - dir * off;
+        x = Math.cos(a) * s2.r; z = Math.sin(a) * s2.r;
+        y = -z * st; z = z * ct;
+        g = Math.pow(1 - tf, 2.2) * 0.26;                // 极淡，越远越虚
+        sz = s2.sz * (0.20 + 0.46 * (1 - tf));
+        satArr[o++] = x; satArr[o++] = y; satArr[o++] = z;
+        satArr[o++] = g; satArr[o++] = g; satArr[o++] = g;
+        satArr[o++] = sz;
+        satArr[o++] = 0.30 + 0.16 * k;
+        satArr[o++] = 0.55;
+        satArr[o++] = 0;
       }
     }
   }

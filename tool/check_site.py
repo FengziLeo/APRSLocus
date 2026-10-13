@@ -246,6 +246,14 @@ def main():
                                    'buildImpacts', 'stepImpacts', 'pickImpactDir'))
         and 'exp(-qa * qa)' in hero_js and 'pow((distance(' not in hero_js
         and 'uWave' in hero_js and '.hero-stat.stale .tl-value' in hero_css)
+    # 撞击的收尾必须"化开"而不是被闸门切断：环要减速扩张（1-e^-t）、要随时间变宽、
+    # 亮度用 smoothstep 起手 + 长尾衰减，且流星在到达前先淡掉（命中是一次交接）。
+    # 上一版是 step(1.20, age) 一刀切 + 匀速环 —— 用户看到的就是"啪"地断掉。
+    chk('hero 撞击收尾是化开的（减速环 / 变宽 / 流星淡出交接）',
+        '1.0 - exp(-a0 * 1.5)' in hero_js and '4.4 - 1.9 * min(a0, 1.2)' in hero_js
+        and 'smoothstep(0.0, 0.06, a0)' in hero_js and '1.0 - smoothstep(0.6, 1.9, a0)' in hero_js
+        and 'smooth01(0.0, 0.14, f)' in hero_js and '1.0 - smooth01(0.70, 1.0, f)' in hero_js
+        and '(1.0 - step(1.20' not in hero_js)
     # 动画时钟 + 读数之后的滑行：随时间演的一切都吃 animT（暂停回来不跳），
     # 滚动量在 JS 里缓动过（每帧朝目标挪一档），CSS 那边不写 transition。
     chk('hero 滚动丝滑（JS 缓动 + animT 时钟）',
@@ -310,9 +318,15 @@ def main():
         and 'vec3 uStn' in hero_js and 'stn: [' in hero_js)
     # 卫星：几颗带尾迹的小亮点快速划过。位置每帧现算（buildSats），不是一圈
     # 静止的轨道点 —— 上一版那圈点已经撤掉，留着会和对不上的轨道叠成两层。
-    chk('hero 卫星：一组带尾迹的亮点',
+    # 尾迹分两截（亮点串 + 更淡的轨迹弧）。点数算式必须与写入的循环对齐：
+    # tail 循环是"含头"的 j <= tail（+1 个点），wake 循环是 j < wake（正好 wake 个），
+    # 两个 off-by-one 都会让 tail/wake 数组越界写（静默丢点）。
+    chk('hero 卫星：一组带尾迹 + 轨迹弧',
         'var SATS = [' in hero_js and 'function buildSats' in hero_js
-        and 'SAT_STEP' in hero_js and 'satBuf' in hero_js and 'ORBIT_SPIN' not in hero_js)
+        and 'SAT_STEP' in hero_js and 'satBuf' in hero_js and 'ORBIT_SPIN' not in hero_js
+        and 'j <= s2.tail' in hero_js and 'j < s2.wake' in hero_js
+        and 'SATS[si].tail + SATS[si].wake' in hero_js and 's2.arc' in hero_js
+        and hero_js.count('tail: ') == hero_js.count('wake: ') >= 6)
     chk('hero 星球：线框球 + 纬向色带 + 开普勒环',
         'function buildWire' in hero_js and 'gl.LINES' in hero_js
         and 'uSpinT' in hero_js

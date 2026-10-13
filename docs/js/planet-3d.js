@@ -46,6 +46,15 @@
   /* 星球渲染就绪后会把"闪一下"填进来：读数每跳一次，星面跟着闪一批点 */
   var hooks = { flash: null };
 
+  /* ── 页面级的节奏覆盖 ──
+     页面可以在**引入本脚本之前**先写一份：
+       window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085 };
+     不写（首页三语页）就全走下面的默认值，画面与以前一模一样。
+     只有彩蛋页 docs/hero.html 写它：同一段画面，开场慢慢聚成球、滚动缓动
+     调软一档 —— 那页是让人走进去读故事的，不是扫一眼就走。
+     只放两个数，不做主题/颜色/几何的覆盖：那是设计，不是节奏。 */
+  var PAGE = window.__planet3dPage || {};
+
   /* ═════════════ 1. 累计报文遥测 ═════════════ */
   (function telemetry() {
     var root = document.getElementById("heroTelemetry");
@@ -594,7 +603,7 @@
   /* 入场（聚成球）：gather 从 0 → 1，顶点着色器用 uGather 把点从「散开的一层」
      拉回球面；相机同时从更近的机位退到取景位（先是一颗大地球，再落定）。
      降级动效下直接到位，不动。 */
-  var GATHER_MS = 2400;
+  var GATHER_MS = PAGE.gatherMs || 2400;          // 聚成球用掉的时间（页面可放慢）
   var gather = reduce ? 1 : 0, gatherT0 = 0, gateAt = 0;
   function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
   function nowMs() { return window.performance && performance.now ? performance.now() : Date.now(); }
@@ -913,7 +922,7 @@
         而且 JS 里只缓一道、CSS 那边不写 transition，免得两套缓动叠在一起发涩。
         降级动效（prefers-reduced-motion）下不接这个监听，CSS 保持原样。 ── */
   var scrollP = 0, scrollTarget = 0, scrollRaf = 0;
-  var SCROLL_EASE = 0.17;                           // 每帧向目标靠近的比例
+  var SCROLL_EASE = PAGE.scrollEase || 0.17;        // 每帧向目标靠近的比例（页面可调软）
   function writeScroll(e) {
     hero.style.setProperty("--hero-3d-y", (e * 30).toFixed(2) + "px");
     hero.style.setProperty("--hero-3d-scale", (1 + e * 0.06).toFixed(4));

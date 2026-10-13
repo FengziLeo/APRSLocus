@@ -25,7 +25,7 @@
 })();
 </script>
 <link rel="stylesheet" href="css/style.css?v=8">
-<link rel="stylesheet" href="css/hero-3d.css?v=17">
+<link rel="stylesheet" href="css/hero-3d.css?v=18">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
 /* 这页没有导航栏，主题按钮固定贴在右上角（只这一页用到，不进共享样式表；
@@ -45,6 +45,24 @@
 }
 .story-bgm iframe { display: block; width: 100%; height: 86px; border: 0; }
 @media (max-width: 520px) { .story-bgm { left: 12px; right: 12px; bottom: 12px; width: auto; } }
+
+/* ── 节奏：这页比首页慢一档 ──
+   首页那一套（文字浮上来 .8s、同排之间错开 .08s）是给「扫一眼」用的：一屏同时
+   亮起四五块也不打紧。这页是讲故事的，一屏只能有一件事发生 —— 所以整段文字
+   浮上来要 1.6s，同一节里「标题 → 正文」之间再隔 .35s，眼睛跟得上，
+   章与章之间也就自然连起来了。
+   只覆盖时长与延迟两个数：缓动曲线、位移距离、透明度都还是共享样式里那一套，
+   动效层（motion.css）也没被碰。降级动效下整块不生效。 */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { transition-duration: 1.6s; }
+  .reveal.d1 { transition-delay: .35s; }
+  .reveal.d2 { transition-delay: .70s; }
+  .reveal.d3 { transition-delay: 1.05s; }
+  /* 那个数字的登场（style.css 的 heroUp / heroBoom）同样放慢一档：
+     首页是「一亮就到位」，这里是「慢慢浮出来」。 */
+  .hero-copy > * { animation-duration: 1.3s; }
+  .hero-copy > *:nth-child(2) { animation-duration: 1.5s; }
+}
 </style>
 </head>
 <body>
@@ -117,7 +135,7 @@
     <p>APRSlocus 累计转发报文 —— 第一屏上一直往上走的那个数。</p>
   </div>
   <div class="section-body">
-    <div class="story-text reveal">
+    <div class="story-text reveal" data-delay="1">
       <p>它不是统计图里的一格刻度，而是<strong>此刻全世界 APRS 台站累计转发过的报文总量</strong>。屏幕上每跳一格，就有一条报文刚被转发出去 —— 可能来自城里某辆车的车载台，也可能来自某个山头上的一台手台。</p>
       <p>数字从 <code>stats.json</code> 里那张快照出发，按「基线 + 速率 × 经过的分钟数」在本地往前推，不需要后端，也不需要定时任务。快照超过 12 小时就不再外推 —— 宁可停在一个保守的上限，也不给你一个凭空涨出来的数。</p>
     </div>
@@ -131,7 +149,7 @@
     <p>一条报文到你眼前之前，走哪条路由发的人自己决定。</p>
   </div>
   <div class="section-body">
-    <div class="story-text reveal">
+    <div class="story-text reveal" data-delay="1">
       <p>它可能经由 APRS-IS 服务器从一台手机或电脑发出；也可能从蓝牙 TNC、声卡音频进来，或者来自一台直连的 Icom 电台；地图上那些站点，就是这些不同的路最后汇在一起的样子。APRS-IS · TNC · 音频 · PKWDWPL —— <strong>四种来源，同一张地图</strong>。</p>
       <p>APRSlocus 不提供、也不预置任何服务器地址。要联网，服务器和连接方式都由你自己填 —— 这条路是你的。</p>
     </div>
@@ -145,7 +163,7 @@
     <p>每一条报文最后都落回顶上那颗星球 —— 那一屏不是贴图。</p>
   </div>
   <div class="section-body">
-    <div class="story-text reveal">
+    <div class="story-text reveal" data-delay="1">
       <p>一万三千个点铺成球体，十二根经线与七根纬线撑着那层线框；球面上会闪的那几粒，就是台站在上报。</p>
       <p>三圈环带各转各的（内圈走得快、外圈慢，按开普勒的 ω ∝ r<sup>-1.5</sup> 排），七颗卫星带着尾迹从球外划过去；偶尔有流星斜插进来，在落点荡开一圈冲击波，再慢慢化开。星面上还有三层浪在跑。一共就这些 —— 都是这一屏里真实在动的几何。</p>
       <p>它自转、它呼吸，但不接受拖动：这层画面是给你看的，不是给你转的。</p>
@@ -160,7 +178,7 @@
     <p>电波穿过夜空，最后都落在这颗星球上。</p>
   </div>
   <div class="section-body">
-    <div class="story-text reveal">
+    <div class="story-text reveal" data-delay="1">
       <p>想自己也发一条，从首页开始 —— 装好、填上呼号和服务器，你那个点就会出现在球面上。</p>
       <p><a class="btn btn-text" href="index.html">回首页<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l7 7-7 7V5z"/></svg></a></p>
     </div>
@@ -181,6 +199,10 @@
 <!-- 与首页同一份脚本：main.js 负责 body.loaded / 显形 / 主题 / 首屏粒子，
      planet-3d.js 负责星球与那个会跳的数字。两个 ?v= 与三语首页保持一致。 -->
 <script src="js/main.js?v=8"></script>
-<script src="js/planet-3d.js?v=17"></script>
+<!-- 节奏覆盖必须在 planet-3d.js 之前写好：它一进来就读这个对象，之后再改没用。
+     gatherMs 2400 → 4400：开场那点云慢慢聚成一颗球，不是一下摆好；
+     scrollEase 0.17 → 0.085：滚动缓动慢一倍，往下拉是滑过去的。 -->
+<script>window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085 };</script>
+<script src="js/planet-3d.js?v=18"></script>
 </body>
 </html>

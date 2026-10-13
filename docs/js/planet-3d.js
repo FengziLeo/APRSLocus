@@ -16,7 +16,7 @@
    · 相机固定在 +Z，靠 uDist 缩放；打开深度测试（加色混合 + 写深度），
      背面点被正面挡住，星球才有实体感，否则只是一团发光的雾。
 
-   降级：没有 WebGL 或着色器编译失败 → 给 .hero-stage 加 .no-3d，用纯 CSS
+   降级：没有 WebGL 或着色器编译失败 → 给 .hero 加 .no-3d，用纯 CSS
    的星球顶上；遥测数字照常跳动（它只依赖 DOM）。
 
    遥测：数值源头是 /stats.json（仓库里的静态快照，由 check_site.py 与页面
@@ -31,6 +31,9 @@
     reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
   } catch (e) { reduce = false; }
 
+  /* 星球渲染就绪后会把"闪一下"填进来：读数每跳一次，星面跟着闪一批点 */
+  var hooks = { flash: null };
+
   /* ═════════════ 1. 累计报文遥测 ═════════════ */
   (function telemetry() {
     var root = document.getElementById("heroTelemetry");
@@ -38,10 +41,6 @@
     var elVal = document.getElementById("tlPackets");
     if (!elVal) return;
     var elRate = document.getElementById("tlRateNum");
-    var elStamp = document.getElementById("tlStamp");
-    var elInc = document.getElementById("tlInc");
-    var elNext = document.getElementById("tlNext");
-    var elBar = document.getElementById("tlBar");
 
     function digits(s) { return String(s == null ? "" : s).replace(/[^0-9]/g, ""); }
     function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
@@ -56,7 +55,6 @@
 
     var shown = -1;
     if (elRate) elRate.textContent = "+" + fmt(rate);
-    if (elInc) elInc.textContent = "+0";
 
     // 外推上限：快照越旧，"基线 + 速率 × 经过时间"离真值越远。超过 12 小时就停止
     // 推算（数字冻结在上限值，LIVE 点变色 + 悬停给解释）—— 宁可保守一点，
@@ -77,12 +75,10 @@
           elVal.classList.remove("bump");
           void elVal.offsetWidth;                   // 强制回流，重启动画
           elVal.classList.add("bump");
+          if (hooks.flash) hooks.flash(live);       // 读数一跳，星面闪一批点
         }
-        if (elInc) elInc.textContent = "+" + fmt(live - packets);
         shown = live;
       }
-      if (elBar) elBar.style.width = stale ? "100%" : ((elapsed % 1) * 100).toFixed(1) + "%";
-      if (elNext) elNext.textContent = stale ? "—" : String(60 - Math.floor((now / 1000) % 60));
       if (stale !== wasStale) {
         wasStale = stale;
         root.classList.toggle("stale", stale);
@@ -100,7 +96,6 @@
           if (typeof d.packetsPerMinute === "number") rate = d.packetsPerMinute;
           var ts = Date.parse(d.updatedIso || "");
           if (ts) t0 = ts;
-          if (d.updated && elStamp) elStamp.textContent = d.updated;
           if (elRate) elRate.textContent = "+" + fmt(rate);
           shown = -1;
           tick();
@@ -113,8 +108,8 @@
 
   /* ═════════════ 2. 3D 星球 ═════════════ */
   var canvas = document.getElementById("planetCanvas");
-  var stage = document.querySelector(".hero-stage");
-  if (!canvas || !stage || !canvas.getContext) return;
+  var hero = document.querySelector(".hero");
+  if (!canvas || !hero || !canvas.getContext) return;
 
   var TILT = 23.4 * Math.PI / 180;    // 轴倾角（与舷窗上 AXIS TILT 标签一致）
   var FOV = 33 * Math.PI / 180;
@@ -122,6 +117,7 @@
   var RING_OUT = 1.78;                // 最外圈环半径（决定取景）
   var ORBIT = 2.05;                   // 卫星轨道半径
   var CLOUD = 13000;
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
 
   /* ── 定点随机：固定种子 → 每次刷新都是同一颗星球（也方便截图对比） ── */
   function mulberry32(a) {
@@ -154,27 +150,28 @@
     return (y0 + (y1 - y0) * w) * 2 - 1;          // → [-1, 1]
   }
 
-  /* ── 色带：深海 → 冰蓝（深色面板上取色，浅色主题也读得清） ── */
-  var RAMP = [
-    [0.00, 0.043, 0.129, 0.243],   // #0b2136
-    [0.42, 0.043, 0.278, 0.463],   // #0b4776
-    [0.72, 0.090, 0.588, 0.847],   // #1796d8
-    [1.00, 0.545, 0.882, 1.000]    // #8be1ff
-  ];
-  function ramp(t, out) {
-    t = t < 0 ? 0 : t > 1 ? 1 : t;
-    var i = 0;
-    while (i < RAMP.length - 2 && t > RAMP[i + 1][0]) i++;
-    var a = RAMP[i], b = RAMP[i + 1];
-    var f = (t - a[0]) / ((b[0] - a[0]) || 1);
-    out[0] = a[1] + (b[1] - a[1]) * f;
-    out[1] = a[2] + (b[2] - a[2]) * f;
-    out[2] = a[3] + (b[3] - a[3]) * f;
+  /* ── 配色：HSL 色斑。整颗星是一族冷色（青绿 ↔ 靛蓝 ↔ 紫），
+        台站点用琥珀 / 洋红单独点出来 —— 彩色但不花。 ── */
+  function hsl2rgb(h, s, l, out) {
+    h = h - Math.floor(h);
+    if (s < 0) s = 0; else if (s > 1) s = 1;
+    if (l < 0) l = 0; else if (l > 1) l = 1;
+    var c = (1 - Math.abs(2 * l - 1)) * s;
+    var hp = h * 6, x = c * (1 - Math.abs(hp % 2 - 1)), m = l - c * 0.5;
+    var i = Math.floor(hp) % 6, r = 0, g = 0, b = 0;
+    if (i === 0) { r = c; g = x; }
+    else if (i === 1) { r = x; g = c; }
+    else if (i === 2) { g = c; b = x; }
+    else if (i === 3) { g = x; b = c; }
+    else if (i === 4) { r = x; b = c; }
+    else { r = c; b = x; }
+    out[0] = r + m; out[1] = g + m; out[2] = b + m;
   }
 
-  /* ── 几何：交错 9 float/点 = pos(3) + col(3) + meta(尺寸, 脉冲) + spin ── */
+  /* ── 几何：交错 10 float/点 = pos(3) + col(3) + meta(尺寸, 呼吸频率, 呼吸幅度) + spin
+        meta.y > 0 的点会自己呼吸（大小与亮度一起抖， 0.5~2.8 Hz）。 ── */
   function buildCloud() {
-    var arr = [], col = [0, 0, 0], i, u, th, s, x, y, z, r, t, n, ang, ex, ez, live, fade;
+    var arr = [], col = [0, 0, 0], i, u, th, s, x, y, z, r, ang, ex, ez, live, fade, patch, fine, hue;
 
     // 星球本体
     for (i = 0; i < CLOUD; i++) {
@@ -183,29 +180,37 @@
       s = Math.sqrt(1 - u * u);
       x = s * Math.cos(th); y = u; z = s * Math.sin(th);
       r = 1 + (rnd() - 0.5) * 0.05;
-      n = noise3(x * 1.7, y * 4.6, z * 1.7) * 0.72 + noise3(x * 5.1, y * 5.1, z * 5.1) * 0.28;
-      t = Math.pow((n + 1) * 0.5, 0.85);
-      ramp(0.16 + t * 0.84, col);
+      patch = noise3(x * 1.25, y * 2.6, z * 1.25) * 0.5 + 0.5;
+      fine = noise3(x * 4.2, y * 4.2, z * 4.2) * 0.5 + 0.5;
+      hue = 0.44 + 0.31 * (patch - 0.5) + 0.16 * Math.abs(y) + 0.03 * fine;
+      hsl2rgb(hue, 0.62 + 0.30 * fine,
+        0.30 + 0.34 * Math.pow(0.35 * patch + 0.65 * fine, 0.9), col);
       arr.push(x * r, y * r, z * r, col[0], col[1], col[2],
-        0.022 + rnd() * 0.010, 0, 0);
+        0.0085 + rnd() * 0.0050,              // 尺寸：相对星球屏幕半径
+        0.5 + rnd() * 2.3,                    // 呼吸频率
+        0.10 + 0.45 * fine,                   // 呼吸幅度
+        0);
     }
 
-    // 信标点（台站）：暖色 + 呼吸脉冲
+    // 台站点：琥珀 / 洋红，呼吸最明显
     for (i = 0; i < 60; i++) {
       u = rnd() * 2 - 1;
       th = rnd() * Math.PI * 2;
       s = Math.sqrt(1 - u * u);
       x = s * Math.cos(th); y = u; z = s * Math.sin(th);
-      var hot = rnd() < 0.3;
-      arr.push(x, y, z,
-        1.0, hot ? 0.60 : 0.86, hot ? 0.20 : 0.40,
-        0.030 + rnd() * 0.018, 0.9 + rnd() * 2.2, 0);
+      var pink = rnd() < 0.25;
+      hsl2rgb(pink ? 0.92 : 0.055 + rnd() * 0.06, 0.95, pink ? 0.62 : 0.56, col);
+      arr.push(x, y, z, col[0], col[1], col[2],
+        0.0115 + rnd() * 0.0075,
+        1.2 + rnd() * 2.8,
+        0.85 + rnd() * 0.15,
+        0);
     }
 
-    // 环带：XZ 平面三圈，密度按 noise 立方取舍 → 亮暗相间的弧段
-    var rings = [[1.30, 900], [1.52, 1000], [1.74, 1100]];
+    // 环带：XZ 平面三圈，色相青 → 蓝 → 紫，密度按 noise 立方取舍 → 亮暗相间的弧段
+    var rings = [[1.30, 900, 0.50], [1.52, 1000, 0.58], [1.74, 1100, 0.67]];
     for (i = 0; i < rings.length; i++) {
-      var rad = rings[i][0], cnt = rings[i][1];
+      var rad = rings[i][0], cnt = rings[i][1], base = rings[i][2];
       for (var j = 0; j < cnt; j++) {
         ang = rnd() * Math.PI * 2;
         ex = Math.cos(ang); ez = Math.sin(ang);
@@ -213,30 +218,38 @@
         if (rnd() > live * 1.15) continue;
         r = rad + (rnd() - 0.5) * 0.035;
         fade = 1 - Math.abs(r - rad) / 0.05;
+        hsl2rgb(base + (rnd() - 0.5) * 0.06, 0.86, 0.42 + 0.18 * fade, col);
         arr.push(ex * r, (rnd() - 0.5) * 0.012, ez * r,
-          0.31 * fade, 0.72 * fade, 0.95 * fade,
-          0.013 + rnd() * 0.006, 0, 1);
+          col[0] * fade, col[1] * fade, col[2] * fade,
+          0.0050 + rnd() * 0.0030,
+          0.7 + rnd() * 1.8,
+          0.35 + 0.35 * fade,
+          1);
       }
     }
 
     // 卫星轨道：一圈细点
     var ON = 280;
+    hsl2rgb(0.42, 0.70, 0.50, col);
     for (i = 0; i < ON; i++) {
       ang = (i / ON) * Math.PI * 2;
-      arr.push(Math.cos(ang) * ORBIT, 0, Math.sin(ang) * ORBIT, 0.30, 0.52, 0.70, 0.011, 0, 1);
+      arr.push(Math.cos(ang) * ORBIT, 0, Math.sin(ang) * ORBIT, col[0], col[1], col[2],
+        0.0042, 0.9 + (i % 7) * 0.12, 0.30, 1);
     }
-    return { data: new Float32Array(arr), count: arr.length / 9 };
+    return { data: new Float32Array(arr), count: arr.length / 10 };
   }
 
   var VS = [
     "attribute vec3 aPos;",
     "attribute vec3 aCol;",
-    "attribute vec2 aMeta;",
+    "attribute vec3 aMeta;",              // 尺寸 / 呼吸频率 / 呼吸幅度
     "attribute float aSpin;",
     "uniform float uCosY; uniform float uSinY;",
     "uniform float uCosP; uniform float uSinP;",
     "uniform float uDist; uniform float uProj; uniform float uAspect;",
-    "uniform float uPxScale; uniform float uMaxSize; uniform float uTime;",
+    "uniform float uPxScale; uniform float uMaxSize; uniform float uMinPx;",
+    "uniform float uTime; uniform float uBurst; uniform float uSeed;",
+    "uniform vec2 uCenter; uniform vec3 uTint;",
     "varying vec3 vCol;",
     "varying float vFade;",
     "void main() {",
@@ -245,13 +258,15 @@
     "  vec3 p = vec3(aPos.x * cy + aPos.z * sy, aPos.y, aPos.z * cy - aPos.x * sy);",
     "  p = vec3(p.x, p.y * uCosP - p.z * uSinP, p.y * uSinP + p.z * uCosP);",
     "  float d = uDist - p.z;",
-    "  gl_Position = vec4(p.x * uProj / uAspect, p.y * uProj, d - uDist, d);",
-    "  gl_PointSize = clamp(aMeta.x * uPxScale / d, 1.0, uMaxSize);",
-    "  float pulse = aMeta.y > 0.0",
-    "    ? 0.30 + 0.70 * pow(0.5 + 0.5 * sin(uTime * aMeta.y + aPos.x * 9.0), 2.0)",
-    "    : 1.0;",
-    "  vCol = aCol * pulse;",
-    "  vFade = 0.45 + 0.55 * clamp(p.z * 0.9 + 0.55, 0.0, 1.0);",
+    "  gl_Position = vec4(p.x * uProj / uAspect + uCenter.x, p.y * uProj + uCenter.y, d - uDist, d);",
+    "  float tw = aMeta.y > 0.0 ? 0.5 + 0.5 * sin(uTime * aMeta.y + aPos.x * 9.0 + aPos.z * 5.0 + aPos.y * 3.0) : 1.0;",
+    "  float k = mix(1.0, 0.34 + 1.20 * tw, aMeta.z);",
+    "  float pick = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719)) + uSeed) * 43758.5453);",
+    "  float flare = uBurst * step(0.95, pick);",
+    "  k *= 1.0 + 1.6 * flare;",
+    "  gl_PointSize = clamp(aMeta.x * uPxScale / d * k, uMinPx, uMaxSize);",
+    "  vCol = aCol * uTint * k;",
+    "  vFade = (0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6;",
     "}"
   ].join("\n");
 
@@ -259,24 +274,25 @@
     "precision mediump float;",
     "varying vec3 vCol;",
     "varying float vFade;",
+    "uniform float uAlpha;",
     "void main() {",
     "  vec2 q = gl_PointCoord - vec2(0.5);",
     "  float r2 = dot(q, q);",
     "  if (r2 > 0.25) discard;",
-    "  gl_FragColor = vec4(vCol, smoothstep(0.25, 0.04, r2) * vFade);",
+    "  gl_FragColor = vec4(vCol, clamp(smoothstep(0.25, 0.05, r2) * vFade * uAlpha, 0.0, 1.0));",
     "}"
   ].join("\n");
 
   function fail(why) {
-    stage.classList.add("no-3d");
-    stage.setAttribute("data-3d", why);
+    hero.classList.add("no-3d");
+    hero.setAttribute("data-3d", why);
     if (window.console && console.warn) console.warn("[planet-3d] fallback:", why);
   }
 
   var gl = null;
   try {
-    gl = canvas.getContext("webgl", { alpha: false, antialias: false, depth: true })
-      || canvas.getContext("experimental-webgl", { alpha: false });
+    gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false, antialias: false, depth: true })
+      || canvas.getContext("experimental-webgl", { alpha: true, premultipliedAlpha: false });
   } catch (e) { gl = null; }
   if (!gl) { fail("no-webgl"); return; }
 
@@ -301,12 +317,12 @@
   gl.useProgram(prog);
 
   var cloud = buildCloud();
-  var STRIDE = 9 * 4;
+  var STRIDE = 10 * 4;
   var buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
   gl.bufferData(gl.ARRAY_BUFFER, cloud.data, gl.STATIC_DRAW);
 
-  var marker = new Float32Array(9);
+  var marker = new Float32Array(10);
   var mBuf = gl.createBuffer();
 
   var A = {
@@ -316,14 +332,15 @@
     spin: gl.getAttribLocation(prog, "aSpin")
   };
   var U = {};
-  ["uCosY", "uSinY", "uCosP", "uSinP", "uDist", "uProj", "uAspect",
-    "uPxScale", "uMaxSize", "uTime"].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
+  ["uCosY", "uSinY", "uCosP", "uSinP", "uDist", "uProj", "uAspect", "uPxScale",
+    "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uAlpha", "uBurst", "uSeed"
+  ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
 
   function bindPointers() {
     gl.vertexAttribPointer(A.pos, 3, gl.FLOAT, false, STRIDE, 0);
     gl.vertexAttribPointer(A.col, 3, gl.FLOAT, false, STRIDE, 12);
-    gl.vertexAttribPointer(A.meta, 2, gl.FLOAT, false, STRIDE, 24);
-    gl.vertexAttribPointer(A.spin, 1, gl.FLOAT, false, STRIDE, 32);
+    gl.vertexAttribPointer(A.meta, 3, gl.FLOAT, false, STRIDE, 24);
+    gl.vertexAttribPointer(A.spin, 1, gl.FLOAT, false, STRIDE, 36);
     gl.enableVertexAttribArray(A.pos);
     gl.enableVertexAttribArray(A.col);
     gl.enableVertexAttribArray(A.meta);
@@ -332,11 +349,23 @@
 
   gl.disable(gl.CULL_FACE);
   gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE);              // 加色混合：点重叠处更亮
   gl.enable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LESS);
   gl.depthMask(true);
-  gl.clearColor(0.024, 0.043, 0.086, 1);           // #060b16（面板底色，与 CSS 一致）
+  gl.clearColor(0, 0, 0, 0);                       // 画布全透明：点之外什么都不画，所以没有"面板"
+
+  /* 深浅主题共用同一份几何，只换混合函数与两个 uniform：
+     浅底用正常混合（彩色墨点压在浅底上），深底用加色混合（同样的点变成霓虹辉光）。 */
+  var MODES = {
+    light: { add: false, tint: [1.00, 1.00, 1.00], alpha: 1.00 },
+    dark: { add: true, tint: [1.10, 1.16, 1.30], alpha: 0.80 }
+  };
+  var dark = false;
+  function syncMode() {
+    var t = document.documentElement.getAttribute("data-theme");
+    dark = (t === "dark");
+  }
+  syncMode();
 
   /* ── 相机 / 交互状态 ── */
   var yaw = 0.55, pitch = -0.10, tYaw = yaw, tPitch = pitch;
@@ -344,23 +373,38 @@
   var dragging = false, lastX = 0, lastY = 0;
   var running = false, paused = false, raf = 0, last = 0;
 
-  function camDist() {
-    var w = canvas.width, h = canvas.height;
+  /* ── 取景：view.r 是星球本体的屏幕半径，view.cx/cy 是它在 hero 里的相对位置。
+        相机距离由 r 反推，所以换屏不会"忽大忽小"，环带始终切出右缘。 ── */
+  var view = { cx: 0.715, cy: 0.475, r: 1 };
+  function frame(w, h) {
     var aspect = w / Math.max(1, h);
-    var fit = aspect < 1 ? 1.30 : 0.92;            // 竖版面板允许环带略微出框
-    var d = RING_OUT * U_PROJ / (fit * aspect);    // 横向最宽，按它取景
-    var dMax = U_PROJ / 0.34;                      // 星球半径不小于画面高度的 17%
-    return Math.max(Math.min(d, dMax), 3.4);
+    if (aspect > 1.25) { view.cx = 0.715; view.cy = 0.475; view.r = 0.325 * h; }     // 桌面：偏右
+    else if (aspect > 0.95) { view.cx = 0.60; view.cy = 0.42; view.r = 0.27 * h; }   // 横屏平板
+    else { view.cx = 0.50; view.cy = 0.30; view.r = 0.34 * w; }                      // 窄屏：上三分之一居中
+    return view;
   }
+  function camDist(h) { return U_PROJ * h / (2 * Math.max(1, view.r)); }
+
+  /* 每来一条报文就挑一批点窜一下：读数一跳，星面跟着亮一片（uBurst 从 1 衰减） */
+  var burstAt = -1e9, burstSeed = 0, BURST_MS = 900;
+  function flash(seed) { burstAt = Date.now(); burstSeed = (seed || 0) * 0.618 % 1; if (!running) start(); }
 
   function draw(now) {
     var w = canvas.width, h = canvas.height;
     if (!w || !h) return;
-    var dist = camDist();
+    var f = frame(w, h);
+    var m = MODES[dark ? "dark" : "light"];
+    var dist = camDist(h);
     var cp = Math.cos(TILT + pitch), sp = Math.sin(TILT + pitch);
+    var age = reduce ? 1 : (Date.now() - burstAt) / BURST_MS;
+    var burst = (age < 0 || age > 1) ? 0 : Math.pow(1 - age, 2);
     gl.viewport(0, 0, w, h);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.useProgram(prog);
+    gl.blendFunc(gl.SRC_ALPHA, m.add ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
+    gl.uniform3f(U.uTint, m.tint[0], m.tint[1], m.tint[2]);
+    gl.uniform1f(U.uAlpha, m.alpha);
+    gl.uniform2f(U.uCenter, f.cx * 2 - 1, 1 - f.cy * 2);
     gl.uniform1f(U.uCosY, Math.cos(yaw));
     gl.uniform1f(U.uSinY, Math.sin(yaw));
     gl.uniform1f(U.uCosP, cp);
@@ -369,8 +413,11 @@
     gl.uniform1f(U.uProj, U_PROJ);
     gl.uniform1f(U.uAspect, w / h);
     gl.uniform1f(U.uPxScale, (h / 2) * U_PROJ);
-    gl.uniform1f(U.uMaxSize, 26);
+    gl.uniform1f(U.uMaxSize, Math.max(10, 11 * DPR));
+    gl.uniform1f(U.uMinPx, Math.max(1, 1.6 * DPR));
     gl.uniform1f(U.uTime, reduce ? 0 : now);
+    gl.uniform1f(U.uBurst, burst);
+    gl.uniform1f(U.uSeed, burstSeed);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     bindPointers();
@@ -381,8 +428,8 @@
     marker[0] = Math.cos(ang) * ORBIT;
     marker[1] = 0;
     marker[2] = Math.sin(ang) * ORBIT;
-    marker[3] = 0.72; marker[4] = 0.95; marker[5] = 1.0;
-    marker[6] = 0.046; marker[7] = 1.6; marker[8] = 1;
+    marker[3] = 0.98; marker[4] = 0.42; marker[5] = 0.78;
+    marker[6] = 0.018; marker[7] = 1.6; marker[8] = 0.9; marker[9] = 1;
     gl.bindBuffer(gl.ARRAY_BUFFER, mBuf);
     gl.bufferData(gl.ARRAY_BUFFER, marker, gl.DYNAMIC_DRAW);
     bindPointers();
@@ -428,7 +475,7 @@
   canvas.addEventListener("pointerdown", function (e) {
     dragging = true;
     lastX = e.clientX; lastY = e.clientY;
-    stage.classList.add("grabbing");
+    hero.classList.add("grabbing");
     if (canvas.setPointerCapture) { try { canvas.setPointerCapture(e.pointerId); } catch (err) {} }
     start();
   });
@@ -441,7 +488,7 @@
   function endDrag() {
     if (!dragging) return;
     dragging = false;
-    stage.classList.remove("grabbing");
+    hero.classList.remove("grabbing");
     start();
   }
   canvas.addEventListener("pointerup", endDrag);
@@ -470,7 +517,7 @@
           if (raf) cancelAnimationFrame(raf);
         }
       });
-    }, { threshold: 0 }).observe(stage);
+    }, { threshold: 0 }).observe(hero);
   }
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) {
@@ -488,6 +535,19 @@
   resize();
   if (!canvas.width) resize();
   start();
+  hooks.flash = flash;                             // 遥测那边每跳一次就调它
+
+  /* 主题切换（站点的 toggle 改的是 <html data-theme>）：只换混合模式与 tint，重画一帧 */
+  if (window.MutationObserver) {
+    new MutationObserver(function () {
+      var was = dark;
+      syncMode();
+      if (was !== dark) {
+        draw(reduce ? 0 : (window.performance ? performance.now() / 1000 : 0));
+        start();
+      }
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  }
 
   /* ── 调试/自检钩子：给脚本一个同步的"渲染 + 回读"入口，静态检查与
         CI 截图都靠它读像素，不需要目测（draw + readPixels 必须同一任务内）。 ── */
@@ -519,15 +579,18 @@
     },
     state: function () {
       return {
-        ok: !stage.classList.contains("no-3d"),
+        ok: !hero.classList.contains("no-3d"),
         glError: gl.getError(),
         points: cloud.count,
-        dist: +camDist().toFixed(3),
+        dist: +camDist(canvas.height).toFixed(3),
+        frame: { cx: +view.cx.toFixed(3), cy: +view.cy.toFixed(3), r: Math.round(view.r) },
+        mode: dark ? "dark" : "light",
         yaw: +yaw.toFixed(3),
         pitch: +pitch.toFixed(3),
         reduce: reduce,
         running: running
       };
-    }
+    },
+    flash: function () { flash(0); }
   };
 })();

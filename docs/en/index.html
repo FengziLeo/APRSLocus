@@ -56,7 +56,7 @@
 <link rel="canonical" href="https://aprslocus.theez.top/en/">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
 <link rel="stylesheet" href="../css/style.css?v=7">
-<link rel="stylesheet" href="../css/hero-3d.css?v=1">
+<link rel="stylesheet" href="../css/hero-3d.css?v=2">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -70,7 +70,7 @@
     <div class="pre-bar"><i></i></div>
   </div>
 </div>
-<noscript><style>.preloader{display:none}.hero-copy>*,.hero-stage,.hero-telemetry{opacity:1!important;transform:none!important}</style></noscript>
+<noscript><style>.preloader{display:none}.hero-copy>*,.planet-canvas{opacity:1!important;transform:none!important}</style></noscript>
 
 <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -123,21 +123,12 @@ html{overflow-x:hidden}
   <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
   <div class="hero-grid"></div>
 
-  <div class="hero-inner">
+  <!-- 3D planet: a transparent point-cloud layer on the hero itself (no frame, no backdrop) -->
+  <canvas class="planet-canvas" id="planetCanvas" tabindex="0" role="img"
+          aria-label="Draggable 3D planet: APRS stations, ring bands and a satellite orbit"></canvas>
+  <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
 
-    <!-- 3D planet: hand-written WebGL point cloud, draggable (js/planet-3d.js) -->
-    <div class="hero-stage" id="heroStage">
-      <canvas class="planet-canvas" id="planetCanvas" width="760" height="760" tabindex="0" role="img"
-              aria-label="Draggable 3D planet: APRS stations, ring bands and a satellite orbit"></canvas>
-      <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
-      <div class="stage-scan" aria-hidden="true"></div>
-      <div class="stage-frame" aria-hidden="true">
-        <i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
-        <span class="stage-tag">ORBIT VIEW · APRS-IS</span>
-        <span class="stage-tag r">AXIS TILT 23.4°</span>
-      </div>
-      <div class="stage-hint" aria-hidden="true"><i></i>Drag to rotate · arrow keys to nudge</div>
-    </div>
+  <div class="hero-inner">
 
     <div class="hero-copy">
       <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
@@ -171,31 +162,18 @@ html{overflow-x:hidden}
         <span>APRS-IS · TNC · Audio · PKWDWPL</span>
         <span>Android / Windows</span>
       </div>
-    </div>
 
-    <!-- Cumulative packet telemetry: numbers come from stats.json; the static
-         fallback values below are kept in sync by tool/check_site.py -->
-    <aside class="hero-telemetry" id="heroTelemetry"
+      <!-- Cumulative packets: numbers only, let it tick (source: stats.json) -->
+      <div class="hero-stat" id="heroTelemetry"
            data-stats="../stats.json" data-packets="509260" data-rate="18"
            data-updated="2026-10-13T16:06:00+08:00"
            data-stale-title="Snapshot older than 12 hours - extrapolation stopped (capped estimate shown)">
-      <div class="tl-head">
-        <span class="tl-kicker">TELEMETRY · APRS-IS</span>
-        <span class="tl-live"><i></i>LIVE</span>
+        <span class="hs-live"><i></i>LIVE</span>
+        <span class="hs-item"><span class="tl-value" id="tlPackets">509,260</span><em>packets</em></span>
+        <span class="hs-item">per minute <b><i id="tlRateNum">+18</i></b></span>
       </div>
-      <div class="tl-main">
-        <span class="tl-label">Packets reported, cumulative</span>
-        <span class="tl-value" id="tlPackets">509,260</span>
-        <span class="tl-unit">packets</span>
-      </div>
-      <div class="tl-rows">
-        <div class="tl-row"><span>Per minute</span><b><i id="tlRateNum">+18</i> /min</b></div>
-        <div class="tl-row"><span>As of</span><b id="tlStamp">2026-10-13 16:06</b></div>
-        <div class="tl-row"><span>Added this session</span><b id="tlInc">+0</b></div>
-      </div>
-      <div class="tl-bar"><i id="tlBar"></i></div>
-      <div class="tl-foot"><span>Extrapolated locally from the live rate</span><span>Next refresh <b id="tlNext">60</b>s</span></div>
-    </aside>
+    </div>
+
   </div>
 
   <a class="hero-scroll" href="#features" aria-label="Scroll down"><span></span></a>
@@ -1956,6 +1934,6 @@ html{overflow-x:hidden}
 </a>
 
 <script src="../js/main.js?v=7"></script>
-<script src="../js/planet-3d.js?v=1"></script>
+<script src="../js/planet-3d.js?v=2"></script>
 </body>
 </html>

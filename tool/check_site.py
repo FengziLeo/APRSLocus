@@ -167,36 +167,52 @@ def main():
         chk('docs/stats.json 可解析', False, e)
     if stats:
         pk = '{:,}'.format(stats['packets'])
+        vers = []
         for f in ('docs/index.html', 'docs/zh-TW/index.html', 'docs/en/index.html'):
             s = read(f)
             up = '' if f == 'docs/index.html' else '../'
-            chk('%s : hero 三件套齐、旧手机示意已撤' % f,
-                'class="hero-stage"' in s and 'id="planetCanvas"' in s
-                and 'id="heroTelemetry"' in s and 'hero-phone' not in s
+            chk('%s : hero 星球层就位、旧面板已撤' % f,
+                'id="planetCanvas"' in s and 'class="planet-fallback"' in s
+                and 'id="heroTelemetry"' in s and 'class="hero-stat"' in s
+                and 'hero-phone' not in s and 'hero-stage' not in s
                 and 'data-stale-title="' in s)
-            chk('%s : 遥测静态值 = stats.json' % f,
+            # 星球直接长在 hero 上、不在面板里：画布必须排在 .hero-inner 前面
+            chk('%s : 星球画布在 hero 层（非面板）' % f,
+                s.index('id="planetCanvas"') < s.index('class="hero-inner"')
+                and 'class="hero-grid"' in s)
+            chk('%s : 读数静态值 = stats.json' % f,
                 'data-packets="%d"' % stats['packets'] in s
                 and 'data-rate="%d"' % stats['packetsPerMinute'] in s
                 and 'id="tlPackets">%s<' % pk in s
-                and 'id="tlStamp">%s<' % stats['updated'] in s
                 and 'id="tlRateNum">+%d<' % stats['packetsPerMinute'] in s)
+            # 只报数字：上限/时间戳/进度条这类"像上传面板"的元信息都不要再出现
+            chk('%s : 只留跳动数字（无时间戳/进度条）' % f,
+                not any(x in s for x in ('tlStamp', 'tlInc', 'tlBar', 'tlNext', 'tl-bar')))
+            vers.append(re.findall(r'hero-3d\.css\?v=(\d+)', s) + re.findall(r'planet-3d\.js\?v=(\d+)', s))
             chk('%s : hero-3d 资源接线' % f,
-                '%scss/hero-3d.css?v=1' % up in s
-                and '%sjs/planet-3d.js?v=1' % up in s
+                '%scss/hero-3d.css?v=' % up in s
+                and '%sjs/planet-3d.js?v=' % up in s
                 and 'data-stats="%sstats.json"' % up in s
                 and 'data-updated="%s"' % stats['updatedIso'] in s)
-    # 降级链路：没有 WebGL 也不能在面板里留一块空白。
-    # 只看「页面里有 canvas」是不够的 —— 真会坏的是脚本早期 return 之后
-    # 舷窗里什么都没有，所以要求 CSS 有 .no-3d 分支、脚本有失败回落。
+        # 三语首页必须链接同一个版本号；线上已缓存过旧值，所以要求 >= 2
+        flat = sorted({v for pair in vers for v in pair})
+        chk('hero-3d 资源版本三语一致且 >=2', len(flat) == 1 and int(flat[0]) >= 2, flat)
+    # 降级链路：没有 WebGL 时不能把 hero 那块留成空白。
+    # 只看「页面里有 canvas」是不够的，真会坏的是脚本早期 return 之后什么都
+    # 没画，所以要求 CSS 有 .no-3d 分支、脚本有失败回落。
     hero_css = read('docs/css/hero-3d.css')
     hero_js = read('docs/js/planet-3d.js')
     chk('hero-3d.css 大括号平衡', hero_css.count('{') == hero_css.count('}'))
     chk('hero 降级链路 (no-3d / no-webgl)',
-        '.hero-stage.no-3d' in hero_css and 'no-webgl' in hero_js
-        and 'classList.add("no-3d")' in hero_js)
-    chk('hero 遥测跳动三件 (bump / bar / next)',
-        all(x in hero_css for x in ('.tl-value.bump', '.tl-bar i'))
-        and all(x in hero_js for x in ('tlPackets', 'tlBar', 'tlNext')))
+        '.hero.no-3d .planet-canvas' in hero_css and '.hero.no-3d .planet-fallback' in hero_css
+        and 'no-webgl' in hero_js and 'classList.add("no-3d")' in hero_js)
+    # 透明画布是"没有面板感"的根：底色一写回去就又变成一块方框了
+    chk('hero 画布保持透明 (alpha:true + clearColor alpha 0)',
+        'alpha: true' in hero_js and 'clearColor(0, 0, 0, 0)' in hero_js)
+    chk('hero 读数跳动三件 (bump / 闪点 / 无旧控件)',
+        '.tl-value.bump' in hero_css
+        and all(x in hero_js for x in ('tlPackets', 'hooks.flash'))
+        and not any(x in hero_js for x in ('tlBar', 'tlNext', 'tlStamp')))
 
     print('[help center x3]')
     for f in ['docs/faq.html', 'docs/zh-TW/faq.html', 'docs/en/faq.html']:

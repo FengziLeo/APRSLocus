@@ -8965,4 +8965,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get agentTool_strategy_request_snapshot => "マップの再送を要求";
 
+  @override
+  String get agentStreamReply => "逐次表示";
+
+  @override
+  String get agentStreamReplyDesc => "モデルの生成に合わせて順次表示します。バックエンドがストリーム非対応なら一括表示に切り替わります（返答が減ることはありません）。";
+
 }

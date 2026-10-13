@@ -672,6 +672,8 @@
   "@agentTaskEvery": {"placeholders": {"n": {"type": "int"}}},
   "@agentAutoReplyPrompt": {"placeholders": {"from": {"type": "String"}, "text": {"type": "String"}}},
   "@agentMessageTaskRunPrompt": {"placeholders": {"n": {"type": "int"}, "task": {"type": "String"}, "from": {"type": "String"}, "text": {"type": "String"}}},
+  "agentStreamReply": "逐次表示",
+  "agentStreamReplyDesc": "モデルの生成に合わせて順次表示します。バックエンドがストリーム非対応なら一括表示に切り替わります（返答が減ることはありません）。",
   "codeContributionTranslation": "翻訳",
   "dataSourceTxHint": "複数のリンクを同時に有効にして受信できますが、**送信は 1 つだけ**です（右側のドット）。同じコールサインを 2 つのリンクから送ると重複パケットになります。",
   "dataSourceTxBadge": "送信",

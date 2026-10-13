@@ -263,6 +263,16 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
           SettingsInput(s.agentModel, _model, hint: 'gpt-4o-mini'),
           SettingsInput(s.agentSystemPrompt, _systemPrompt,
               hint: s.agentSystemPromptHint),
+          // 逐字回复：走流式接口，模型边写边显示（见 AgentService.streamText）。
+          // 放在「接口」这一折里而不是自动化 —— 它是**这一类后端支不支持流式**的
+          // 取舍，跟「让智能体自己干活」不是一回事。
+          SettingsSwitch(s.agentStreamReply,
+              value: cfg.streamReply, color: C.blue, onChanged: (v) async {
+            cfg.streamReply = v;
+            await AgentService.instance.saveConfig();
+            if (mounted) setState(() {});
+          }),
+          SettingsHint(s.agentStreamReplyDesc),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(children: [
@@ -795,7 +805,10 @@ class _AgentOverlayState extends State<AgentOverlay> {
   Timer? _taskTimer;
 
   void _onSvcChanged() {
-    _scrollToBottom(animate: true);
+    // 逐字回复期间每 60ms 就来一次：这时**不能**用 200ms 动画 —— 每次新内容
+    // 都会把上一次的动画打断重启，列表越长越追不上（表现为文字在屏幕外「写」）。
+    // 打字中直接跳到最新，既跟手又不抖。
+    _scrollToBottom(animate: svc.streamText.isEmpty);
   }
 
   /// 恢复上次拖动到的胶囊位置；从没拖过就保持 null（用默认右下角位）。
@@ -1116,7 +1129,8 @@ class _AgentOverlayState extends State<AgentOverlay> {
               Divider(height: 1, color: C.border),
               if (!cfg.ready) _notReady(s),
               Expanded(child: _messageList(s)),
-              if (svc.busy && _pendingCall == null) _thinking(s),
+              if (svc.busy && _pendingCall == null && svc.streamText.isEmpty)
+                _thinking(s),
               if (_clearPending) _clearBar(s),
               if (_pendingCall != null) _confirmBar(s, _pendingCall!),
               Divider(height: 1, color: C.border),
@@ -1213,6 +1227,10 @@ class _AgentOverlayState extends State<AgentOverlay> {
       _welcomeBubble(s),
       for (final m in msgs) _bubbleFor(m, s),
     ];
+    // 逐字回复：这段文字**还没定稿**（流式增量 / 打字机未吐完），所以不放在
+    // `svc.messages` 里 —— 进了历史就会跟着下一轮请求发出去，模型会读到自己的
+    // 半截话。定稿后由 send() 并入历史，这里的气泡随之消失、换成正式气泡。
+    if (svc.streamText.isNotEmpty) items.add(_streamBubble(s));
     if (items.isEmpty) return const SizedBox.shrink();
     return ListView(
       controller: _scroll,
@@ -1220,6 +1238,25 @@ class _AgentOverlayState extends State<AgentOverlay> {
       children: items,
     );
   }
+
+  /// 逐字回复中的助手气泡（正文后面跟一个光标，表示还在写）。
+  ///
+  /// 走 MarkdownView 而不是纯文本：定稿时也是 MarkdownView，两边同一套渲染，
+  /// 「逐字」结束的瞬间不会因为换渲染器而整段跳一下（换行/加粗的位置会变）。
+  /// 未闭合的 `**` 在中间态可能短暂显示成星号，那正是「还在写」的正常样子。
+  Widget _streamBubble(S s) => Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+          constraints: const BoxConstraints(maxWidth: 280),
+          decoration: BoxDecoration(
+            color: C.bgSoft,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: SelectionArea(child: MarkdownView('${svc.streamText}▌')),
+        ),
+      );
 
   Widget _welcomeBubble(S s) => Align(
         alignment: Alignment.centerLeft,

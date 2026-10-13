@@ -739,6 +739,8 @@
   "@agentTaskEvery": {"placeholders": {"n": {"type": "int"}}},
   "@agentAutoReplyPrompt": {"placeholders": {"from": {"type": "String"}, "text": {"type": "String"}}},
   "@agentMessageTaskRunPrompt": {"placeholders": {"n": {"type": "int"}, "task": {"type": "String"}, "from": {"type": "String"}, "text": {"type": "String"}}},
+  "agentStreamReply": "Stream replies",
+  "agentStreamReplyDesc": "Show the text while the model is still writing it. If the backend cannot stream, the whole reply is shown at once instead — never fewer replies.",
   "codeContributionTranslation": "Translation",
   "dataSourceTxHint": "You can enable several links at once to receive from all of them, but **only one transmits** (the dot on the right). Sending the same callsign over two links would duplicate packets.",
   "dataSourceTxBadge": "TX",

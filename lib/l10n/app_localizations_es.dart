@@ -9303,4 +9303,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get agentTool_strategy_request_snapshot => "Pedir reenvío del mapa";
 
+  @override
+  String get agentStreamReply => "Respuesta progresiva";
+
+  @override
+  String get agentStreamReplyDesc => "Muestra el texto mientras el modelo lo escribe. Si el backend no admite streaming, se muestra la respuesta completa de una vez (nunca menos respuestas).";
+
 }

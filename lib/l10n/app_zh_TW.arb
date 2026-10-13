@@ -721,6 +721,8 @@
   "@agentTaskEvery": {"placeholders": {"n": {"type": "int"}}},
   "@agentAutoReplyPrompt": {"placeholders": {"from": {"type": "String"}, "text": {"type": "String"}}},
   "@agentMessageTaskRunPrompt": {"placeholders": {"n": {"type": "int"}, "task": {"type": "String"}, "from": {"type": "String"}, "text": {"type": "String"}}},
+  "agentStreamReply": "逐字回覆",
+  "agentStreamReplyDesc": "模型邊生成邊顯示。後端不支援串流時自動退回整段顯示，不會少一句回覆。",
   "codeContributionTranslation": "翻譯",
   "dataSourceTxHint": "可以同時勾選多條鏈路一起收報文，但**發射只有一條**（右側圓點為發射來源）——同一個呼號從兩條鏈路發出去會造成重複報文。",
   "dataSourceTxBadge": "發射",

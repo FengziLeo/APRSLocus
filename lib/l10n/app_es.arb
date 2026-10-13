@@ -671,6 +671,8 @@
   "@agentTaskEvery": {"placeholders": {"n": {"type": "int"}}},
   "@agentAutoReplyPrompt": {"placeholders": {"from": {"type": "String"}, "text": {"type": "String"}}},
   "@agentMessageTaskRunPrompt": {"placeholders": {"n": {"type": "int"}, "task": {"type": "String"}, "from": {"type": "String"}, "text": {"type": "String"}}},
+  "agentStreamReply": "Respuesta progresiva",
+  "agentStreamReplyDesc": "Muestra el texto mientras el modelo lo escribe. Si el backend no admite streaming, se muestra la respuesta completa de una vez (nunca menos respuestas).",
   "codeContributionTranslation": "Traducción",
   "dataSourceTxHint": "Puedes activar varios enlaces para recibir, pero **solo uno transmite** (el punto a la derecha). Enviar el mismo indicativo por dos enlaces duplicaría paquetes.",
   "dataSourceTxBadge": "TX",

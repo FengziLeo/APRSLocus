@@ -16092,6 +16092,18 @@ abstract class AppLocalizations {
   /// **'请求重播图层'**
   String get agentTool_strategy_request_snapshot;
 
+  /// No description provided for @agentStreamReply.
+  ///
+  /// In zh, this message translates to:
+  /// **'逐字回复'**
+  String get agentStreamReply;
+
+  /// No description provided for @agentStreamReplyDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'模型边生成边显示。后端不支持流式时自动退回整段显示，不会少一句回复。'**
+  String get agentStreamReplyDesc;
+
 }
 
 class _AppLocalizationsDelegate

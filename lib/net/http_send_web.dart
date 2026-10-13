@@ -23,6 +23,18 @@ Future<Uint8List> httpGetBytes(
   throw UnsupportedError('http-unsupported');
 }
 
+/// 流式发送的 Web 兜底：与 [httpSend] 同理（本项目 Web 版不发自定义接口请求），
+/// 明确抛错而不是给一个空流 —— 空流会被上层当成「模型没说话」，静默失败。
+Stream<String> httpSendLines(
+  String method,
+  Uri uri, {
+  Map<String, String>? headers,
+  String? body,
+  Duration timeout = const Duration(seconds: 30),
+}) async* {
+  throw UnsupportedError('http-unsupported');
+}
+
 class HttpStatusError implements Exception {
   final int status;
   final String body;

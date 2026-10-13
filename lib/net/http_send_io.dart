@@ -41,6 +41,59 @@ Future<String> httpSend(
   }
 }
 
+/// 流式发送：把响应体**按行**吐出来（SSE / `text/event-stream` 用）。
+///
+/// 与 [httpSend] 的唯一差别是**不等整段收完**：智能体的「逐字回复」每收到
+/// 几个 token 就要立刻显示，等 `choices[0].message` 那种「一次性收尾」的
+/// 写法在长回答上会白屏十几秒 —— 看起来就像卡死了。
+///
+/// [timeout] 在这里是**空闲超时**（两次数据之间最长等多久），不是总时长：
+/// 一次 90 秒的长生成是正常的，不能因为「总共写得久」就掐断；但连接建好
+/// 之后半分钟一个字节都不来，那就是链路死了。调用方把 TimeoutException
+/// 翻成人话即可。
+///
+/// 非 2xx 抛 [HttpStatusError]（错误正文尽量读全，Key 错 / 限流原因都在里面）。
+Stream<String> httpSendLines(
+  String method,
+  Uri uri, {
+  Map<String, String>? headers,
+  String? body,
+  Duration timeout = const Duration(seconds: 30),
+}) async* {
+  final client = HttpClient()..connectionTimeout = timeout;
+  try {
+    final m = method.toUpperCase();
+    final req = await client.openUrl(m, uri);
+    req.headers.set(HttpHeaders.userAgentHeader, 'APRSLocus');
+    headers?.forEach((k, v) => req.headers.set(k, v));
+    if (body != null && m != 'GET' && m != 'HEAD') {
+      final bytes = utf8.encode(body);
+      req.headers.contentLength = bytes.length;
+      req.add(bytes);
+    }
+    final resp = await req.close().timeout(timeout);
+    if (resp.statusCode < 200 || resp.statusCode >= 300) {
+      String err = '';
+      try {
+        err = await resp.transform(utf8.decoder).join().timeout(timeout);
+      } catch (_) {}
+      throw HttpStatusError(resp.statusCode, err);
+    }
+    // LineSplitter 负责跨 chunk 的半行拼接 —— 一个 token 可能刚好被 TCP 切成
+    // 两个包，自己按 `\n` split 会把半截 JSON 喂给解析器（表现为随机丢字）。
+    yield* resp
+        .transform(utf8.decoder)
+        .transform(const LineSplitter())
+        .timeout(timeout);
+  } finally {
+    // 取消订阅（用户点了停止 / 上层 break）也要走到这里：不断开的话，
+    // 一次被放弃的长生成会一直占着一条连接读到超时。
+    try {
+      client.close(force: true);
+    } catch (_) {}
+  }
+}
+
 /// 非 2xx 响应
 class HttpStatusError implements Exception {
   final int status;

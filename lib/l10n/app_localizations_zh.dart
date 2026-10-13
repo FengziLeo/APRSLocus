@@ -8864,6 +8864,12 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get agentTool_strategy_request_snapshot => "请求重播图层";
 
+  @override
+  String get agentStreamReply => "逐字回复";
+
+  @override
+  String get agentStreamReplyDesc => "模型边生成边显示。后端不支持流式时自动退回整段显示，不会少一句回复。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -17724,5 +17730,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get agentTool_strategy_request_snapshot => "請求重播圖層";
+
+  @override
+  String get agentStreamReply => "逐字回覆";
+
+  @override
+  String get agentStreamReplyDesc => "模型邊生成邊顯示。後端不支援串流時自動退回整段顯示，不會少一句回覆。";
 
 }

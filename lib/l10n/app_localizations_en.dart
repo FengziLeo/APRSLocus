@@ -9244,4 +9244,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get agentTool_strategy_request_snapshot => "Request map snapshot";
 
+  @override
+  String get agentStreamReply => "Stream replies";
+
+  @override
+  String get agentStreamReplyDesc => "Show the text while the model is still writing it. If the backend cannot stream, the whole reply is shown at once instead — never fewer replies.";
+
 }

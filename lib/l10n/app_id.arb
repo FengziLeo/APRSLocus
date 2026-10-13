@@ -672,6 +672,8 @@
   "@agentTaskEvery": {"placeholders": {"n": {"type": "int"}}},
   "@agentAutoReplyPrompt": {"placeholders": {"from": {"type": "String"}, "text": {"type": "String"}}},
   "@agentMessageTaskRunPrompt": {"placeholders": {"n": {"type": "int"}, "task": {"type": "String"}, "from": {"type": "String"}, "text": {"type": "String"}}},
+  "agentStreamReply": "Balasan bertahap",
+  "agentStreamReplyDesc": "Tampilkan teks selagi model menulisnya. Jika backend tidak mendukung streaming, balasan penuh ditampilkan sekaligus — jumlah balasan tidak berkurang.",
   "codeContributionTranslation": "Terjemahan",
   "dataSourceTxHint": "Beberapa tautan dapat diaktifkan sekaligus untuk menerima, tetapi **hanya satu yang memancar** (titik di kanan). Mengirim tanda panggil sama lewat dua tautan akan menduplikasi paket.",
   "dataSourceTxBadge": "TX",

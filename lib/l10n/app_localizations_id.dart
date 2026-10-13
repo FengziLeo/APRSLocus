@@ -9254,4 +9254,10 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get agentTool_strategy_request_snapshot => "Minta kirim ulang peta";
 
+  @override
+  String get agentStreamReply => "Balasan bertahap";
+
+  @override
+  String get agentStreamReplyDesc => "Tampilkan teks selagi model menulisnya. Jika backend tidak mendukung streaming, balasan penuh ditampilkan sekaligus — jumlah balasan tidak berkurang.";
+
 }

@@ -309,6 +309,12 @@ jobs:
       - name: Test agent tools
         run: flutter test test/agent_tools_test.dart
 
+      # 智能体逐字回复的流式解析：`tool_calls` 是**分片**下发的（id/name 在首片、
+      # arguments 是逐段拼的 JSON 片段），拼错了不会编译失败、analyze 也全绿，
+      # 只会表现成「工具参数丢了一半」或「调用与结果配不上对」。用模拟流钉住。
+      - name: Test agent streaming (SSE) parsing
+        run: flutter test test/agent_stream_test.dart
+
       # WLAN 电台文案本地化：phaseLabel / 型号描述在 net 层写死中文，界面必须
       # 翻回 l10n 键。翻错了切到非中文界面才暴露，锁在测试里。
       - name: Test Icom WLAN localization

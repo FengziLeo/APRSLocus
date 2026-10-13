@@ -27,6 +27,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'net/http_send.dart';
+import 'agent_stream.dart' show AgentStreamAssembler;
 
 /// 一条工具调用（来自模型的 tool_calls）
 class AgentToolCall {
@@ -183,6 +184,12 @@ class AgentConfig {
   /// 对话压缩：历史变长时自动把旧对话折叠成一段摘要。
   bool compressEnabled;
 
+  /// 逐字回复：走流式（SSE）接口，模型边生成边显示（见 [AgentService.streamText]）。
+  ///
+  /// 默认开。后端不认 `stream:true`（回一整段普通 JSON）或平台不支持时
+  /// **自动退回**整段式，不会因此少一句回复 —— 只是不再逐字出现。
+  bool streamReply;
+
   AgentConfig({
     this.enabled = false,
     this.baseUrl = 'https://api.openai.com/v1',
@@ -199,6 +206,7 @@ class AgentConfig {
     this.allowNetwork = false,
     this.memoryEnabled = true,
     this.compressEnabled = true,
+    this.streamReply = true,
   }) : alwaysAllow = alwaysAllow ?? <String>{};
 
   /// 配置是否已填写到「可发起请求」的程度
@@ -234,6 +242,7 @@ class AgentConfig {
         'allowNetwork': allowNetwork,
         'memoryEnabled': memoryEnabled,
         'compressEnabled': compressEnabled,
+        'streamReply': streamReply,
       };
 
   static AgentConfig fromJson(Object? j) {
@@ -264,6 +273,9 @@ class AgentConfig {
       compressEnabled: j.containsKey('compressEnabled')
           ? j['compressEnabled'] != false
           : c.compressEnabled,
+      // 同上：老配置没有这个键 → 默认开启逐字回复。
+      streamReply:
+          j.containsKey('streamReply') ? j['streamReply'] != false : c.streamReply,
     );
   }
 }
@@ -564,6 +576,12 @@ class AgentService extends ChangeNotifier {
 
   bool loaded = false;
   bool busy = false;
+
+  /// 流式回复中**已经收到**的正文（空 = 当前不在逐字流）。
+  ///
+  /// UI 直接渲染它 —— 字符一个一个出现就是靠这个。只在 [_chatStreaming]
+  /// 期间非空；流结束 / 出错 / 取消都会清掉，随后由完整消息接管显示。
+  String streamText = '';
 
   /// 自动回复冷却：会话 key（呼号/群）→ 上次自动回复时刻。
   final Map<String, DateTime> _autoReplyAt = {};
@@ -1054,6 +1072,8 @@ class AgentService extends ChangeNotifier {
   void cancel() {
     _epoch++;
     busy = false;
+    // 半截正文也要丢掉：否则取消后气泡还挂着「写到一半」的一段。
+    streamText = '';
     notifyListeners();
   }
 
@@ -1215,8 +1235,12 @@ class AgentService extends ChangeNotifier {
   ///
   /// [requireTool] = true 时用 `tool_choice: "required"` 强制模型这一步必须调
   /// 工具（见 [send] 里的「主动调工具」nudge）；默认 `"auto"`。
+  ///
+  /// 开了逐字回复就先走流式，拿不到流再退回整段 —— 两条路产出的
+  /// [AgentMessage] 完全同形，上层（[send] / 工具循环）感知不到差别。
   Future<AgentMessage> _chat(List<Map<String, dynamic>> tools,
       {bool requireTool = false}) async {
+    final my = _epoch;
     final body = <String, dynamic>{
       'model': config.model.trim(),
       'messages': _wireMessages(),
@@ -1225,16 +1249,118 @@ class AgentService extends ChangeNotifier {
         'tool_choice': requireTool ? 'required' : 'auto',
       'temperature': 0.3,
     };
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${config.apiKey.trim()}',
+    };
+    final raw = jsonEncode(body);
+    if (config.streamReply) {
+      final streamed = await _chatStreaming(headers, raw);
+      // 被取消时 [send] 马上就会 return，这里返回什么都不会进历史。
+      if (_epoch != my) return AgentMessage(role: 'assistant');
+      if (streamed != null) return streamed;
+    }
+    final reply = await _chatOnce(headers, raw);
+    // 后端不支持流式（回到这里）时，用打字机补上「逐字」的观感：
+    // 关掉逐字回复的开关（config.streamReply=false）就整段直接出现，不再补。
+    if (config.streamReply) await _typeOut(reply);
+    return reply;
+  }
+
+  /// 打字机：把**已经到手**的整段正文逐字吐出来（给 [streamText]）。
+  ///
+  /// 只有「请求了流式但后端不认」这条路才会用到它 —— 真正的流式是模型边生成
+  /// 边到的，再动一次反而像卡顿。每 ~20ms 吐一小段、总时长压在 ~1.2 秒内：
+  /// 短句看起来就是在打字，长回答也不会让人干等 —— 按字符数线性吐字的话，
+  /// 800 字的回复要「写」十几秒，比直接显示更难受。
+  Future<void> _typeOut(AgentMessage reply) async {
+    final text = reply.content;
+    if (text.trim().isEmpty) return; // 只有 tool_calls 的一轮：没有正文可吐
+    final my = _epoch;
+    final total = text.length;
+    final steps = (total ~/ 3).clamp(12, 60);
+    final per = (total / steps).ceil();
+    try {
+      for (var end = per; end <= total; end += per) {
+        if (_epoch != my) return; // 用户点了停止
+        streamText = text.substring(0, end);
+        notifyListeners();
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+    } finally {
+      // 收干净：留着半截会让下一个气泡先显示上一轮的残句。清理与「并入历史」
+      // 之间只隔一个微任务（send 里 messages.add），不会渲染出中间帧。
+      streamText = '';
+      if (_epoch == my) notifyListeners();
+    }
+  }
+
+  /// 流式调一次：边收边把正文写进 [streamText]（UI 因此能「逐字」显示）。
+  ///
+  /// 返回 null = 这次流式**一个字节的内容都没拿到**，通常意味着后端忽略了
+  /// `stream:true`、直接回了一整段普通 JSON（不是合法的 SSE），调用方据此
+  /// 退回 [_chatOnce]。真正的错误（HTTP 状态 / 平台不支持 / 服务端 error）
+  /// 照常抛 [AgentException]。
+  Future<AgentMessage?> _chatStreaming(
+      Map<String, String> headers, String body) async {
+    final my = _epoch;
+    final asm = AgentStreamAssembler();
+    streamText = '';
+    var lastNotify = 0;
+    try {
+      await for (final line in httpSendLines(
+        'POST',
+        Uri.parse(config.endpoint),
+        headers: headers,
+        body: body,
+        // 空闲超时：长回答写几分钟都正常，但两片之间静了 60 秒就是链路死了。
+        timeout: const Duration(seconds: 60),
+      )) {
+        if (_epoch != my) return null; // 被取消：立刻停止收流
+        if (!asm.feed(line)) continue;
+        streamText = asm.text;
+        // 节流：一片一个 token，长回答能到每秒几十片；每片都 notifyListeners
+        // 会让整页（列表 / 输入框 / 头像）跟着每帧重建。60ms 既省又能保持
+        // 「逐字」的观感。
+        final now = DateTime.now().millisecondsSinceEpoch;
+        if (now - lastNotify >= 60) {
+          lastNotify = now;
+          notifyListeners();
+        }
+      }
+    } on HttpStatusError catch (e) {
+      throw AgentException('HTTP ${e.status}: ${_brief(e.body)}');
+    } on UnsupportedError {
+      // Web 构建里 httpSendLines 明确不支持（CORS），给一句人话。
+      throw AgentException(
+          'Network requests are not supported on this platform.');
+    } on TimeoutException {
+      throw AgentException('Stream timed out');
+    } catch (e) {
+      throw AgentException('$e');
+    } finally {
+      // 无论怎么结束都要收干净：留着半截正文会让下一个气泡「先显示上一轮的
+      // 残句」，看起来像串台。
+      streamText = '';
+      if (_epoch == my) notifyListeners();
+    }
+    if (asm.error != null) throw AgentException(asm.error!);
+    if (asm.isEmpty) return null;
+    return asm.build();
+  }
+
+  /// 整段式调一次（老路径）：等响应体收完再解析。
+  ///
+  /// 留着它有两个用途：关闭逐字回复时走这里；后端不支持流式时的兜底。
+  Future<AgentMessage> _chatOnce(
+      Map<String, String> headers, String body) async {
     String resp;
     try {
       resp = await httpSend(
         'POST',
         Uri.parse(config.endpoint),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${config.apiKey.trim()}',
-        },
-        body: jsonEncode(body),
+        headers: headers,
+        body: body,
         timeout: const Duration(seconds: 60),
       );
     } on HttpStatusError catch (e) {

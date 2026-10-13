@@ -4,15 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>下一格等你来补 · APRSlocus</title>
-<meta name="description" content="那颗一直在走的星球，和第一屏上那个数字背后的东西：电波从哪儿来、落在哪里，以及把它一起做出来的人。">
+<meta name="description" content="那颗一直在转的星球，和它背后那个数字：电波从哪儿来、落在哪里，以及把它一起做出来的人。">
 <meta name="theme-color" content="#0a0e12">
 <!-- 声音那只 <audio> 会 302 到 http 的 CDN（只能这样拿到音源）：这条策略让浏览器
      把那一跳升级成 https（CDN 本身支持 https），否则混合内容策略会当场掐掉这段音频。
      这页没有别的 http 子资源，不会误伤。 -->
 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-<!-- 彩蛋页：整站没有一处链接指向它，robots 也不收它进 sitemap —— 只有自己走到这个
-     地址的人才看得见。所以这页不放下载入口、不放品牌徽标与口号（要装应用从首页走），
-     只留首页 hero 那一段画面，加上它背后的故事。 -->
+<!-- 彩蛋页：整站没有一处链接指向它，robots 也不收它进 sitemap —— 这页是从**应用里**
+     打开的（App 内置一个入口，用 WebView 载这一页），读它的人已经在 APRSlocus 里了。
+     所以这页不摆下载入口、不摆品牌徽标与口号，页尾也不给「回首页」这种网页式的出口：
+     文案说的是应用里的事（你面前这张地图、球面上那个点），不是网页上的事。 -->
 <meta name="robots" content="noindex, follow">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <script>
@@ -68,6 +69,11 @@
     font-size: clamp(17px, 2vw, 22px); line-height: 1.85; }
   .slide-slogan p { margin: 0; color: var(--text-dim);
     font-size: clamp(18px, 2.4vw, 26px); line-height: 1.7; }
+  /* 第一屏那句「点下去有什么」：比邀请小一档、淡一档，是同一件事的下半句 */
+  .slide-line .note { margin-top: 14px; font-size: 15.5px; color: var(--text-faint); }
+  /* 招呼那一屏：h1 下面就是标语，标语当它的副题读（不再单独占一屏） */
+  .slide-hello p { margin: 16px 0 0; color: var(--text-dim);
+    font-size: clamp(17px, 2.2vw, 24px); line-height: 1.7; }
   /* 标题卡：这一章要说什么（h2 + 引子）。抬头沿用 .section-head 那一套，
      只是它现在自己占一屏，底下不留空。 */
   .slide-inner .section-head { margin-bottom: 0; }
@@ -160,17 +166,13 @@ html, body { height: auto; overflow: auto; }
   <section class="slide">
     <div class="slide-inner slide-line rise">
       <p>点一下，音乐就起来了。</p>
+      <p class="note">再往里，是一颗一直在转的星球。</p>
     </div>
   </section>
 
   <section class="slide">
-    <div class="slide-inner rise">
+    <div class="slide-inner slide-hello rise">
       <h1>你好，很高兴认识你。</h1>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="slide-inner slide-slogan rise">
       <p>保持你的好奇心，探索世界。</p>
     </div>
   </section>
@@ -193,7 +195,7 @@ html, body { height: auto; overflow: auto; }
     <div class="hero-copy">
       <!-- 这一屏只有这一件事：那个数字（APRSlocus 累计转发报文总量，数值源
            stats.json）。它是什么、为什么会一直往上走，全在下面的故事里。
-           注意它不再是第一屏 —— 上面还有一屏招呼（.intro），往下翻才到这儿。 -->
+           注意它不再开头 —— 前面还有邀请与招呼两屏，翻过去才到这儿。 -->
       <div class="hero-stat" id="heroTelemetry"
            data-stats="stats.json" data-packets="509260" data-rate="18"
            data-updated="2026-10-13T16:06:00+08:00">
@@ -210,7 +212,7 @@ html, body { height: auto; overflow: auto; }
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>那个数字是谁的</h2>
-        <p>它在第一屏上一直往上走。不是刻度，是此刻天空里正在发生的应答。</p>
+        <p>它就在刚才那一屏上，一直往上走。不是刻度，是此刻天空里正在发生的应答。</p>
       </div>
     </div>
   </section>

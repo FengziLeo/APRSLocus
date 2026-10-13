@@ -45,6 +45,11 @@
 }
 .story-bgm iframe { display: block; width: 100%; height: 86px; border: 0; }
 @media (max-width: 520px) { .story-bgm { left: 12px; right: 12px; bottom: 12px; width: auto; } }
+/* 首屏那句邀请（读者按下的第一下 = 一次发射）：数字下面一行小字，按过之后
+   换一句话，再自己退场 —— 这页只有这一处要人动手。 */
+.hero-press { margin: 4px 0 0; font-size: 13.5px; color: var(--text-faint);
+  transition: opacity .9s var(--ease), visibility .9s; }
+.hero-press.done { opacity: 0; visibility: hidden; }
 
 /* ── 节奏：这页比首页慢一档 ──
    首页那一套（文字浮上来 .8s、同排之间错开 .08s）是给「扫一眼」用的：一屏同时
@@ -118,6 +123,9 @@
            data-stale-title="数据快照超过 12 小时，已停止外推（显示上限估算）">
         <span class="hs-label">APRSlocus 累计转发报文</span>
         <span class="tl-value" id="tlPackets">509,260</span>
+        <!-- 这页唯一要人动手的地方：按一下 = 一次发射（音乐起来、球面闪一批点、
+             这个数字像刚收到一条报文那样亮一下）。按过就退场，不再打扰。 -->
+        <p class="hero-press" id="heroPress">按一下屏幕 —— 这一下，就是一次发射。</p>
       </div>
     </div>
 
@@ -305,8 +313,57 @@
      所以这个播放器自己就是那颗播放键：点一下就唱，不点就一直安静。
      title 是给读屏用的：iframe 没有可见文案，不给名字就是一个无名区块。 -->
 <div class="story-bgm">
-  <iframe title="背景音乐播放器（网易云音乐）" frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&id=1903408779&auto=1&height=66"></iframe>
+  <iframe id="bgmFrame" title="背景音乐播放器（网易云音乐）" allow="autoplay" frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&id=1903408779&auto=1&height=66"></iframe>
 </div>
+
+<!-- 让音乐真的响起来。浏览器不允许「页面还没被点过就出声」，这条跨域 iframe 里
+     那个 <audio> 我们碰不到，所以只能两步走：
+       ① 播放器自带 auto=1 先试一次 —— 常来的读者、手动放宽过策略的浏览器，
+          这一步当场就响；
+       ② 还没响，就借读者在这页上的**第一次交互**（点一下 / 按一下键 / 滚一下）
+          把播放器重新载入一次：在手势之后加载的播放器才有出声的资格。
+     同一次交互顺手在这页留个回响 —— 球面闪一批点（和收到一条报文时同一个钩子），
+     那个数字亮一下（同一段 bump 动画）：你按的这一下，看上去就是一次真实的上报。
+     全部一次性，触发完就撤监听。 -->
+<script>
+(function () {
+  var press = document.getElementById("heroPress");
+  var frame = document.getElementById("bgmFrame");
+  var val = document.getElementById("tlPackets");
+  var src = frame && frame.getAttribute("src");
+  var TYPES = ["pointerdown", "touchstart", "keydown", "wheel"];
+  var fired = false;
+
+  function echo() {
+    // 球面闪一批点：与遥测每跳一格调的是同一个钩子（没有 WebGL 时不必勉强）
+    try {
+      if (window.__planet3d && window.__planet3d.flash) window.__planet3d.flash(1);
+    } catch (e) {}
+    // 数字亮一下：与「刚收到一条报文」同一段动画（先摘再挂，动画才会重播）
+    if (val) {
+      val.classList.remove("bump");
+      void val.offsetWidth;
+      val.classList.add("bump");
+    }
+  }
+
+  function wake() {
+    if (fired) return;
+    fired = true;
+    TYPES.forEach(function (t) { window.removeEventListener(t, wake); });
+    if (frame && src) frame.setAttribute("src", src + "&_r=" + Date.now());  // 手势后再载一次
+    echo();
+    if (press) {
+      press.textContent = "这一下也算数了 —— 你已经在广播里。";
+      setTimeout(function () { press.classList.add("done"); }, 1500);
+    }
+  }
+
+  TYPES.forEach(function (t) {
+    window.addEventListener(t, wake, { once: true, passive: true });
+  });
+})();
+</script>
 
 <!-- 与首页同一份脚本：main.js 负责 body.loaded / 显形 / 主题 / 首屏粒子，
      planet-3d.js 负责星球与那个会跳的数字。两个 ?v= 与三语首页保持一致。 -->

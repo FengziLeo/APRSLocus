@@ -6,7 +6,9 @@
 <title>下一格等你来补 · APRSlocus</title>
 <meta name="description" content="APRSlocus 官网首屏那颗星球、以及那个一直在走的数字背后的故事：报文从哪来、落在哪里、为什么它会一直往上跳。">
 <meta name="theme-color" content="#0a0e12">
-<!-- 故事页：不放下载入口（要装应用从首页走）。与首页 hero 同一段画面，不进 sitemap。 -->
+<!-- 彩蛋页：整站没有一处链接指向它，robots 也不收它进 sitemap —— 只有自己走到这个
+     地址的人才看得见。所以这页不放下载入口、不放品牌徽标与口号（要装应用从首页走），
+     只留首页 hero 那一段画面，加上它背后的故事。 -->
 <meta name="robots" content="noindex, follow">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <script>
@@ -59,11 +61,11 @@
 <main id="main">
 
 <!-- ═══════════ HERO ═══════════
-     与三语首页同一块（装饰层 → 文案 → 数字），只有三处按这页的处境改：
+     与三语首页同一段画面（装饰层 → 那个数字），按这页的处境收掉了三样东西：
+     · 首页折线之下那一整块（徽标 / TOUCH SKY / 口号 / 自我介绍）不留 ——
+       彩蛋页不自我介绍，讲完故事才轮到你动手；
      · 页面唯一的主题按钮从导航里挪到右上角（这页没有导航栏）；
-     · 「向下箭头」指向下面的故事，不再是首页的 #features；
-     · 说明块里那句「上面那个数字是…」搬到了第一章 —— 故事页里这句话是正文，
-       不是首屏的一句注解，留着就重复了。 -->
+     · 「向下箭头」指向下面的故事，不再是首页的 #features。 -->
 <section class="hero" id="hero">
   <button class="theme-toggle hero-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切换深色模式" title="切换深色模式" data-label-dark="切换浅色模式" data-label-light="切换深色模式"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
   <!-- 装饰层：网格、星尘、3D 星球、以及没有 WebGL 时的静态球，全都在这一层。
@@ -81,28 +83,14 @@
   <div class="hero-inner">
 
     <div class="hero-copy">
-      <!-- 第一屏只有这一件事：那个数字（APRSlocus 累计转发报文总量，数值源 stats.json）；"这是什么"在下面的故事里 -->
-        <div class="hero-stat" id="heroTelemetry"
-             data-stats="stats.json" data-packets="509260" data-rate="18"
-             data-updated="2026-10-13T16:06:00+08:00"
-             data-stale-title="数据快照超过 12 小时，已停止外推（显示上限估算）">
-          <span class="hs-label">APRSlocus 累计转发报文</span>
-          <span class="tl-value" id="tlPackets">509,260</span>
-        </div>
-    </div>
-
-    <div class="hero-copy-next">
-      <div class="hero-intro reveal" data-delay="0">
-        <!-- 页面唯一的 h1：品牌名（连版本与口号）。下面那句巨型主题字是同一句口号的
-             放大版，重复一遍对读屏没有信息量，标成装饰。 -->
-        <h1 class="hero-badge"><span class="pulse-dot" aria-hidden="true"></span><b>APRSlocus 2.0</b><span class="sep" aria-hidden="true"></span><span class="rel-tag">TOUCH SKY</span></h1>
-        <div class="hero-wordmark" aria-hidden="true">TOUCH SKY</div>
-        <p class="hero-slogan">APRS <span class="grad">定位追踪</span> 与 <span class="grad">地图</span></p>
-        <p class="hero-sub">
-          一个业余无线电爱好者用的 APRS 客户端 —— 在本机运行的工具。<br>
-          不提供、也不预置任何服务器地址：要联网请自行填写 APRS-IS 服务器，
-          或改用蓝牙 TNC / 声卡音频 / Icom 电台直连。
-        </p>
+      <!-- 第一屏只有这一件事：那个数字（APRSlocus 累计转发报文总量，数值源 stats.json）。
+           它是什么、为什么会一直往上走，全在下面的故事里 —— 首屏不再插一句注解。 -->
+      <div class="hero-stat" id="heroTelemetry"
+           data-stats="stats.json" data-packets="509260" data-rate="18"
+           data-updated="2026-10-13T16:06:00+08:00"
+           data-stale-title="数据快照超过 12 小时，已停止外推（显示上限估算）">
+        <span class="hs-label">APRSlocus 累计转发报文</span>
+        <span class="tl-value" id="tlPackets">509,260</span>
       </div>
     </div>
 
@@ -111,10 +99,12 @@
   <a class="hero-scroll" href="#story" aria-label="往下看故事"><span></span></a>
 </section>
 
-<!-- ═══════════ 一 · 那个数字是谁的 ═══════════ -->
+<!-- ═══════════ 一 · 那个数字是谁的 ═══════════
+     页面唯一的 h1：这页没有品牌徽标可当下标题，故事本身就得自己开篇
+     （.section-head h1 与 h2 同一套度量，见 style.css）。 -->
 <section class="section" id="story">
   <div class="section-head reveal">
-    <h2>那个数字是谁的</h2>
+    <h1>那个数字是谁的</h1>
     <p>APRSlocus 累计转发报文 —— 第一屏上一直往上走的那个数。</p>
   </div>
   <div class="section-body">

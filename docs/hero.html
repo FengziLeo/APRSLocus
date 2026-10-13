@@ -142,7 +142,7 @@ html, body { height: auto; overflow: auto; }
 
   <section class="slide">
     <div class="slide-inner slide-line rise">
-      <p id="heroPress">点一下，音乐就起来了。</p>
+      <p>点一下，音乐就起来了。</p>
     </div>
   </section>
 
@@ -276,51 +276,6 @@ html, body { height: auto; overflow: auto; }
   <section class="slide">
     <div class="slide-inner slide-line rise">
       <p>电波没有昼夜，只有谁守在天线后面。</p>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="slide-inner">
-      <div class="section-head rise">
-        <h2>它落在哪里</h2>
-        <p>每一条电波，最后都落回上面那颗星球。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="slide-inner slide-line rise">
-      <p>一万三千个点聚成一颗球，经纬线把它撑起来；球面上闪的那几粒，就是有人在回答。</p>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="slide-inner slide-line rise">
-      <p>三圈环带各转各的，越靠里走得越快；七颗卫星带着尾迹从球外划过；偶尔有流星斜插进来，在落点荡开一圈波纹，又慢慢化开。</p>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="slide-inner slide-line rise">
-      <p>球面上还有三层浪在走。</p>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="slide-inner slide-line rise">
-      <p>它自转，它呼吸，却从不接受谁的拖动 —— 这层画面是给你看的，不是给你转的。</p>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="slide-inner slide-line rise">
-      <p>耐心看一会儿：流星会来，卫星会绕到球背后再出来，那个数字会在你不看它的时候自己跳一下。</p>
-    </div>
-  </section>
-
-  <section class="slide">
-    <div class="slide-inner slide-line rise">
-      <p>这里没有一个点是被画上去的 —— 它们都在自己走。</p>
     </div>
   </section>
 
@@ -538,7 +493,6 @@ html, body { height: auto; overflow: auto; }
 (function () {
   var deck = document.getElementById("deck");
   var hint = document.getElementById("deckHint");
-  var press = document.getElementById("heroPress");
   var audio = document.getElementById("bgm");
   var btn = document.getElementById("bgmToggle");
   var box = document.getElementById("bgmBox");
@@ -636,9 +590,6 @@ html, body { height: auto; overflow: auto; }
     } catch (e) {}
     if (val) { val.classList.remove("bump"); void val.offsetWidth; val.classList.add("bump"); }
   }
-  function say() {            // 真出声了，才把开场那句邀请换成回话（再翻回第一屏才看得见）
-    if (press) press.textContent = "听见了吗 —— 这一下也算数了，你已经在广播里。";
-  }
   function paint(on) {
     if (!btn) return;
     btn.classList.toggle("on", !!on);
@@ -670,7 +621,7 @@ html, body { height: auto; overflow: auto; }
     }, 12000);
   }
   if (audio) {
-    audio.addEventListener("playing", function () { playing = true; paint(true); say(); });
+    audio.addEventListener("playing", function () { playing = true; paint(true); });
     audio.addEventListener("pause", function () { playing = false; want = false; paint(false); });
     audio.addEventListener("error", fallback);
   }

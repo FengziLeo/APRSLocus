@@ -58,7 +58,7 @@
 <link rel="canonical" href="https://aprslocus.theez.top/zh-TW/">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
 <link rel="stylesheet" href="../css/style.css?v=7">
-<link rel="stylesheet" href="../css/hero-3d.css?v=6">
+<link rel="stylesheet" href="../css/hero-3d.css?v=7">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -134,54 +134,59 @@ html{overflow-x:hidden}
   <div class="hero-inner">
 
     <div class="hero-copy">
-      <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
-      <div class="hero-wordmark">TOUCH SKY</div>
-      <p class="hero-slogan">APRS <span class="grad">定位追蹤</span> 與 <span class="grad">地圖</span></p>
-      <p class="hero-sub">
-        一個業餘無線電愛好者用的 APRS 用戶端 —— 在本機執行的工具。<br>
-        不提供、也不預置任何伺服器位址：要連網請自行填寫 APRS-IS 伺服器，
-        或改用藍牙 TNC / 音效卡音訊 / Icom 電台直連。
-      </p>
-      <p class="hero-invite">
-        <span class="hi-mark" aria-hidden="true">✦</span>電波穿過夜空，最後都落在這顆星球上 —— 下一格，等你來補。
-      </p>
+      <!-- 第一屏只有這件事：那個數字（APRSlocus 累計轉發報文總量，數值源 stats.json）；「這是什麼」的說明在折線之下 -->
+        <div class="hero-stat" id="heroTelemetry"
+             data-stats="../stats.json" data-packets="509260" data-rate="18"
+             data-updated="2026-10-13T16:06:00+08:00"
+             data-stale-title="資料快照已超過 12 小時，停止外推（顯示上限估算）">
+          <span class="hs-label">APRSlocus 累計轉發報文</span>
+          <span class="tl-value" id="tlPackets">509,260</span>
+          <span class="hs-foot"><span class="hs-live"><i></i>LIVE</span><span>每分鐘 <b><i id="tlRateNum">+18</i></b></span></span>
+        </div>
+    </div>
 
-      <!-- 累計報文：標籤（這是什麼）+ 數字（會自己跳）+ 一行小註；數值源 stats.json -->
-      <div class="hero-stat" id="heroTelemetry"
-           data-stats="../stats.json" data-packets="509260" data-rate="18"
-           data-updated="2026-10-13T16:06:00+08:00"
-           data-stale-title="資料快照已超過 12 小時，停止外推（顯示上限估算）">
-        <span class="hs-label">累計報文總量</span>
-        <span class="tl-value" id="tlPackets">509,260</span>
-        <span class="hs-foot"><span class="hs-live"><i></i>LIVE</span><span>每分鐘 <b><i id="tlRateNum">+18</i></b></span></span>
+    <div class="hero-copy-next">
+      <!-- 折線之下才是「這是什麼」：滾上來才淡出（站點的 .reveal） -->
+      <div class="hero-intro reveal" data-delay="0">
+        <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
+        <div class="hero-wordmark">TOUCH SKY</div>
+        <p class="hero-slogan">APRS <span class="grad">定位追蹤</span> 與 <span class="grad">地圖</span></p>
+        <p class="hero-sub">
+          一個業餘無線電愛好者用的 APRS 用戶端 —— 在本機執行的工具。<br>
+          不提供、也不預置任何伺服器位址：要連網請自行填寫 APRS-IS 伺服器，
+          或改用藍牙 TNC / 音效卡音訊 / Icom 電台直連。
+        </p>
+        <p class="hero-invite">
+          <span class="hi-mark" aria-hidden="true">✦</span>上面那個數字，是全世界 APRS 台站累計轉發過的報文總量 —— 電波穿過夜空，最後都落在這顆星球上，下一格等你來補。
+        </p>
       </div>
 
-      <!-- 往下滑才出現：真正要動手的那一塊（版本卡 + 下載按鈕 + 來源） -->
-      <div class="hero-cta reveal" data-delay="0">
-        <div class="hero-release" id="heroRelease" style="display:inline-flex;align-items:center;gap:12px;margin:8px 0 6px;padding:12px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 30px rgba(45,70,120,.14);backdrop-filter:blur(14px)">
-          <span id="hrIcon" style="font-size:20px">✅</span>
-          <span>
-            <b style="font-size:14px">APRSlocus 2.0 <span id="hrState" style="color:var(--cyan)">已發佈</span></b>
-            <span id="hrTimer" style="display:block;font-size:12.5px;color:var(--text-faint)">2.0 已發佈 · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener" style="color:var(--cyan);font-weight:700">立即下載 →</a></span>
-          </span>
+      <!-- 再往下：真正要動手的那一塊（版本卡 + 下載按鈕 + 來源） -->
+        <div class="hero-cta reveal" data-delay="0">
+          <div class="hero-release" id="heroRelease" style="display:inline-flex;align-items:center;gap:12px;margin:8px 0 6px;padding:12px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 30px rgba(45,70,120,.14);backdrop-filter:blur(14px)">
+            <span id="hrIcon" style="font-size:20px">✅</span>
+            <span>
+              <b style="font-size:14px">APRSlocus 2.0 <span id="hrState" style="color:var(--cyan)">已發佈</span></b>
+              <span id="hrTimer" style="display:block;font-size:12.5px;color:var(--text-faint)">2.0 已發佈 · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener" style="color:var(--cyan);font-weight:700">立即下載 →</a></span>
+            </span>
+          </div>
+          <div class="hero-actions">
+            <a class="btn btn-primary" id="heroDownload" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
+              <i class="fa-solid fa-mobile-screen"></i>
+              <span id="heroDlText">下載 2.0 最新版</span>
+            </a>
+            <a class="btn btn-ghost" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
+              <i class="fa-solid fa-desktop" style="width:20px;height:20px"></i>
+              Windows 安裝包
+            </a>
+            <a class="btn btn-text" href="../promo.html">2.0 宣傳頁<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
+            <a class="btn btn-text" href="#getting-started">開始使用<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
+          </div>
+          <div class="hero-meta">
+            <span>APRS-IS · TNC · 音訊 · PKWDWPL 四種來源</span>
+            <span>Android / Windows</span>
+          </div>
         </div>
-        <div class="hero-actions">
-          <a class="btn btn-primary" id="heroDownload" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
-            <i class="fa-solid fa-mobile-screen"></i>
-            <span id="heroDlText">下載 2.0 最新版</span>
-          </a>
-          <a class="btn btn-ghost" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
-            <i class="fa-solid fa-desktop" style="width:20px;height:20px"></i>
-            Windows 安裝包
-          </a>
-          <a class="btn btn-text" href="../promo.html">2.0 宣傳頁<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
-          <a class="btn btn-text" href="#getting-started">開始使用<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
-        </div>
-        <div class="hero-meta">
-          <span>APRS-IS · TNC · 音訊 · PKWDWPL 四種來源</span>
-          <span>Android / Windows</span>
-        </div>
-      </div>
     </div>
 
   </div>
@@ -1943,6 +1948,6 @@ html{overflow-x:hidden}
 </a>
 
 <script src="../js/main.js?v=7"></script>
-<script src="../js/planet-3d.js?v=6"></script>
+<script src="../js/planet-3d.js?v=7"></script>
 </body>
 </html>

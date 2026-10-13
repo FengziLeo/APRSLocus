@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════
-   Hero：3D 星球直接长在 hero 上 + 一行累计报文读数（三语首页共用）
+   Hero：3D 星球直接长在 hero 上 + 首屏一个累计报文数字（三语首页共用）
    ──────────────────────────────────────────────────────────────────────
    为什么单独一个文件：style.css 被 46 个页面以 ?v=7 引用，动它就得全站改
    版本号；这块只有三语首页 hero 用到，独立文件 + 独立 ?v 更省事。
@@ -35,27 +35,35 @@
 /* 文案在最上层。hero-inner 自己不拦指针事件，好让右半边的拖动落到画布上，
    只有文案栏恢复接收（链接、选中文字照常）。 */
 .hero-inner { grid-template-columns: minmax(0, 1fr); pointer-events: none; }
+/* ── 第一屏只摆那个数字 ──
+   进来第一眼应该是一个数，不是一段自我介绍。所以首屏就是一个差不多一屏高的
+   盒子（hero 的上内边距是 140px，减 150 之后盒子正好压在折线上），数字在盒子
+   里垂直居中；说明与下载都在它下面，要滚上来。 */
 .hero-copy {
   pointer-events: auto; position: relative; max-width: 620px;
-  /* 第一拍（说明 + 数字）自己占满第一屏：hero 的上下内边距是 140/80，所以
-     减 90 之后盒子正好压在折线上，下载那块就稳稳落在折线之下 —— 不然在
-     高一点的屏幕上它会跟着首屏一起出现，"往下滑才弹出"就没了。
-     保守一句：文字这一块仍是正常块流，只是盒子变高，孩子不多挪一格。 */
-  min-height: calc(100vh - 90px);
-  padding-top: clamp(0px, 4vh, 44px);
-  /* 往下拉：文案比星球走得快一点、先淡掉，hero 交给下一屏 */
+  min-height: calc(100vh - 150px);
+  display: flex; align-items: center; justify-content: flex-start;
+  /* 往下拉：数字比星球走得快一点、先淡掉，hero 交给下一屏 */
   transform: translate3d(0, var(--hero-3d-copy, 0px), 0);
   opacity: var(--hero-3d-copy-fade, 1);
+}
+
+/* ── 折线之下：这是什么（说明）→ 真正要动手的那一块 ──
+   这两块**不放在 .hero-copy 里面**。滚动退场的淡出只该作用在首屏那个数字上 ——
+   老版把下载块和读数放在同一个会淡出的盒子里，滚过 0.8 屏之后整块只剩 12%
+   不透明度（因为一直没人滚到那儿，这个坑没被发现）。 */
+.hero-copy-next {
+  pointer-events: auto; position: relative; max-width: 620px;
+  padding-top: clamp(16px, 5vh, 64px);
 }
 
 /* 文案底下铺一层很淡的同色晕，长句子压在点云上也读得清（不出边框感） */
 .hero { --hero-veil: rgba(244, 247, 253, .9); }
 :root[data-theme="dark"] .hero { --hero-veil: rgba(9, 14, 26, .84); }
-.hero-copy::before {
+.hero-copy::before, .hero-copy-next::before {
   content: ""; position: absolute; z-index: -1; pointer-events: none;
-  /* 盒子现在有一屏高，晕只跟着"字"走：高度收在文字那一段，别糊满整屏 */
-  inset: -4% -16% auto -10%; height: 70%;
-  background: radial-gradient(50% 50% at 36% 50%, var(--hero-veil), transparent 76%);
+  inset: -18% -34%;
+  background: radial-gradient(46% 46% at 38% 50%, var(--hero-veil), transparent 74%);
 }
 
 /* ── 读数之上的一句邀请：说清「这个数字是什么」，语气是邀请不是参数表。
@@ -71,16 +79,18 @@
       看上去像页脚的一行注释，压不住这一屏；竖排之后数字自己成一个体量，
       "这是什么"（标签）也终于排在数字**前面**而不是后面小字里。 ── */
 .hero-stat {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
-  margin: 30px 0 0;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
+  margin: 0;
 }
+/* 标签：这个数字是**谁的、是什么**。首屏只有数字加这一行小字，没有它就只剩
+   一个来路不明的计数器 —— 所以品牌名必须留在这里，不许省成"累计报文总量"。 */
 .hero-stat .hs-label {
-  font-size: 11px; letter-spacing: .26em; text-transform: uppercase;
+  font-size: 12px; letter-spacing: .28em; text-transform: uppercase;
   color: var(--text-faint);
 }
 .hero-stat .hs-foot {
-  display: inline-flex; align-items: center; gap: 12px;
-  font-size: 12.5px; color: var(--text-dim);
+  display: inline-flex; align-items: center; gap: 13px;
+  font-size: 13px; color: var(--text-dim);
 }
 .hero-stat .hs-foot b { color: var(--text); font-weight: 700; }
 .hs-live {
@@ -100,9 +110,9 @@
   display: block;
   /* 站点正文那一族字（不是等宽）：摆得进 hero 的字形体系，但数字必须
      tabular —— 每三秒换一位数字时，整块不能跟着抖。 */
-  font-size: clamp(46px, 6.6vw, 76px);
-  font-weight: 800; line-height: .95;
-  letter-spacing: -.035em; font-variant-numeric: tabular-nums;
+  font-size: clamp(64px, 11vw, 148px);
+  font-weight: 800; line-height: .92;
+  letter-spacing: -.04em; font-variant-numeric: tabular-nums;
   /* 不上渐变、不上彩：就是正文墨色。跳动靠"抬起 + 换成站点那一支青再退回来"，
      整条读数里只有这一处强调色，也就不会跟旁边的玻璃、按钮抢色。 */
   color: var(--text);
@@ -136,7 +146,7 @@
       滚到位才淡上来。.reveal 是站点本来就有的机制（风格与其它 section 一致），
       这里只把它从 hero 的依次登场里摘出来 —— 否则遮罩一走开它就自己演完了，
       也就不用"往下滑"了。 ── */
-.hero-copy > .hero-cta { animation: none; margin-top: clamp(40px, 9vh, 96px); }
+.hero-copy-next .hero-cta { margin-top: clamp(40px, 9vh, 96px); }
 
 /* hero 背景那层网（main.js 画的）压一档：这一屏的主角是星球，不是噪点 */
 .hero-canvas { opacity: .5; }
@@ -202,20 +212,20 @@
 @media (max-width: 1024px) {
   .planet-fallback .pf-globe { left: 50%; top: 30%; width: 68vw; }
   .planet-fallback .pf-ring { left: 50%; top: 30%; width: 124vw; height: 44vw; }
-  .hero-copy { max-width: 640px; margin: 0 auto; text-align: center; }
+  .hero-copy, .hero-copy-next { max-width: 640px; margin: 0 auto; text-align: center; }
   .hero-badge, .hero-actions, .hero-meta, .hero-stat { justify-content: center; }
   .hero-stat { display: flex; align-items: center; }
   .hero-sub, .hero-invite { margin-left: auto; margin-right: auto; }
-  .hero-copy::before {
+  .hero-copy::before, .hero-copy-next::before {
     inset: -10% -8%;
     background: radial-gradient(58% 58% at 50% 46%, var(--hero-veil), transparent 78%);
   }
 }
 @media (max-width: 620px) {
-  .hero-stat { gap: 6px 12px; font-size: 12.5px; }
-  /* 手机上也不把数字缩回小字：它是这一屏唯一的主角 */
-  .hero-stat { gap: 8px; margin-top: 24px; }
-  .hero-stat .tl-value { font-size: clamp(42px, 13vw, 58px); }
+  /* 手机上更不把数字缩回小字：这一屏就是它 */
+  .hero-stat { gap: 12px; margin-top: 0; }
+  .hero-stat .hs-label { font-size: 11px; letter-spacing: .2em; }
+  .hero-stat .tl-value { font-size: clamp(54px, 19vw, 88px); }
   .hero-stat .hs-foot { font-size: 12px; gap: 10px; }
   .hero-invite { font-size: 13.5px; line-height: 1.9; }
 }

@@ -194,17 +194,27 @@ def main():
             pk_i = s.find('id="tlPackets"')
             chk('%s : 读数标签排在数字之前、小注收尾' % f,
                 lb > 0 and pk_i > lb and s.find('class="hs-foot"') > pk_i)
-            # 读数之前要有一句邀请，并且**必须排在读数前面**：先说清这个数字是
-            # 什么（累计报文总量），再让它跳。只判「有 hero-invite」抓不到顺序写反。
-            inv = s.find('class="hero-invite"')
+            # 首屏只摆那个数字：读数必须在 .hero-copy-next（说明 + 下载）之前，
+            # 且自己独占 .hero-copy。两块一旦回到同一个盒子里，滚动退场那套淡出
+            # 就会把折线之下的说明连坐成半透明（滚过 0.8 屏只剩 12%）。
             st = s.find('id="heroTelemetry"')
-            chk('%s : 邀请文案在读数之前' % f,
-                inv > 0 and 'class="hi-mark"' in s and inv < st)
-            # 下载那块要排在读数之后，并且挂着 .reveal：先说明、再看数字、往下滑
-            # 才轮到你动手。顺序写反、或者漏了 reveal（那就会在首屏直接冒出来），
-            # 这一屏的节奏就散了。
+            nxt = s.find('class="hero-copy-next"')
+            chk('%s : 数字独占首屏，说明与下载另起一块跟在它后面' % f,
+                0 < st < nxt and s.count('class="hero-copy"') == 1
+                and s.count('class="hero-copy-next"') == 1)
+            # 标签要写清这个数字是**谁的、是什么**：首屏只有数字 + 这行小字，
+            # 少了品牌名就只剩一个来路不明的计数器。
+            chk('%s : 读数标签带品牌名' % f,
+                re.search(r'class="hs-label">[^<]*APRSlocus', s) is not None)
+            # 说明（邀请那句）要有，而且排在数字**之后**、和下载一样在折线之下，
+            # 靠 .reveal 滚上来才淡出。只判「有 hero-invite」抓不到顺序写反。
+            inv = s.find('class="hero-invite"')
+            chk('%s : 说明排在数字之后、滚上来才淡出' % f,
+                inv > st > 0 and nxt < inv and 'class="hero-intro reveal"' in s
+                and 'class="hi-mark"' in s)
+            # 下载那块排在说明之后，同样挂 .reveal：先看数字 → 再读说明 → 最后动手
             cta = s.find('class="hero-cta reveal"')
-            chk('%s : 下载排在读数之后、滚下去才弹出' % f, cta > st > 0)
+            chk('%s : 下载排在说明之后、滚下去才弹出' % f, cta > inv > 0)
             vers.append(re.findall(r'hero-3d\.css\?v=(\d+)', s) + re.findall(r'planet-3d\.js\?v=(\d+)', s))
             chk('%s : hero-3d 资源接线' % f,
                 '%scss/hero-3d.css?v=' % up in s

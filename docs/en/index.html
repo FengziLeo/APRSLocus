@@ -56,7 +56,7 @@
 <link rel="canonical" href="https://aprslocus.theez.top/en/">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
 <link rel="stylesheet" href="../css/style.css?v=7">
-<link rel="stylesheet" href="../css/hero-3d.css?v=6">
+<link rel="stylesheet" href="../css/hero-3d.css?v=7">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
@@ -131,54 +131,59 @@ html{overflow-x:hidden}
   <div class="hero-inner">
 
     <div class="hero-copy">
-      <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
-      <div class="hero-wordmark">TOUCH SKY</div>
-      <p class="hero-slogan">APRS <span class="grad">Tracking</span> &amp; <span class="grad">Mapping</span></p>
-      <p class="hero-sub">
-        An APRS client for amateur radio operators - a tool that runs on your own device.<br>
-        It ships with no server address: enter your own APRS-IS server, or use a
-        Bluetooth TNC / sound card / direct Icom connection.
-      </p>
-      <p class="hero-invite">
-        <span class="hi-mark" aria-hidden="true">✦</span>Radio waves cross the sky and end up on this planet — the next one is yours to send.
-      </p>
+      <!-- First screen is this one thing: the number (APRSlocus packets relayed; source: stats.json). The "what is this" note sits below the fold. -->
+        <div class="hero-stat" id="heroTelemetry"
+             data-stats="../stats.json" data-packets="509260" data-rate="18"
+             data-updated="2026-10-13T16:06:00+08:00"
+             data-stale-title="Snapshot older than 12 hours - extrapolation stopped (capped estimate shown)">
+          <span class="hs-label">APRSlocus · packets relayed</span>
+          <span class="tl-value" id="tlPackets">509,260</span>
+          <span class="hs-foot"><span class="hs-live"><i></i>LIVE</span><span><b><i id="tlRateNum">+18</i></b> per minute</span></span>
+        </div>
+    </div>
 
-      <!-- Cumulative packets: label + number + one caption line (source: stats.json) -->
-      <div class="hero-stat" id="heroTelemetry"
-           data-stats="../stats.json" data-packets="509260" data-rate="18"
-           data-updated="2026-10-13T16:06:00+08:00"
-           data-stale-title="Snapshot older than 12 hours - extrapolation stopped (capped estimate shown)">
-        <span class="hs-label">Packets relayed</span>
-        <span class="tl-value" id="tlPackets">509,260</span>
-        <span class="hs-foot"><span class="hs-live"><i></i>LIVE</span><span><b><i id="tlRateNum">+18</i></b> per minute</span></span>
+    <div class="hero-copy-next">
+      <!-- Below the fold: what this is (revealed on scroll via .reveal) -->
+      <div class="hero-intro reveal" data-delay="0">
+        <span class="hero-badge"><span class="pulse-dot"></span><b>APRSlocus 2.0</b><span class="sep"></span><span class="rel-tag">TOUCH SKY</span></span>
+        <div class="hero-wordmark">TOUCH SKY</div>
+        <p class="hero-slogan">APRS <span class="grad">Tracking</span> &amp; <span class="grad">Mapping</span></p>
+        <p class="hero-sub">
+          An APRS client for amateur radio operators - a tool that runs on your own device.<br>
+          It ships with no server address: enter your own APRS-IS server, or use a
+          Bluetooth TNC / sound card / direct Icom connection.
+        </p>
+        <p class="hero-invite">
+          <span class="hi-mark" aria-hidden="true">✦</span>That number is every packet the world’s APRS stations have relayed so far — radio waves cross the sky and end up on this planet, and the next one is yours to send.
+        </p>
       </div>
 
-      <!-- below the fold: the part you actually act on (release card + downloads + sources) -->
-      <div class="hero-cta reveal" data-delay="0">
-        <div class="hero-release" id="heroRelease" style="display:inline-flex;align-items:center;gap:12px;margin:8px 0 6px;padding:12px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 30px rgba(45,70,120,.14);backdrop-filter:blur(14px)">
-          <span id="hrIcon" style="font-size:20px">✅</span>
-          <span>
-            <b style="font-size:14px">APRSlocus 2.0 <span id="hrState" style="color:var(--cyan)">released</span></b>
-            <span id="hrTimer" style="display:block;font-size:12.5px;color:var(--text-faint)">2.0 is out · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener" style="color:var(--cyan);font-weight:700">Download now →</a></span>
-          </span>
+      <!-- Then the part you actually act on: release card + download buttons + sources -->
+        <div class="hero-cta reveal" data-delay="0">
+          <div class="hero-release" id="heroRelease" style="display:inline-flex;align-items:center;gap:12px;margin:8px 0 6px;padding:12px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--line);box-shadow:0 12px 30px rgba(45,70,120,.14);backdrop-filter:blur(14px)">
+            <span id="hrIcon" style="font-size:20px">✅</span>
+            <span>
+              <b style="font-size:14px">APRSlocus 2.0 <span id="hrState" style="color:var(--cyan)">released</span></b>
+              <span id="hrTimer" style="display:block;font-size:12.5px;color:var(--text-faint)">2.0 is out · <a href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener" style="color:var(--cyan);font-weight:700">Download now →</a></span>
+            </span>
+          </div>
+          <div class="hero-actions">
+            <a class="btn btn-primary" id="heroDownload" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
+              <i class="fa-solid fa-mobile-screen"></i>
+              <span id="heroDlText">Download 2.0</span>
+            </a>
+            <a class="btn btn-ghost" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
+              <i class="fa-solid fa-desktop" style="width:20px;height:20px"></i>
+              Windows Installer
+            </a>
+            <a class="btn btn-text" href="../promo.html">2.0 Promo<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
+            <a class="btn btn-text" href="#getting-started">Get Started<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
+          </div>
+          <div class="hero-meta">
+            <span>APRS-IS · TNC · Audio · PKWDWPL</span>
+            <span>Android / Windows</span>
+          </div>
         </div>
-        <div class="hero-actions">
-          <a class="btn btn-primary" id="heroDownload" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
-            <i class="fa-solid fa-mobile-screen"></i>
-            <span id="heroDlText">Download 2.0</span>
-          </a>
-          <a class="btn btn-ghost" href="https://github.com/dariondong/APRSLocus/releases" target="_blank" rel="noopener">
-            <i class="fa-solid fa-desktop" style="width:20px;height:20px"></i>
-            Windows Installer
-          </a>
-          <a class="btn btn-text" href="../promo.html">2.0 Promo<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
-          <a class="btn btn-text" href="#getting-started">Get Started<svg viewBox="0 0 24 24"><path d="M8 5l7 7-7 7V5z"/></svg></a>
-        </div>
-        <div class="hero-meta">
-          <span>APRS-IS · TNC · Audio · PKWDWPL</span>
-          <span>Android / Windows</span>
-        </div>
-      </div>
     </div>
 
   </div>
@@ -1941,6 +1946,6 @@ html{overflow-x:hidden}
 </a>
 
 <script src="../js/main.js?v=7"></script>
-<script src="../js/planet-3d.js?v=6"></script>
+<script src="../js/planet-3d.js?v=7"></script>
 </body>
 </html>

@@ -330,18 +330,17 @@ def render_head(lang, file, title, desc, anchors):
 <link rel="canonical" href="{canonical}">
 {hreflangs}
 <link rel="icon" type="image/png" href="{asset}assets/favicon.png">
-<link rel="stylesheet" href="{asset}css/style.css?v=6">
+<link rel="stylesheet" href="{asset}css/style.css?v=8">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <script>
 /* 主题：localStorage 优先，否则跟随系统；首帧前执行防闪白 */
 (function () {{
   try {{
     var t = localStorage.getItem('theme');
-    if (t !== 'dark' && t !== 'light')
-      t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (t !== 'light') t = 'dark'; /* 默认 NASA 朋克深色 */
     document.documentElement.setAttribute('data-theme', t);
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#0b1220' : '#f3f6fd');
+    if (m) m.setAttribute('content', t === 'dark' ? '#060810' : '#efe9db');
   }} catch (e) {{}}
 }})();
 </script>

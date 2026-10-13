@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>连接与数据来源 — APRSlocus</title>
 <meta name="description" content="目标：选对数据来源、把 APRS-IS 连上并验证，必要时接上电台跑通射频链路。">
-<meta name="theme-color" content="#f3f6fd">
+<meta name="theme-color" content="#060810">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="APRSlocus">
 <meta property="og:title" content="连接与数据来源 — APRSlocus">
@@ -22,18 +22,17 @@
     <link rel="alternate" hreflang="en" href="https://aprslocus.theez.top/en/manual/connections.html">
     <link rel="alternate" hreflang="x-default" href="https://aprslocus.theez.top/manual/connections.html">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
-<link rel="stylesheet" href="../css/style.css?v=7">
+<link rel="stylesheet" href="../css/style.css?v=8">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <script>
 /* 主题：localStorage 优先，否则跟随系统；首帧前执行防闪白 */
 (function () {
   try {
     var t = localStorage.getItem('theme');
-    if (t !== 'dark' && t !== 'light')
-      t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (t !== 'light') t = 'dark'; /* 默认 NASA 朋克深色 */
     document.documentElement.setAttribute('data-theme', t);
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#0b1220' : '#f3f6fd');
+    if (m) m.setAttribute('content', t === 'dark' ? '#060810' : '#efe9db');
   } catch (e) {}
 })();
 </script>

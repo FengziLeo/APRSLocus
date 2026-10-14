@@ -16374,6 +16374,24 @@ abstract class AppLocalizations {
   /// **'未找到设备 · 请先在系统蓝牙设置里配对，或插上 USB 串口线（OTG）'**
   String get linkNoPaired;
 
+  /// No description provided for @beaconIncludeSats.
+  ///
+  /// In zh, this message translates to:
+  /// **'卫星数'**
+  String get beaconIncludeSats;
+
+  /// No description provided for @beaconSatsNow.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前卫星数'**
+  String get beaconSatsNow;
+
+  /// No description provided for @beaconSatsHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'卫星数来自正在供位的那个来源 —— 手机 GPS（Android）或外接 GPS 模组（GGA 语句）。SAT=nn 是非标准备注字段（与 STEPS= 同类），第三方地图只会当备注文字显示；来源不提供这个值时不会发送，而不是发一个 0。'**
+  String get beaconSatsHint;
+
 }
 
 class _AppLocalizationsDelegate

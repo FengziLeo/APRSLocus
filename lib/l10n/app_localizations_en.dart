@@ -9389,4 +9389,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get linkNoPaired => "No device found -- pair it in the system Bluetooth settings first, or plug in the USB serial cable (OTG)";
 
+  @override
+  String get beaconIncludeSats => "Satellites";
+
+  @override
+  String get beaconSatsNow => "Satellites now";
+
+  @override
+  String get beaconSatsHint => "The satellite count comes from whichever source is supplying position -- phone GPS (Android) or the external GPS module (GGA sentence). SAT=nn is a non-standard comment field (like STEPS=) that third-party maps only show as comment text; when the source does not provide it, nothing is sent rather than a zero.";
+
 }

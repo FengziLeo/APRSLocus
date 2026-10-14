@@ -866,6 +866,49 @@ KEYS = {
         'sistem, atau sambungkan kabel serial USB (OTG)',
     ),
 
+    # ── 信标里带上卫星数（用户 2026-10-14：「定位上报，上报内容添加识别的卫星数，
+    # 支持安卓和外置 GPS」）──
+    #
+    # 数据源有两条：Android 系统定位（LocationService 把 GNSS 状态里参与定位的
+    # 颗数发上来）与外接 GPS 模组的 GGA 语句。与 STEPS= 同类：**非标准**备注字段，
+    # 会把备注撑长、第三方地图只会当文字显示，所以默认关。
+    'beaconIncludeSats': (
+        '卫星数', '衛星數',
+        'Satellites', '衛星数',
+        'Satélites', 'Satelit',
+    ),
+    'beaconSatsNow': (
+        '当前卫星数', '目前衛星數',
+        'Satellites now', '現在の衛星数',
+        'Satélites ahora', 'Satelit saat ini',
+    ),
+    'beaconSatsHint': (
+        '卫星数来自正在供位的那个来源 —— 手机 GPS（Android）或外接 GPS 模组（GGA 语句）。'
+        'SAT=nn 是非标准备注字段（与 STEPS= 同类），第三方地图只会当备注文字显示；'
+        '来源不提供这个值时不会发送，而不是发一个 0。',
+        '衛星數來自正在供位的那個來源 —— 手機 GPS（Android）或外接 GPS 模組（GGA 語句）。'
+        'SAT=nn 是非標準備註欄位（與 STEPS= 同類），第三方地圖只會當備註文字顯示；'
+        '來源不提供這個值時不會發送，而不是發一個 0。',
+        'The satellite count comes from whichever source is supplying position -- '
+        'phone GPS (Android) or the external GPS module (GGA sentence). SAT=nn is a '
+        'non-standard comment field (like STEPS=) that third-party maps only show as '
+        'comment text; when the source does not provide it, nothing is sent rather '
+        'than a zero.',
+        '衛星数は現在位置を供給している側（スマートフォン GPS（Android）または外付け '
+        'GPS モジュールの GGA）から取ります。SAT=nn は非標準のコメント欄（STEPS= と同類）'
+        'で、サードパーティの地図ではコメント文字列として表示されるだけです。'
+        '供給側が値を出さないときは 0 ではなく何も送りません。',
+        'El número de satélites procede de la fuente que está aportando la posición: '
+        'el GPS del teléfono (Android) o el módulo GPS externo (sentencia GGA). '
+        'SAT=nn es un campo de comentario no estándar (como STEPS=) que los mapas de '
+        'terceros solo muestran como texto; si la fuente no lo aporta, no se envía '
+        'nada en lugar de un cero.',
+        'Jumlah satelit berasal dari sumber yang sedang memasok posisi -- GPS ponsel '
+        '(Android) atau modul GPS eksternal (kalimat GGA). SAT=nn adalah kolom '
+        'komentar non-standar (seperti STEPS=) yang di peta pihak ketiga hanya tampil '
+        'sebagai teks komentar; bila sumbernya tidak memberi nilai, tidak ada yang '
+        'dikirim, bukan angka nol.',
+    ),
 }
 
 # ── 占位符声明（可空）──

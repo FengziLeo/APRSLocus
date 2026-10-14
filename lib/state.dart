@@ -260,6 +260,17 @@ class AppState extends ChangeNotifier {
   /// 自己位置的精度（米）。粗定位时不是系统原值，见 [_kCoarseAccuracyFloorM]
   double myAccuracy = 0;
 
+  /// 当前这个定位**参与定轨的卫星数**（null = 正在供位的来源不提供这个值）。
+  ///
+  /// 两条来源都可能填：[LocService] 的事件（Android 侧读 `Location.extras` 、
+  /// 机型缺这个字段时回退到 `GnssStatus`）与外接 GPS 模块的 GGA 语句
+  /// （见 [_onNmeaGpsFix] → [_ingestExternalFix]）。
+  /// 与 [myAccuracy] 不同的是：它**不参与任何取舍**（既不用来拦点、也不用来自适应
+  /// 抽稀）—— 只用于 ① 信标里可选地带上 `SAT=nn`；② 设置页如实显示。
+  /// null 与 0 必须区分：null 是「这个来源不说」，0 是「确实一颗星都没有」，
+  /// 所以发信标时只发大于 0 的值。
+  int? mySats;
+
   /// 当前这个定位是不是粗定位（网络/基站/被动）。
   ///
   /// 界面上要如实告知：粗点会把「我」放在几百米开外，不说清楚用户会以为
@@ -401,6 +412,7 @@ class AppState extends ChangeNotifier {
     double? prevLng,
     int? hr,
     double accuracyM = 0,
+    int? satellites,
   }) {
     final first = !myHasFix;
     myLat = lat;
@@ -410,6 +422,10 @@ class AppState extends ChangeNotifier {
     _pendingSavedPos = false; // 外部源给的是真实点，可以上报
     myFixCoarse = false; // 外部源不是粗定位
     myAccuracy = accuracyM;
+    // 卫星数：这条源的定位自带的颗数（佳明不给这个字段 → null）。
+    // **无条件赋值**而不是「有值才改」：「这个源不说」与「上一颗源说的」是两件事 ——
+    // 留着上一个值会让信标里的 `SAT=nn` 变成一个没人再说得清来源的数字。
+    mySats = satellites;
     if (altM != null) myAlt = altM;
     if (speedKmh != null) mySpeed = speedKmh;
     if (hr != null && hr > 0) {
@@ -736,6 +752,16 @@ class AppState extends ChangeNotifier {
   // 与信标的关系：`STEPS=` 是**非标准** APRS 备注字段（和 `TRV:`/`ODO:` 同类），
   // 会把备注撑长、也只在 APRSlocus 自己的运动排行榜里有意义，所以**默认关**。
   bool beaconIncludeSteps = false;
+
+  /// 信标备注里是否带上**卫星数**（`SAT=nn`）。
+  ///
+  /// 与 [beaconIncludeSteps] 同类：APRS 没有卫星数的标准字段，`SAT=` 是本应用
+  /// 自造的备注（第三方地图只会当文字显示，aprs.fi 那类站点不会给你画出来）。
+  /// 默认关 —— 它属于「自己看得开心」的信息，不该默认把别人的备注栏占满。
+  ///
+  /// 值来自 [mySats]：正在供位的那个来源（手机 GPS / 外接模块）说多少就是多少；
+  /// 来源不提供时**不发**（而不是发一个会被读成「没有卫星」的 0）。
+  bool beaconIncludeSats = false;
 
   /// 今日步数（0 = 还没读到或确实没走）。
   ///
@@ -1478,6 +1504,13 @@ class AppState extends ChangeNotifier {
 
   void setBeaconIncludeSpeed(bool v) {
     beaconIncludeSpeed = v;
+    persist();
+    _notify();
+  }
+
+  /// 信标是否带上卫星数（见 [beaconIncludeSats]）。
+  void setBeaconIncludeSats(bool v) {
+    beaconIncludeSats = v;
     persist();
     _notify();
   }
@@ -3738,6 +3771,7 @@ class AppState extends ChangeNotifier {
     crashSensitivity = 'standard';
     emergencyTel = '120';
     beaconIncludeSteps = false;
+    beaconIncludeSats = false;
     _stepsBaseline = -1;
     _stepsDayKey = '';
     _stepsCarry = 0;
@@ -4071,6 +4105,8 @@ class AppState extends ChangeNotifier {
       emergencyTel = p.getString('emergencyTel') ?? emergencyTel;
       beaconIncludeSteps =
           p.getBool('beaconIncludeSteps') ?? beaconIncludeSteps;
+      beaconIncludeSats =
+          p.getBool('beaconIncludeSats') ?? beaconIncludeSats;
       // 计步基线：跨重启必须留着，否则重启后「今日步数」会从 0 重新数
       _stepsBaseline = p.getInt('stepsBaseline') ?? _stepsBaseline;
       _stepsDayKey = p.getString('stepsDayKey') ?? _stepsDayKey;
@@ -4385,6 +4421,7 @@ class AppState extends ChangeNotifier {
     await p.setString('crashSensitivity', crashSensitivity);
     await p.setString('emergencyTel', emergencyTel);
     await p.setBool('beaconIncludeSteps', beaconIncludeSteps);
+    await p.setBool('beaconIncludeSats', beaconIncludeSats);
     await p.setInt('stepsBaseline', _stepsBaseline);
     await p.setString('stepsDayKey', _stepsDayKey);
     await p.setInt('stepsCarry', _stepsCarry);
@@ -5309,6 +5346,8 @@ class AppState extends ChangeNotifier {
       prevLng: prev?.lng,
       // 精度由 HDOP 估算（见 NmeaFix.accuracyM）；没有 HDOP 时是 null → 0 = 未知
       accuracyM: fix.accuracyM ?? 0,
+      // 卫星数：模组 GGA 里的「参与定位的颗数」（不发 GGA 的模组就是 null）
+      satellites: fix.satellites,
     );
     // 日志只打两次：本进程首个点、以及**每次连接的首条定位** ——
     // 每条都打会把日志页刷满（模组每秒 1~10 条），而这两条才是排查时真正要看的。
@@ -6153,6 +6192,7 @@ class AppState extends ChangeNotifier {
     bool lastKnown,
     double accuracy,
     String source,
+    int? satellites,
   ) async {
     if (_disposed) return;
     if (useSimLocation) return; // 模拟位置模式下忽略 GPS 数据
@@ -6360,6 +6400,10 @@ class AppState extends ChangeNotifier {
     myAccuracy = coarse
         ? (accuracy > _kCoarseAccuracyFloorM ? accuracy : _kCoarseAccuracyFloorM)
         : (accuracy > 0 ? accuracy : 0);
+    // 卫星数：只认**实时**定位 —— 缓存点（lastKnown）带的是几小时前那份星数，
+    // 把它写进信标等于向全网报一个当下的假数据。null（平台不给）与 0（真没星）
+    // 在这里都如实传播，发不发由 _beaconComment 决定（只发 > 0）。
+    if (!lastKnown) mySats = satellites;
     if (!lastKnown && !coarse) {
       // 只有实时 **GPS** 才推进参照点与「有过实时定位」标记；
       // 缓存位置与粗定位都不算数（否则粗点会成为后续跳变判断的基准，
@@ -6709,6 +6753,13 @@ class AppState extends ChangeNotifier {
     // 发 `STEPS=0` 会让收端以为「他一步没走」，而实际可能只是没授权/没传感器。
     if (beaconIncludeSteps && stepsToday > 0) {
       parts.add('STEPS=$stepsToday');
+    }
+    // 卫星数：非标准字段（与 STEPS= 同类），默认关。
+    // 值与来源同源（见 [mySats]）：手机 GPS（Android）或外接模组都行，
+    // 来源不说就**不发** —— 发 `SAT=0` 会让收端以为「一颗星都没有」，
+    // 而实际可能只是这个平台不给这个字段。
+    if (beaconIncludeSats && (mySats ?? 0) > 0) {
+      parts.add('SAT=$mySats');
     }
     if (myComment.trim().isNotEmpty) {
       parts.add(myComment.trim());
@@ -7817,6 +7868,9 @@ class AppState extends ChangeNotifier {
     _pendingFixCount = 0;
     myAccuracy = 0;
     myFixCoarse = false;
+    // 卫星数也是「这一轮定位的状态」：切换来源 / 清空数据后必须跟着复位，
+    // 否则会拿着上一颗源的颗数往信标里填（`SAT=12` 而实际根本没在定位）。
+    mySats = null;
     // 复位「只是保存的位置」这一位：切到模拟位置 / 清空数据后若不复位，
     // 用户切回真机 GPS 时可能带着上一次的「可上报」状态（那正是要防的）。
     _pendingSavedPos = true;

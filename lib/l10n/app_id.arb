@@ -4123,5 +4123,8 @@
   "linkConnectAction": "Hubungkan perangkat",
   "linkBoundDevice": "Perangkat terikat",
   "linkNotBound": "Belum ada perangkat terikat",
-  "linkNoPaired": "Perangkat tidak ditemukan -- pasangkan dulu di pengaturan Bluetooth sistem, atau sambungkan kabel serial USB (OTG)"
+  "linkNoPaired": "Perangkat tidak ditemukan -- pasangkan dulu di pengaturan Bluetooth sistem, atau sambungkan kabel serial USB (OTG)",
+  "beaconIncludeSats": "Satelit",
+  "beaconSatsNow": "Satelit saat ini",
+  "beaconSatsHint": "Jumlah satelit berasal dari sumber yang sedang memasok posisi -- GPS ponsel (Android) atau modul GPS eksternal (kalimat GGA). SAT=nn adalah kolom komentar non-standar (seperti STEPS=) yang di peta pihak ketiga hanya tampil sebagai teks komentar; bila sumbernya tidak memberi nilai, tidak ada yang dikirim, bukan angka nol."
 }

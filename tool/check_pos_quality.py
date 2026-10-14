@@ -51,8 +51,8 @@ def main() -> int:
     # accuracy 从原生接回 Dart（以前原生算了、Dart 侧没读，等于白算）
     need('lib/services.dart', "(event['accuracy'] as num?)?.toDouble()",
          '原生上报的 accuracy 没被解析（精度信息在传输途中丢掉了）')
-    need('lib/services.dart', "String source)? onFix;",
-         'onFix 回调签名缺 source（定位来源）参数')
+    need('lib/services.dart', "String source, int? satellites)? onFix;",
+         'onFix 回调签名缺 source / satellites 参数')
     need('lib/services.dart', "(event['provider'] as String?) ?? ''",
          "原生发的 provider 没被解析 —— 上层就分不出「GPS 实测」和「基站/Wi-Fi "
          '粗定位」，用户报的「网络让定位飞来飞去」会原样回来')
@@ -62,6 +62,22 @@ def main() -> int:
          'myAccuracy 没有区分粗定位（会照抄系统那个过于乐观的 accuracy）')
     need('lib/state.dart', 'myFixCoarse = coarse;',
          'myFixCoarse 没落库 —— 界面无法区分粗定位与 GPS')
+
+    # 卫星数（用户要求「定位上报里带上识别的卫星数」）：同样要**两条路都接回 Dart**，
+    # 与 accuracy / source 是同一类漏接 —— 原生算了、模组发了，Dart 侧没读就白算。
+    need('lib/services.dart', "(event['satellites'] as num?)?.toInt()",
+         '原生上报的 satellites 没被解析（卫星数在传输途中丢掉了）')
+    need('android/app/src/main/kotlin/com/aprslocus/aprslocus/LocationService.kt',
+         '"satellites" to',
+         'Android 侧没有把卫星数发上来（机型 extras 缺失时还要回退 GnssStatus）')
+    need('lib/state.dart', 'if (!lastKnown) mySats = satellites;',
+         '_onFix 没有接住原生给的卫星数（缓存点的颗数不算）')
+    need('lib/state.dart', 'satellites: fix.satellites,',
+         '外接 GPS 模组 GGA 的卫星数没有传给 _ingestExternalFix')
+    need('lib/state.dart',
+         'if (beaconIncludeSats && (mySats ?? 0) > 0) {\n'
+         '      parts.add(\'SAT=$mySats\');',
+         '信标里没有把卫星数带上 —— 或者写成了「发 SAT=0」（收端会读成「一颗星都没有」）')
 
     # 粗定位（网络/基站）的两道闸：缺任何一道，标记都会在 GPS 一闪一断时横跳。
     #

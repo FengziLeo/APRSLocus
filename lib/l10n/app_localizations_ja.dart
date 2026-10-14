@@ -9110,4 +9110,13 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get linkNoPaired => "デバイスが見つかりません · 先にシステムの Bluetooth 設定でペアリングするか、USB シリアルケーブル（OTG）を接続してください";
 
+  @override
+  String get beaconIncludeSats => "衛星数";
+
+  @override
+  String get beaconSatsNow => "現在の衛星数";
+
+  @override
+  String get beaconSatsHint => "衛星数は現在位置を供給している側（スマートフォン GPS（Android）または外付け GPS モジュールの GGA）から取ります。SAT=nn は非標準のコメント欄（STEPS= と同類）で、サードパーティの地図ではコメント文字列として表示されるだけです。供給側が値を出さないときは 0 ではなく何も送りません。";
+
 }

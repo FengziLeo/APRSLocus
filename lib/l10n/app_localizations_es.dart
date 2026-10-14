@@ -9448,4 +9448,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get linkNoPaired => "No se encontró ningún dispositivo: empareja primero en los ajustes de Bluetooth del sistema, o conecta el cable serie USB (OTG)";
 
+  @override
+  String get beaconIncludeSats => "Satélites";
+
+  @override
+  String get beaconSatsNow => "Satélites ahora";
+
+  @override
+  String get beaconSatsHint => "El número de satélites procede de la fuente que está aportando la posición: el GPS del teléfono (Android) o el módulo GPS externo (sentencia GGA). SAT=nn es un campo de comentario no estándar (como STEPS=) que los mapas de terceros solo muestran como texto; si la fuente no lo aporta, no se envía nada en lugar de un cero.";
+
 }

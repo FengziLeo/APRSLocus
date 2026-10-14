@@ -1113,6 +1113,7 @@ Future<AgentToolOutcome> executeAgentTool(
           'include_course': st.beaconIncludeCourse,
           'include_battery': st.beaconIncludeBattery,
           'include_hr': st.beaconIncludeHr,
+          'include_sats': st.beaconIncludeSats,
         },
         'preferences': {
           'language': st.locale,

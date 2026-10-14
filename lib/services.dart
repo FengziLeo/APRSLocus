@@ -38,8 +38,15 @@ class LocService {
   /// 代价是「基站/Wi-Fi 粗定位」与「GPS」在上层长得一模一样 —— 而前者会一次偏
   /// 几百米到几公里，这就是用户报的「网络让定位飞来飞去」。空串表示平台没给
   /// （iOS/桌面），按「未知」处理，不当作粗定位（保持旧行为，不制造回归）。
+  ///
+  /// [satellites] —— 参与定位的卫星数（null = 平台/机型不提供）。
+  /// 只有 Android 侧会填（`Location.extras["satellites"]`，机型缺失时回退到
+  /// `GnssStatus` 里 usedInFix 的颗数）；iOS / 桌面 / IP 网络定位都是 null。
+  /// 它**不参与任何定位取舍**，只用来：① 信标里可选地带上 `SAT=nn`；
+  /// ② 设置页如实显示「现在几颗星」。所以 null（不知道）与 0（已知一颗都没有）
+  /// 必须区分开，别把 null 当 0。
   void Function(double lat, double lng, double alt, double speed, double bearing,
-      bool lastKnown, double accuracyM, String source)? onFix;
+      bool lastKnown, double accuracyM, String source, int? satellites)? onFix;
   void Function(String status)? onStatus;
   /// 通知栏"连接/断开"按钮点击回调
   void Function()? onToggleConnect;
@@ -96,6 +103,9 @@ class LocService {
             // 区分「GPS 实测」与「基站/Wi-Fi 粗定位」—— 后者精度字段常常
             // 报得很乐观（20~40m）却实际偏几百米，只看 accuracy 拦不住。
             (event['provider'] as String?) ?? '',
+            // 参与定位的卫星数：只有 Android 侧会带（机型不给时是 null）。
+            // 与精度/来源同一类 —— 解析层不读的话，上层永远拿不到它。
+            (event['satellites'] as num?)?.toInt(),
           );
         }
       }
@@ -209,7 +219,8 @@ class LocService {
           // 而 50km 远超过那些门限，所以 IP 点天然不会写轨迹、也不会被当成
           // 「静止」的可靠依据。
           // source 传 'network'：IP 定位是城市级粗点，与 Wi-Fi 粗定位同类。
-          onFix?.call(lat, lng, 0, 0, -1, true, 50000, 'network');
+          // satellites 传 null：IP 定位没有卫星一说（0 会被误读成「一颗星都没有」）。
+          onFix?.call(lat, lng, 0, 0, -1, true, 50000, 'network', null);
           return true;
         } finally {
           client.close(force: true);

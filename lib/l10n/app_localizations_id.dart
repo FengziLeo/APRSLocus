@@ -9399,4 +9399,13 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get linkNoPaired => "Perangkat tidak ditemukan -- pasangkan dulu di pengaturan Bluetooth sistem, atau sambungkan kabel serial USB (OTG)";
 
+  @override
+  String get beaconIncludeSats => "Satelit";
+
+  @override
+  String get beaconSatsNow => "Satelit saat ini";
+
+  @override
+  String get beaconSatsHint => "Jumlah satelit berasal dari sumber yang sedang memasok posisi -- GPS ponsel (Android) atau modul GPS eksternal (kalimat GGA). SAT=nn adalah kolom komentar non-standar (seperti STEPS=) yang di peta pihak ketiga hanya tampil sebagai teks komentar; bila sumbernya tidak memberi nilai, tidak ada yang dikirim, bukan angka nol.";
+
 }

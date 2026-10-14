@@ -4123,5 +4123,8 @@
   "linkConnectAction": "Connect device",
   "linkBoundDevice": "Bound device",
   "linkNotBound": "No device bound",
-  "linkNoPaired": "No device found -- pair it in the system Bluetooth settings first, or plug in the USB serial cable (OTG)"
+  "linkNoPaired": "No device found -- pair it in the system Bluetooth settings first, or plug in the USB serial cable (OTG)",
+  "beaconIncludeSats": "Satellites",
+  "beaconSatsNow": "Satellites now",
+  "beaconSatsHint": "The satellite count comes from whichever source is supplying position -- phone GPS (Android) or the external GPS module (GGA sentence). SAT=nn is a non-standard comment field (like STEPS=) that third-party maps only show as comment text; when the source does not provide it, nothing is sent rather than a zero."
 }

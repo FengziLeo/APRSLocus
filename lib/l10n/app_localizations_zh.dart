@@ -9009,6 +9009,15 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get linkNoPaired => "未找到设备 · 请先在系统蓝牙设置里配对，或插上 USB 串口线（OTG）";
 
+  @override
+  String get beaconIncludeSats => "卫星数";
+
+  @override
+  String get beaconSatsNow => "当前卫星数";
+
+  @override
+  String get beaconSatsHint => "卫星数来自正在供位的那个来源 —— 手机 GPS（Android）或外接 GPS 模组（GGA 语句）。SAT=nn 是非标准备注字段（与 STEPS= 同类），第三方地图只会当备注文字显示；来源不提供这个值时不会发送，而不是发一个 0。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18014,5 +18023,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get linkNoPaired => "未找到裝置 · 請先在系統藍牙設定裡配對，或插上 USB 序列埠線（OTG）";
+
+  @override
+  String get beaconIncludeSats => "衛星數";
+
+  @override
+  String get beaconSatsNow => "目前衛星數";
+
+  @override
+  String get beaconSatsHint => "衛星數來自正在供位的那個來源 —— 手機 GPS（Android）或外接 GPS 模組（GGA 語句）。SAT=nn 是非標準備註欄位（與 STEPS= 同類），第三方地圖只會當備註文字顯示；來源不提供這個值時不會發送，而不是發一個 0。";
 
 }

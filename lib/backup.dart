@@ -99,6 +99,8 @@ const List<BackupGroupSpec> kBackupGroups = [
     'crashSensitivity',
     // 信标是否附带步数（非标准字段，同 TRV/ODO 一类）：属于信标内容偏好。
     'beaconIncludeSteps',
+    // 信标是否附带卫星数（非标准字段，同 STEPS= 一类）：属于信标内容偏好。
+    'beaconIncludeSats',
     'emergencyTel',
     // 里程附带（TRV/ODO）与累计总里程：属于「信标内容 + 累计数据」，
     // 换机后当然希望继续累计、按自己调的那样上报。

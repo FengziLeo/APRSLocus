@@ -4711,5 +4711,8 @@
   "linkConnectAction": "連接裝置",
   "linkBoundDevice": "已綁定裝置",
   "linkNotBound": "未綁定裝置",
-  "linkNoPaired": "未找到裝置 · 請先在系統藍牙設定裡配對，或插上 USB 序列埠線（OTG）"
+  "linkNoPaired": "未找到裝置 · 請先在系統藍牙設定裡配對，或插上 USB 序列埠線（OTG）",
+  "beaconIncludeSats": "衛星數",
+  "beaconSatsNow": "目前衛星數",
+  "beaconSatsHint": "衛星數來自正在供位的那個來源 —— 手機 GPS（Android）或外接 GPS 模組（GGA 語句）。SAT=nn 是非標準備註欄位（與 STEPS= 同類），第三方地圖只會當備註文字顯示；來源不提供這個值時不會發送，而不是發一個 0。"
 }

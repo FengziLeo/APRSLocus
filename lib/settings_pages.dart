@@ -1526,6 +1526,12 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
                   SettingsMiniSwitch(S.of(context).beaconIncludeSteps,
                       value: st.beaconIncludeSteps,
                       onChanged: st.setBeaconIncludeSteps),
+                  // 卫星数（用户 2026-10-14 要求）：同样是**非标准**备注字段
+                  // （`SAT=nn`），默认关。值来自正在供位的来源：手机 GPS（Android）
+                  // 或外接 GPS 模组（GGA），两条路汇到同一个 st.mySats。
+                  SettingsMiniSwitch(S.of(context).beaconIncludeSats,
+                      value: st.beaconIncludeSats,
+                      onChanged: st.setBeaconIncludeSats),
                 ],
               ),
             ),
@@ -1580,6 +1586,14 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
               ),
             if (st.hasStepSensor)
               SettingsHint(S.of(context).stepsHint, color: C.grey),
+            // 卫星数：如实回显「现在几颗」（来源不说就是「—」，不是 0 ——
+            // 「不知道」与「一颗都没有」含义不同，见 AppState.mySats）。
+            SettingsRow2(
+              S.of(context).beaconSatsNow,
+              st.mySats == null ? '—' : '${st.mySats}',
+              valueColor: (st.mySats ?? 0) > 0 ? C.green : C.grey,
+            ),
+            if (st.beaconIncludeSats) SettingsHint(S.of(context).beaconSatsHint),
             SettingsRow2(S.of(context).locationStatus,
                 localizedLocationStatus(context, st.locStatus)),
             SettingsRow2(S.of(context).beaconsSent,

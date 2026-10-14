@@ -549,5 +549,71 @@ void main() {
       }
     });
   });
+
+  // ─── 信标里的卫星数（`SAT=nn`，用户 2026-10-14 要求）───
+  //
+  // 三条要钉住的行为（都不是样式问题，而是「报了个假数据」的问题）：
+  //   ① 开关关着时**一个字都不发**（与其它非标准字段一样）；
+  //   ② 来源不说（mySats == null）时**不发**，而不是发 `SAT=0`
+  //      —— 收端分不出「没有卫星」与「这个平台不报卫星」；
+  //   ③ 真没星（0）时也不发，理由同上。
+  group('信标带上卫星数（SAT=nn）', () {
+    AppState base() => AppState()
+      ..myCall = 'BG7LZQ'
+      ..mySsid = 2
+      ..mySymbol = 'b'
+      ..myLat = 39.9075
+      ..myLng = 116.3972
+      ..myHasFix = true
+      ..debugSetFreshFix()
+      ..beaconIncludeBattery = false
+      ..beaconIncludeSpeed = false
+      ..beaconIncludeCourse = false
+      ..myComment = '';
+
+    String posRaw(AppState st) {
+      final hits = st.packets.where((p) => p.type == 'position');
+      return hits.isEmpty ? '' : hits.first.raw;
+    }
+
+    test('开着 + 有颗数：备注里出现 SAT=nn，且在坐标之后', () {
+      final st = base()
+        ..beaconIncludeSats = true
+        ..mySats = 9;
+      st.sendBeacon();
+      final raw = posRaw(st);
+      // 备注直接紧跟符号（APRS 的位置报文本来就这么拼），只有 SAT= 这一项时
+      // 它就是注释的第一个 token；有扩展块时它在扩展块之后。
+      expect(raw, endsWith('SAT=9'),
+          reason: '卫星数是非标准备注字段，拼在注释里、不得混进扩展块');
+      final comment = raw.substring(raw.indexOf(':') + 1);
+      expect(comment.split(' ').contains('SAT=9'), isTrue);
+      // 标准数据扩展块内部不能混进备注字段（否则第三方把 /A= 也当文字）
+      final head = comment.split(' ').first;
+      expect(head.contains('SAT='), isFalse);
+      st.dispose();
+    });
+
+    test('开关关着：即使有颗数也不发', () {
+      final st = base()
+        ..beaconIncludeSats = false
+        ..mySats = 12;
+      st.sendBeacon();
+      expect(posRaw(st).contains('SAT='), isFalse);
+      st.dispose();
+    });
+
+    test('来源不说（null）与真没星（0）：都不发，不能写成 SAT=0', () {
+      for (final int? v in [null, 0]) {
+        final st = base()
+          ..beaconIncludeSats = true
+          ..mySats = v;
+        st.sendBeacon();
+        expect(posRaw(st).contains('SAT='), isFalse,
+            reason: 'mySats=$v 时发 SAT=0，收端会读成「一颗星都没有」');
+        st.dispose();
+      }
+    });
+  });
 }
 

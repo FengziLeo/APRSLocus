@@ -8,6 +8,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.location.GnssStatus
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -226,6 +227,19 @@ class LocationService : Service() {
     private var lastGpsFixMs: Long = 0L
     /** 本次运行是否已收到过**实时**定位（收到后，缓存位置不再上报，见 considerLocation） */
     private var hasLiveFix = false
+
+    /**
+     * 最近一次 GNSS 状态里**参与定位**的卫星数（-1 = 还不知道）。
+     *
+     * 为什么要单独听 GNSS 状态、而不是只读 `Location.extras["satellites"]`：
+     * 那个 extras 只有部分机型的 GPS provider 会填（很多机器上是空的），
+     * 而 GnssStatus 是系统统一给的 —— 谁在上面、哪几颗真的参与了定轨都在里面。
+     * 两者都试，谁有值用谁：extras 是**那颗星定出来的点**自带的，最准；
+     * GNSS 状态是实时的，能补上 extras 缺失的机型。
+     * 只用于「信标里带上卫星数」与界面显示 —— 不参与任何「这个点要不要」的判断。
+     */
+    private var gnssUsed = -1
+    private var gnssCallback: GnssStatus.Callback? = null
     private val lastKnownPoll = Handler(Looper.getMainLooper())
     private val lastKnownRunnable = object : Runnable {
         override fun run() {
@@ -449,6 +463,9 @@ class LocationService : Service() {
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
         }
         locationListener = listener
+        // GNSS 卫星状态：与 provider 监听同生同死（切模式 / 停服务都要注销，
+        // 否则回调会一直挂在系统上、拿着已死的 Service 引用）。
+        startGnssStatusMonitor(useGps)
         // GPS 高精度（gps / gps_network 注册；纯网络模式不注册 GPS）
         var gpsRequested = false
         if (useGps) {
@@ -534,10 +551,62 @@ class LocationService : Service() {
             "bearing" to location.bearing,  // 度
             "accuracy" to (if (acc.isNaN()) null else acc.toDouble()),
             "provider" to provider,
+            // 参与定位的卫星数（null = 平台/机型没给）。
+            // 缓存位置（fromLastKnown）一律不带：那是几小时前的颗数，报出去只会骗人。
+            "satellites" to (if (fromLastKnown) null else satellitesOf(location, isGps)),
             // 让上层知道这只是「缓存位置、仅供快速出图」：可以更新标记，
             // 但**不能**写进轨迹（见 state.dart 的 _onFix）
             "lastKnown" to fromLastKnown,
             "status" to status))
+    }
+
+    /**
+     * 这次定位里参与定轨的卫星数：先用定位自带的 extras，再用 GNSS 状态兜底。
+     *
+     * 网络定位（基站 / Wi-Fi）没有卫星可言，一律返回 null —— 返回 0 会让界面与信标
+     * 把「这个来源不报卫星」说成「一颗星都没有」。
+     */
+    @Suppress("MissingPermission")
+    private fun satellitesOf(location: Location, isGps: Boolean): Int? {
+        try {
+            val b = location.extras
+            if (b != null && b.containsKey("satellites")) {
+                val n = b.getInt("satellites", -1)
+                if (n > 0) return n
+            }
+        } catch (_: Exception) {}
+        if (isGps && gnssUsed > 0) return gnssUsed
+        return null
+    }
+
+    /** 注册 / 注销 GNSS 卫星状态监听（只在需要 GPS 的模式下听）。 */
+    @Suppress("MissingPermission")
+    private fun startGnssStatusMonitor(useGps: Boolean) {
+        stopGnssStatusMonitor()
+        if (!useGps) return
+        val cb = object : GnssStatus.Callback() {
+            override fun onSatelliteStatusChanged(status: GnssStatus) {
+                var n = 0
+                for (i in 0 until status.satelliteCount) {
+                    if (status.usedInFix(i)) n++
+                }
+                gnssUsed = n
+            }
+        }
+        try {
+            locationManager?.registerGnssStatusCallback(cb, Handler(Looper.getMainLooper()))
+            gnssCallback = cb
+        } catch (_: Exception) {
+            gnssCallback = null
+        }
+    }
+
+    private fun stopGnssStatusMonitor() {
+        gnssCallback?.let {
+            try { locationManager?.unregisterGnssStatusCallback(it) } catch (_: Exception) {}
+        }
+        gnssCallback = null
+        gnssUsed = -1
     }
 
     @Suppress("MissingPermission")
@@ -567,5 +636,6 @@ class LocationService : Service() {
             try { locationManager?.removeUpdates(listener) } catch (_: Exception) {}
         }
         locationListener = null
+        stopGnssStatusMonitor()
     }
 }

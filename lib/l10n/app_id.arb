@@ -4095,11 +4095,11 @@
   "locationExtGps": "GPS eksternal (Bluetooth)",
   "dataSourceNmeaGps": "GPS eksternal (Bluetooth)",
   "dataSourceNmeaGpsDesc": "Baca kalimat posisi NMEA 0183 dari modul GPS dan pakai sebagai posisi perangkat ini (hanya terima)",
-  "dataSourceNmeaGpsHint": "Tautan ini memasok **posisi perangkat ini** (bukan paket stasiun lain): begitu tersambung ia diprioritaskan, dan GPS ponsel kembali mengambil alih 30 detik setelah modul berhenti mengirim",
+  "dataSourceNmeaGpsHint": "Tautan ini memasok posisi perangkat ini (bukan paket stasiun lain): begitu tersambung ia diprioritaskan, dan GPS ponsel kembali mengambil alih 30 detik setelah modul berhenti mengirim",
   "extGpsDeviceTitle": "GPS eksternal",
   "extGpsDeviceDesc": "Sumber posisi NMEA 0183 lewat Bluetooth SPP atau serial",
   "extGpsBindTitle": "Perangkat dan koneksi",
-  "extGpsBindSubtitle": "Pindai perangkat yang sudah dipasangkan lalu ikat (izin Bluetooth sama dengan TNC / PKWDWPL)",
+  "extGpsBindSubtitle": "Pindai perangkat yang sudah dipasangkan lalu ikat (izin Bluetooth dipakai bersama tautan lain)",
   "extGpsTip": "Setelah tersambung, posisi diambil dari modul lebih dulu (biasanya dipasang di atap atau dekat jendela, sehingga lebih akurat daripada ponsel dan jam); GPS ponsel kembali mengambil alih 30 detik setelah posisi terakhir.",
   "extGpsReadOnly": "Hanya terima: modul hanya mengeluarkan posisi dan tidak ikut memancar",
   "extGpsStatTitle": "Penerimaan posisi",
@@ -4118,5 +4118,10 @@
   "extGpsStrictChecksum": "Checksum ketat (buang yang tidak cocok)",
   "extGpsStrictChecksumTip": "Aktif secara bawaan: modul GPS mengirim kalimat standar, jadi ketidakcocokan checksum hampir selalu berarti derau pada jalur — kalimatnya dibuang agar satu byte rusak tidak membuat posisi melenceng. Sebagian modul murah memang mengirim checksum yang salah; matikan ini untuk modul seperti itu (penghitung pembuangan dan log tetap terlihat).",
   "beaconSppSource": "Memancarkan dari GPS eksternal",
-  "beaconSppNext": "GPS eksternal · {s}"
+  "beaconSppNext": "GPS eksternal · {s}",
+  "linkScanAction": "Pindai perangkat",
+  "linkConnectAction": "Hubungkan perangkat",
+  "linkBoundDevice": "Perangkat terikat",
+  "linkNotBound": "Belum ada perangkat terikat",
+  "linkNoPaired": "Perangkat tidak ditemukan -- pasangkan dulu di pengaturan Bluetooth sistem, atau sambungkan kabel serial USB (OTG)"
 }

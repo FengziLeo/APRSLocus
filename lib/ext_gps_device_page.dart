@@ -89,7 +89,7 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
     } else {
       if (link.device == null) {
         setState(() => _busy = false);
-        _toast(s.tncNotBound, color: C.orange);
+        _toast(s.linkNotBound, color: C.orange);
         return;
       }
       if (!await link.requestPermissions()) {
@@ -137,7 +137,7 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
       case NmeaGpsStatus.silent:
         return s.connected;
       case NmeaGpsStatus.noDevice:
-        return s.tncNotBound;
+        return s.linkNotBound;
       case NmeaGpsStatus.unsupported:
         return s.tncSupportedNo;
       case NmeaGpsStatus.openFailed:
@@ -196,8 +196,8 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
       children: [
         SettingsHint(s.extGpsTip, color: C.blue),
         SettingsRow2(
-          s.tncBoundDevice,
-          link.device?.label ?? s.tncNotBound,
+          s.linkBoundDevice,
+          link.device?.label ?? s.linkNotBound,
           valueColor: link.device == null ? C.grey : C.ink,
         ),
         SettingsRow2(
@@ -227,7 +227,7 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.search_rounded, size: 16),
-                label: Text(s.tncScanPaired),
+                label: Text(s.linkScanAction),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: C.blue,
                   side: BorderSide(color: C.blue.withValues(alpha: 0.5)),
@@ -245,7 +245,7 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
                       : Icons.link_rounded,
                   size: 16,
                 ),
-                label: Text(link.connected ? s.disconnect : s.tncConnectAction),
+                label: Text(link.connected ? s.disconnect : s.linkConnectAction),
                 style: FilledButton.styleFrom(
                   backgroundColor: link.connected ? C.red : C.blue,
                   textStyle: ts(12, c: Colors.white, w: FontWeight.w600),
@@ -286,7 +286,7 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
           Divider(height: 1, color: C.border),
           for (final d in link.devices) _deviceTile(d),
         ] else if (!_scanning)
-          SettingsHint(s.tncNoPaired, icon: Icons.bluetooth_disabled_rounded),
+          SettingsHint(s.linkNoPaired, icon: Icons.bluetooth_disabled_rounded),
       ],
     );
   }

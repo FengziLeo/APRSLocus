@@ -9309,7 +9309,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get dataSourceNmeaGpsDesc => 'Baca kalimat posisi NMEA 0183 dari modul GPS dan pakai sebagai posisi perangkat ini (hanya terima)';
 
   @override
-  String get dataSourceNmeaGpsHint => 'Tautan ini memasok **posisi perangkat ini** (bukan paket stasiun lain): begitu tersambung ia diprioritaskan, dan GPS ponsel kembali mengambil alih 30 detik setelah modul berhenti mengirim';
+  String get dataSourceNmeaGpsHint => 'Tautan ini memasok posisi perangkat ini (bukan paket stasiun lain): begitu tersambung ia diprioritaskan, dan GPS ponsel kembali mengambil alih 30 detik setelah modul berhenti mengirim';
 
   @override
   String get extGpsDeviceTitle => 'GPS eksternal';
@@ -9321,7 +9321,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get extGpsBindTitle => 'Perangkat dan koneksi';
 
   @override
-  String get extGpsBindSubtitle => 'Pindai perangkat yang sudah dipasangkan lalu ikat (izin Bluetooth sama dengan TNC / PKWDWPL)';
+  String get extGpsBindSubtitle => 'Pindai perangkat yang sudah dipasangkan lalu ikat (izin Bluetooth dipakai bersama tautan lain)';
 
   @override
   String get extGpsTip => 'Setelah tersambung, posisi diambil dari modul lebih dulu (biasanya dipasang di atap atau dekat jendela, sehingga lebih akurat daripada ponsel dan jam); GPS ponsel kembali mengambil alih 30 detik setelah posisi terakhir.';
@@ -9383,5 +9383,20 @@ class AppLocalizationsId extends AppLocalizations {
   String beaconSppNext(String s) {
     return 'GPS eksternal · $s';
   }
+
+  @override
+  String get linkScanAction => "Pindai perangkat";
+
+  @override
+  String get linkConnectAction => "Hubungkan perangkat";
+
+  @override
+  String get linkBoundDevice => "Perangkat terikat";
+
+  @override
+  String get linkNotBound => "Belum ada perangkat terikat";
+
+  @override
+  String get linkNoPaired => "Perangkat tidak ditemukan -- pasangkan dulu di pengaturan Bluetooth sistem, atau sambungkan kabel serial USB (OTG)";
 
 }

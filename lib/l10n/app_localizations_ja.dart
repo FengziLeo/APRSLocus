@@ -9020,7 +9020,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dataSourceNmeaGpsDesc => 'GPS モジュールが出力する NMEA 0183 の測位文を読み、この端末自身の位置として使います（受信のみ）';
 
   @override
-  String get dataSourceNmeaGpsHint => 'このリンクが供給するのは**この端末の位置**です（他局のパケットではありません）。接続すると優先的に使われ、モジュールの送信が 30 秒止まるとスマートフォンの GPS に戻ります';
+  String get dataSourceNmeaGpsHint => 'このリンクが供給するのはこの端末の位置です（他局のパケットではありません）。接続すると優先的に使われ、モジュールの送信が 30 秒止まるとスマートフォンの GPS に戻ります';
 
   @override
   String get extGpsDeviceTitle => '外付け GPS';
@@ -9032,7 +9032,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get extGpsBindTitle => 'デバイスと接続';
 
   @override
-  String get extGpsBindSubtitle => 'ペアリング済みのデバイスをスキャンしてバインドします（TNC / PKWDWPL と同じ Bluetooth 権限）';
+  String get extGpsBindSubtitle => 'ペアリング済みのデバイスをスキャンしてバインドします（Bluetooth 権限は他のリンクと共用）';
 
   @override
   String get extGpsTip => '接続後はモジュールの位置を優先します（屋根や窓辺に置くことが多く、スマートフォンや時計より正確）。最後の測位から 30 秒たつとスマートフォンの GPS に戻ります。';
@@ -9094,5 +9094,20 @@ class AppLocalizationsJa extends AppLocalizations {
   String beaconSppNext(String s) {
     return '外付け GPS · $s';
   }
+
+  @override
+  String get linkScanAction => "デバイスをスキャン";
+
+  @override
+  String get linkConnectAction => "デバイスに接続";
+
+  @override
+  String get linkBoundDevice => "バインド済みデバイス";
+
+  @override
+  String get linkNotBound => "未バインド";
+
+  @override
+  String get linkNoPaired => "デバイスが見つかりません · 先にシステムの Bluetooth 設定でペアリングするか、USB シリアルケーブル（OTG）を接続してください";
 
 }

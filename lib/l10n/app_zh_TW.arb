@@ -4683,11 +4683,11 @@
   "locationExtGps": "外接 GPS（藍牙）",
   "dataSourceNmeaGps": "外接 GPS（藍牙）",
   "dataSourceNmeaGpsDesc": "讀取 GPS 模組輸出的 NMEA 0183 定位語句，作為本機位置來源（只收不發）",
-  "dataSourceNmeaGpsHint": "這條鏈路供的是**本機位置**（不是別人的報文）：接上後位置優先用它，模組斷流 30 秒後自動交回手機 GPS",
+  "dataSourceNmeaGpsHint": "這條鏈路供的是本機位置（不是別人的報文）：接上後位置優先用它，模組斷流 30 秒後自動交回手機 GPS",
   "extGpsDeviceTitle": "外接 GPS",
   "extGpsDeviceDesc": "藍牙 SPP / 串列埠上的 NMEA 0183 位置來源",
   "extGpsBindTitle": "裝置與連線",
-  "extGpsBindSubtitle": "掃描已配對裝置並綁定（與 TNC / PKWDWPL 同一套藍牙權限）",
+  "extGpsBindSubtitle": "掃描已配對裝置並綁定（藍牙權限與其它鏈路共用）",
   "extGpsTip": "接上後位置優先用模組（常架在車頂或窗外，比手機與手錶準）；拿不到新定位 30 秒後自動交回手機 GPS。",
   "extGpsReadOnly": "只收不發：模組只輸出位置，不參與發射",
   "extGpsStatTitle": "定位接收",
@@ -4706,5 +4706,10 @@
   "extGpsStrictChecksum": "嚴格校驗和（不符即丟棄）",
   "extGpsStrictChecksumTip": "預設開啟：GPS 模組按標準送語句，校驗和不符基本上只有線路雜訊一種解釋 ——整條丟棄，別讓一個壞位元把定位帶偏。少數雜牌模組確實會送錯校驗和，那時把這裡關掉（丟棄條數與日誌會一直顯示）。",
   "beaconSppSource": "外接 GPS 上報中",
-  "beaconSppNext": "外接 GPS 上報 · {s}"
+  "beaconSppNext": "外接 GPS 上報 · {s}",
+  "linkScanAction": "掃描裝置",
+  "linkConnectAction": "連接裝置",
+  "linkBoundDevice": "已綁定裝置",
+  "linkNotBound": "未綁定裝置",
+  "linkNoPaired": "未找到裝置 · 請先在系統藍牙設定裡配對，或插上 USB 序列埠線（OTG）"
 }

@@ -16344,6 +16344,36 @@ abstract class AppLocalizations {
   /// **'外接 GPS 上报 · {s}'**
   String beaconSppNext(String s);
 
+  /// No description provided for @linkScanAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描设备'**
+  String get linkScanAction;
+
+  /// No description provided for @linkConnectAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'连接设备'**
+  String get linkConnectAction;
+
+  /// No description provided for @linkBoundDevice.
+  ///
+  /// In zh, this message translates to:
+  /// **'已绑定设备'**
+  String get linkBoundDevice;
+
+  /// No description provided for @linkNotBound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未绑定设备'**
+  String get linkNotBound;
+
+  /// No description provided for @linkNoPaired.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到设备 · 请先在系统蓝牙设置里配对，或插上 USB 串口线（OTG）'**
+  String get linkNoPaired;
+
 }
 
 class _AppLocalizationsDelegate

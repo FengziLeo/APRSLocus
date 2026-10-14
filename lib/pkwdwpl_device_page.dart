@@ -86,7 +86,7 @@ class _PkwdwplDevicePageState extends State<PkwdwplDevicePage> {
     } else {
       if (link.device == null) {
         setState(() => _busy = false);
-        _toast(s.tncNotBound, color: C.orange);
+        _toast(s.linkNotBound, color: C.orange);
         return;
       }
       if (!await link.requestPermissions()) {
@@ -128,7 +128,7 @@ class _PkwdwplDevicePageState extends State<PkwdwplDevicePage> {
       case PkwdwplStatus.connecting:
         return s.connecting;
       case PkwdwplStatus.noDevice:
-        return s.tncNotBound;
+        return s.linkNotBound;
       case PkwdwplStatus.unsupported:
         return s.tncSupportedNo;
       case PkwdwplStatus.openFailed:
@@ -182,8 +182,8 @@ class _PkwdwplDevicePageState extends State<PkwdwplDevicePage> {
               color: C.red),
         SettingsHint(s.pkwdwplTip, color: C.green),
         SettingsRow2(
-          s.tncBoundDevice,
-          link.device?.label ?? s.tncNotBound,
+          s.linkBoundDevice,
+          link.device?.label ?? s.linkNotBound,
           valueColor: link.device == null ? C.grey : C.ink,
         ),
         SettingsRow2(
@@ -213,7 +213,7 @@ class _PkwdwplDevicePageState extends State<PkwdwplDevicePage> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.search_rounded, size: 16),
-                label: Text(s.tncScanPaired),
+                label: Text(s.linkScanAction),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: C.green,
                   side: BorderSide(color: C.green.withValues(alpha: 0.5)),
@@ -231,7 +231,7 @@ class _PkwdwplDevicePageState extends State<PkwdwplDevicePage> {
                       : Icons.link_rounded,
                   size: 16,
                 ),
-                label: Text(link.connected ? s.disconnect : s.tncConnectAction),
+                label: Text(link.connected ? s.disconnect : s.linkConnectAction),
                 style: FilledButton.styleFrom(
                   backgroundColor: link.connected ? C.red : C.green,
                   textStyle: ts(12, c: Colors.white, w: FontWeight.w600),
@@ -272,7 +272,7 @@ class _PkwdwplDevicePageState extends State<PkwdwplDevicePage> {
           Divider(height: 1, color: C.border),
           for (final d in link.devices) _deviceTile(d),
         ] else if (!_scanning)
-          SettingsHint(s.tncNoPaired, icon: Icons.bluetooth_disabled_rounded),
+          SettingsHint(s.linkNoPaired, icon: Icons.bluetooth_disabled_rounded),
       ],
     );
   }

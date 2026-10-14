@@ -8919,7 +8919,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dataSourceNmeaGpsDesc => '读取 GPS 模组输出的 NMEA 0183 定位语句，作为本机位置来源（只收不发）';
 
   @override
-  String get dataSourceNmeaGpsHint => '这条链路供的是**本机位置**（不是别人的报文）：接上后位置优先用它，模组断流 30 秒后自动交回手机 GPS';
+  String get dataSourceNmeaGpsHint => '这条链路供的是本机位置（不是别人的报文）：接上后位置优先用它，模组断流 30 秒后自动交回手机 GPS';
 
   @override
   String get extGpsDeviceTitle => '外接 GPS';
@@ -8931,7 +8931,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get extGpsBindTitle => '设备与连接';
 
   @override
-  String get extGpsBindSubtitle => '扫描已配对设备并绑定（与 TNC / PKWDWPL 同一套蓝牙权限）';
+  String get extGpsBindSubtitle => '扫描已配对设备并绑定（蓝牙权限与其它链路共用）';
 
   @override
   String get extGpsTip => '接上后位置优先用模组（常架在车顶或窗外，比手机与手表准）；拿不到新定位 30 秒后自动交回手机 GPS。';
@@ -8993,6 +8993,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String beaconSppNext(String s) {
     return '外接 GPS 上报 · $s';
   }
+
+  @override
+  String get linkScanAction => "扫描设备";
+
+  @override
+  String get linkConnectAction => "连接设备";
+
+  @override
+  String get linkBoundDevice => "已绑定设备";
+
+  @override
+  String get linkNotBound => "未绑定设备";
+
+  @override
+  String get linkNoPaired => "未找到设备 · 请先在系统蓝牙设置里配对，或插上 USB 串口线（OTG）";
 
 }
 
@@ -17910,7 +17925,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get dataSourceNmeaGpsDesc => '讀取 GPS 模組輸出的 NMEA 0183 定位語句，作為本機位置來源（只收不發）';
 
   @override
-  String get dataSourceNmeaGpsHint => '這條鏈路供的是**本機位置**（不是別人的報文）：接上後位置優先用它，模組斷流 30 秒後自動交回手機 GPS';
+  String get dataSourceNmeaGpsHint => '這條鏈路供的是本機位置（不是別人的報文）：接上後位置優先用它，模組斷流 30 秒後自動交回手機 GPS';
 
   @override
   String get extGpsDeviceTitle => '外接 GPS';
@@ -17922,7 +17937,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get extGpsBindTitle => '裝置與連線';
 
   @override
-  String get extGpsBindSubtitle => '掃描已配對裝置並綁定（與 TNC / PKWDWPL 同一套藍牙權限）';
+  String get extGpsBindSubtitle => '掃描已配對裝置並綁定（藍牙權限與其它鏈路共用）';
 
   @override
   String get extGpsTip => '接上後位置優先用模組（常架在車頂或窗外，比手機與手錶準）；拿不到新定位 30 秒後自動交回手機 GPS。';
@@ -17984,5 +17999,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String beaconSppNext(String s) {
     return '外接 GPS 上報 · $s';
   }
+
+  @override
+  String get linkScanAction => "掃描裝置";
+
+  @override
+  String get linkConnectAction => "連接裝置";
+
+  @override
+  String get linkBoundDevice => "已綁定裝置";
+
+  @override
+  String get linkNotBound => "未綁定裝置";
+
+  @override
+  String get linkNoPaired => "未找到裝置 · 請先在系統藍牙設定裡配對，或插上 USB 序列埠線（OTG）";
 
 }

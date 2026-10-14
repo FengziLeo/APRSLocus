@@ -4095,11 +4095,11 @@
   "locationExtGps": "external GPS (Bluetooth)",
   "dataSourceNmeaGps": "External GPS (Bluetooth)",
   "dataSourceNmeaGpsDesc": "Read NMEA 0183 position sentences from a GPS module and use them as this device own position (receive-only)",
-  "dataSourceNmeaGpsHint": "This link supplies **your own position** (not other stations packets): it takes priority once connected, and the phone GPS takes over again 30 seconds after the module stops sending",
+  "dataSourceNmeaGpsHint": "This link supplies your own position (not other stations' packets): it takes priority once connected, and the phone GPS takes over again 30 seconds after the module stops sending",
   "extGpsDeviceTitle": "External GPS",
   "extGpsDeviceDesc": "NMEA 0183 position source over Bluetooth SPP or serial",
   "extGpsBindTitle": "Device and connection",
-  "extGpsBindSubtitle": "Scan paired devices and bind one (same Bluetooth permission as TNC / PKWDWPL)",
+  "extGpsBindSubtitle": "Scan paired devices and bind one (Bluetooth permission is shared with the other links)",
   "extGpsTip": "Once connected the position comes from the module first (it usually sits on the roof or by a window, so it beats the phone and the watch); the phone GPS takes over again 30 seconds after the last fix.",
   "extGpsReadOnly": "Receive-only: the module only outputs position and never transmits",
   "extGpsStatTitle": "Position reception",
@@ -4118,5 +4118,10 @@
   "extGpsStrictChecksum": "Strict checksum (drop mismatches)",
   "extGpsStrictChecksumTip": "On by default: a GPS module sends standard sentences, so a checksum mismatch almost always means line noise — the sentence is dropped so a single bad byte cannot skew the position. A few cheap modules really do send a wrong checksum; turn this off for those (the drop counter and log stay visible).",
   "beaconSppSource": "Beaconing from external GPS",
-  "beaconSppNext": "External GPS · {s}"
+  "beaconSppNext": "External GPS · {s}",
+  "linkScanAction": "Scan devices",
+  "linkConnectAction": "Connect device",
+  "linkBoundDevice": "Bound device",
+  "linkNotBound": "No device bound",
+  "linkNoPaired": "No device found -- pair it in the system Bluetooth settings first, or plug in the USB serial cable (OTG)"
 }

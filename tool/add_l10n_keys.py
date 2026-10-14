@@ -823,6 +823,49 @@ KEYS = {
         'Buscando actualizaciones vía Aliyun OSS ☁️',
         'Memeriksa pembaruan via Aliyun OSS ☁️',
     ),
+
+    # ── 「链路设备页」的通用按钮/标签（用户 2026-10-14 反馈：「GPS 连接页面的
+    # 文案还是连接 TNC」）──
+    #
+    # 外接 GPS 页与 PKWDWPL 页都是从 TNC 设备页抄来的骨架，于是按钮沿用
+    # `tncConnectAction`（「连接 TNC」）—— 那两页连的根本不是 TNC，用户看着
+    # 会以为点下去要连电台。这里给它们一套**按设备而不是按协议**说话的文案，
+    # 两页共用（TNC 页仍用 tnc* 那套，那里说「连接 TNC」才是对的）。
+    'linkScanAction': (
+        '扫描设备', '掃描裝置',
+        'Scan devices', 'デバイスをスキャン',
+        'Buscar dispositivos', 'Pindai perangkat',
+    ),
+    'linkConnectAction': (
+        '连接设备', '連接裝置',
+        'Connect device', 'デバイスに接続',
+        'Conectar dispositivo', 'Hubungkan perangkat',
+    ),
+    'linkBoundDevice': (
+        '已绑定设备', '已綁定裝置',
+        'Bound device', 'バインド済みデバイス',
+        'Dispositivo vinculado', 'Perangkat terikat',
+    ),
+    'linkNotBound': (
+        '未绑定设备', '未綁定裝置',
+        'No device bound', '未バインド',
+        'Sin dispositivo vinculado', 'Belum ada perangkat terikat',
+    ),
+    # 「先在系统蓝牙设置里配对」的宾语刻意只说「设备」：这页面对的是蓝牙 SPP
+    # 模组 / USB 串口，GPS 模组与电台都一样，写死其中一个反而误导。
+    'linkNoPaired': (
+        '未找到设备 · 请先在系统蓝牙设置里配对，或插上 USB 串口线（OTG）',
+        '未找到裝置 · 請先在系統藍牙設定裡配對，或插上 USB 序列埠線（OTG）',
+        'No device found -- pair it in the system Bluetooth settings first, '
+        'or plug in the USB serial cable (OTG)',
+        'デバイスが見つかりません · 先にシステムの Bluetooth 設定でペアリングするか、'
+        'USB シリアルケーブル（OTG）を接続してください',
+        'No se encontró ningún dispositivo: empareja primero en los ajustes de '
+        'Bluetooth del sistema, o conecta el cable serie USB (OTG)',
+        'Perangkat tidak ditemukan -- pasangkan dulu di pengaturan Bluetooth '
+        'sistem, atau sambungkan kabel serial USB (OTG)',
+    ),
+
 }
 
 # ── 占位符声明（可空）──

@@ -9299,7 +9299,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataSourceNmeaGpsDesc => 'Read NMEA 0183 position sentences from a GPS module and use them as this device own position (receive-only)';
 
   @override
-  String get dataSourceNmeaGpsHint => 'This link supplies **your own position** (not other stations packets): it takes priority once connected, and the phone GPS takes over again 30 seconds after the module stops sending';
+  String get dataSourceNmeaGpsHint => 'This link supplies your own position (not packets from other stations): it takes priority once connected, and the phone GPS takes over again 30 seconds after the module stops sending';
 
   @override
   String get extGpsDeviceTitle => 'External GPS';
@@ -9311,7 +9311,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get extGpsBindTitle => 'Device and connection';
 
   @override
-  String get extGpsBindSubtitle => 'Scan paired devices and bind one (same Bluetooth permission as TNC / PKWDWPL)';
+  String get extGpsBindSubtitle => 'Scan paired devices and bind one (Bluetooth permission is shared with the other links)';
 
   @override
   String get extGpsTip => 'Once connected the position comes from the module first (it usually sits on the roof or by a window, so it beats the phone and the watch); the phone GPS takes over again 30 seconds after the last fix.';
@@ -9373,5 +9373,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String beaconSppNext(String s) {
     return 'External GPS · $s';
   }
+
+  @override
+  String get linkScanAction => "Scan devices";
+
+  @override
+  String get linkConnectAction => "Connect device";
+
+  @override
+  String get linkBoundDevice => "Bound device";
+
+  @override
+  String get linkNotBound => "No device bound";
+
+  @override
+  String get linkNoPaired => "No device found -- pair it in the system Bluetooth settings first, or plug in the USB serial cable (OTG)";
 
 }

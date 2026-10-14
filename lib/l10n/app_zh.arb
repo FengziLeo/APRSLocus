@@ -4760,11 +4760,11 @@
   "locationExtGps": "外接 GPS（蓝牙）",
   "dataSourceNmeaGps": "外接 GPS（蓝牙）",
   "dataSourceNmeaGpsDesc": "读取 GPS 模组输出的 NMEA 0183 定位语句，作为本机位置来源（只收不发）",
-  "dataSourceNmeaGpsHint": "这条链路供的是**本机位置**（不是别人的报文）：接上后位置优先用它，模组断流 30 秒后自动交回手机 GPS",
+  "dataSourceNmeaGpsHint": "这条链路供的是本机位置（不是别人的报文）：接上后位置优先用它，模组断流 30 秒后自动交回手机 GPS",
   "extGpsDeviceTitle": "外接 GPS",
   "extGpsDeviceDesc": "蓝牙 SPP / 串口上的 NMEA 0183 位置来源",
   "extGpsBindTitle": "设备与连接",
-  "extGpsBindSubtitle": "扫描已配对设备并绑定（与 TNC / PKWDWPL 同一套蓝牙权限）",
+  "extGpsBindSubtitle": "扫描已配对设备并绑定（蓝牙权限与其它链路共用）",
   "extGpsTip": "接上后位置优先用模组（常架在车顶或窗外，比手机与手表准）；拿不到新定位 30 秒后自动交回手机 GPS。",
   "extGpsReadOnly": "只收不发：模组只输出位置，不参与发射",
   "extGpsStatTitle": "定位接收",
@@ -4797,5 +4797,10 @@
         "type": "String"
       }
     }
-  }
+  },
+  "linkScanAction": "扫描设备",
+  "linkConnectAction": "连接设备",
+  "linkBoundDevice": "已绑定设备",
+  "linkNotBound": "未绑定设备",
+  "linkNoPaired": "未找到设备 · 请先在系统蓝牙设置里配对，或插上 USB 串口线（OTG）"
 }

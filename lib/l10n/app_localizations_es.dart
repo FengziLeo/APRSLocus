@@ -9358,7 +9358,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dataSourceNmeaGpsDesc => 'Lee las sentencias de posición NMEA 0183 de un módulo GPS y las usa como posición de este dispositivo (solo recepción)';
 
   @override
-  String get dataSourceNmeaGpsHint => 'Este enlace aporta **tu propia posición** (no los paquetes de otras estaciones): pasa a tener prioridad al conectar, y el GPS del teléfono vuelve a asumir 30 segundos después de que el módulo deje de enviar';
+  String get dataSourceNmeaGpsHint => 'Este enlace aporta tu propia posición (no los paquetes de otras estaciones): pasa a tener prioridad al conectar, y el GPS del teléfono vuelve a asumir 30 segundos después de que el módulo deje de enviar';
 
   @override
   String get extGpsDeviceTitle => 'GPS externo';
@@ -9370,7 +9370,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get extGpsBindTitle => 'Dispositivo y conexión';
 
   @override
-  String get extGpsBindSubtitle => 'Escanea dispositivos emparejados y vincula uno (mismo permiso de Bluetooth que TNC / PKWDWPL)';
+  String get extGpsBindSubtitle => 'Escanea dispositivos emparejados y vincula uno (el permiso de Bluetooth se comparte con los demás enlaces)';
 
   @override
   String get extGpsTip => 'Al conectar, la posición sale primero del módulo (suele ir en el techo o junto a una ventana, así que es más preciso que el teléfono y el reloj); el GPS del teléfono vuelve a asumir 30 segundos después de la última posición.';
@@ -9432,5 +9432,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String beaconSppNext(String s) {
     return 'GPS externo · $s';
   }
+
+  @override
+  String get linkScanAction => "Buscar dispositivos";
+
+  @override
+  String get linkConnectAction => "Conectar dispositivo";
+
+  @override
+  String get linkBoundDevice => "Dispositivo vinculado";
+
+  @override
+  String get linkNotBound => "Sin dispositivo vinculado";
+
+  @override
+  String get linkNoPaired => "No se encontró ningún dispositivo: empareja primero en los ajustes de Bluetooth del sistema, o conecta el cable serie USB (OTG)";
 
 }

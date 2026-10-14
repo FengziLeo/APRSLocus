@@ -9444,4 +9444,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get extGpsFixHint => "Akurasi diperkirakan dari HDOP (sekitar HDOP x 5 m), bukan hasil pengukuran; tipe posisi berasal dari kalimat GSA, jadi modul yang hanya mengirim RMC/GGA tidak punya baris itu; waktu modul berasal dari satelit dan mungkin belum tersinkron.";
 
+  @override
+  String get beaconSatsUnknown => "Sumber saat ini tidak menyediakan jumlah satelit: lokasi jaringan (seluler / Wi-Fi) tidak punya satelit, dan sebagian perangkat atau ROM Android tidak melaporkan datanya.";
+
 }

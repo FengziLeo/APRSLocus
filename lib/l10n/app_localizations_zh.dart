@@ -9054,6 +9054,9 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get extGpsFixHint => "精度是按 HDOP 估算的（≈ HDOP × 5 m），不是实测值；定位类型来自 GSA 语句，只发 RMC/GGA 的模组没有这一项；「模组时间」来自卫星，可能还没同步上。";
 
+  @override
+  String get beaconSatsUnknown => "当前来源未提供卫星数：网络定位（基站 / Wi-Fi）本身没有卫星，部分 Android 机型 / 系统也不返回该数据。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18104,5 +18107,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get extGpsFixHint => "精度是依 HDOP 估算的（≈ HDOP × 5 m），不是實測值；定位類型來自 GSA 語句，只發 RMC/GGA 的模組沒有這一項；「模組時間」來自衛星，可能還沒同步上。";
+
+  @override
+  String get beaconSatsUnknown => "目前來源未提供衛星數：網路定位（基地台 / Wi-Fi）本身沒有衛星，部分 Android 機型 / 系統也不返回該資料。";
 
 }

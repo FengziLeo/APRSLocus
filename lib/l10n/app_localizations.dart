@@ -16464,6 +16464,12 @@ abstract class AppLocalizations {
   /// **'精度是按 HDOP 估算的（≈ HDOP × 5 m），不是实测值；定位类型来自 GSA 语句，只发 RMC/GGA 的模组没有这一项；「模组时间」来自卫星，可能还没同步上。'**
   String get extGpsFixHint;
 
+  /// No description provided for @beaconSatsUnknown.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前来源未提供卫星数：网络定位（基站 / Wi-Fi）本身没有卫星，部分 Android 机型 / 系统也不返回该数据。'**
+  String get beaconSatsUnknown;
+
 }
 
 class _AppLocalizationsDelegate

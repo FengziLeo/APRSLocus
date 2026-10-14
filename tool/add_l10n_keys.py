@@ -1001,6 +1001,25 @@ KEYS = {
         'tidak punya baris itu; waktu modul berasal dari satelit dan mungkin belum '
         'tersinkron.',
     ),
+    # 「当前卫星数」显示「—」时把原因说清楚：这个「—」最常见的原因不是应用坏了，
+    # 而是**来源真的不给这个数** —— 网络定位（基站/Wi-Fi）压根没有卫星，
+    # 部分 Android 机型/系统也不返回 GNSS 状态里的星数。不写这一行，用户只会
+    # 看到一个默默不动的破折号（用户就报过「安卓无法获取卫星数」）。
+    'beaconSatsUnknown': (
+        '当前来源未提供卫星数：网络定位（基站 / Wi-Fi）本身没有卫星，部分 Android 机型 / 系统也不返回该数据。',
+        '目前來源未提供衛星數：網路定位（基地台 / Wi-Fi）本身沒有衛星，部分 Android 機型 / 系統也不返回該資料。',
+        'The current source does not provide a satellite count: network positioning '
+        '(cell / Wi-Fi) has no satellites, and some Android devices or ROMs do not '
+        'report the data.',
+        '現在の取得元は衛星数を提供していません。ネットワーク測位（基地局 / Wi-Fi）に衛星はなく、'
+        '一部の Android 端末 / ROM もこのデータを返しません。',
+        'La fuente actual no proporciona el número de satélites: la ubicación por red '
+        '(celda / Wi-Fi) no tiene satélites, y algunos dispositivos o ROM de Android '
+        'no informan del dato.',
+        'Sumber saat ini tidak menyediakan jumlah satelit: lokasi jaringan '
+        '(seluler / Wi-Fi) tidak punya satelit, dan sebagian perangkat atau ROM '
+        'Android tidak melaporkan datanya.',
+    ),
 }
 
 # ── 占位符声明（可空）──

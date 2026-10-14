@@ -1593,6 +1593,10 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
               st.mySats == null ? '—' : '${st.mySats}',
               valueColor: (st.mySats ?? 0) > 0 ? C.green : C.grey,
             ),
+            // 「—」得有个说法：不然看起来就是「安卓取不到卫星数」。
+            // 真正的原因通常是来源不给（网络定位 / 机型差异），见 beaconSatsUnknown。
+            if (st.mySats == null)
+              SettingsHint(S.of(context).beaconSatsUnknown, color: C.grey),
             if (st.beaconIncludeSats) SettingsHint(S.of(context).beaconSatsHint),
             SettingsRow2(S.of(context).locationStatus,
                 localizedLocationStatus(context, st.locStatus)),

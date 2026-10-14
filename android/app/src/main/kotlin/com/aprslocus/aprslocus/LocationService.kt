@@ -161,6 +161,8 @@ class LocationService : Service() {
         /** 「上次已知位置」的最大年龄（毫秒）。超过它的缓存点比没有更糟：
          *  会把标记与轨迹拉到一个早已离开的地方。 */
         const val LAST_KNOWN_MAX_AGE_MS = 5 * 60 * 1000L
+        /** GNSS 状态监听注册失败后的重试间隔（毫秒）。见 considerLocation。 */
+        const val GNSS_RETRY_MS = 30000L
         private var instance: LocationService? = null
 
         /**
@@ -237,9 +239,16 @@ class LocationService : Service() {
      * 两者都试，谁有值用谁：extras 是**那颗星定出来的点**自带的，最准；
      * GNSS 状态是实时的，能补上 extras 缺失的机型。
      * 只用于「信标里带上卫星数」与界面显示 —— 不参与任何「这个点要不要」的判断。
+     *
+     * 为什么还要记一个 `gnssView`（在视颗数）：`usedInFix` 的位图**不是所有机型都填**
+     * —— 部分华为 / 小米 ROM 与老基带的上层接口里它恒为 false，于是「参与定位数」
+     * 永远是 0。这时在视颗数是唯一能拿到的数，而界面与信标要的正是「现在有几颗星」。
      */
     private var gnssUsed = -1
+    private var gnssView = -1
     private var gnssCallback: GnssStatus.Callback? = null
+    /** 上次尝试注册 GNSS 监听的时刻（注册失败要退避重试，见 considerLocation） */
+    private var gnssAttemptMs = 0L
     private val lastKnownPoll = Handler(Looper.getMainLooper())
     private val lastKnownRunnable = object : Runnable {
         override fun run() {
@@ -503,6 +512,17 @@ class LocationService : Service() {
         val isGps = location.provider == LocationManager.GPS_PROVIDER
         val now = System.currentTimeMillis()
 
+        // 0.5) GNSS 监听的**自愈重试**。注册会失败且不会自己好：权限刚授予（服务比
+        //    授权早一步起来）、系统 GPS 引擎刚起、个别 ROM 直接拒绝。此时
+        //    `gnssUsed/gnssView` 一直是 -1，上层永远显示「—」—— 用户报的
+        //    「安卓取不到卫星数」就是这个状态。拿到实时 GPS 定位说明引擎在跑，
+        //    就按 30 秒退避再注册一次（`gnssAttemptMs` 由 startGnssStatusMonitor 记）。
+        if (isGps && !fromLastKnown && gnssUsed < 0 && gnssView < 0 &&
+            now - gnssAttemptMs > GNSS_RETRY_MS
+        ) {
+            startGnssStatusMonitor(true)
+        }
+
         // 0) 缓存位置（getLastKnownLocation）：**只在还没有实时定位时**用于「快速出图」。
         //
         //    ── 这是「轨迹横跳：回到起点再画一次、反复横画」的根因 ──
@@ -561,7 +581,11 @@ class LocationService : Service() {
     }
 
     /**
-     * 这次定位里参与定轨的卫星数：先用定位自带的 extras，再用 GNSS 状态兜底。
+     * 这次定位里的卫星数：定位自带的 extras → GNSS 参与定轨数 → GNSS 在视数。
+     *
+     * 三级都试是为了**机型差异**：extras（部分机型的 GPS provider 会填）最准，
+     * 它没有时用系统 GNSS 状态；status 里的 `usedInFix` 位图也有机型不填
+     * （恒 false → 参与数恒 0），那时退回在视颗数 —— 有数总比装作「平台没提供」好。
      *
      * 网络定位（基站 / Wi-Fi）没有卫星可言，一律返回 null —— 返回 0 会让界面与信标
      * 把「这个来源不报卫星」说成「一颗星都没有」。
@@ -575,7 +599,9 @@ class LocationService : Service() {
                 if (n > 0) return n
             }
         } catch (_: Exception) {}
-        if (isGps && gnssUsed > 0) return gnssUsed
+        if (!isGps) return null
+        if (gnssUsed > 0) return gnssUsed
+        if (gnssView > 0) return gnssView
         return null
     }
 
@@ -584,13 +610,16 @@ class LocationService : Service() {
     private fun startGnssStatusMonitor(useGps: Boolean) {
         stopGnssStatusMonitor()
         if (!useGps) return
+        // 记下尝试时刻：失败时不会自己好，靠 considerLocation 的退避重试再来（见那里）。
+        gnssAttemptMs = System.currentTimeMillis()
         val cb = object : GnssStatus.Callback() {
             override fun onSatelliteStatusChanged(status: GnssStatus) {
-                var n = 0
+                var used = 0
                 for (i in 0 until status.satelliteCount) {
-                    if (status.usedInFix(i)) n++
+                    if (status.usedInFix(i)) used++
                 }
-                gnssUsed = n
+                gnssUsed = used
+                gnssView = status.satelliteCount
             }
         }
         try {
@@ -607,6 +636,7 @@ class LocationService : Service() {
         }
         gnssCallback = null
         gnssUsed = -1
+        gnssView = -1
     }
 
     @Suppress("MissingPermission")

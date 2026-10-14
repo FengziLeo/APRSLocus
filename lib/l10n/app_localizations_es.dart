@@ -9493,4 +9493,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get extGpsFixHint => "La precisión se estima a partir del HDOP (unos HDOP x 5 m), no es una medida; el tipo de posición viene de la sentencia GSA, así que un módulo que solo envía RMC/GGA no tiene esa línea; la hora del módulo viene de los satélites y puede que aún no esté sincronizada.";
 
+  @override
+  String get beaconSatsUnknown => "La fuente actual no proporciona el número de satélites: la ubicación por red (celda / Wi-Fi) no tiene satélites, y algunos dispositivos o ROM de Android no informan del dato.";
+
 }

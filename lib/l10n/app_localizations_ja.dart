@@ -9155,4 +9155,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get extGpsFixHint => "精度は HDOP からの推定値（約 HDOP × 5 m）で、実測値ではありません。測位種別は GSA 文に由来するため、RMC/GGA しか出さないモジュールにはこの行がありません。モジュール時刻は衛星由来なので、まだ同期していない場合があります。";
 
+  @override
+  String get beaconSatsUnknown => "現在の取得元は衛星数を提供していません。ネットワーク測位（基地局 / Wi-Fi）に衛星はなく、一部の Android 端末 / ROM もこのデータを返しません。";
+
 }

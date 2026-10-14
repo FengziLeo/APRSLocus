@@ -1,51 +1,39 @@
-# 建议反馈调查问卷｜官方 QQ 群925025834|致敬中国航天 70 周年 · 星河追梦
+# v2.1.0 已正式推送 · APRSLocus 进入以维护为主的稳定阶段
 
-在过去的日子里，我们不断迭代更新，现在用户数量已经突破420+，覆盖地区也达到了5+。接下来，我们想邀请您，听听您的声音，期待您的参与！🤗
+v2.1.0 已经正式推送。这一版把该收的尾都收了，功能日臻完善。
 
-调查问卷
-[点击进入](https://ccncqe00x1e4.feishu.cn/share/base/form/shrcnWcCKNxzSMvlGP54DCrnAZg)
-
-
-
-欢迎大家加入官方 QQ 群
-[点击加入925025834](https://qun.qq.com/universal-share/share?ac=1&authKey=tqe%2BI6lZzakmEoIBwnSVV9%2BT8Zg36F4%2FejuSGAfEIYiDhj5sGyQUOx%2B3YCU68G05&busi_data=eyJncm91cENvZGUiOiI5MjUwMjU4MzQiLCJ0b2tlbiI6ImxiMTMrTm55MEoxU1o2aFV1V1hLUDRKQkZBR21nTEdNemJFOUM0aE1jOWJLU2lNZUtZaGpOa1dicnlYSk15V0YiLCJ1aW4iOiIzNDIxMDE2MTUwIn0%3D&data=nW_8Q1gX2ft-4C0n9p83Ukel3sHzCwlFOSMnOU0HZ8sCtWkwY3hmqlwVFAZm5ipk2W3hIDPxc6Rl0HoW-nMf8Q&svctype=4&tempid=h5_group_info)
+从这一版起，APRSLocus 将进入**以维护为主的稳定发展阶段**：不再有推倒重来的大改，力气花在「让它一直稳、一直对」上 —— 协议跟得上、设备认得出、边界情况有人管，你报上来的每一个问题都有回音。步子小一点，但一直往前走。
 
 ---
 
-从 **东方红一号** 到 **天宫**，
-七十载仰望，几代人追梦。
-这一次，我们把坐标也点亮到了天上。
+## 🥚 2.1.0 的一份彩蛋：点一下，那颗星球会转过身来
+
+彩蛋就藏在「关于」页 —— 那个你大概每天都会路过一次的地方。
+
+封面那颗一直在转的星，不是一张画。**轻轻点它一下**：它会抖一抖，转过身去，然后带你落进一页故事里。那里也有一颗星球在转，有一个数字一直在往上走；有守着电波的人，也有把这件事一起做出来的人。
+
+那一页里有声音，记得开着音响听。不用长按，也不用等五秒 —— 点一下，故事就来了。想反悔也来得及：再点一下，它翻回正面，故事也就不打开了。
+
+剩下的，请你自己去看。
 
 ---
 
-星河浩瀚，追梦不止。
+## 📮 想听听你的声音
 
-谨以此歌，致敬中国航天事业的每一位追梦人。
-也致敬屏幕前的你——
-架台、守听、点亮信标、把信号送上天的每一个火腿。
+APRSLocus 已经陪 420+ 位用户走过一段路。下一步往哪儿走，我们想听你说：哪里别扭、还缺什么、最该先修的是哪一个。
 
-他们仰望星空，我们守望电波；
-他们向宇宙发问，我们向天空呼叫。
-不同的频段，同一种追梦。
+**[点击进入调查问卷](https://ccncqe00x1e4.feishu.cn/share/base/form/shrcnWcCKNxzSMvlGP54DCrnAZg)**
 
-**跟我们一样。**
+## 💬 官方 QQ 群 925025834
 
-🎵 [▶《星河追梦》· BV18NF9zUEq3](https://www.bilibili.com/video/BV18NF9zUEq3)
+有问题、有想法，或者只是想说一句「收到了」，都欢迎进来坐坐。
 
-@video https://player.bilibili.com/player.html?isOutside=true&aid=116047298434484&bvid=BV18NF9zUEq3&cid=35969762505&p=1
-
-> 视频来自 Bilibili @YSming_
+**[点击加入 925025834](https://qun.qq.com/universal-share/share?ac=1&authKey=tqe%2BI6lZzakmEoIBwnSVV9%2BT8Zg36F4%2FejuSGAfEIYiDhj5sGyQUOx%2B3YCU68G05&busi_data=eyJncm91cENvZGUiOiI5MjUwMjU4MzQiLCJ0b2tlbiI6ImxiMTMrTm55MEoxU1o2aFV1V1hLUDRKQkZBR21nTEdNemJFOUM0aE1jOWJLU2lNZUtZaGpOa1dicnlYSk15V0YiLCJ1aW4iOiIzNDIxMDE2MTUwIn0%3D&data=nW_8Q1gX2ft-4C0n9p83Ukel3sHzCwlFOSMnOU0HZ8sCtWkwY3hmqlwVFAZm5ipk2W3hIDPxc6Rl0HoW-nMf8Q&svctype=4&tempid=h5_group_info)**
 
 ---
 
-## 📡 关于 APRSLocus
-
-APRSLocus 是一款**本地 APRS 客户端**：地图、信标、消息与翻译、生命守护……
-把业余无线电的坐标，画在同一张星空图上。
-
-七十年，从追星到问天；
-愿每一个仰望的人，都能等到回音。
+> 那颗星球还在转，那个数字还在往上走。
+> 谢谢每一个还在守听的人。
 
 **APRSLocus 开发团队**
 2026 年 10 月
----

@@ -1,39 +1,39 @@
-# 🚀 致敬中國航天 70 週年 · 星河追夢
+# v2.1.0 已正式推送 · APRSLocus 進入以維護為主的穩定階段
 
-從 **東方紅一號** 到 **天宮**，
-七十載仰望，幾代人追夢。
-這一次，我們把座標也點亮到了天上。
+v2.1.0 已經正式推送。這一版把該收的尾都收了，功能日臻完善。
 
----
-
-星河浩瀚，追夢不止。
-
-謹以此歌，致敬中國航天事業的每一位追夢人。
-也致敬螢幕前的你——
-架台、守聽、點亮信標、把信號送上天的每一個火腿。
-
-他們仰望星空，我們守望電波；
-他們向宇宙發問，我們向天空呼叫。
-不同的頻段，同一種追夢。
-
-**跟我們一樣。**
-
-🎵 [▶《星河追夢》· BV18NF9zUEq3](https://www.bilibili.com/video/BV18NF9zUEq3)
-
-@video https://player.bilibili.com/player.html?isOutside=true&aid=116047298434484&bvid=BV18NF9zUEq3&cid=35969762505&p=1
-
-> 影片來自 Bilibili @YSming_
+從這一版起，APRSLocus 將進入**以維護為主的穩定發展階段**：不再有推倒重來的大改，力氣花在「讓它一直穩、一直對」上 —— 協議跟得上、裝置認得出、邊界情況有人管，你報上來的每一個問題都有回音。步子小一點，但一直往前走。
 
 ---
 
-## 📡 關於 APRSLocus
+## 🥚 2.1.0 的一份彩蛋：點一下，那顆星球會轉過身來
 
-APRSLocus 是一款**本機 APRS 用戶端**：地圖、信標、訊息與翻譯、生命守護……
-把業餘無線電的座標，畫在同一張星空圖上。
+彩蛋就藏在「關於」頁 —— 那個你大概每天都會路過一次的地方。
 
-七十年，從追星到問天；
-願每一個仰望的人，都能等到回音。
+封面那顆一直在轉的星，不是一張畫。**輕輕點它一下**：它會抖一抖，轉過身去，然後帶你落進一頁故事裡。那裡也有一顆星球在轉，有一個數字一直在往上走；有守著電波的人，也有把這件事一起做出來的人。
+
+那一頁裡有聲音，記得開著音響聽。不用長按，也不用等五秒 —— 點一下，故事就來了。想反悔也來得及：再點一下，它翻回正面，故事也就不打開了。
+
+剩下的，請你自己去看。
+
+---
+
+## 📮 想聽聽你的聲音
+
+APRSLocus 已經陪 420+ 位使用者走過一段路。下一步往哪兒走，我們想聽你說：哪裡彆扭、還缺什麼、最該先修的是哪一個。
+
+**[點擊進入調查問卷](https://ccncqe00x1e4.feishu.cn/share/base/form/shrcnWcCKNxzSMvlGP54DCrnAZg)**
+
+## 💬 官方 QQ 群 925025834
+
+有問題、有想法，或者只是想說一句「收到了」，都歡迎進來坐坐。
+
+**[點擊加入 925025834](https://qun.qq.com/universal-share/share?ac=1&authKey=tqe%2BI6lZzakmEoIBwnSVV9%2BT8Zg36F4%2FejuSGAfEIYiDhj5sGyQUOx%2B3YCU68G05&busi_data=eyJncm91cENvZGUiOiI5MjUwMjU4MzQiLCJ0b2tlbiI6ImxiMTMrTm55MEoxU1o2aFV1V1hLUDRKQkZBR21nTEdNemJFOUM0aE1jOWJLU2lNZUtZaGpOa1dicnlYSk15V0YiLCJ1aW4iOiIzNDIxMDE2MTUwIn0%3D&data=nW_8Q1gX2ft-4C0n9p83Ukel3sHzCwlFOSMnOU0HZ8sCtWkwY3hmqlwVFAZm5ipk2W3hIDPxc6Rl0HoW-nMf8Q&svctype=4&tempid=h5_group_info)**
+
+---
+
+> 那顆星球還在轉，那個數字還在往上走。
+> 謝謝每一個還在守聽的人。
 
 **APRSLocus 開發團隊**
 2026 年 10 月
----

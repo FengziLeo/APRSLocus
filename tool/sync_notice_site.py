@@ -53,26 +53,28 @@ PAGES = [
 ]
 
 # 官网公告卡片的头部（kicker / 标题 / 英文小字 / 导语）。
-# 为什么不从 md 的 `#` 标题推：md 标题是「📡 APRSLocus 2.0 已上线 · TOUCH SKY」，
-# 而卡片标题要的是「TOUCH SKY」+ 右侧小字，推不出来（也不该推）。
+# 为什么不从 md 的 `#` 标题推：md 标题是横幅摘要那一行
+# （「v2.1.0 已正式推送 · APRSLocus 进入以维护为主的稳定阶段」），
+# 而卡片标题要的是短标题 + 右侧小字 + 导语，推不出来（也不该推）。
+# ⚠ 换一期公告时这里必须一起改，否则会出现「正文是新的、标题还是上一期」。
 HEAD = {
     'zh': {
-        'kicker': '🚀 致敬中国航天 70 周年',
-        'title': '星河追梦 · 同一片星空，同一种追梦',
-        'en': '70 years of China\'s space program',
-        'sub': '七十年，从追星到问天。谨以此歌致敬每一位追梦人——也致敬守望电波、把信号送上天的你。',
+        'kicker': '🎉 v2.1.0 已正式推送',
+        'title': '稳下来，继续转 —— 2.1.0 与一份彩蛋',
+        'en': 'maintenance-first from here on',
+        'sub': '功能日臻完善。从 2.1.0 起，APRSLocus 进入以维护为主的稳定发展阶段 —— 顺带，还有一份藏在「关于」页里的彩蛋。',
     },
     'zh_TW': {
-        'kicker': '🚀 致敬中國航天 70 週年',
-        'title': '星河追夢 · 同一片星空，同一種追夢',
-        'en': '70 years of China\'s space program',
-        'sub': '七十年，從追星到問天。謹以此歌致敬每一位追夢人——也致敬守望電波、把信號送上天的你。',
+        'kicker': '🎉 v2.1.0 已正式推送',
+        'title': '穩下來，繼續轉 —— 2.1.0 與一份彩蛋',
+        'en': 'maintenance-first from here on',
+        'sub': '功能日臻完善。從 2.1.0 起，APRSLocus 進入以維護為主的穩定發展階段 —— 順帶，還有一份藏在「關於」頁裡的彩蛋。',
     },
     'en': {
-        'kicker': '🚀 Honoring 70 years of China\'s space program',
-        'title': 'Chasing the Stars · one sky, one dream',
-        'en': 'v2.0 · a song for the dream-chasers',
-        'sub': 'Seventy years, from chasing stars to asking the heavens. With this song we honor every dream-chaser — and you, who keeps watch on the airwaves and sends a signal into the sky.',
+        'kicker': '🎉 v2.1.0 is out',
+        'title': 'Steady from here on — 2.1.0 and a small easter egg',
+        'en': 'a maintenance-first phase',
+        'sub': 'The feature set is where we want it. From 2.1.0 on, APRSLocus enters a maintenance-first, stable phase — plus one small easter egg hidden on the About page.',
     },
 }
 

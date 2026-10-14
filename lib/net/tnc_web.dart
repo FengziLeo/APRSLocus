@@ -12,6 +12,9 @@ TncTransport createPkwdwplTransport() => TncStub();
 /// 盒子链路同样需要串口/蓝牙，Web 不支持（UI 会给出提示）
 TncTransport createBoxTransport() => TncStub();
 
+/// 外接 GPS 同样需要蓝牙 SPP / 串口，Web 不支持（UI 会给出提示）
+TncTransport createGpsTransport() => TncStub();
+
 class TncStub implements TncTransport {
   @override
   bool get connected => false;

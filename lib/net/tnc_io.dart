@@ -78,6 +78,27 @@ TncTransport createBoxTransport() {
   }
 }
 
+/// 外接 GPS（NMEA 0183）的传输层。
+///
+/// 模组只有一条线 —— 蓝牙 SPP，所以这里**不带 USB 自动选路**：
+/// 移动端直接用蓝牙实现，桌面端（Windows / Linux / macOS）退回串口，
+/// 方便在电脑上拿 USB-TTL 接一个模组验证解析链路。
+/// 通道名独立（`/gps`）理由同 PKWDWPL：原生一次只维护一个 socket，
+/// 共用会让「接 GPS」把正在收发的 TNC 顶掉。
+TncTransport createGpsTransport() {
+  if (kIsWeb) return TncDesktopSerial();
+  switch (defaultTargetPlatform) {
+    case TargetPlatform.android:
+    case TargetPlatform.iOS:
+      return TncNativeBluetooth(
+        methodChannel: 'com.aprslocus/gps',
+        eventChannel: 'com.aprslocus/gps_events',
+      );
+    default:
+      return TncDesktopSerial();
+  }
+}
+
 /// ─── Android / iOS：原生蓝牙 SPP ───
 ///
 /// Dart 侧不做任何协议处理，只搬运字节；KISS 组帧在 `kiss.dart`。

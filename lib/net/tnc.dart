@@ -23,3 +23,10 @@ TncTransport createPkwdwplTransport() => impl.createPkwdwplTransport();
 /// 串口 / 桌面串口。这里只多一条**独立通道**：原生 `TncManager` 一次只维护
 /// 一个 socket，共用通道会让「管盒子」把正在工作的 TNC 顶掉。
 TncTransport createBoxTransport() => impl.createBoxTransport();
+
+/// 外接 GPS（NMEA 0183）的传输层工厂。
+///
+/// 走的还是「蓝牙 SPP / 串口」这套字节搬运，只是**又一条独立通道** ——
+/// 与 TNC / PKWDWPL / 盒子三者同理：原生侧一次只维护一个 socket，
+/// 共用通道会让「接 GPS」把正在收发的链路顶掉。
+TncTransport createGpsTransport() => impl.createGpsTransport();

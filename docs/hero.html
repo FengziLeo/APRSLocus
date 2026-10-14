@@ -205,6 +205,10 @@
   .deck-spot .spot-no { margin-top: 12px; font-family: var(--font-mono);
     font-size: clamp(12px, 1.5vw, 15px); letter-spacing: .2em; text-indent: .2em;
     color: var(--text-dim); }
+  /* 最后一行是他的描述：页面上有的就用页面上的（开发 / 贡献者那一行写了分工），
+     纯呼号名单没有的就用那一份名单自己的说法（见页尾脚本的 ROSTER_DESC）。 */
+  .deck-spot .spot-desc { margin-top: 10px; font-size: clamp(12px, 1.4vw, 14px);
+    letter-spacing: .12em; text-indent: .12em; color: var(--text-dim); }
 
   /* ── 点了一个名字：这一屏就只剩他 ──
      别的人不是“退到几乎看不见”，是**不显示** —— 正文那一整块连着名单一起退开，
@@ -339,16 +343,19 @@ html, body { height: auto; overflow: auto; }
   </div>
 
   <!-- ── 星野点名的那一段（整页一层，同壁纸与天空层一样不在任何一屏里）──
-       点一颗星、或点名单上的一个名字，这里报出他在哪份名单上、他是谁、编号多少
-       （贴着那一粒）。编号是从名字**算**出来的（两个 32 位哈希拼 20 位）：没有
-       随机数、没有时间，同一个呼号永远是同一串号 —— 名单增补、页面改版都不会
-       变动它。名单那一行读的是这一屏自己的标题（已点亮用户 / 开发 …）。
+       点一颗星、或点名单上的一个名字，这里报出他在哪份名单上、他是谁、编号多少、
+       他是干什么的（贴着那一粒）。编号是从名字**算**出来的（两个 32 位哈希拼 20 位）：
+       没有随机数、没有时间，同一个呼号永远是同一串号 —— 名单增补、页面改版都
+       不会变动它。名单那一行读的是这一屏自己的标题（已点亮用户 / 开发 …）；
+       描述那一行先看页面上有没有写（开发 / 贡献者都有分工），没有就用那一份
+       名单自己的说法（见下面脚本的 ROSTER_DESC）。
        拿不到呼号的那几个（群组、每一位支持者）中间那行就空着，不编一个出来。 -->
   <div class="deck-spot" id="deckSpot" aria-live="polite">
     <div class="deck-spot-in">
       <span class="spot-tag" id="spotTag"></span>
       <b id="spotCall"></b>
       <span class="spot-no" id="spotNo"></span>
+      <span class="spot-desc" id="spotDesc"></span>
     </div>
   </div>
 
@@ -1082,7 +1089,8 @@ html, body { height: auto; overflow: auto; }
      结尾那几屏，名单上的每个人就是球面上的一粒符号
      （名字有多少个，模块就补多少粒 —— 见 planet-3d.js 的 scatter）。
      点一粒星、或点名单上的一个名字，是同一件事：镜头飞过去停在那一粒上，
-     那一粒换成暖金，下面报出他在哪份名单上、他是谁、编号多少。
+     那一粒换成暖金，下面报出他在哪份名单上、他是谁、编号多少、他是干什么的
+     （页面上写着分工的就用页面上的，没有的看 ROSTER_DESC）。
      点着谁的这一屏，其余东西（名单正文、主题按钮、音乐开关、署名、那句提示）
      一起退开 —— 留下的就是能直接截下来发出去的那一张。点别处照旧往前走一屏。
      编号由名字本身哈希出来（两个 32 位 FNV-1a 拼 20 位）：没有随机数、没有时间，
@@ -1092,6 +1100,7 @@ html, body { height: auto; overflow: auto; }
   var spotCall = document.getElementById("spotCall");
   var spotNo = document.getElementById("spotNo");
   var spotTag = document.getElementById("spotTag");
+  var spotDesc = document.getElementById("spotDesc");
   var spotOrd = -1;
 
   /* 那一粒飞去哪儿，这一行字就跟到哪儿：模块每帧报一次它的屏幕位置
@@ -1139,6 +1148,22 @@ html, body { height: auto; overflow: auto; }
     var head = host ? host.querySelector("h2, .cgroup-title") : null;
     return head ? (head.textContent || "").replace(/\s+/g, " ").trim() : "";
   }
+  /* 一句描述：先看页面上写没写（开发 / 贡献者那一行都注了分工，如「创始人 · 全栈开发」），
+     没有的（纯呼号的名单）就用这一份名单自己的说法 —— 说法只写在这一张表里，
+     不编人名也不编经历。 */
+  var ROSTER_DESC = {
+    "已点亮用户": "点亮这颗星球的人",
+    "开发": "把这颗星球做出来的人",
+    "开山成员 · 15 位": "最早的那一批",
+    "早期成员 · 38 位": "很早就来了",
+    "赞助": "星球是这么亮起来的"
+  };
+  function descOf(el, roster) {
+    var role = el && el.closest ? el.closest(".contributor") : null;
+    var t = role ? role.querySelector(".c-role") : null;
+    var s = t ? (t.textContent || "").replace(/\s+/g, " ").trim() : "";
+    return s || ROSTER_DESC[roster] || "";
+  }
   function paintSpot(ord) {
     spotOrd = ord;
     if (deck) deck.classList.toggle("pick", ord >= 0);   // 这一屏交给他一个人
@@ -1151,6 +1176,7 @@ html, body { height: auto; overflow: auto; }
       if (spotTag) spotTag.textContent = rosterOf(el);
       spotCall.textContent = call;                 // 拿不到呼号：这一行就空着
       spotNo.textContent = "星表编号 " + starNo(call || txt);
+      if (spotDesc) spotDesc.textContent = descOf(el, spotTag ? spotTag.textContent : "");
       spotBox.title = txt;
     }
     spotBox.classList.toggle("on", on);

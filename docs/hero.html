@@ -51,7 +51,7 @@
   /* 一屏一件东西：正文柱子居中；比一屏高的那一屏（名单）在自己那一栏里滚 ——
      滚到边上才轮到翻屏（见页尾脚本）。 */
   .slide-inner { width: 100%; max-width: 720px; max-height: 100%; overflow-y: auto;
-    scrollbar-width: none; }
+    scrollbar-width: none; transition: opacity .42s var(--ease); }
   .slide-inner::-webkit-scrollbar { width: 0; height: 0; }
   /* 翻页是换屏：内容自己落下，页面不动 —— display 从 none 变回来时 CSS 动画
      才会起跑，所以每一屏的内容每次都是新落下的。 */
@@ -198,9 +198,14 @@
   .deck-spot span { display: block; margin-top: 4px; font-family: var(--font-mono);
     font-size: 12.5px; letter-spacing: .08em; color: var(--text-dim); }
 
-  /* ── 点了一个名字：名单不动 ──
-     不做“其余名字退开”那种隐去：名单照旧整份读得下去，点名是 3D 那一层的事 ——
-     那一粒换暖金、镜头飞过去，信息贴在星球旁边（见 .deck-spot）。 */
+  /* ── 点了一个名字：这一屏就只剩他 ──
+     别的人不是“退到几乎看不见”，是**不显示** —— 正文那一整块连着名单一起退开，
+     这一屏成了他一个人的单独一页：球面上一颗金星，旁边一行他是谁、编号多少
+     （见 .deck-spot）。收回（再点那一粒 / 翻屏）时整块原样回来。
+     opacity 必须带 !important：.rise 上那条 deckRise 动画 fill 的是 both，
+     会把普通声明盖掉。 */
+  .deck.pick .slide.on .slide-inner { opacity: 0 !important; visibility: hidden;
+    pointer-events: none; transition: opacity .42s var(--ease), visibility 0s .42s; }
 
 
 
@@ -1074,19 +1079,24 @@ html, body { height: auto; overflow: auto; }
   /* 那一粒飞去哪儿，这一行字就跟到哪儿：模块每帧报一次它的屏幕位置
      （planet-3d.js 的 reportSpot），这里只管把它挪过去 —— 镜头飞的整段里
      它是跟着那一粒一起过去的，不是页脚那一条。收回时模块报 null：不用管，
-     .on 一摘就淡掉了。 */
+     .on 一摘就淡掉了。
+     这一行字跟着那一粒走，但**不许走出画面**：那一粒靠近视口边上的时候
+     把它按回来（点名之后球会转过来正对着它，所以这只是一段路上的事）。 */
+  var spotIn = spotBox ? spotBox.firstElementChild : null;
   if (window.__planet3dPage) {
     window.__planet3dPage.onSpot = function (o) {
       if (!spotBox || !o) return;
-      spotBox.style.transform = "translate3d(" + o.x.toFixed(1) + "px," + o.y.toFixed(1) + "px,0)";
+      var x = o.x, y = o.y, pad = 14;
+      if (spotIn) {
+        var w = spotIn.offsetWidth, h = spotIn.offsetHeight;
+        var lo = pad + w / 2, hi = window.innerWidth - pad - w / 2;
+        if (lo <= hi) { if (x < lo) x = lo; else if (x > hi) x = hi; }
+        else x = window.innerWidth / 2;
+        if (y + 24 + h > window.innerHeight - pad) y = window.innerHeight - pad - h - 24;
+        if (y < pad - 24) y = pad - 24;
+      }
+      spotBox.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)";
     };
-  }
-
-  /* 点了谁：把他滚进视野 —— 那一长条里他排到哪儿，都别让读者自己去找。
-     名单本身一个字都不动：点名是 3D 那一层的事。 */
-  function revealName(ord) {
-    var el = ord >= 0 ? nameList[ord] : null;
-    if (el && el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "auto" });
   }
 
   function starNo(s) {
@@ -1106,7 +1116,7 @@ html, body { height: auto; overflow: auto; }
   }
   function paintSpot(ord) {
     spotOrd = ord;
-    revealName(ord);
+    if (deck) deck.classList.toggle("pick", ord >= 0);   // 这一屏交给他一个人
     if (!spotBox) return;
     var on = ord >= 0;
     if (on) {
@@ -1216,6 +1226,7 @@ html, body { height: auto; overflow: auto; }
   /* 正文比一屏高的那一屏（名单）在自己那一栏里滚：手指 / 滚轮落在它上面、还没滚到边，
      就让它自己滚，滚到头才轮到翻屏 —— 否则名单的后半截没人读得到。 */
   function scrollable(target, dir) {
+    if (spotOrd >= 0) return false;   // 点着名的时候名单已经不在屏上：整屏只翻页
     var el = target;
     while (el && el !== deck) {
       var max = el.scrollHeight - el.clientHeight;

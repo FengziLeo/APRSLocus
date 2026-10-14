@@ -188,6 +188,19 @@
     opacity: 0; transition: opacity .9s var(--ease); pointer-events: none; }
   .deck-hint.on { opacity: .72; }
 
+  /* ── 右下角那枚徽标 ──
+     整页固定，翻到哪一屏都在；它是署名，不是入口，所以不吃指针事件、
+     也不进键盘序列。出现得比正文晚半拍（body.loaded 之后才淡上来）——
+     开场那一下应该只有星球和那句话。 */
+  .story-mark { position: fixed; right: clamp(20px, 6vw, 96px); bottom: 76px; z-index: 90;
+    display: flex; align-items: center; gap: 10px; pointer-events: none;
+    opacity: 0; transition: opacity 1.2s var(--ease) .7s; }
+  body.loaded .story-mark { opacity: .74; }
+  .story-mark img { width: 30px; height: 30px; border-radius: var(--radius);
+    box-shadow: 0 8px 22px var(--shadow-cool); }
+  .story-mark-name { font-size: 12.5px; font-weight: 700; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--text-faint); }
+
   /* BGM：整页唯一的声音（只有这页有）。右下角一颗音符是开关，右侧留白与上面
      那颗 .hero-toggle 用同一个式子，两者在同一列上。音源万一载不出来，脚本会
      退回网易云播放器（330×86 的 iframe）。 */
@@ -201,6 +214,9 @@
     .slide { padding: 84px 20px; }
     .story-bgm { right: 14px; bottom: 14px; }
     .story-bgm iframe { width: calc(100vw - 28px); }
+    /* 窄屏只剩那枚标：一行字挤在右上角就成噪音了 */
+    .story-mark { right: 16px; bottom: 66px; }
+    .story-mark-name { display: none; }
   }
   @media (prefers-reduced-motion: reduce) { .slide.on .rise { animation: none; } }
 </style>
@@ -225,6 +241,15 @@
 </div>
 <!-- 主题按钮不在任何一屏里：固定在右上角，翻到哪一屏它都在。 -->
 <button class="theme-toggle hero-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切换深色模式" title="切换深色模式" data-label-dark="切换浅色模式" data-label-light="切换深色模式"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
+
+<!-- 右下角那枚签名徽标（与首页导航栏那颗同一张图）：整页固定，翻到哪一屏都在。
+     它是署名，不是入口 —— 不接指针、不进键盘序列（这一页的出口在最后一屏）。
+     它不抢正文：一直待在右侧那一列里，与右上角的主题按钮、右下角的音符开关
+     同一套玻璃语言。 -->
+<div class="story-mark" aria-hidden="true">
+  <span class="story-mark-name">APRSLocus</span>
+  <img src="assets/logo.png" alt="" width="30" height="30">
+</div>
 
 <noscript><style>
 /* 没有脚本就翻不动屏：把整页摊回一份长文档（每一屏上下排开），照常读。 */

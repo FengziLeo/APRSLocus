@@ -1,6 +1,6 @@
 # 更新日志
 
-## [2.2.0] - 2026-10-14
+## [2.1.1] - 2026-10-14
 
 ### 外接 GPS：车顶那个模组，现在能直接当本机定位来源
 
@@ -23,7 +23,7 @@
 
 ---
 
-## [2.2.0] - 2026-10-14 (English)
+## [2.1.1] - 2026-10-14 (English)
 
 ### An external GPS: the module on the roof is now a position source of its own
 

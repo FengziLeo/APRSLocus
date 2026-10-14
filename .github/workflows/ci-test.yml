@@ -356,6 +356,14 @@ jobs:
       - name: Test external GPS NMEA parsing
         run: flutter test test/nmea_test.dart
 
+      # 外接 GPS 链路（lib/nmea_gps.dart）：字节流分帧、语句 → 定位的上抛、
+      # 丢弃/忽略/未定位**分别**计数（混在一起会让「还没定上」看着像线路故障）、
+      # 静默 10s 与定位新鲜期 30s（靠注入时钟拨表，不用 sleep）、配置与设备持久化、
+      # 只读守卫。这几件的错法分别是「永远显示未定位」「统计一片红看不出真问题」
+      # 「模组拔了还以为在供位」，都不报编译错，只能靠这份测试钉住。
+      - name: Test external GPS link
+        run: flutter test test/nmea_gps_test.dart
+
       - name: Analyze (tolerate known vector_map false positive)
         shell: bash
         run: |

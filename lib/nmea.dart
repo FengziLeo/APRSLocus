@@ -683,6 +683,7 @@ class NmeaFix {
     this.fixQuality,
     this.accuracyM,
     this.utc,
+    this.checksumValid = true,
   });
 
   /// 本机收到这条语句的时刻（本地时钟）。
@@ -727,6 +728,13 @@ class NmeaFix {
 
   /// 触发这次定位的原始语句
   final String raw;
+
+  /// 这条定位来自的语句校验和是否相符。
+  ///
+  /// 只有**关掉严格校验**（[NmeaAssembler.strictChecksum] = false）时才可能为
+  /// false —— 那时坐标照用，但链路必须能把它计数并显示出来（模组发错校验和
+  /// 是少数杂牌货的通病，用户有权知道「现在这个点是在宽松模式下拿到的」）。
+  final bool checksumValid;
 }
 
 /// 把一串 NMEA 语句**装配**成一条条可用的定位。
@@ -855,6 +863,7 @@ class NmeaAssembler {
       utc: s.utc ?? _zdaUtc ?? nmeaCombineUtc(_date, _utcTime),
       source: s.id,
       raw: s.raw,
+      checksumValid: s.checksumValid,
     );
   }
 

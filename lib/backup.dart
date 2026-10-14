@@ -155,16 +155,20 @@ const List<BackupGroupSpec> kBackupGroups = [
     'server', 'port', 'passcode', 'dataSource', 'enabledSources',
     'igateEnabled', 'igateTwoWay',
     'myLat', 'myLng',
-    // 链路配置（TNC / 声卡 TNC / PKWDWPL / 小盒子）与各自上次选的设备。
+    // 链路配置（TNC / 声卡 TNC / PKWDWPL / 小盒子 / 外接 GPS）与各自上次选的设备。
     //
-    // 这 7 个键是 tool/check_backup_keys.py 补强后「查」出来的：原先只扫
-    // 字面量键，而这几个是通过 `static const _kConfig` 这类常量读写的，
+    // tnc/audio/pkwdwpl/box 这 7 个键是 tool/check_backup_keys.py 补强后
+    // 「查」出来的：原先只扫字面量键，而这几个是通过 `static const _kConfig`
+    // 这类常量读写的，
     // 于是整套链路配置在备份里**静默缺失** —— 用户换机后要重新配蓝牙
     // 设备与串口。备份功能里这种缺失最致命：以为备了，直到恢复那天才发现。
     'tncConfigJson', 'tncDeviceJson',
     'audioConfigJson',
     'pkwdwplConfigJson', 'pkwdwplDeviceJson',
     'boxConfigJson', 'boxDeviceJson',
+    // 外接 GPS（蓝牙 SPP / NMEA 0183）：绑定的模组与严格校验开关。
+    // 与上面几条同属「链路配置」，缺了它换机后要重新配对一次模组。
+    'gpsConfigJson', 'gpsDeviceJson',
   ]),
   // 台站与联系人：整份 stations JSON（收藏/手动添加/备注）+ 本地屏蔽列表
   // （用户主动隐藏的台站，属于「用户自己攒的台站偏好」，换机后应保留）。

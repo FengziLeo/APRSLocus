@@ -576,21 +576,34 @@ void main() {
       return hits.isEmpty ? '' : hits.first.raw;
     }
 
-    test('开着 + 有颗数：备注里出现 SAT=nn，且在坐标之后', () {
+    test('开着 + 有颗数：SAT=nn 拼在注释里，且紧贴符号', () {
       final st = base()
         ..beaconIncludeSats = true
         ..mySats = 9;
       st.sendBeacon();
       final raw = posRaw(st);
-      // 备注直接紧跟符号（APRS 的位置报文本来就这么拼），只有 SAT= 这一项时
-      // 它就是注释的第一个 token；有扩展块时它在扩展块之后。
       expect(raw, endsWith('SAT=9'),
-          reason: '卫星数是非标准备注字段，拼在注释里、不得混进扩展块');
-      final comment = raw.substring(raw.indexOf(':') + 1);
-      expect(comment.split(' ').contains('SAT=9'), isTrue);
-      // 标准数据扩展块内部不能混进备注字段（否则第三方把 /A= 也当文字）
-      final head = comment.split(' ').first;
-      expect(head.contains('SAT='), isFalse);
+          reason: '卫星数是非标准备注字段，拼在注释里');
+      // 注释必须**紧贴符号**（APRS101：注释紧跟位置字段，中间无分隔符）——
+      // 插一个空格，第三方解析器就再也认不出注释的开头
+      // （与 PHG 那个坑同源，见上一组用例）。
+      expect(raw.contains(' SAT='), isFalse,
+          reason: '注释与符号之间被插了空格：第三方会把整段当普通备注文字');
+      st.dispose();
+    });
+
+    test('带数据扩展时：SAT=nn 排在扩展块之后，不挤进扩展块', () {
+      final st = base()
+        ..beaconIncludeSats = true
+        ..mySats = 12
+        ..beaconAltOverrideM = 10.0584;
+      st.sendBeacon();
+      final info = posRaw(st);
+      final toks = info.substring(info.indexOf(':') + 1).split(' ');
+      expect(toks.first, endsWith('/A=000033'),
+          reason: '数据扩展必须整块紧贴符号（中间不能有空格）');
+      expect(toks.last, 'SAT=12',
+          reason: 'SAT= 是备注字段，排在扩展块之后；挤进去会让第三方把 /A= 也当文字');
       st.dispose();
     });
 

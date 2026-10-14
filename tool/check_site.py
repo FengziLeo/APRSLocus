@@ -401,6 +401,17 @@ def main():
             and not any(x in hp for x in ('hero-cta', 'hero-actions', 'hero-release',
                                           'heroDownload', 'heroDlText', 'releases'))
             and 'class="nav"' not in hp and '<footer' not in hp)
+        # 天空层是**整页一层**（.deck 的第一个孩子），不在任何一屏里 —— 搬回某一屏里
+        # 就回到了上一版：翻到别的屏，点云跟着那一屏一起消失，也就无所谓换形状了。
+        chk('hero 故事页：天空层整页一层（不在任何一屏里）',
+            hp.index('class="hero-decor deck-sky"') < hp.index('<section class="slide"')
+            and 'data-sky="full"' in hp and '.deck-sky.no-3d .planet-canvas' in hp)
+        # 换形状这件事横跨两处：屏上的 data-shape（声明）与翻屏时的那一次调用。
+        # 只写数据不调用，或是调用时把参数写错，表现都是"翻屏了，但点云动都没动"。
+        chk('hero 故事页：各屏声明形状 + 翻屏时通知脚本换形状',
+            hp.count('data-shape=') >= 5
+            and 'window.__planet3d.shape(s2)' in hp
+            and 'scrollEase: 0.085, deck: true' in hp)
     # 降级链路：没有 WebGL 时不能把 hero 那块留成空白。
     # 只看「页面里有 canvas」是不够的，真会坏的是脚本早期 return 之后什么都
     # 没画，所以要求 CSS 有 .no-3d 分支、脚本有失败回落。
@@ -435,6 +446,15 @@ def main():
         all(x in hero_js for x in ('animT', 'SCROLL_EASE', 'glide', 'scrollTarget', 'writeScroll'))
         and all(x in hero_css + hero_js for x in ('--hero-3d-copy-scale', '--hero-3d-next'))
         and all(x in hero_css for x in ('--hero-3d-copy-scale', '--hero-3d-next', 'will-change: transform')))
+    # 换形状（只有彩蛋页开）：位置两只乒乓缓冲 + aFrom/aTo + 三个 uniform，
+    # 缺一个的表现都很安静 —— 屏翻过去了，点云还站在原地（或换成一片乱点）。
+    # 环带 / 线框 / 卫星 / 流星不会跟着变形状，所以 uForm 必须把它们按下去。
+    chk('hero 换形状（乒乓位置缓冲 / 形状采样 / 仪表退场）',
+        all(x in hero_js for x in ('aFrom', 'aTo', 'uMorph', 'uScatter', 'uForm', 'uShape',
+                                   'shapeTo', 'shapeFill', 'bindShape', 'DECK'))
+        and "if (name === \"heart\")" in hero_js and "if (name === \"pin\")" in hero_js
+        and 'createElement("canvas")' in hero_js and 'WU.uAlpha, m.wire * (1 -' in hero_js
+        and 'shape: function (name)' in hero_js)
     # 着色器与脚本之间的名字必须对得上。名字打错的话 getUniformLocation 返回
     # null，uniform 调用静默失效 —— 浏览器不报任何错，只是那个效果凭空不见，
     # 是最难查的一类问题（这类错误只有真跑起来、且真的盯着看才发现）。

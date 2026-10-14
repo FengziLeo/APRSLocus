@@ -30,7 +30,7 @@
 })();
 </script>
 <link rel="stylesheet" href="css/style.css?v=8">
-<link rel="stylesheet" href="css/hero-3d.css?v=20">
+<link rel="stylesheet" href="css/hero-3d.css?v=21">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
   /* 这页没有导航栏，主题按钮固定贴在右上角（只这一页用到，不进共享样式表；
@@ -61,6 +61,31 @@
      底边不留 —— 数字那一屏正好一屏高；min-height 归零，别让 .hero 的 100vh 把
      这一屏撑出视口。 */
   .slide.hero { padding-top: var(--hero-pad-top, 140px); padding-bottom: 0; min-height: 0; }
+
+  /* ── 天空层（整页一层，见 body 里那个 .deck-sky）──
+     固定在视口底下、不吃指针事件；翻屏时它不动，只有星球那两块在动：
+     地图那一屏铺开（full），有正文的屏退到右上角、压暗一档（soft）。
+     动的是**星球那块画布**，不是整层：星尘与网格是背景底纹，跟着一起缩放只会
+     变成一块糊掉的底（网格是重复底图，缩放后线宽也跟着变）。transform-origin
+     放在星球在屏幕上的位置（62% 46%），所以缩小的过程中它始终待在右上方那个点，
+     看着是"退开"，不是"滑走"。缓动约一秒，与点云自己"散开再聚合"是两套速度。 */
+  .deck-sky .planet-canvas, .deck-sky .planet-fallback {
+    transition: transform 1.05s var(--ease), opacity 1.05s var(--ease);
+    transform-origin: 62% 46%;
+  }
+  .deck[data-sky="soft"] .deck-sky .planet-canvas,
+  .deck[data-sky="soft"] .deck-sky .planet-fallback {
+    transform: scale(.58) translate3d(15%, -14%, 0); opacity: .48;
+  }
+  /* 没有 WebGL：退回纯 CSS 星球。hero-3d.css 里那两条是按 .hero 写的，
+     而这页的装饰层不在 .hero 里面，所以选择器得跟着换成 .deck-sky。 */
+  .deck-sky.no-3d .planet-canvas { display: none; }
+  .deck-sky.no-3d .planet-fallback {
+    display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100svh;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .deck-sky .planet-canvas, .deck-sky .planet-fallback { transition: none; }
+  }
 
   /* ── 一屏一句 ──
      正文不再挤成一段：一章的每一句各占一屏，所以这一句是本屏唯一的东西。
@@ -153,6 +178,9 @@
 <noscript><style>
 /* 没有脚本就翻不动屏：把整页摊回一份长文档（每一屏上下排开），照常读。 */
 html, body { height: auto; overflow: auto; }
+/* 天空层是脚本画出来的（这页的星球、星尘、网格都在那里）：没有脚本它就是一层
+   空东西，别让它铺在正文上面。 */
+.deck-sky { display: none; }
 .deck { position: static; }
 .slide { position: static; display: block; min-height: 0; height: auto; padding: 96px 20px; }
 .slide.hero { padding-top: var(--hero-pad-top, 140px); padding-bottom: 0; }
@@ -170,6 +198,21 @@ html, body { height: auto; overflow: auto; }
      屏与屏之间没有别的机关：前一屏收起、这一屏亮出来，CSS 动画自己起跑。 -->
 <div class="deck" id="deck" role="region" aria-label="一个关于电波的故事">
 
+  <!-- ── 天空层：整页共用一层，不在任何一屏里（就是 .deck 的第一个孩子）──
+       网格、星尘、3D 星球、以及没有 WebGL 时的静态球都在这一层。
+       上一版它长在"地图那一屏"里面，翻屏就跟着那一屏一起消失；现在它钉在
+       页面底下不换，翻屏时点云才有机会散开、再聚成下一屏的形状。
+       整层不吃指针事件（星球是只看不摸的画面，不接拖动、不接焦点）。 -->
+  <div class="hero-decor deck-sky">
+    <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+    <div class="hero-grid"></div>
+
+    <!-- 3D 星球：一层透明点云（无边框、无底色），只看不摸 -->
+    <canvas class="planet-canvas" id="planetCanvas" role="img"
+            aria-label="3D 星球：APRS 台站分布、环带与卫星轨道示意"></canvas>
+    <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
+  </div>
+
   <section class="slide">
     <div class="slide-inner slide-line rise">
       <p>点一下，音乐就起来了。</p>
@@ -184,18 +227,10 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide hero" id="hero">
-  <!-- 装饰层：网格、星尘、3D 星球、以及没有 WebGL 时的静态球，全都在这一层。
-       整层不吃指针事件（星球是只看不摸的画面，不接拖动、不接焦点）。 -->
-  <div class="hero-decor">
-    <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
-    <div class="hero-grid"></div>
-
-    <!-- 3D 星球：直接长在 hero 上的一层透明点云（无边框、无底色），只看不摸 -->
-    <canvas class="planet-canvas" id="planetCanvas" role="img"
-            aria-label="3D 星球：APRS 台站分布、环带与卫星轨道示意"></canvas>
-    <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
-  </div>
+  <section class="slide hero" id="hero" data-sky="full">
+  <!-- 装饰层不在这儿了 —— 它搬到了 #deck 的第一个孩子（.deck-sky，页面级固定层，
+       见下面那份注释）。以前它长在这一屏里，翻屏就跟着消失；现在整页共用一层，
+       翻屏时点云才有机会散开、再聚成下一屏的形状。 -->
 
   <div class="hero-inner">
 
@@ -254,7 +289,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-shape="pin">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>电波从哪来</h2>
@@ -305,7 +340,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-shape="sphere">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>夜里还亮着的那些点</h2>
@@ -359,7 +394,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-shape="heart">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>感谢名单</h2>
@@ -489,7 +524,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-shape="sphere">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>已点亮用户</h2>
@@ -829,13 +864,13 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-shape="heart">
     <div class="slide-inner slide-line rise">
       <p>谢谢你们 —— 名单上的每一个名字，和名单外的每一次应答。</p>
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-shape="73">
     <div class="slide-inner slide-slogan rise">
       <p>那颗星球还在转，那个数字还在往上走 —— 下一次让它亮起来的，可能就是你。</p>
     </div>
@@ -893,16 +928,34 @@ html, body { height: auto; overflow: auto; }
     cur = i;
     var el = slides[cur];
     el.classList.add("on");
+    sky(el);
     var inner = el.querySelector(".slide-inner");
     if (inner) inner.scrollTop = 0;
-    /* 那两块画布只在窗口 resize 时重量尺寸，而 display:none 时量到的是 0 ——
-       露脸的下一帧补一次，星尘那层才有尺寸（星球自己有 ResizeObserver）。 */
+    /* 万一某一屏里还带着画布：display:none 时量到的是 0，露脸的下一帧补一次尺寸。
+       （天空层那两块画布已经不在任何一屏里了 —— 它们固定铺满视口，自己量得准。） */
     if (el.querySelector("canvas")) {
       requestAnimationFrame(function () { window.dispatchEvent(new Event("resize")); });
     }
     if (hint) hint.classList.toggle("on", begun && cur < last);
     return true;
   }
+  /* ── 1b. 天空：翻到哪一屏，点云就散开、再聚成那一屏的形状 ──
+     形状写在屏上的 data-shape（sphere / pin / heart / 73），取景写在 data-sky
+     （full = 地图那一屏铺开，soft = 有正文的屏退到右上角）。两件事都不是
+     CSS 自己能做的：形状得让 WebGL 那层重新采样点云。
+     只在真的换了一个形状时才通知一次 —— 连续几屏没写 data-shape 的时候它
+     什么都不做（点云就静静挂在背景里）。 */
+  var curShape = "sphere";
+  function sky(el) {
+    var mode = (el && el.getAttribute("data-sky")) || "soft";
+    if (deck.getAttribute("data-sky") !== mode) deck.setAttribute("data-sky", mode);
+    var s2 = el && el.getAttribute("data-shape");
+    if (s2 && s2 !== curShape && window.__planet3d && window.__planet3d.shape) {
+      curShape = s2;
+      window.__planet3d.shape(s2);
+    }
+  }
+
   function advance() {
     if (!begun) { begun = true; react(); start(); }        // 第一下：音乐起来
     else if (!playing && !dead && !want) start();          // 还没响？那这一下再试一次
@@ -1010,6 +1063,7 @@ html, body { height: auto; overflow: auto; }
   /* 脚本接手了：第一屏由 .on 决定（.ready 交回那条兜底规则） */
   deck.classList.add("ready");
   slides[cur].classList.add("on");
+  sky(slides[cur]);
 })();
 </script>
 
@@ -1018,8 +1072,10 @@ html, body { height: auto; overflow: auto; }
 <script src="js/main.js?v=8"></script>
 <!-- 节奏覆盖必须在 planet-3d.js 之前写好：它一进来就读这个对象，之后再改没用。
      gatherMs 2400 → 4400：开场那点云慢慢聚成一颗球，不是一下摆好；
-     scrollEase 0.17 → 0.085：滚动缓动慢一倍，往下拉是滑过去的。 -->
-<script>window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085 };</script>
-<script src="js/planet-3d.js?v=20"></script>
+     scrollEase 0.17 → 0.085：滚动缓动慢一倍，往下拉是滑过去的。
+     deck: true：只有这页开 —— 装饰层是页面级固定层（翻屏不换），并且点云会
+     按各屏的 data-shape 换形状（散开 → 聚成地图针 / 一颗心 / 73）。 -->
+<script>window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085, deck: true };</script>
+<script src="js/planet-3d.js?v=21"></script>
 </body>
 </html>

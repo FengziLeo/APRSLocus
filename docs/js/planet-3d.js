@@ -52,8 +52,14 @@
      不写（首页三语页）就全走下面的默认值，画面与以前一模一样。
      只有彩蛋页 docs/hero.html 写它：同一段画面，开场慢慢聚成球、滚动缓动
      调软一档 —— 那页是让人走进去读故事的，不是扫一眼就走。
-     只放两个数，不做主题/颜色/几何的覆盖：那是设计，不是节奏。 */
+     只放两个数，外加一个布尔 `deck`（那页的装饰层是页面级固定层、点云会换形状），
+      不做主题/颜色的覆盖：那是设计，不是节奏。 */
   var PAGE = window.__planet3dPage || {};
+
+  /* 彩蛋页还要多做一件事：点云会**换形状**（见第 3b 节）。它把 deck: true 写进
+     __planet3dPage，连带着两处按它开关：降级标记挂在哪一层、"在不在画面里"
+     按哪一层看。三语首页没有这个键。 */
+  var DECK = !!PAGE.deck;
 
   /* ═════════════ 1. 累计报文遥测 ═════════════ */
   (function telemetry() {
@@ -152,6 +158,12 @@
   var canvas = document.getElementById("planetCanvas");
   var hero = document.querySelector(".hero");
   if (!canvas || !hero || !canvas.getContext) return;
+
+  /* 降级标记与"在不在画面里"都挂在**画布所在的那一层**上：首页那一层是 .hero
+     里的装饰层，彩蛋页那一层是页面级天空层（固定铺满视口，翻到哪一屏都在）。
+     挂错层的表现很具体：降级时 .no-3d 加在看不见的元素上 → 纯 CSS 星球不出现；
+     或者按"某一屏在不在视口里"停掉渲染 → 翻到别的屏时点云死在半路。 */
+  var host = (DECK && canvas.parentNode) ? canvas.parentNode : hero;
 
   var TILT = 23.4 * Math.PI / 180;    // 轴倾角（与舷窗上 AXIS TILT 标签一致）
   var FOV = 33 * Math.PI / 180;
@@ -301,6 +313,7 @@
     "attribute vec3 aCol;",
     "attribute vec3 aMeta;",              // 尺寸 / 呼吸频率 / 呼吸幅度
     "attribute float aSpin;",             // 自己的角速度（0 = 只跟着星球整体自转）
+    "attribute vec3 aFrom; attribute vec3 aTo;",   // 换形状的两只纯位置缓冲（乒乓）
     "uniform float uCosY; uniform float uSinY;",
     "uniform float uCosP; uniform float uSinP;",
     "uniform float uSpinT;",
@@ -309,7 +322,11 @@
     "uniform float uPxScale; uniform float uMaxSize; uniform float uMinPx;",
     "uniform float uTime; uniform float uBurst; uniform float uSeed;",
     "uniform float uGather;",                          // 入场进度 0 → 1
-    "uniform float uWave;",                            // 星面海浪（0 = 关：降级动效）
+    "uniform float uWave;",                            // 星面海浪（0 = 关 / 已经不是星球了）
+    "uniform float uMorph;",                           // 换形状的进度 0 → 1
+    "uniform float uScatter;",                         // 中途甩出去的幅度
+    "uniform float uShape;",                           // 1 = 形状参与（首页给 0：整段退回 aPos）
+    "uniform float uForm;",                            // 1 = 已经不是星球了（环带 / 仪表退场）
     "uniform vec3 uImpDir0; uniform float uImpAge0;",  // 撞击落点 + 命中后经过的秒数
     "uniform vec3 uImpDir1; uniform float uImpAge1;",  //   （负数 = 这一槽在等下一颗）
     "uniform vec3 uImpDir2; uniform float uImpAge2;",
@@ -322,10 +339,19 @@
     // 入场：点云不是一下就摆好，而是从上方散落着被「拉」下来 ——
     // 每点一个 [0,1) 相位，起点是抬高且摊开的一层，逐点错峰落回球面。
     "  float sd = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719))) * 43758.5453);",
-    "  vec3 src = aPos * (1.05 + 0.75 * sd) + vec3(0.0, 0.35 + 1.70 * sd, 0.0);",
+    // 换形状：位置 = mix(aFrom, aTo) 再加一记"甩出去又收回来"的包络
+    // （sin(π·进度)，峰值在中途）——所以是散开、再聚拢成另一个形状，
+    // 不是两点之间直线插值。uShape = 0（三语首页）时 home 逐位等于 aPos。
+    "  float mot = uMorph * uMorph * (3.0 - 2.0 * uMorph);",
+    "  vec3 unit = normalize(aPos + vec3(0.0001, 0.0002, 0.0003));",
+    "  vec3 tan3 = normalize(cross(unit, vec3(0.0, 1.0, 0.0)) + vec3(0.0001, 0.0, 0.0));",
+    "  float burst = uScatter * sin(3.14159265 * mot) * (0.35 + 0.85 * sd);",
+    "  vec3 goal = mix(aFrom, aTo, mot) + (unit + tan3 * 0.42) * burst;",
+    "  vec3 home = mix(aPos, goal, uShape);",
+    "  vec3 src = home * (1.05 + 0.75 * sd) + vec3(0.0, 0.35 + 1.70 * sd, 0.0);",
     "  float gp = clamp((uGather - sd * 0.55) / (1.0 - sd * 0.55), 0.0, 1.0);",
     "  gp = gp * gp * (3.0 - 2.0 * gp);",               // 缓入缓出，落点不带刹车感
-    "  vec3 loc = mix(src, aPos, gp);",
+    "  vec3 loc = mix(src, home, gp);",
     "  float cy = uCosY * co - uSinY * so;",            // 拖着走 + 自己转，一次合成
     "  float sy = uSinY * co + uCosY * so;",
     // 明暗用「落定后」的法线算：飞行途中的位置不参与打光，否则一路乱闪
@@ -361,7 +387,7 @@
     "  rip += smoothstep(0.0, 0.06, a0) * (1.0 - smoothstep(0.6, 1.9, a0)) * exp(-qa * qa) * exp(-a0 * 0.8);",
     "  rip += smoothstep(0.0, 0.06, a1) * (1.0 - smoothstep(0.6, 1.9, a1)) * exp(-qb * qb) * exp(-a1 * 0.8);",
     "  rip += smoothstep(0.0, 0.06, a2) * (1.0 - smoothstep(0.6, 1.9, a2)) * exp(-qc * qc) * exp(-a2 * 0.8);",
-    "  rip = min(rip, 1.5);",
+    "  rip = min(rip, 1.5) * (1.0 - uForm);",       // 换了形状就别再荡冲击环了
     "  p += hn * body * uWave * (wv * 0.021 + rip * 0.070);",
     "  float d = uDist - p.z;",
     // 画面 roll 是**绕视轴的旋转**，所以要在物体屏幕平面 (x,y) 上转，转完再除
@@ -376,6 +402,7 @@
     "  float tw = 0.5 + 0.5 * sin(uTime * aMeta.y + aPos.x * 9.0 + aPos.z * 5.0 + aPos.y * 3.0);",
     "  float k = mix(1.0, 0.34 + 1.20 * tw, aMeta.z) * lam;",
     "  k *= 1.0 + body * uWave * (max(wv, 0.0) * 0.75 + rip * 3.0);",    // 波峰亮、撞击那圈最亮
+    "  k *= 1.0 - uForm * smoothstep(1.20, 1.30, length(aPos));",       // 环带：换形状就退场
     "  float pick = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719)) + uSeed) * 43758.5453);",
     "  float flare = uBurst * step(0.95, pick);",
     "  k *= 1.0 + 1.6 * flare;",
@@ -383,7 +410,7 @@
     "  float isStn = step(0.5, aMeta.z);",              // 台站 / 卫星：比本体亮一大截的那一类
     "  vec3 base = mix(aCol, uStn * (0.72 + 0.62 * aCol.b), isStn);",
     "  vCol = base * uTint * k;",
-    "  vFade = ((0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6 + rip * 0.9 * uWave) * (0.10 + 0.90 * gp);",
+    "  vFade = ((0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6 + rip * 0.9 * uWave) * (0.10 + 0.90 * gp) * (1.0 - uForm * smoothstep(1.20, 1.30, length(aPos)));",
     "}"
   ].join("\n");
 
@@ -438,8 +465,8 @@
   ].join("\n");
 
   function fail(why) {
-    hero.classList.add("no-3d");
-    hero.setAttribute("data-3d", why);
+    host.classList.add("no-3d");
+    host.setAttribute("data-3d", why);
     if (window.console && console.warn) console.warn("[planet-3d] fallback:", why);
   }
 
@@ -525,7 +552,8 @@
   ["uCosY", "uSinY", "uCosP", "uSinP", "uSpinT", "uDist", "uProj", "uAspect", "uCosR", "uSinR",
     "uPxScale",
     "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uStn", "uAlpha", "uBurst", "uSeed", "uGather",
-    "uWave", "uImpDir0", "uImpAge0", "uImpDir1", "uImpAge1", "uImpDir2", "uImpAge2"
+    "uWave", "uImpDir0", "uImpAge0", "uImpDir1", "uImpAge1", "uImpDir2", "uImpAge2",
+    "uMorph", "uScatter", "uShape", "uForm"
   ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
 
   function bindPointers() {
@@ -537,6 +565,186 @@
     gl.enableVertexAttribArray(A.col);
     gl.enableVertexAttribArray(A.meta);
     gl.enableVertexAttribArray(A.spin);
+  }
+
+  /* ═════════════ 3b. 换形状（只有彩蛋页用） ═════════════
+     一屏一件事的那页里，点云不该只属于"地图那一屏"：翻过去时它们先摊开、
+     再拢成**另一种形状**，屏与屏之间才是同一团东西在变。
+
+     怎么做到不重写几何：
+       · aPos（原有那份交错缓冲）依旧是"星球身份" —— 打光的法线、呼吸相位、
+         哪一批点是环带，全都拿它算；所以形状换了，明暗体系没换。
+       · 另加两只**纯位置**缓冲（aFrom / aTo）乒乓：静止时点站在 aTo 上；
+         换形状就把新形状写进空着的那只、swap 一下、进度归零 —— 起点恰好是
+         "上一刻那个形状"，所以画面不会跳。
+       · 进度 uMorph 0 → 1，配上顶点着色器里那个 sin(π·进度) 包络，就成了
+         "散开 → 聚成新形状"。
+     环带 / 线框 / 卫星 / 流星是"球体仪表"，成不了别的形状：uForm 随进度升起，
+     它们整体退场，聚回球时再一起回来。 */
+
+  var pArr = [new Float32Array(cloud.count * 3), new Float32Array(cloud.count * 3)];
+  (function () {
+    var i, o;
+    for (i = 0; i < cloud.count; i++) {
+      o = i * 10;
+      pArr[0][i * 3] = cloud.data[o];
+      pArr[0][i * 3 + 1] = cloud.data[o + 1];
+      pArr[0][i * 3 + 2] = cloud.data[o + 2];
+    }
+    pArr[1].set(pArr[0]);                       // 两只都从"家"（球面）出发
+  })();
+  var pBuf = [gl.createBuffer(), gl.createBuffer()];
+  (function () {
+    for (var i = 0; i < 2; i++) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, pBuf[i]);
+      gl.bufferData(gl.ARRAY_BUFFER, pArr[i], gl.DYNAMIC_DRAW);
+    }
+  })();
+  var SA = {
+    from: gl.getAttribLocation(prog, "aFrom"),
+    to: gl.getAttribLocation(prog, "aTo")
+  };
+  var bi = 1;                                   // 现在这一只（= 家）
+  var morphP = 1;                               // 进度：1 = 已经站定
+  var shapeName = "sphere";
+  var form = 0, formTarget = 0;                 // 0 = 球（仪表全在），1 = 别的形状
+  var MORPH_S = PAGE.morphMs ? PAGE.morphMs / 1000 : 1.25;
+
+  function bindShape() {
+    gl.bindBuffer(gl.ARRAY_BUFFER, pBuf[1 - bi]);          // aFrom = 上一刻那只
+    gl.vertexAttribPointer(SA.from, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(SA.from);
+    gl.bindBuffer(gl.ARRAY_BUFFER, pBuf[bi]);              // aTo = 现在这只
+    gl.vertexAttribPointer(SA.to, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(SA.to);
+  }
+
+  /* 形状采样：给每个点一个目标位置。坐标与星球同一套（半径 1 的球、+Z 朝观众），
+     体量可以直接跟取景半径 view.r 比。随机数走**另一条**流 —— 星球几何那条流
+     一点没动，同一颗星还是每次刷新都一模一样。
+     ⚠ 逐点消耗随机数、不写 while 式的拒绝采样：同一个形状每次生成要一模一样，
+       点数也必须正好是 cloud.count。 */
+  var rnd3 = mulberry32(0x41505255);
+  var glyphs = {};
+
+  /* 文字点阵：离屏画一次字，把"亮着的像素"收成点集，再按最长边归一化到半宽 1。
+     字重 800 的粗体 —— 点云要靠笔画宽才看得清。拿不到像素（没有 2D 上下文、
+     字体量不出笔画）就返回 null，调用方退回球面：宁可少一个形状，不要散乱一片。 */
+  function glyph(text) {
+    if (Object.prototype.hasOwnProperty.call(glyphs, text)) return glyphs[text];
+    var pts = null, i, x, y, d, g, max = 1;
+    try {
+      var c = document.createElement("canvas");
+      c.width = 512; c.height = 256;
+      g = c.getContext("2d");
+      if (g) {
+        g.fillStyle = "#fff";
+        g.textAlign = "center";
+        g.textBaseline = "middle";
+        g.font = "800 190px system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+        g.fillText(text, 256, 132);
+        d = g.getImageData(0, 0, 512, 256).data;
+        pts = [];
+        for (y = 0; y < 256; y += 2) {
+          for (x = 0; x < 512; x += 2) {
+            if (d[(y * 512 + x) * 4 + 3] > 120) pts.push(x - 256, 128 - y);
+          }
+        }
+      }
+    } catch (e) { pts = null; }
+    if (!pts || pts.length < 40) { glyphs[text] = null; return null; }
+    for (i = 0; i < pts.length; i += 2) {
+      max = Math.max(max, Math.abs(pts[i]), Math.abs(pts[i + 1]));
+    }
+    for (i = 0; i < pts.length; i++) pts[i] /= max;
+    glyphs[text] = pts;
+    return pts;
+  }
+
+  /* 把形状写进 out（长度 = 点数 × 3）。 */
+  function shapeFill(name, out) {
+    var n = cloud.count, i, o, u, th, r, t, q, sp, ang, gp, m, half;
+    if (name === "sphere") {                   // 家：原样那层球面
+      out.set(pArr[0]);
+      return;
+    }
+    if (name === "heart") {
+      /* 心形参数曲线（16sin³t / 13cos t − 5cos2 t − 2cos3t − cos4t）。
+         q 往 1 偏 → 边缘密、中间疏：轮廓才看得出是"一颗心"，不是一团雾。
+         另给一点厚度（z）—— 它仍然是个有体积的东西，不是一张纸。 */
+      for (i = 0; i < n; i++) {
+        o = i * 3;
+        t = rnd3() * Math.PI * 2;
+        q = Math.pow(rnd3(), 0.34);
+        u = Math.sin(t);
+        out[o] = 16 * u * u * u * 0.0469 * q;
+        out[o + 1] = (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t)
+          - Math.cos(4 * t)) * 0.0449 * q + 0.114;   // x 半宽 0.75、y 半高 0.65（量过包围盒）
+        out[o + 2] = (rnd3() - 0.5) * 0.16 * (1 - q * 0.6);
+      }
+      return;
+    }
+    if (name === "pin") {
+      /* 地图针：上半一颗球头、下半一支往下的锥。"电波从哪来" —— 它先是一个点。 */
+      for (i = 0; i < n; i++) {
+        o = i * 3;
+        if (rnd3() < 0.40) {
+          u = rnd3() * 2 - 1;
+          th = rnd3() * Math.PI * 2;
+          r = 0.40 * (0.80 + 0.20 * rnd3());
+          sp = Math.sqrt(1 - u * u);
+          out[o] = sp * Math.cos(th) * r;
+          out[o + 1] = 0.42 + u * r;
+          out[o + 2] = sp * Math.sin(th) * r;
+        } else {
+          t = Math.pow(rnd3(), 0.42);
+          ang = rnd3() * Math.PI * 2;
+          r = 0.40 * (1 - t) * (0.86 + 0.14 * rnd3());
+          out[o] = Math.cos(ang) * r;
+          out[o + 1] = 0.42 - t * 1.46;
+          out[o + 2] = Math.sin(ang) * r * 0.9;
+        }
+      }
+      return;
+    }
+    /* 其余一律按**文字**处理：比如 `73`（火腿收尾那句话）。 */
+    gp = glyph(name);
+    if (!gp) { out.set(pArr[0]); return; }
+    m = gp.length / 2;
+    half = 1.02;                                // 半宽：与星球半径同量级
+    for (i = 0; i < n; i++) {
+      o = i * 3;
+      u = (rnd3() * m) | 0;
+      if (u >= m) u = m - 1;
+      out[o] = gp[u * 2] * half + (rnd3() - 0.5) * 0.012;
+      out[o + 1] = gp[u * 2 + 1] * half + (rnd3() - 0.5) * 0.012;
+      out[o + 2] = (rnd3() - 0.5) * 0.09;
+    }
+  }
+
+  var _tmp = new Float32Array(cloud.count * 3);
+
+  /* 换形状：新目标写进**空着**的那只缓冲，swap，进度归零。
+     同一个形状再来一次就直接返回（翻屏时会被反复调用，别白甩一遍）。
+     降级动效下不甩不聚，直接站定 —— 与入场、自转同一套规矩。 */
+  function shapeTo(name) {
+    if (!DECK || typeof name !== "string" || name === shapeName) return;
+    if (!/^[A-Za-z0-9]{1,8}$/.test(name)) return;
+    shapeName = name;
+    formTarget = (name === "sphere") ? 0 : 1;
+    shapeFill(name, _tmp);
+    pArr[1 - bi].set(_tmp);
+    gl.bindBuffer(gl.ARRAY_BUFFER, pBuf[1 - bi]);
+    gl.bufferData(gl.ARRAY_BUFFER, pArr[1 - bi], gl.DYNAMIC_DRAW);
+    bi = 1 - bi;
+    if (reduce) {
+      morphP = 1;
+      form = formTarget;
+      draw(animT);
+      return;
+    }
+    morphP = 0;
+    start();
   }
 
   gl.disable(gl.CULL_FACE);
@@ -607,7 +815,7 @@
      只剩一颗早就在转的球，入场那一下白演了。所以这里再等一手：这一屏真的
      进过画面才开演。首页上 hero 本来就在最顶上，这道门第一帧就开着，
      行为与以前一个字不差。 */
-  var heroSeen = reduce || !window.IntersectionObserver;
+  var heroSeen = reduce || !window.IntersectionObserver || DECK;
   if (!heroSeen) {
     new IntersectionObserver(function (entries, ob) {
       for (var i = 0; i < entries.length; i++) {
@@ -680,7 +888,12 @@
     gl.uniform1f(U.uBurst, burst);
     gl.uniform1f(U.uSeed, burstSeed);
     gl.uniform1f(U.uGather, gather);
-    gl.uniform1f(U.uWave, reduce ? 0 : 1);            // 星面海浪（降级动效下关掉）
+    // 换形状：进度 / 中途甩出的幅度 / 形状是否参与（首页恒为 0 → 与上一版一致）
+    gl.uniform1f(U.uMorph, reduce ? 1 : easeOutCubic(morphP));
+    gl.uniform1f(U.uScatter, reduce ? 0 : (PAGE.scatter == null ? 0.95 : PAGE.scatter));
+    gl.uniform1f(U.uShape, DECK ? 1 : 0);
+    gl.uniform1f(U.uForm, reduce ? formTarget : form);
+    gl.uniform1f(U.uWave, reduce ? 0 : (1 - form));   // 星面海浪（降级动效 / 已换形状都关掉）
     // 撞击落点：物体空间的单位向量，按当前的 yaw / pitch 转成与顶点同一套坐标系
     // （顶点着色器里的 hn 就是转过的）—— 两边不是同一套的话，球自转时冲击环
     // 会从落点上滑走。
@@ -707,7 +920,7 @@
     gl.uniform3f(WU.uColor, m.wireCol[0], m.wireCol[1], m.wireCol[2]);
     var wireIn = reduce ? 1 : Math.max(0, Math.min(1, (gather - 0.40) / 0.60));
     gl.uniform1f(WU.uGather, wireIn);
-    gl.uniform1f(WU.uAlpha, m.wire);
+    gl.uniform1f(WU.uAlpha, m.wire * (1 - (reduce ? formTarget : form)));   // 换形状 → 线框退场
     gl.bindBuffer(gl.ARRAY_BUFFER, wBuf);
     gl.vertexAttribPointer(WA.pos, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(WA.pos);
@@ -717,7 +930,12 @@
     gl.useProgram(prog);
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     bindPointers();
+    bindShape();                                   // aFrom / aTo：换形状那两只位置缓冲
     gl.drawArrays(gl.POINTS, 0, cloud.count);
+
+    // 卫星与流星的位置是每帧自己算的，不吃形状那一套：uShape 归零让着色器直接
+    // 退回 aPos（否则它们会去读形状缓冲，落到画面正中变成一坨）
+    gl.uniform1f(U.uShape, 0);
 
     // 卫星：一组小亮点带着尾迹与淡淡轨迹，各在自己的倾斜轨道上快速划过
     if (!reduce) buildSats(now);
@@ -755,7 +973,10 @@
       var o = imps[i];
       o.t += dt;
       if (o.phase === "wait") {
-        if (o.t >= o.wait) { o.phase = "fly"; o.t = 0; o.dir = pickImpactDir(); }
+        if (o.t >= o.wait) {
+          if (form > 0.5) o.t = 0;                      // 换形状途中别再放流星进来
+          else { o.phase = "fly"; o.t = 0; o.dir = pickImpactDir(); }
+        }
       } else if (o.phase === "fly") {
         if (o.t >= IMP_FLY) { o.phase = "hit"; o.t = 0; }
       } else if (o.t >= IMP_AGE) {
@@ -807,6 +1028,7 @@
      划过之后天上还剩一道淡淡的痕。位置每帧重算，不需要 aSpin（着色器里给 0）。 */
   function buildSats(t) {
     var o = 0, k, j, s2, ct, st, base, dir, a, x, y, z, f, g, sz, step, tf, off;
+    var cut = 1 - form;                    // 换形状时卫星跟着退场（它们只在球上有意义）
     for (k = 0; k < SATS.length; k++) {
       s2 = SATS[k];
       base = s2.ph + s2.w * t;
@@ -818,7 +1040,7 @@
         x = Math.cos(a) * s2.r; z = Math.sin(a) * s2.r;
         y = -z * st; z = z * ct;                 // 轨道面绕 X 轴倾斜 tilt
         f = j === 0 ? 1 : 1 - j / (s2.tail + 1);
-        g = j === 0 ? 1 : 0.16 + 0.84 * f * f;   // 头最亮，尾点快速衰减
+        g = (j === 0 ? 1 : 0.16 + 0.84 * f * f) * cut;   // 头最亮，尾点快速衰减
         sz = s2.sz * (j === 0 ? 1 : 0.34 + 0.66 * f);
         satArr[o++] = x; satArr[o++] = y; satArr[o++] = z;
         satArr[o++] = g; satArr[o++] = g; satArr[o++] = g;   // 亮度：色相由 uStn 按主题给
@@ -833,7 +1055,7 @@
         a = base - dir * off;
         x = Math.cos(a) * s2.r; z = Math.sin(a) * s2.r;
         y = -z * st; z = z * ct;
-        g = Math.pow(1 - tf, 2.2) * 0.26;                // 极淡，越远越虚
+        g = Math.pow(1 - tf, 2.2) * 0.26 * cut;          // 极淡，越远越虚
         sz = s2.sz * (0.20 + 0.46 * (1 - tf));
         satArr[o++] = x; satArr[o++] = y; satArr[o++] = z;
         satArr[o++] = g; satArr[o++] = g; satArr[o++] = g;
@@ -854,6 +1076,9 @@
       gather = easeOutCubic(Math.min(1, (now - gatherT0) / GATHER_MS));
       if (gather > 0.999) gather = 1;
     }
+    // 换形状：进度往前走；仪表（环带 / 线框 / 卫星 / 流星）按 form 退场或回来
+    if (morphP < 1) morphP = Math.min(1, morphP + dt / MORPH_S);
+    form += (formTarget - form) * Math.min(1, dt * 2.6);
     var k = Math.min(1, dt * 9);                   // 阻尼跟随（参考实现是每帧 0.1）
     yaw += (tYaw - yaw) * k;
     if (spin) { tYaw += spin * dt; yaw += spin * dt; }
@@ -877,8 +1102,12 @@
 
   function resize() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var rect = canvas.getBoundingClientRect();
-    var w = Math.round(rect.width * dpr), h = Math.round(rect.height * dpr);
+    /* 量**布局尺寸**（clientWidth/Height），不是 getBoundingClientRect：彩蛋页会把这
+       块画布用 CSS 缩放（有正文的屏上它退到右上角），而 rect 量到的是缩放后的尺寸。
+       拿缩放后的尺寸当分辨率，则缩放一变（CSS transform 不触发 resize 事件）
+       画面就会整体放大、发糊。布局尺寸不受 transform 影响：画布始终按满屏
+       分辨率渲染，缩放交给 CSS。 */
+    var w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
     if (w < 2 || h < 2) return;
     if (w === canvas.width && h === canvas.height) return;
     canvas.width = w;
@@ -899,7 +1128,7 @@
           if (raf) cancelAnimationFrame(raf);
         }
       });
-    }, { threshold: 0 }).observe(hero);
+    }, { threshold: 0 }).observe(host);
   }
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) {
@@ -1027,11 +1256,15 @@
         gather: +gather.toFixed(3),
         scroll: +scrollP.toFixed(3),
         animT: +animT.toFixed(2),
+        shape: shapeName,
+        morph: +morphP.toFixed(3),
+        form: +form.toFixed(3),
         impacts: imps.filter(function (o) { return o.age >= 0; }).length,
         impCount: impCount,
         running: running
       };
     },
-    flash: function () { flash(0); }
+    flash: function () { flash(0); },
+    shape: function (name) { shapeTo(name); }        // 彩蛋页翻屏时换形状（见第 3b 节）
   };
 })();

@@ -638,12 +638,24 @@ class AppState extends ChangeNotifier {
   ///
   /// 与 [beaconEnabled] 的区别：
   ///   * [beaconEnabled] 是**持久**的自动上报总开关（用户设置里选的）；
-  ///   * [beaconArmed] 是**每次连接**的一次性确认，掉线/重连/重开 App 都会复位，
-  ///     所以老用户不会因为它而被静默恢复成自动上报。
+  ///   * [beaconArmed] 是**每次连接**的一次性确认，由用户自己发起的连接/断开
+  ///     与重开 App 都会复位，所以老用户不会因为它而被静默恢复成自动上报。
+  ///
+  /// ── 什么算「新的一次连接」（用户 2026-10-14 补充）──
+  ///
+  /// 用户原话：「如果是**计划外**断开，可以直接重连」。即
+  ///   * **计划内**（用户自己点连接 / 断开 / 恢复出厂）→ 复位，要重新确认；
+  ///   * **计划外**（链路抖动、被服务器踢、自动重连、发射来源切换）→ **保留**
+  ///     确认，直接接着上报。
+  ///
+  /// 为什么计划外要保留：以前只要 `connected` 翻转就复位，链路一抖用户刚点过
+  /// 的确认就没了 —— 上报停住，界面与常驻通知又跳回「待确认上报」，在部分
+  /// ROM 上还会连着弹（用户报的「反复弹出待确认上报」）。对用户来说，一条自己
+  /// 掉线又自己连回来的链路仍然是同一次连接。
   ///
   /// ⚠️ 不持久化是刻意的：持久化就等于「确认一次，以后永远自动」，
   /// 又绕回用户反对的「连上就自动上报」。
-  bool beaconArmed = true;
+  bool beaconArmed = false;
 
   /// 用户点了正式的「开始上报」按钮 → 本次连接内放行自动上报。
   ///
@@ -3050,6 +3062,15 @@ class AppState extends ChangeNotifier {
   @visibleForTesting
   void debugSetLinkUp(String src, bool up) => _setLinkUp(src, up);
 
+  /// 仅测试用：模拟「用户自己点了连接 / 断开」这一计划内动作。
+  ///
+  /// 生产路径走 [toggleConnect]（连接与断开两个分支）和 [factoryReset]，
+  /// 它们都从 [_plannedLinkChange] 进；单测里跑真实的 [toggleConnect] 会碰
+  /// 平台通道，所以留这个口子（与 [debugSetLinkUp] 同理）。
+  @visibleForTesting
+  void debugPlannedLinkChange({required bool disconnecting}) =>
+      _plannedLinkChange(disconnecting: disconnecting);
+
   /// 仅测试用：模拟「本轮重新拿到了一次定位」。
   ///
   /// 生产代码不要用它 —— 真实定位通过 [_onFix] 打开上报闸（[myPositionReportable]）。
@@ -3068,20 +3089,32 @@ class AppState extends ChangeNotifier {
   @visibleForTesting
   void debugSyncSteps() => _syncSteps();
 
+  /// 「计划内」的连接变动 —— 用户自己点的连接 / 断开 / 恢复出厂。
+  ///
+  /// 两件事必须成对做，所以合成一个口子，别再各写各的：
+  ///   * 压住或放开自动重连（[_userDisconnected]）；
+  ///   * 作废本次连接的「开始上报」确认（[beaconArmed]）—— 用户自己的动作算
+  ///     「新的一次连接」，坐标要重新看过再确认。
+  ///
+  /// **计划外**的掉线自愈**不**走这里（见 [beaconArmed] 的长注释）：链路自己
+  /// 掉、自己连回来的，确认要留着 —— 用户要求「计划外断开可以直接重连」。
+  void _plannedLinkChange({required bool disconnecting}) {
+    _userDisconnected = disconnecting;
+    beaconArmed = false;
+  }
+
   void _setLinkUp(String src, bool up) {
     final wasConnected = connected;
     _linkUp[src] = up;
     _refreshConnected();
-    // 连接状态发生翻转 → 复位本次连接的「开始上报」确认。
+    // ⚠️ 这里**不再**复位「开始上报」的确认（以前是「connected 一翻转就复位」）。
     //
-    // 用户要求：无论用哪种方式定位，**连上服务器后不要自动上报**，必须由用户
-    // 手动点一下「开始上报」再发。所以每次「从断到连」都把确认复位；
-    // 反过来「从连到断」也复位，这样下一次连上同样要重新确认。
-    // 只有真正翻转才动它：同一状态被重复设置（幂等重连）不该打断用户已做的确认。
-    if (connected != wasConnected) {
-      beaconArmed = false;
-      _notify();
-    }
+    // 那正是「计划外断开」被当成新连接的根源：链路抖一下、APRS-IS 被踢一次、
+    // 自动重连成功、换一次发射来源，用户已经点过的确认就没了 —— 上报停住，
+    // 界面与常驻通知反复跳回「待确认上报」（用户报的 bug）。
+    // 现在的分工：计划内的连接变动在 [_plannedLinkChange] 里复位，这里只负责
+    // 把「链路可用性变了」通知给界面。
+    if (connected != wasConnected) _notify();
   }
 
   /// 该链路是否因**设备冲突**而根本不可能连上。
@@ -3701,7 +3734,8 @@ class AppState extends ChangeNotifier {
   Future<void> factoryReset() async {
     // ① 先压住自动重连：断链会触发 onDisconnected → 立刻排重连，
     //    若不在最前面置位，清完设置后会马上又拿旧参数去连。
-    _userDisconnected = true;
+    //    （顺带作废「开始上报」确认 —— 恢复出厂后必须重新确认。）
+    _plannedLinkChange(disconnecting: true);
     try {
       aprs.disconnect();
     } catch (_) {}
@@ -3739,6 +3773,7 @@ class AppState extends ChangeNotifier {
     aprsStatusText = '';
     beaconEnabled = true;
     beaconAutoAsked = false;
+    beaconArmed = false; // 恢复出厂：上报确认一并作废（与字段默认值一致）
     dataNoticeAccepted = false;
     pendingDataNotice = false;
     agentNoticeAccepted = false;
@@ -6771,6 +6806,9 @@ class AppState extends ChangeNotifier {
 
   // ─── 连接 ───
   Future<void> reconnect() async {
+    // 刻意**不**作废「开始上报」确认：用户点「重连」是修复现有的这条连接
+    // （应用新过滤/新参数），不是要开一次新会话 —— 掉线自愈不该让他重新确认
+    // （用户要求：「计划外断开可以直接重连」）。
     _userDisconnected = false;
     _reconnectTimer?.cancel();
     _lastFilter = ''; // 重置，确保下次连接后更新
@@ -6824,7 +6862,8 @@ class AppState extends ChangeNotifier {
     // 判据用 anyLinkUp：多选模式下「发射来源断了但别的还连着」时，
     // 用户点这个按钮的意图仍然是「全部断开」，而不是再连一次。
     if (anyLinkUp) {
-      _userDisconnected = true;
+      // 计划内断开：压住自动重连，并作废「开始上报」确认（下次连接重新确认）。
+      _plannedLinkChange(disconnecting: true);
       _reconnectAttempt = 0; // 手动断开，重置重试计数
       _reconnectTimer?.cancel();
       if (aprsIsOn) aprs.disconnect();
@@ -6846,7 +6885,9 @@ class AppState extends ChangeNotifier {
       _notify();
       return;
     }
-    _userDisconnected = false;
+    // 用户自己发起连接（[toggleConnect] 的入口有 7 处）：算新的一次连接，
+    // 不论之前确认过没有都要重新确认 —— 这正是「连上就自动上报」的反面。
+    _plannedLinkChange(disconnecting: false);
     await _connect();
   }
 
@@ -9782,7 +9823,8 @@ enum BeaconPhase {
   rfDisabled,
   /// 已连上服务器，但用户还没点「开始上报」（[AppState.beaconArmed] 为假）——
   /// 此时不会自动发射，UI 必须给一个正式的「开始上报」按钮，而不是继续倒计时。
-  /// 这是每次连接的一次性确认（见 user 要求：手动确认后才开始上报）。
+  /// 这是每次连接的一次性确认（见 user 要求：手动确认后才开始上报）；
+  /// **计划外**的掉线自愈会保留确认，所以这档不会因为链路抖动反复回来。
   needConfirm,
   /// 当前是**粗定位**（网络/基站/被动）——自动上报已暂停（见 [canAutoBeacon]），
   /// UI 必须说明原因，而不是继续倒计时。

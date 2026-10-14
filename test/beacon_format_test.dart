@@ -178,6 +178,9 @@ void main() {
       final st = located(AppState()..dataSource = AppState.srcAudio);
       st.beaconEnabled = true;
       st.connected = true;
+      // 本用例只关心「射频信标开关」这一档，把连接内的上报确认直接摆成已确认
+      // （默认关：连上后要用户点一下「开始上报」）
+      st.beaconArmed = true;
       expect(st.beaconPhase, BeaconPhase.rfDisabled);
       await st.enableRfBeacon();
       expect(st.audio.config.rfBeacon, isTrue, reason: '一键开启要落到当前来源的配置');

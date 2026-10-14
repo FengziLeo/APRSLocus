@@ -222,7 +222,7 @@ def main() -> int:
     # 用户要求：无论用哪种方式定位，**连上服务器后不要自动上报**，必须由用户
     # 手动点一下正式的「开始上报」按钮、确认坐标有效之后才开始。否则一连上就
     # 抢在用户看清坐标之前把位置发出去。
-    need('lib/state.dart', 'bool beaconArmed = true;',
+    need('lib/state.dart', 'bool beaconArmed = false;',
          '没有「本次连接已确认开始上报」的闸（beaconArmed）—— '
          '连上后会自动上报，用户要求手动确认后才开始')
     need('lib/state.dart', '  bool get canAutoBeacon => connected &&\n'
@@ -230,10 +230,29 @@ def main() -> int:
          '      myPositionReportable &&\n'
          '      beaconArmed &&',
          'canAutoBeacon 没有过 beaconArmed —— 连上后未确认就会自动上报')
-    need('lib/state.dart', 'if (connected != wasConnected) {\n'
-         '      beaconArmed = false;',
-         '_setLinkUp 没有在连接翻转时复位 beaconArmed —— '
-         '老连接残留的确认会让新连接又变成自动上报')
+    # 作废确认只认「计划内」的连接变动（用户自己的连接/断开/恢复出厂）；
+    # **计划外**的掉线自愈必须保留确认 —— 用户 2026-10-14：
+    # 「如果是计划外断开，可以直接重连」。
+    need('lib/state.dart',
+         'void _plannedLinkChange({required bool disconnecting}) {\n'
+         '    _userDisconnected = disconnecting;\n'
+         '    beaconArmed = false;',
+         '没有 _plannedLinkChange —— 用户自己点连接/断开时不会作废上报确认，'
+         '新连接会继承上一次的确认，又变成「连上就自动上报」')
+    need('lib/state.dart', '    _plannedLinkChange(disconnecting: true);\n'
+         '      _reconnectAttempt = 0; // 手动断开，重置重试计数',
+         'toggleConnect 的断开分支没走 _plannedLinkChange —— 手动断开后确认还留着')
+    need('lib/state.dart', '    _plannedLinkChange(disconnecting: false);\n'
+         '    await _connect();',
+         'toggleConnect 的连接分支没走 _plannedLinkChange —— 用户自己发起连接'
+         '会继承上一次的确认，变成「连上就自动上报」')
+    # 老写法：connected 一翻转就复位 —— 计划外的掉线自愈（链路抖动、自动重连、
+    # 换发射来源）会抹掉用户已做的确认，界面与常驻通知于是反复跳回
+    # 「待确认上报」（用户报的 bug）。不许回来。
+    forbid('lib/state.dart', 'if (connected != wasConnected) {\n'
+           '      beaconArmed = false;',
+           '_setLinkUp 又在连接翻转时复位 beaconArmed —— 计划外断开会把用户'
+           '已做的确认抹掉，「反复弹出待确认上报」会回来')
     need('lib/state.dart', 'if (!beaconArmed) return BeaconPhase.needConfirm;',
          'beaconPhase 没有把「还没点开始上报」报成 needConfirm —— '
          '界面会显示一个照走的倒计时，到点却什么都不发')

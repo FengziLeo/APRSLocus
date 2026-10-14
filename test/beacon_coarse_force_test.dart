@@ -30,6 +30,10 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 20));
     st.beaconEnabled = true;
     st.connected = true; // 默认来源是 APRS-IS，不受「射频信标」那一档影响
+    // 「本次连接已确认开始上报」（beaconArmed）字段默认是**关**的（连上后要
+    // 用户点一下才开始自动上报）。这里直接摆成已确认 —— 本文件测的是粗定位
+    // 门控，不是那道确认闸（那道闸的回归在 test/report_confirm_test.dart）。
+    st.beaconArmed = true;
     // ⚠ 新增的上报闸（myPositionReportable）要求「本轮已重新定位」，即
     // myHasFix && !_pendingSavedPos —— **缺一不可**。这里没有真实定位回调，
     // 用调试口子把它摆成「已拿到本轮定位」。

@@ -9351,4 +9351,86 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get locationExtGps => 'GPS externo (Bluetooth)';
 
+  @override
+  String get dataSourceNmeaGps => 'GPS externo (Bluetooth)';
+
+  @override
+  String get dataSourceNmeaGpsDesc => 'Lee las sentencias de posición NMEA 0183 de un módulo GPS y las usa como posición de este dispositivo (solo recepción)';
+
+  @override
+  String get dataSourceNmeaGpsHint => 'Este enlace aporta **tu propia posición** (no los paquetes de otras estaciones): pasa a tener prioridad al conectar, y el GPS del teléfono vuelve a asumir 30 segundos después de que el módulo deje de enviar';
+
+  @override
+  String get extGpsDeviceTitle => 'GPS externo';
+
+  @override
+  String get extGpsDeviceDesc => 'Fuente de posición NMEA 0183 por Bluetooth SPP o serie';
+
+  @override
+  String get extGpsBindTitle => 'Dispositivo y conexión';
+
+  @override
+  String get extGpsBindSubtitle => 'Escanea dispositivos emparejados y vincula uno (mismo permiso de Bluetooth que TNC / PKWDWPL)';
+
+  @override
+  String get extGpsTip => 'Al conectar, la posición sale primero del módulo (suele ir en el techo o junto a una ventana, así que es más preciso que el teléfono y el reloj); el GPS del teléfono vuelve a asumir 30 segundos después de la última posición.';
+
+  @override
+  String get extGpsReadOnly => 'Solo recepción: el módulo solo emite posición y nunca transmite';
+
+  @override
+  String get extGpsStatTitle => 'Recepción de posición';
+
+  @override
+  String extGpsStats(String rx) {
+    return '$rx posiciones recibidas';
+  }
+
+  @override
+  String get extGpsStatNoFix => 'Sentencias válidas sin posición';
+
+  @override
+  String get extGpsStatMismatch => 'Discrepancias de suma';
+
+  @override
+  String get extGpsStatRejected => 'Sentencias descartadas o inválidas';
+
+  @override
+  String get extGpsStatIgnored => 'Otras sentencias NMEA (ignoradas)';
+
+  @override
+  String get extGpsSatellites => 'Satélites';
+
+  @override
+  String get extGpsAccuracy => 'Precisión';
+
+  @override
+  String get extGpsWaitingFix => 'Conectado, buscando satélites (aún sin posición utilizable)';
+
+  @override
+  String get extGpsSilent => 'Conectado pero sin ninguna sentencia (comprueba la alimentación y si otra aplicación ocupa el dispositivo)';
+
+  @override
+  String get extGpsLogEmpty => 'Aún no hay registro del GPS externo';
+
+  @override
+  String get ownSourceExtGpsLive => 'El módulo aporta la posición (el GPS del teléfono se aparta)';
+
+  @override
+  String get deviceInUseByOther => 'Ya lo usa otro enlace, no se puede vincular dos veces';
+
+  @override
+  String get extGpsStrictChecksum => 'Suma de verificación estricta (descartar discrepancias)';
+
+  @override
+  String get extGpsStrictChecksumTip => 'Activado por defecto: un módulo GPS envía sentencias estándar, así que una discrepancia de suma casi siempre significa ruido en la línea: se descarta la sentencia para que un solo byte defectuoso no desvíe la posición. Algunos módulos baratos sí envían una suma incorrecta; desactívalo en ese caso (el contador de descartes y el registro siguen visibles).';
+
+  @override
+  String get beaconSppSource => 'Balizando desde GPS externo';
+
+  @override
+  String beaconSppNext(String s) {
+    return 'GPS externo · $s';
+  }
+
 }

@@ -16188,6 +16188,162 @@ abstract class AppLocalizations {
   /// **'外接 GPS（蓝牙）'**
   String get locationExtGps;
 
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'外接 GPS（蓝牙）'**
+  String get dataSourceNmeaGps;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'读取 GPS 模组输出的 NMEA 0183 定位语句，作为本机位置来源（只收不发）'**
+  String get dataSourceNmeaGpsDesc;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'这条链路供的是**本机位置**（不是别人的报文）：接上后位置优先用它，模组断流 30 秒后自动交回手机 GPS'**
+  String get dataSourceNmeaGpsHint;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'外接 GPS'**
+  String get extGpsDeviceTitle;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'蓝牙 SPP / 串口上的 NMEA 0183 位置来源'**
+  String get extGpsDeviceDesc;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'设备与连接'**
+  String get extGpsBindTitle;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描已配对设备并绑定（与 TNC / PKWDWPL 同一套蓝牙权限）'**
+  String get extGpsBindSubtitle;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'接上后位置优先用模组（常架在车顶或窗外，比手机与手表准）；拿不到新定位 30 秒后自动交回手机 GPS。'**
+  String get extGpsTip;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'只收不发：模组只输出位置，不参与发射'**
+  String get extGpsReadOnly;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'定位接收'**
+  String get extGpsStatTitle;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'已收定位 {rx} 条'**
+  String extGpsStats(String rx);
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'语句有效但还没定上'**
+  String get extGpsStatNoFix;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'校验和不符'**
+  String get extGpsStatMismatch;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'丢弃/无效语句'**
+  String get extGpsStatRejected;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'其它 NMEA 语句（已忽略）'**
+  String get extGpsStatIgnored;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'卫星'**
+  String get extGpsSatellites;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'精度'**
+  String get extGpsAccuracy;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'已连接，正在搜星（还没有一次可用定位）'**
+  String get extGpsWaitingFix;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'已连接，但没有收到任何语句（查供电 / 是否被别的应用占着）'**
+  String get extGpsSilent;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无外接 GPS 日志'**
+  String get extGpsLogEmpty;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'外接模块供位（手机 GPS 已让位）'**
+  String get ownSourceExtGpsLive;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'已被其它链路占用，不能重复绑定'**
+  String get deviceInUseByOther;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'严格校验和（不符即丢弃）'**
+  String get extGpsStrictChecksum;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'默认开启：GPS 模组按标准发语句，校验和不符基本只有线路噪声一种解释 ——整条丢弃，别让一个坏字节把定位带偏。少数杂牌模组确实会发错校验和，那时把这里关掉（丢弃条数与日志会一直显示）。'**
+  String get extGpsStrictChecksumTip;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'外接 GPS 上报中'**
+  String get beaconSppSource;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'外接 GPS 上报 · {s}'**
+  String beaconSppNext(String s);
+
 }
 
 class _AppLocalizationsDelegate

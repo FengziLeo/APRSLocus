@@ -9292,4 +9292,86 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get locationExtGps => 'external GPS (Bluetooth)';
 
+  @override
+  String get dataSourceNmeaGps => 'External GPS (Bluetooth)';
+
+  @override
+  String get dataSourceNmeaGpsDesc => 'Read NMEA 0183 position sentences from a GPS module and use them as this device own position (receive-only)';
+
+  @override
+  String get dataSourceNmeaGpsHint => 'This link supplies **your own position** (not other stations packets): it takes priority once connected, and the phone GPS takes over again 30 seconds after the module stops sending';
+
+  @override
+  String get extGpsDeviceTitle => 'External GPS';
+
+  @override
+  String get extGpsDeviceDesc => 'NMEA 0183 position source over Bluetooth SPP or serial';
+
+  @override
+  String get extGpsBindTitle => 'Device and connection';
+
+  @override
+  String get extGpsBindSubtitle => 'Scan paired devices and bind one (same Bluetooth permission as TNC / PKWDWPL)';
+
+  @override
+  String get extGpsTip => 'Once connected the position comes from the module first (it usually sits on the roof or by a window, so it beats the phone and the watch); the phone GPS takes over again 30 seconds after the last fix.';
+
+  @override
+  String get extGpsReadOnly => 'Receive-only: the module only outputs position and never transmits';
+
+  @override
+  String get extGpsStatTitle => 'Position reception';
+
+  @override
+  String extGpsStats(String rx) {
+    return '$rx positions received';
+  }
+
+  @override
+  String get extGpsStatNoFix => 'Valid sentences, no fix yet';
+
+  @override
+  String get extGpsStatMismatch => 'Checksum mismatches';
+
+  @override
+  String get extGpsStatRejected => 'Dropped or invalid sentences';
+
+  @override
+  String get extGpsStatIgnored => 'Other NMEA sentences (ignored)';
+
+  @override
+  String get extGpsSatellites => 'Satellites';
+
+  @override
+  String get extGpsAccuracy => 'Accuracy';
+
+  @override
+  String get extGpsWaitingFix => 'Connected, acquiring satellites (no usable fix yet)';
+
+  @override
+  String get extGpsSilent => 'Connected but no sentences at all (check power and whether another app holds the device)';
+
+  @override
+  String get extGpsLogEmpty => 'No external GPS log yet';
+
+  @override
+  String get ownSourceExtGpsLive => 'Module supplying position (phone GPS stood down)';
+
+  @override
+  String get deviceInUseByOther => 'Already used by another link, cannot bind twice';
+
+  @override
+  String get extGpsStrictChecksum => 'Strict checksum (drop mismatches)';
+
+  @override
+  String get extGpsStrictChecksumTip => 'On by default: a GPS module sends standard sentences, so a checksum mismatch almost always means line noise — the sentence is dropped so a single bad byte cannot skew the position. A few cheap modules really do send a wrong checksum; turn this off for those (the drop counter and log stay visible).';
+
+  @override
+  String get beaconSppSource => 'Beaconing from external GPS';
+
+  @override
+  String beaconSppNext(String s) {
+    return 'External GPS · $s';
+  }
+
 }

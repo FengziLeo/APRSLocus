@@ -8912,6 +8912,88 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get locationExtGps => '外接 GPS（蓝牙）';
 
+  @override
+  String get dataSourceNmeaGps => '外接 GPS（蓝牙）';
+
+  @override
+  String get dataSourceNmeaGpsDesc => '读取 GPS 模组输出的 NMEA 0183 定位语句，作为本机位置来源（只收不发）';
+
+  @override
+  String get dataSourceNmeaGpsHint => '这条链路供的是**本机位置**（不是别人的报文）：接上后位置优先用它，模组断流 30 秒后自动交回手机 GPS';
+
+  @override
+  String get extGpsDeviceTitle => '外接 GPS';
+
+  @override
+  String get extGpsDeviceDesc => '蓝牙 SPP / 串口上的 NMEA 0183 位置来源';
+
+  @override
+  String get extGpsBindTitle => '设备与连接';
+
+  @override
+  String get extGpsBindSubtitle => '扫描已配对设备并绑定（与 TNC / PKWDWPL 同一套蓝牙权限）';
+
+  @override
+  String get extGpsTip => '接上后位置优先用模组（常架在车顶或窗外，比手机与手表准）；拿不到新定位 30 秒后自动交回手机 GPS。';
+
+  @override
+  String get extGpsReadOnly => '只收不发：模组只输出位置，不参与发射';
+
+  @override
+  String get extGpsStatTitle => '定位接收';
+
+  @override
+  String extGpsStats(String rx) {
+    return '已收定位 $rx 条';
+  }
+
+  @override
+  String get extGpsStatNoFix => '语句有效但还没定上';
+
+  @override
+  String get extGpsStatMismatch => '校验和不符';
+
+  @override
+  String get extGpsStatRejected => '丢弃/无效语句';
+
+  @override
+  String get extGpsStatIgnored => '其它 NMEA 语句（已忽略）';
+
+  @override
+  String get extGpsSatellites => '卫星';
+
+  @override
+  String get extGpsAccuracy => '精度';
+
+  @override
+  String get extGpsWaitingFix => '已连接，正在搜星（还没有一次可用定位）';
+
+  @override
+  String get extGpsSilent => '已连接，但没有收到任何语句（查供电 / 是否被别的应用占着）';
+
+  @override
+  String get extGpsLogEmpty => '暂无外接 GPS 日志';
+
+  @override
+  String get ownSourceExtGpsLive => '外接模块供位（手机 GPS 已让位）';
+
+  @override
+  String get deviceInUseByOther => '已被其它链路占用，不能重复绑定';
+
+  @override
+  String get extGpsStrictChecksum => '严格校验和（不符即丢弃）';
+
+  @override
+  String get extGpsStrictChecksumTip => '默认开启：GPS 模组按标准发语句，校验和不符基本只有线路噪声一种解释 ——整条丢弃，别让一个坏字节把定位带偏。少数杂牌模组确实会发错校验和，那时把这里关掉（丢弃条数与日志会一直显示）。';
+
+  @override
+  String get beaconSppSource => '外接 GPS 上报中';
+
+  @override
+  String beaconSppNext(String s) {
+    return '外接 GPS 上报 · $s';
+  }
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -17820,5 +17902,87 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get locationExtGps => '外接 GPS（藍牙）';
+
+  @override
+  String get dataSourceNmeaGps => '外接 GPS（藍牙）';
+
+  @override
+  String get dataSourceNmeaGpsDesc => '讀取 GPS 模組輸出的 NMEA 0183 定位語句，作為本機位置來源（只收不發）';
+
+  @override
+  String get dataSourceNmeaGpsHint => '這條鏈路供的是**本機位置**（不是別人的報文）：接上後位置優先用它，模組斷流 30 秒後自動交回手機 GPS';
+
+  @override
+  String get extGpsDeviceTitle => '外接 GPS';
+
+  @override
+  String get extGpsDeviceDesc => '藍牙 SPP / 串列埠上的 NMEA 0183 位置來源';
+
+  @override
+  String get extGpsBindTitle => '裝置與連線';
+
+  @override
+  String get extGpsBindSubtitle => '掃描已配對裝置並綁定（與 TNC / PKWDWPL 同一套藍牙權限）';
+
+  @override
+  String get extGpsTip => '接上後位置優先用模組（常架在車頂或窗外，比手機與手錶準）；拿不到新定位 30 秒後自動交回手機 GPS。';
+
+  @override
+  String get extGpsReadOnly => '只收不發：模組只輸出位置，不參與發射';
+
+  @override
+  String get extGpsStatTitle => '定位接收';
+
+  @override
+  String extGpsStats(String rx) {
+    return '已收定位 $rx 條';
+  }
+
+  @override
+  String get extGpsStatNoFix => '語句有效但還沒定上';
+
+  @override
+  String get extGpsStatMismatch => '校驗和不符';
+
+  @override
+  String get extGpsStatRejected => '丟棄/無效語句';
+
+  @override
+  String get extGpsStatIgnored => '其它 NMEA 語句（已忽略）';
+
+  @override
+  String get extGpsSatellites => '衛星';
+
+  @override
+  String get extGpsAccuracy => '精度';
+
+  @override
+  String get extGpsWaitingFix => '已連線，正在搜星（還沒有一次可用定位）';
+
+  @override
+  String get extGpsSilent => '已連線，但沒有收到任何語句（檢查供電 / 是否被別的應用佔用）';
+
+  @override
+  String get extGpsLogEmpty => '暫無外接 GPS 日誌';
+
+  @override
+  String get ownSourceExtGpsLive => '外接模組供位（手機 GPS 已讓位）';
+
+  @override
+  String get deviceInUseByOther => '已被其它鏈路佔用，不能重複綁定';
+
+  @override
+  String get extGpsStrictChecksum => '嚴格校驗和（不符即丟棄）';
+
+  @override
+  String get extGpsStrictChecksumTip => '預設開啟：GPS 模組按標準送語句，校驗和不符基本上只有線路雜訊一種解釋 ——整條丟棄，別讓一個壞位元把定位帶偏。少數雜牌模組確實會送錯校驗和，那時把這裡關掉（丟棄條數與日誌會一直顯示）。';
+
+  @override
+  String get beaconSppSource => '外接 GPS 上報中';
+
+  @override
+  String beaconSppNext(String s) {
+    return '外接 GPS 上報 · $s';
+  }
 
 }

@@ -9013,4 +9013,86 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get locationExtGps => '外付け GPS（Bluetooth）';
 
+  @override
+  String get dataSourceNmeaGps => '外付け GPS（Bluetooth）';
+
+  @override
+  String get dataSourceNmeaGpsDesc => 'GPS モジュールが出力する NMEA 0183 の測位文を読み、この端末自身の位置として使います（受信のみ）';
+
+  @override
+  String get dataSourceNmeaGpsHint => 'このリンクが供給するのは**この端末の位置**です（他局のパケットではありません）。接続すると優先的に使われ、モジュールの送信が 30 秒止まるとスマートフォンの GPS に戻ります';
+
+  @override
+  String get extGpsDeviceTitle => '外付け GPS';
+
+  @override
+  String get extGpsDeviceDesc => 'Bluetooth SPP / シリアル経由の NMEA 0183 位置ソース';
+
+  @override
+  String get extGpsBindTitle => 'デバイスと接続';
+
+  @override
+  String get extGpsBindSubtitle => 'ペアリング済みのデバイスをスキャンしてバインドします（TNC / PKWDWPL と同じ Bluetooth 権限）';
+
+  @override
+  String get extGpsTip => '接続後はモジュールの位置を優先します（屋根や窓辺に置くことが多く、スマートフォンや時計より正確）。最後の測位から 30 秒たつとスマートフォンの GPS に戻ります。';
+
+  @override
+  String get extGpsReadOnly => '受信のみ：モジュールは位置を出力するだけで送信には関与しません';
+
+  @override
+  String get extGpsStatTitle => '測位の受信';
+
+  @override
+  String extGpsStats(String rx) {
+    return '測位を $rx 件受信';
+  }
+
+  @override
+  String get extGpsStatNoFix => '文は有効だが未測位';
+
+  @override
+  String get extGpsStatMismatch => 'チェックサム不一致';
+
+  @override
+  String get extGpsStatRejected => '破棄/無効な文';
+
+  @override
+  String get extGpsStatIgnored => 'その他の NMEA 文（無視）';
+
+  @override
+  String get extGpsSatellites => '衛星';
+
+  @override
+  String get extGpsAccuracy => '精度';
+
+  @override
+  String get extGpsWaitingFix => '接続済み、衛星を捕捉中（まだ有効な測位がありません）';
+
+  @override
+  String get extGpsSilent => '接続済みですが文が一切届きません（給電と、他のアプリが占有していないかを確認してください）';
+
+  @override
+  String get extGpsLogEmpty => '外付け GPS のログはまだありません';
+
+  @override
+  String get ownSourceExtGpsLive => 'モジュールが位置を供給中（スマートフォン GPS は待機）';
+
+  @override
+  String get deviceInUseByOther => '他のリンクが使用中のため重複バインドできません';
+
+  @override
+  String get extGpsStrictChecksum => '厳格なチェックサム（不一致は破棄）';
+
+  @override
+  String get extGpsStrictChecksumTip => '既定でオン：GPS モジュールは規格どおりの文を送るため、チェックサム不一致はほぼ配線ノイズです。1 バイトの破損で測位がずれないよう文ごと破棄します。安価なモジュールには実際に誤ったチェックサムを送るものもあり、その場合はここをオフにしてください（破棄数とログは表示され続けます）。';
+
+  @override
+  String get beaconSppSource => '外付け GPS から送信';
+
+  @override
+  String beaconSppNext(String s) {
+    return '外付け GPS · $s';
+  }
+
 }

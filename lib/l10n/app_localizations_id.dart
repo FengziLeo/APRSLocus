@@ -9302,4 +9302,86 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get locationExtGps => 'GPS eksternal (Bluetooth)';
 
+  @override
+  String get dataSourceNmeaGps => 'GPS eksternal (Bluetooth)';
+
+  @override
+  String get dataSourceNmeaGpsDesc => 'Baca kalimat posisi NMEA 0183 dari modul GPS dan pakai sebagai posisi perangkat ini (hanya terima)';
+
+  @override
+  String get dataSourceNmeaGpsHint => 'Tautan ini memasok **posisi perangkat ini** (bukan paket stasiun lain): begitu tersambung ia diprioritaskan, dan GPS ponsel kembali mengambil alih 30 detik setelah modul berhenti mengirim';
+
+  @override
+  String get extGpsDeviceTitle => 'GPS eksternal';
+
+  @override
+  String get extGpsDeviceDesc => 'Sumber posisi NMEA 0183 lewat Bluetooth SPP atau serial';
+
+  @override
+  String get extGpsBindTitle => 'Perangkat dan koneksi';
+
+  @override
+  String get extGpsBindSubtitle => 'Pindai perangkat yang sudah dipasangkan lalu ikat (izin Bluetooth sama dengan TNC / PKWDWPL)';
+
+  @override
+  String get extGpsTip => 'Setelah tersambung, posisi diambil dari modul lebih dulu (biasanya dipasang di atap atau dekat jendela, sehingga lebih akurat daripada ponsel dan jam); GPS ponsel kembali mengambil alih 30 detik setelah posisi terakhir.';
+
+  @override
+  String get extGpsReadOnly => 'Hanya terima: modul hanya mengeluarkan posisi dan tidak ikut memancar';
+
+  @override
+  String get extGpsStatTitle => 'Penerimaan posisi';
+
+  @override
+  String extGpsStats(String rx) {
+    return '$rx posisi diterima';
+  }
+
+  @override
+  String get extGpsStatNoFix => 'Kalimat valid tetapi belum ada posisi';
+
+  @override
+  String get extGpsStatMismatch => 'Ketidakcocokan checksum';
+
+  @override
+  String get extGpsStatRejected => 'Kalimat dibuang atau tidak valid';
+
+  @override
+  String get extGpsStatIgnored => 'Kalimat NMEA lain (diabaikan)';
+
+  @override
+  String get extGpsSatellites => 'Satelit';
+
+  @override
+  String get extGpsAccuracy => 'Akurasi';
+
+  @override
+  String get extGpsWaitingFix => 'Tersambung, mencari satelit (belum ada posisi yang dapat dipakai)';
+
+  @override
+  String get extGpsSilent => 'Tersambung tetapi tidak ada kalimat sama sekali (periksa daya dan apakah aplikasi lain memakai perangkat itu)';
+
+  @override
+  String get extGpsLogEmpty => 'Belum ada log GPS eksternal';
+
+  @override
+  String get ownSourceExtGpsLive => 'Modul memasok posisi (GPS ponsel mundur)';
+
+  @override
+  String get deviceInUseByOther => 'Sudah dipakai tautan lain, tidak bisa diikat dua kali';
+
+  @override
+  String get extGpsStrictChecksum => 'Checksum ketat (buang yang tidak cocok)';
+
+  @override
+  String get extGpsStrictChecksumTip => 'Aktif secara bawaan: modul GPS mengirim kalimat standar, jadi ketidakcocokan checksum hampir selalu berarti derau pada jalur — kalimatnya dibuang agar satu byte rusak tidak membuat posisi melenceng. Sebagian modul murah memang mengirim checksum yang salah; matikan ini untuk modul seperti itu (penghitung pembuangan dan log tetap terlihat).';
+
+  @override
+  String get beaconSppSource => 'Memancarkan dari GPS eksternal';
+
+  @override
+  String beaconSppNext(String s) {
+    return 'GPS eksternal · $s';
+  }
+
 }

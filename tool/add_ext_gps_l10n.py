@@ -40,6 +40,16 @@ FILES = ('app_localizations_zh.dart', 'app_localizations_en.dart',
          'app_localizations_es.dart', 'app_localizations_id.dart',
          'app_localizations_ja.dart')
 
+# 带占位符的键：key → {占位符: 类型}。gen-l10n 的产物里这种键是**带参方法**
+# （`String x(String a) { return '...$a...'; }`）而不是 getter —— 写错成本形，
+# 本机 analyze 会报 not_a_function，而 CI 的 pub get 重新生成产物后又看不见。
+# 带占位符的键还必须在**模板 arb** 里有自己的 `@key` 元数据（gen-l10n 靠它定
+# 参数类型；没有就按 Object 生成，产物与提交的那份对不上），下面的 ①b 会写。
+PLACEHOLDERS = {
+    'extGpsStats': {'rx': 'String'},
+    'beaconSppNext': {'s': 'String'},
+}
+
 # key → (zh, zh_TW, en, ja, es, id)
 KEYS = {
     # 定位来源名。与 posSrcSim / posSrcGarmin / posSrcPhone 并列的第四档，
@@ -61,7 +71,304 @@ KEYS = {
         'GPS externo (Bluetooth)',
         'GPS eksternal (Bluetooth)',
     ),
+    # ── 数据来源卡里的一行（与 PKWDWPL 同类：设备链路、只收不发） ──
+    'dataSourceNmeaGps': (
+        '外接 GPS（蓝牙）', '外接 GPS（藍牙）',
+        'External GPS (Bluetooth)',
+        '外付け GPS（Bluetooth）',
+        'GPS externo (Bluetooth)',
+        'GPS eksternal (Bluetooth)',
+    ),
+    'dataSourceNmeaGpsDesc': (
+        '读取 GPS 模组输出的 NMEA 0183 定位语句，作为本机位置来源（只收不发）',
+        '讀取 GPS 模組輸出的 NMEA 0183 定位語句，作為本機位置來源（只收不發）',
+        'Read NMEA 0183 position sentences from a GPS module and use them as this '
+        'device own position (receive-only)',
+        'GPS モジュールが出力する NMEA 0183 の測位文を読み、この端末自身の位置として'
+        '使います（受信のみ）',
+        'Lee las sentencias de posición NMEA 0183 de un módulo GPS y las usa como '
+        'posición de este dispositivo (solo recepción)',
+        'Baca kalimat posisi NMEA 0183 dari modul GPS dan pakai sebagai posisi '
+        'perangkat ini (hanya terima)',
+    ),
+    'dataSourceNmeaGpsHint': (
+        '这条链路供的是**本机位置**（不是别人的报文）：接上后位置优先用它，'
+        '模组断流 30 秒后自动交回手机 GPS',
+        '這條鏈路供的是**本機位置**（不是別人的報文）：接上後位置優先用它，'
+        '模組斷流 30 秒後自動交回手機 GPS',
+        'This link supplies **your own position** (not other stations packets): it '
+        'takes priority once connected, and the phone GPS takes over again 30 '
+        'seconds after the module stops sending',
+        'このリンクが供給するのは**この端末の位置**です（他局のパケットではありません）。'
+        '接続すると優先的に使われ、モジュールの送信が 30 秒止まるとスマートフォンの GPS '
+        'に戻ります',
+        'Este enlace aporta **tu propia posición** (no los paquetes de otras '
+        'estaciones): pasa a tener prioridad al conectar, y el GPS del teléfono '
+        'vuelve a asumir 30 segundos después de que el módulo deje de enviar',
+        'Tautan ini memasok **posisi perangkat ini** (bukan paket stasiun lain): '
+        'begitu tersambung ia diprioritaskan, dan GPS ponsel kembali mengambil alih '
+        '30 detik setelah modul berhenti mengirim',
+    ),
+    # ── 设备页（与 PKWDWPL 设备页同构） ──
+    'extGpsDeviceTitle': (
+        '外接 GPS', '外接 GPS',
+        'External GPS',
+        '外付け GPS',
+        'GPS externo',
+        'GPS eksternal',
+    ),
+    'extGpsDeviceDesc': (
+        '蓝牙 SPP / 串口上的 NMEA 0183 位置来源',
+        '藍牙 SPP / 串列埠上的 NMEA 0183 位置來源',
+        'NMEA 0183 position source over Bluetooth SPP or serial',
+        'Bluetooth SPP / シリアル経由の NMEA 0183 位置ソース',
+        'Fuente de posición NMEA 0183 por Bluetooth SPP o serie',
+        'Sumber posisi NMEA 0183 lewat Bluetooth SPP atau serial',
+    ),
+    'extGpsBindTitle': (
+        '设备与连接', '裝置與連線',
+        'Device and connection',
+        'デバイスと接続',
+        'Dispositivo y conexión',
+        'Perangkat dan koneksi',
+    ),
+    'extGpsBindSubtitle': (
+        '扫描已配对设备并绑定（与 TNC / PKWDWPL 同一套蓝牙权限）',
+        '掃描已配對裝置並綁定（與 TNC / PKWDWPL 同一套藍牙權限）',
+        'Scan paired devices and bind one (same Bluetooth permission as '
+        'TNC / PKWDWPL)',
+        'ペアリング済みのデバイスをスキャンしてバインドします（TNC / PKWDWPL と'
+        '同じ Bluetooth 権限）',
+        'Escanea dispositivos emparejados y vincula uno (mismo permiso de Bluetooth '
+        'que TNC / PKWDWPL)',
+        'Pindai perangkat yang sudah dipasangkan lalu ikat (izin Bluetooth sama '
+        'dengan TNC / PKWDWPL)',
+    ),
+    'extGpsTip': (
+        '接上后位置优先用模组（常架在车顶或窗外，比手机与手表准）；'
+        '拿不到新定位 30 秒后自动交回手机 GPS。',
+        '接上後位置優先用模組（常架在車頂或窗外，比手機與手錶準）；'
+        '拿不到新定位 30 秒後自動交回手機 GPS。',
+        'Once connected the position comes from the module first (it usually sits '
+        'on the roof or by a window, so it beats the phone and the watch); the '
+        'phone GPS takes over again 30 seconds after the last fix.',
+        '接続後はモジュールの位置を優先します（屋根や窓辺に置くことが多く、'
+        'スマートフォンや時計より正確）。最後の測位から 30 秒たつとスマートフォンの GPS '
+        'に戻ります。',
+        'Al conectar, la posición sale primero del módulo (suele ir en el techo o '
+        'junto a una ventana, así que es más preciso que el teléfono y el reloj); '
+        'el GPS del teléfono vuelve a asumir 30 segundos después de la última '
+        'posición.',
+        'Setelah tersambung, posisi diambil dari modul lebih dulu (biasanya dipasang '
+        'di atap atau dekat jendela, sehingga lebih akurat daripada ponsel dan jam); '
+        'GPS ponsel kembali mengambil alih 30 detik setelah posisi terakhir.',
+    ),
+    'extGpsReadOnly': (
+        '只收不发：模组只输出位置，不参与发射',
+        '只收不發：模組只輸出位置，不參與發射',
+        'Receive-only: the module only outputs position and never transmits',
+        '受信のみ：モジュールは位置を出力するだけで送信には関与しません',
+        'Solo recepción: el módulo solo emite posición y nunca transmite',
+        'Hanya terima: modul hanya mengeluarkan posisi dan tidak ikut memancar',
+    ),
+    'extGpsStatTitle': (
+        '定位接收', '定位接收',
+        'Position reception',
+        '測位の受信',
+        'Recepción de posición',
+        'Penerimaan posisi',
+    ),
+    # 带占位符：产物里是带参方法（见上面的 PLACEHOLDERS）
+    'extGpsStats': (
+        '已收定位 {rx} 条', '已收定位 {rx} 條',
+        '{rx} positions received',
+        '測位を {rx} 件受信',
+        '{rx} posiciones recibidas',
+        '{rx} posisi diterima',
+    ),
+    'extGpsStatNoFix': (
+        '语句有效但还没定上', '語句有效但還沒定上',
+        'Valid sentences, no fix yet',
+        '文は有効だが未測位',
+        'Sentencias válidas sin posición',
+        'Kalimat valid tetapi belum ada posisi',
+    ),
+    'extGpsStatMismatch': (
+        '校验和不符', '校驗和不符',
+        'Checksum mismatches',
+        'チェックサム不一致',
+        'Discrepancias de suma',
+        'Ketidakcocokan checksum',
+    ),
+    'extGpsStatRejected': (
+        '丢弃/无效语句', '丟棄/無效語句',
+        'Dropped or invalid sentences',
+        '破棄/無効な文',
+        'Sentencias descartadas o inválidas',
+        'Kalimat dibuang atau tidak valid',
+    ),
+    'extGpsStatIgnored': (
+        '其它 NMEA 语句（已忽略）', '其它 NMEA 語句（已忽略）',
+        'Other NMEA sentences (ignored)',
+        'その他の NMEA 文（無視）',
+        'Otras sentencias NMEA (ignoradas)',
+        'Kalimat NMEA lain (diabaikan)',
+    ),
+    'extGpsSatellites': (
+        '卫星', '衛星',
+        'Satellites',
+        '衛星',
+        'Satélites',
+        'Satelit',
+    ),
+    'extGpsAccuracy': (
+        '精度', '精度',
+        'Accuracy',
+        '精度',
+        'Precisión',
+        'Akurasi',
+    ),
+    'extGpsWaitingFix': (
+        '已连接，正在搜星（还没有一次可用定位）',
+        '已連線，正在搜星（還沒有一次可用定位）',
+        'Connected, acquiring satellites (no usable fix yet)',
+        '接続済み、衛星を捕捉中（まだ有効な測位がありません）',
+        'Conectado, buscando satélites (aún sin posición utilizable)',
+        'Tersambung, mencari satelit (belum ada posisi yang dapat dipakai)',
+    ),
+    'extGpsSilent': (
+        '已连接，但没有收到任何语句（查供电 / 是否被别的应用占着）',
+        '已連線，但沒有收到任何語句（檢查供電 / 是否被別的應用佔用）',
+        'Connected but no sentences at all (check power and whether another app '
+        'holds the device)',
+        '接続済みですが文が一切届きません（給電と、他のアプリが占有していないかを'
+        '確認してください）',
+        'Conectado pero sin ninguna sentencia (comprueba la alimentación y si otra '
+        'aplicación ocupa el dispositivo)',
+        'Tersambung tetapi tidak ada kalimat sama sekali (periksa daya dan apakah '
+        'aplikasi lain memakai perangkat itu)',
+    ),
+    'extGpsLogEmpty': (
+        '暂无外接 GPS 日志', '暫無外接 GPS 日誌',
+        'No external GPS log yet',
+        '外付け GPS のログはまだありません',
+        'Aún no hay registro del GPS externo',
+        'Belum ada log GPS eksternal',
+    ),
+    # 校验严格度：**不能复用 pkwdwpl 的键** —— 那个的说明写的是「默认关闭」
+    # （电台固件常与手册有出入），而模组按标准发语句，这里的默认是**开**。
+    'extGpsStrictChecksum': (
+        '严格校验和（不符即丢弃）', '嚴格校驗和（不符即丟棄）',
+        'Strict checksum (drop mismatches)',
+        '厳格なチェックサム（不一致は破棄）',
+        'Suma de verificación estricta (descartar discrepancias)',
+        'Checksum ketat (buang yang tidak cocok)',
+    ),
+    'extGpsStrictChecksumTip': (
+        '默认开启：GPS 模组按标准发语句，校验和不符基本只有线路噪声一种解释 ——'
+        '整条丢弃，别让一个坏字节把定位带偏。少数杂牌模组确实会发错校验和，'
+        '那时把这里关掉（丢弃条数与日志会一直显示）。',
+        '預設開啟：GPS 模組按標準送語句，校驗和不符基本上只有線路雜訊一種解釋 ——'
+        '整條丟棄，別讓一個壞位元把定位帶偏。少數雜牌模組確實會送錯校驗和，'
+        '那時把這裡關掉（丟棄條數與日誌會一直顯示）。',
+        'On by default: a GPS module sends standard sentences, so a checksum '
+        'mismatch almost always means line noise — the sentence is dropped so a '
+        'single bad byte cannot skew the position. A few cheap modules really do '
+        'send a wrong checksum; turn this off for those (the drop counter and log '
+        'stay visible).',
+        '既定でオン：GPS モジュールは規格どおりの文を送るため、チェックサム不一致は'
+        'ほぼ配線ノイズです。1 バイトの破損で測位がずれないよう文ごと破棄します。'
+        '安価なモジュールには実際に誤ったチェックサムを送るものもあり、'
+        'その場合はここをオフにしてください（破棄数とログは表示され続けます）。',
+        'Activado por defecto: un módulo GPS envía sentencias estándar, así que una '
+        'discrepancia de suma casi siempre significa ruido en la línea: se descarta '
+        'la sentencia para que un solo byte defectuoso no desvíe la posición. '
+        'Algunos módulos baratos sí envían una suma incorrecta; desactívalo en ese '
+        'caso (el contador de descartes y el registro siguen visibles).',
+        'Aktif secara bawaan: modul GPS mengirim kalimat standar, jadi '
+        'ketidakcocokan checksum hampir selalu berarti derau pada jalur — '
+        'kalimatnya dibuang agar satu byte rusak tidak membuat posisi melenceng. '
+        'Sebagian modul murah memang mengirim checksum yang salah; matikan ini '
+        'untuk modul seperti itu (penghitung pembuangan dan log tetap terlihat).',
+    ),
+    # ── 位置来源那一组 / 设备占用 ──
+    'ownSourceExtGpsLive': (
+        '外接模块供位（手机 GPS 已让位）', '外接模組供位（手機 GPS 已讓位）',
+        'Module supplying position (phone GPS stood down)',
+        'モジュールが位置を供給中（スマートフォン GPS は待機）',
+        'El módulo aporta la posición (el GPS del teléfono se aparta)',
+        'Modul memasok posisi (GPS ponsel mundur)',
+    ),
+    'deviceInUseByOther': (
+        '已被其它链路占用，不能重复绑定', '已被其它鏈路佔用，不能重複綁定',
+        'Already used by another link, cannot bind twice',
+        '他のリンクが使用中のため重複バインドできません',
+        'Ya lo usa otro enlace, no se puede vincular dos veces',
+        'Sudah dipakai tautan lain, tidak bisa diikat dua kali',
+    ),
+    # ── 信标横杠上的「来源档位」（BeaconPhase.spp） ──
+    #
+    # 与 beaconGarminSource / beaconGarminNext 并列的第四档：位置来自外接模块
+    # 时，横杠必须把**来源**说清楚（否则用户会以为发的是手机定位）。与佳明那
+    # 两键的区别只有一个：模块不带心率，所以没有 ❤ 字段。
+    'beaconSppSource': (
+        '外接 GPS 上报中', '外接 GPS 上報中',
+        'Beaconing from external GPS',
+        '外付け GPS から送信',
+        'Balizando desde GPS externo',
+        'Memancarkan dari GPS eksternal',
+    ),
+    # 带占位符：产物里是带参方法（见上面的 PLACEHOLDERS）
+    'beaconSppNext': (
+        '外接 GPS 上报 · {s}', '外接 GPS 上報 · {s}',
+        'External GPS · {s}',
+        '外付け GPS · {s}',
+        'GPS externo · {s}',
+        'GPS eksternal · {s}',
+    ),
 }
+
+
+def _params(key):
+    """这个键的占位符名字（保持声明顺序）。"""
+    return list(PLACEHOLDERS.get(key, {}).keys())
+
+
+def member(key):
+    """产出的成员签名：无占位符 → `get key`；有 → `key(String a, String b)`。"""
+    ps = _params(key)
+    if not ps:
+        return 'get %s' % key
+    return '%s(%s)' % (key, ', '.join('String ' + x for x in ps))
+
+
+def interp(key, text):
+    """把 `{x}` 换成 Dart 插值 `$x`（与 gen-l10n 的产物一致）。"""
+    for x in _params(key):
+        text = text.replace('{%s}' % x, '$%s' % x)
+    return text
+
+
+def esc(v):
+    """产物里是单引号字符串：转义反斜杠、单引号与 $。"""
+    return v.replace('\\', '\\\\').replace("'", r"\'").replace('$', r'\$')
+
+
+def members(key, text):
+    """产物里的成员文本：getter 一行；带占位符的是 gen-l10n 那种多行方法。
+
+    ⚠ 顺序要紧：**先**转义字面量里的 `$`（如 `$PKWDWPL`），**再**把 `{rx}` 换成
+    插值 `$rx`。反过来的话（先插值再转义）会把插值本身也转义掉，产物就变成
+    `return '已收定位 \\$rx 条';` —— 编译通过、参数却永远显示不出来。
+    """
+    ps = _params(key)
+    if not ps:
+        return ['  @override',
+                "  String get %s => '%s';" % (key, esc(text))]
+    return ['  @override',
+            '  String %s(%s) {' % (key, ', '.join('String ' + x for x in ps)),
+            "    return '%s';" % interp(key, esc(text)),
+            '  }']
 
 
 def read(p, newline=None):
@@ -127,6 +434,32 @@ def main() -> int:
             return 1
         print('%-22s arb ok（+%d 键）' % ('app_%s.arb' % lg, len(add)))
 
+    # ── ①b 占位符的 @元数据（**只**写在模板 arb 里）──
+    #
+    # gen-l10n 从模板 arb 的 `@key` 块读占位符类型。只把 `{rx}` 写在文案里
+    # 而不给元数据，它会按 Object 生成参数 —— 与这里手写的 `String rx` 不一致，
+    # 本机（不重新生成产物）与 CI（重新生成）看到的是两份不同的签名。
+    p = os.path.join(ROOT, 'lib', 'l10n', 'app_zh.arb')
+    t = read(p, newline='')
+    add = []
+    for k in KEYS:
+        ps = _params(k)
+        if not ps or '"@%s":' % k in t:
+            continue
+        meta = {'placeholders': {x: {'type': PLACEHOLDERS[k][x]} for x in ps}}
+        add.append('  %s: %s'
+                   % (json.dumps('@' + k, ensure_ascii=False),
+                      json.dumps(meta, ensure_ascii=False,
+                                 indent=2).replace('\n', '\n  ')))
+    if add:
+        write(p, add_lines(t, add), newline='')
+    try:
+        json.loads(read(p))
+    except Exception as e:
+        print('app_zh.arb 的 @元数据拼坏了: %s' % e)
+        return 1
+    print('%-22s @元数据 +%d' % ('app_zh.arb', len(add)))
+
     # ── ② 抽象类 ──
     p = os.path.join(ROOT, 'lib', 'l10n', 'app_localizations.dart')
     s = read(p)
@@ -136,7 +469,7 @@ def main() -> int:
             continue
         code.append("  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。\n  ///\n"
                     "  /// In zh, this message translates to:\n  /// **'%s'**\n"
-                    "  String get %s;\n" % (v[0], k))
+                    "  String %s;\n" % (v[0], member(k)))
     if code:
         _, j = class_body(s, 'AppLocalizations')
         s = s[:j] + '\n' + '\n'.join(code) + s[j:]
@@ -170,11 +503,7 @@ def main() -> int:
                 raise SystemExit('%s / %s 里找不到收尾的 }' % (fname, cname))
             add = []
             for k in miss:
-                add += ['', '  @override',
-                        "  String get %s => '%s';" % (
-                            k, KEYS[k][LANGS.index(lg)]
-                            .replace('\\', '\\\\').replace("'", r"\'")
-                            .replace('$', r'\$'))]
+                add += [''] + members(k, KEYS[k][LANGS.index(lg)])
             add.append('')      # 收尾前留一个空行（与产物既有排版一致）
             if ai > 0 and seg[ai - 1].strip() == '':
                 del add[0]      # 收尾前本来就是空行 —— 别再插一个变成两行

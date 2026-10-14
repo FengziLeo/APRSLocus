@@ -4757,5 +4757,45 @@
   "icomAudioFmtValue": "12000 Hz (LPCM 16-bit 单声道)",
   "icomLanHotspotRoutingHint": "连上电台热点后，电台数据会绑定到 Wi-Fi 局域网，移动数据仍用于 APRS-IS 上网；若系统把这条热点当成了默认上网通道，请在该 Wi-Fi 的高级设置里关闭「自动切换网络」。",
   "posSrcSpp": "外接 GPS 模块",
-  "locationExtGps": "外接 GPS（蓝牙）"
+  "locationExtGps": "外接 GPS（蓝牙）",
+  "dataSourceNmeaGps": "外接 GPS（蓝牙）",
+  "dataSourceNmeaGpsDesc": "读取 GPS 模组输出的 NMEA 0183 定位语句，作为本机位置来源（只收不发）",
+  "dataSourceNmeaGpsHint": "这条链路供的是**本机位置**（不是别人的报文）：接上后位置优先用它，模组断流 30 秒后自动交回手机 GPS",
+  "extGpsDeviceTitle": "外接 GPS",
+  "extGpsDeviceDesc": "蓝牙 SPP / 串口上的 NMEA 0183 位置来源",
+  "extGpsBindTitle": "设备与连接",
+  "extGpsBindSubtitle": "扫描已配对设备并绑定（与 TNC / PKWDWPL 同一套蓝牙权限）",
+  "extGpsTip": "接上后位置优先用模组（常架在车顶或窗外，比手机与手表准）；拿不到新定位 30 秒后自动交回手机 GPS。",
+  "extGpsReadOnly": "只收不发：模组只输出位置，不参与发射",
+  "extGpsStatTitle": "定位接收",
+  "extGpsStats": "已收定位 {rx} 条",
+  "extGpsStatNoFix": "语句有效但还没定上",
+  "extGpsStatMismatch": "校验和不符",
+  "extGpsStatRejected": "丢弃/无效语句",
+  "extGpsStatIgnored": "其它 NMEA 语句（已忽略）",
+  "extGpsSatellites": "卫星",
+  "extGpsAccuracy": "精度",
+  "extGpsWaitingFix": "已连接，正在搜星（还没有一次可用定位）",
+  "extGpsSilent": "已连接，但没有收到任何语句（查供电 / 是否被别的应用占着）",
+  "extGpsLogEmpty": "暂无外接 GPS 日志",
+  "ownSourceExtGpsLive": "外接模块供位（手机 GPS 已让位）",
+  "deviceInUseByOther": "已被其它链路占用，不能重复绑定",
+  "extGpsStrictChecksum": "严格校验和（不符即丢弃）",
+  "extGpsStrictChecksumTip": "默认开启：GPS 模组按标准发语句，校验和不符基本只有线路噪声一种解释 ——整条丢弃，别让一个坏字节把定位带偏。少数杂牌模组确实会发错校验和，那时把这里关掉（丢弃条数与日志会一直显示）。",
+  "beaconSppSource": "外接 GPS 上报中",
+  "beaconSppNext": "外接 GPS 上报 · {s}",
+  "@extGpsStats": {
+    "placeholders": {
+      "rx": {
+        "type": "String"
+      }
+    }
+  },
+  "@beaconSppNext": {
+    "placeholders": {
+      "s": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -141,17 +141,17 @@ void main() {
 
     test('噪声行 / 未知语句分得清（「协议不对」要让用户看得见）', () {
       expect(NmeaParser.parse('hello').error, NmeaErrorCode.notNmea);
-      expect(NmeaParser.parse(r'$XXABC,1,2*00').error,
+      expect(NmeaParser.parse(r'$XXABC,1,2*43').error,
           NmeaErrorCode.unknownSentence);
       // GSV 是「认识但用不上」：绝不能算失败（一次定位会有好几条 GSV）
-      final gsv = NmeaParser.parse(r'$GPGSV,3,1,11,01,05,000,00*6E');
+      final gsv = NmeaParser.parse(r'$GPGSV,3,1,11,01,05,000,00*4F');
       expect(gsv.isOk, isTrue);
       expect(gsv.sentence!.kind, NmeaKind.other);
       expect(gsv.sentence!.positionValid, isFalse);
     });
 
     test('字段太少 / 坐标坏掉 → 明确的错误码', () {
-      expect(NmeaParser.parse(r'$GPRMC,123519,A*00').error,
+      expect(NmeaParser.parse(r'$GPRMC,123519,A*07').error,
           NmeaErrorCode.tooFewFields);
       expect(
         NmeaParser.parse(r'$GPGGA,123519,9999.9,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,')
@@ -210,7 +210,7 @@ void main() {
     test('ZDA 补上日期后，GGA 的定位就带完整时刻', () {
       final asm = NmeaAssembler();
       const zda = r'$GPZDA,201530.00,04,07,2002,00,00*60';
-      const gga2 = r'$GPGGA,201531.00,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*49';
+      const gga2 = r'$GPGGA,201531.00,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*60';
       expect(asm.feed(zda), isNull, reason: 'ZDA 不带定位');
       final f = asm.feed(gga2)!;
       expect(f.utc, DateTime.utc(2002, 7, 4, 20, 15, 30));
@@ -218,7 +218,7 @@ void main() {
 
     test('GSV 之类的「认识但用不上」不产出定位、也不报错', () {
       final asm = NmeaAssembler();
-      expect(asm.feed(r'$GPGSV,3,1,11,01,05,000,00*6E'), isNull);
+      expect(asm.feed(r'$GPGSV,3,1,11,01,05,000,00*4F'), isNull);
       expect(asm.lastError, isNull);
     });
 

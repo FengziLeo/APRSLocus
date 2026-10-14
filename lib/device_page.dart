@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'audio.dart';
 import 'audio_page.dart';
 import 'box_device_page.dart';
+import 'ext_gps_device_page.dart';
 import 'garmin_page.dart';
 import 'hr_page.dart';
 import 'ic705_device_page.dart';
@@ -199,6 +200,7 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
       AppState.srcTnc,
       AppState.srcAudio,
       AppState.srcPkwdwpl,
+      AppState.srcNmeaGps,
     ]) {
       if (!state.enabledSources.contains(src)) continue;
       final up = state.isUp(src);
@@ -212,12 +214,16 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
               ? s.dataSourceTnc
               : (src == AppState.srcAudio
                   ? (isIcom ? 'WLAN 电台（${radioModel.id}）' : s.dataSourceAudio)
-                  : s.dataSourcePkwdwpl));
+                  : (src == AppState.srcPkwdwpl
+                      ? s.dataSourcePkwdwpl
+                      : s.dataSourceNmeaGps)));
       final detail = switch (src) {
         AppState.srcAprsIs => '${state.aprs.server}:${state.aprs.port}',
         AppState.srcTnc => state.tnc.device?.label ?? s.tncNotBound,
         AppState.srcPkwdwpl =>
           state.pkwdwpl.device?.label ?? s.tncNotBound,
+        AppState.srcNmeaGps =>
+          state.nmeaGps.device?.label ?? s.tncNotBound,
         _ => isIcom
             ? (state.audio.config.icomLan.host.isNotEmpty
                 ? '${radioModel.displayName} · ${state.audio.config.icomLan.host}:${state.audio.config.icomLan.controlPort}'
@@ -229,11 +235,12 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
         AppState.srcTnc => s.tncStats(
             '${state.tnc.rxFrames}', '${state.tnc.txFrames}'),
         AppState.srcPkwdwpl => s.pkwdwplStats('${state.pkwdwpl.rxFrames}'),
+        AppState.srcNmeaGps => s.extGpsStats('${state.nmeaGps.fixes}'),
         _ => s.tncStats(
             '${state.audio.rxFrames}', '${state.audio.txFrames}'),
       };
       // 只读链路额外标一下：否则「只有收没有发」看着像统计坏了
-      final badge = src == AppState.srcPkwdwpl
+      final badge = (src == AppState.srcPkwdwpl || src == AppState.srcNmeaGps)
           ? ' · ${s.pkwdwplRxOnly}'
           : (isTx ? ' · ${s.dataSourceTxBadge}' : '');
       rows.add(SettingsRow2(
@@ -307,6 +314,19 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
           title: s.pkwdwplDeviceTitle,
           desc: s.pkwdwplDeviceDesc,
           page: PkwdwplDevicePage(state: state),
+          disabled: !tncPlatformSupported,
+          disabledReason: s.iosFeatureUnsupported,
+        ),
+        // 外接 GPS 模块：同样是一条「设备链路」（扫设备 / 绑定 / 连接），
+        // 只是它供的是本机位置。放在这里而不是只藏在数据来源卡里 ——
+        // 用户找「设备」时应该一眼看到它。
+        _entry(
+          context,
+          icon: Icons.gps_fixed_rounded,
+          color: C.blue,
+          title: s.extGpsDeviceTitle,
+          desc: s.extGpsDeviceDesc,
+          page: ExtGpsDevicePage(state: state),
           disabled: !tncPlatformSupported,
           disabledReason: s.iosFeatureUnsupported,
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'settings_widgets.dart';
 import 'audio_page.dart';
+import 'ext_gps_device_page.dart';
 import 'garmin_page.dart';
 import 'hr_page.dart';
 import 'ic705_device_page.dart';
@@ -173,6 +174,24 @@ class DataSourceCard extends StatelessWidget {
             MaterialPageRoute(builder: (_) => PkwdwplDevicePage(state: state)),
           ),
         ),
+        // 外接 GPS 模块（蓝牙 SPP / USB-TTL 上的 NMEA 0183）：与 PKWDWPL
+        // **同类** —— 同一条只读约定（canTx: false）、同一套「扫设备 / 绑定 /
+        // 连接 / 断开」，只是在设备页里说的是「我的位置」。区别在语义：
+        // PKWDWPL 收的是**别人的位置**（电台自报的航点），这条供的是
+        // **我的位置**（见下面「位置来源」那一组与 positionSourceNow）。
+        _tile(
+          context,
+          key: AppState.srcNmeaGps,
+          title: s.dataSourceNmeaGps,
+          desc: s.dataSourceNmeaGpsDesc,
+          icon: Icons.gps_fixed_rounded,
+          canTx: false,
+          disabled: !tncPlatformSupported,
+          disabledReason: s.iosFeatureUnsupported,
+          onConfigure: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => ExtGpsDevicePage(state: state)),
+          ),
+        ),
         // ── 位置来源 / 心率来源（用户要求：佳明应当作为「数据来源」的一种选择）──
         //
         // 与上面那些**报文链路**分开列：那几条的语义是「报文从哪条链路收发」，
@@ -190,9 +209,15 @@ class DataSourceCard extends StatelessWidget {
           context,
           icon: Icons.smartphone_rounded,
           title: s.ownSourcePhoneGps,
-          desc: !state.loc.running
-              ? s.posSourceIdle
-              : (state.garminOn ? s.ownSourceGarminLive : s.garminRunning),
+          // 供位的是外接模块时必须先说出来（此时手机定位多半已待机，
+          // 写「未启动」会让人以为定位坏了）。
+          desc: state.nmeaGpsSupplying
+              ? s.ownSourceExtGpsLive
+              : (!state.loc.running
+                  ? s.posSourceIdle
+                  : (state.garminOn
+                      ? s.ownSourceGarminLive
+                      : s.garminRunning)),
           live: state.loc.running,
         ),
         _ownTile(
@@ -250,6 +275,8 @@ class DataSourceCard extends StatelessWidget {
         if (state.multiSource) SettingsHint(s.dataSourceIgateHint),
         // PKWDWPL 是只读的，这句必须常驻：否则用户会奇怪为何它没有发射圆点
         if (state.pkwdwplOn) SettingsHint(s.dataSourcePkwdwplHint),
+        // 外接 GPS 同理（而且它供的是本机位置，不是报文 —— 更要说清）
+        if (state.nmeaGpsOn) SettingsHint(s.dataSourceNmeaGpsHint),
         if (extra != null) SettingsHint(extra!),
       ],
     );

@@ -787,6 +787,27 @@
   }
   syncMode();
 
+  /* ── 3c. 天色：整片点云跟着翻屏换色（只有故事页用）──
+     名字与页面上壁纸的色阶**同名** —— 页面那边一处声明，天光与粒子一起换。
+     这里只给“倍数”，不给绝对颜色：深浅两套主题各自的原色照旧算，乘完再进
+     着色器，于是夜间是霓虹、白天是墨蓝，两套主题里都不会有哪个色阶发飘。
+     值都在 1 上下：>1 是把那个通道拉亮（也能把整片往暖里拉），<1 是压暗。 */
+  var MOODS = {
+    bloom: [1.00, 1.02, 1.08],     // 星球与那个数字：还是本来的冷蓝，略提一点
+    wave: [0.92, 1.00, 1.16],      // 电波那一章：更冷、更蓝
+    night: [0.74, 0.84, 1.00],     // 夜里那几屏：整体压暗一档
+    spark: [0.98, 1.06, 1.14],     // 等你自己那一格：亮起来
+    warm: [1.30, 1.02, 0.72],      // 名单那几屏：暖过来（站内的安全橙那一族）
+    roster: [1.10, 1.02, 1.00]     // 三百多个呼号那屏：偏中性，别抢正文
+  };
+  var mTint = [1, 1, 1], mTintTo = [1, 1, 1], mName = "";
+  function setMood(name) {
+    if (!DECK || typeof name !== "string" || name === mName) return;
+    if (!Object.prototype.hasOwnProperty.call(MOODS, name)) return;
+    mName = name;
+    mTintTo = MOODS[name];
+  }
+
   /* ── 机位摆位 ──
      星球是只看不摸的：不能拖动，机位就是唯一的机位。两个常量各管一件事：
      · VIEW_ROLL：画面自己转一点点（**正数 = 极轴往左上倒**）——「从左上往下看」
@@ -883,7 +904,7 @@
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.useProgram(prog);
     gl.blendFunc(gl.SRC_ALPHA, m.add ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
-    gl.uniform3f(U.uTint, m.tint[0], m.tint[1], m.tint[2]);
+    gl.uniform3f(U.uTint, m.tint[0] * mTint[0], m.tint[1] * mTint[1], m.tint[2] * mTint[2]);
     gl.uniform3f(U.uStn, m.stn[0], m.stn[1], m.stn[2]);
     gl.uniform1f(U.uAlpha, m.alpha);
     gl.uniform2f(U.uCenter, f.cx * 2 - 1, 1 - f.cy * 2);
@@ -1096,6 +1117,9 @@
     // 换形状：进度往前走；仪表（环带 / 线框 / 卫星 / 流星）按 form 退场或回来
     if (morphP < 1) morphP = Math.min(1, morphP + dt / MORPH_S);
     form += (formTarget - form) * Math.min(1, dt * 2.6);
+    // 天色：色温比形状慢半拍换（指数趋近）—— 翻屏时粒子是"游"过去的，不是跳色
+    var mk = Math.min(1, dt * 1.6);
+    for (var mi = 0; mi < 3; mi++) mTint[mi] += (mTintTo[mi] - mTint[mi]) * mk;
     var k = Math.min(1, dt * 9);                   // 阻尼跟随（参考实现是每帧 0.1）
     yaw += (tYaw - yaw) * k;
     if (spin) { tYaw += spin * dt; yaw += spin * dt; }
@@ -1274,6 +1298,7 @@
         scroll: +scrollP.toFixed(3),
         animT: +animT.toFixed(2),
         shape: shapeName,
+        mood: mName || "deep",
         morph: +morphP.toFixed(3),
         form: +form.toFixed(3),
         impacts: imps.filter(function (o) { return o.age >= 0; }).length,
@@ -1282,6 +1307,7 @@
       };
     },
     flash: function () { flash(0); },
-    shape: function (name) { shapeTo(name); }        // 彩蛋页翻屏时换形状（见第 3b 节）
+    shape: function (name) { shapeTo(name); },        // 彩蛋页翻屏时换形状（见第 3b 节）
+    mood: function (name) { setMood(name); }          // 同一个名字也顺便换粒子的色温（第 3c 节）
   };
 })();

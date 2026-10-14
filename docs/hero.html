@@ -30,7 +30,7 @@
 })();
 </script>
 <link rel="stylesheet" href="css/style.css?v=8">
-<link rel="stylesheet" href="css/hero-3d.css?v=23">
+<link rel="stylesheet" href="css/hero-3d.css?v=24">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
   /* 这页没有导航栏，主题按钮固定贴在右上角（只这一页用到，不进共享样式表；
@@ -1001,14 +1001,14 @@ html, body { height: auto; overflow: auto; }
   }
   /* ── 1b. 天空与壁纸：翻到哪一屏，点云散开、聚成那一屏的形状，整页天色也换一档 ──
      形状写在屏上的 data-shape（sphere / beacon / heart / 73），取景写在 data-sky
-     （full = 地图那一屏铺开，soft = 有正文的屏退到右上角），天色写在 data-wall。
+     （full = 地图那一屏铺开，soft = 有正文的屏退到右上角），天色写在 data-wall（壁纸与粒子同档：翻到那一屏，天光与点云的色温一起变）。
      这三件事都不是 CSS 自己能做的：形状得让 WebGL 那层重新采样点云。
      只在真的换了的时候才动一次 —— 连续几屏没写 data-shape / data-wall 的时候它
      什么都不做（点云静静挂在背景里，天色也沿用上一屏那一档）。 */
   var curShape = "sphere", curWall = "", wallTop = 0;
   var wallLayers = wall ? wall.getElementsByTagName("i") : [];
   /* 换天色：新色阶写进**暗着**的那一层，再把它点亮、把原来那层按下去。
-     色阶名是从页里取的，拼进 class 之前还是先看一眼字符集。 */
+     色阶名与星球同档（粒子跟着天一起变），拼进 class 之前还是先看一眼字符集。 */
   function wallTo(name) {
     if (!wallLayers.length || name === curWall || !/^[a-z]{2,10}$/.test(name)) return;
     curWall = name;
@@ -1017,6 +1017,7 @@ html, body { height: auto; overflow: auto; }
     next.classList.add("on");
     wallLayers[wallTop].classList.remove("on");
     wallTop = 1 - wallTop;
+    if (window.__planet3d && window.__planet3d.mood) window.__planet3d.mood(name);
   }
   function sky(el) {
     var mode = (el && el.getAttribute("data-sky")) || "soft";
@@ -1152,6 +1153,6 @@ html, body { height: auto; overflow: auto; }
      zoom / pxSize：这页的星球大一圆（×1.18）、粒子粗一档（×1.35）——
      三语首页不传这两个键，星球与粒子与之前逐像素一致。 -->
 <script>window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085, deck: true, zoom: 1.18, pxSize: 1.35 };</script>
-<script src="js/planet-3d.js?v=23"></script>
+<script src="js/planet-3d.js?v=24"></script>
 </body>
 </html>

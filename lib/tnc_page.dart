@@ -174,34 +174,21 @@ class DataSourceCard extends StatelessWidget {
             MaterialPageRoute(builder: (_) => PkwdwplDevicePage(state: state)),
           ),
         ),
-        // 外接 GPS 模块（蓝牙 SPP / USB-TTL 上的 NMEA 0183）：与 PKWDWPL
-        // **同类** —— 同一条只读约定（canTx: false）、同一套「扫设备 / 绑定 /
-        // 连接 / 断开」，只是在设备页里说的是「我的位置」。区别在语义：
-        // PKWDWPL 收的是**别人的位置**（电台自报的航点），这条供的是
-        // **我的位置**（见下面「位置来源」那一组与 positionSourceNow）。
-        _tile(
-          context,
-          key: AppState.srcNmeaGps,
-          title: s.dataSourceNmeaGps,
-          desc: s.dataSourceNmeaGpsDesc,
-          icon: Icons.gps_fixed_rounded,
-          canTx: false,
-          disabled: !tncPlatformSupported,
-          disabledReason: s.iosFeatureUnsupported,
-          onConfigure: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => ExtGpsDevicePage(state: state)),
-          ),
-        ),
         // ── 位置来源 / 心率来源（用户要求：佳明应当作为「数据来源」的一种选择）──
         //
         // 与上面那些**报文链路**分开列：那几条的语义是「报文从哪条链路收发」，
-        // 而这两条是「**我自己的位置/心率**从哪来」。混成一组会让「发射来源」
+        // 而这几条是「**我自己的位置/心率**从哪来」。混成一组会让「发射来源」
         // 的判定变乱 —— 但用户找「数据来源」时就该在这一张卡里看到它们。
-        // 位置来源**不是二选一**（佳明直播时优先用手表，超过 120s 没新点自动交回
-        // 手机 GPS），所以这里**不画选中圆点**，只如实显示「现在是谁在供位置」。
-        // 曾经画成单选，出现两个不诚实的表现（用户实测指出）：
-        //   * 未启动定位时「手机 GPS」也显示已选中 —— 其实什么都没在跑；
-        //   * 佳明那行可以「选中」，哪怕应用根本没在追踪。
+        //
+        // 外接 GPS 模块也归在这一组（它原先排在上面报文链路的末尾）：用户看到
+        // 它顶着「报文从哪里来」那个副标题写「本机位置来源」，一眼就问「这个位置对吗」。
+        // 它需要的「扫设备 / 绑定 / 连接 / 日志」仍在设备页那一份入口里
+        // （设置 → 设备 → 外接 GPS 子页），这里只管「现在是不是它在供位」。
+        //
+        // 手机 GPS 是**状态行**（`_statusRow`，不画圆点）：它不是用户选的，而是自动兜底，
+        // 未启动定位时也显示成已选中过（用户实测指出）。佳明与外接模块都是**用户显式
+        // 开启的一条源**，用 `_ownTile`：圆点只表示「现在生效的是它」——位置本身是自动
+        // 让位的（佳明直播时优先用手表、超过 120s 没新点交回手机 GPS；模块断流 30s 同理）。
         _ownLabel(context, s.posSourceLabel),
         // 手机 GPS：只有在真的在追踪、且佳明**没有**在供位置时才算「在用」。
         // `loc.running` 是定位服务是否在跑（用户没启动追踪时它是 false）。
@@ -219,6 +206,36 @@ class DataSourceCard extends StatelessWidget {
                       ? s.ownSourceGarminLive
                       : s.garminRunning)),
           live: state.loc.running,
+        ),
+        // 外接 GPS 模块：比佳明更靠前（`sim > spp > garmin > phone`，见
+        // AppState.positionSourceNow），所以排在这一组里、佳明之前。
+        _ownTile(
+          context,
+          icon: Icons.gps_fixed_rounded,
+          title: s.dataSourceNmeaGps,
+          // 四种如实状态：在供位（报收到的定位条数，与心率行报 bpm 同一个用意）/
+          // 已连上但还没定上 / 开着却没连上 / 没开（它是什么）
+          desc: state.nmeaGpsSupplying
+              ? s.extGpsStats('${state.nmeaGps.fixes}')
+              : (state.nmeaGpsOn
+                  ? (state.nmeaGps.up
+                      ? s.extGpsWaitingFix
+                      : s.dataSourceNmeaGpsDesc)
+                  : s.extGpsDeviceDesc),
+          active: state.nmeaGpsSupplying,
+          disabled: !tncPlatformSupported,
+          disabledReason: s.iosFeatureUnsupported,
+          onTap: () {
+            // 还没绑过设备 → 先进设备页（扫设备 / 绑定 / 日志都在那里）
+            if (state.nmeaGps.device == null) {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => ExtGpsDevicePage(state: state)));
+              return;
+            }
+            // 最后一条来源不允许关掉：全关掉应用就什么都不收 —— 与报文链路同一套规矩
+            if (state.nmeaGpsOn && state.enabledSources.length <= 1) return;
+            state.toggleSource(AppState.srcNmeaGps, !state.nmeaGpsOn);
+          },
         ),
         _ownTile(
           context,

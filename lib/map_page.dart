@@ -2528,6 +2528,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         st.nextBeaconIn,
         st.myHr == null ? '--' : '${st.myHr}',
       ),
+      // 外接 GPS 模块档：同理把来源说清楚（否则用户会以为发的是手机定位）。
+      // 模块没带心率，所以没有佳明那一档的 ❤ 字段。
+      BeaconPhase.spp => S.of(context).beaconSppNext(st.nextBeaconIn),
       BeaconPhase.imminent => S.of(context).beaconImminent,
       BeaconPhase.counting => S.of(context).beaconNextIn(st.nextBeaconIn),
       BeaconPhase.disconnected => S.of(context).beaconNotConnected,
@@ -2536,7 +2539,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     // 颜色：非绿 = 「现在这一发不能当作正常 GPS 上报看」。
     //   * coarseFix / coarseForced → 橙（粗定位）；强制那档虽然是绿的语义
     //     （会发射），但内容同样是粗点，用绿色会与正常 GPS 上报混为一谈；
-    //   * garmin → 红（发的是手表的位置，可能差几十公里）。
+    //   * garmin → 红（发的是手表的位置，可能差几十公里）；
+    //   * spp → 绿（外接 GPS 模块就在车上/窗边，发的就是本机位置，精度反而
+    //     比手机高）—— 只需在文案里点明来源，不能像佳明那样吓人。
     // 改成 switch 而不是嵌套三元：档位会继续长，三元叠到第四层就没法读了。
     final c = !on
         ? C.slate
@@ -2647,9 +2652,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       default:
         // 不发射的阶段（未连接 / 等待定位 / 信标关 / 射频信标关 /
         // 网络定位暂不上报 / 佳明来源）：倒计时没有意义，因此不摆。
-        // 佳明那一档例外地要给来源，所以单独列出来。
+        // 佳明与「外接 GPS 模块」两档例外地要给来源，所以单独列出来。
         if (st.beaconPhase == BeaconPhase.garmin) {
           parts.add(s.beaconGarminSource);
+        } else if (st.beaconPhase == BeaconPhase.spp) {
+          parts.add(s.beaconSppSource);
         }
     }
 

@@ -9561,8 +9561,10 @@ class AppState extends ChangeNotifier {
     // 与 canAutoBeacon 条件 ④ 同源）。这一档要盖过下面的来源/粗定位说明 ——
     // 因为此刻用户首先要做的动作是「确认开始」，其它细节都是确认之后的事。
     if (!beaconArmed) return BeaconPhase.needConfirm;
-    // **顺序有讲究**：佳明优先于粗定位 —— 位置来自手表时，粗定位那条已经不生效
-    // （佳明新鲜时手机 GPS 整个让位，见 _onFix），显示「网络定位中」会是错的。
+    // **顺序有讲究**：外接 GPS 模块优先于佳明，佳明优先于粗定位 —— 位置来自
+    // 模组时，佳明那条与粗定位那条都已经不生效（见 _onFix 的接管顺序
+    // sim > 外接模块 > 佳明 > 手机），显示「佳明上报」/「网络定位中」都会是错的。
+    if (nmeaGpsSupplying) return BeaconPhase.spp;
     if (garmin.on && garmin.fresh) return BeaconPhase.garmin;
     // 粗定位（网络/基站）**不自动上报**（见 [canAutoBeacon]），所以也不能显示一个
     // 照走的倒计时 —— 那正是「倒计时结束什么也没发生」的老症状。
@@ -9603,6 +9605,8 @@ class AppState extends ChangeNotifier {
         return '${beaconSecondsLeft}s';
       case BeaconPhase.garmin:
         return l.beaconGarminSource;
+      case BeaconPhase.spp:
+        return l.beaconSppSource;
       case BeaconPhase.waitingFix:
         return l.beaconWaitingFix;
       case BeaconPhase.imminent:
@@ -9738,6 +9742,11 @@ enum BeaconPhase {
   /// 这一档不是「不能上报」，而是「要告诉用户**上报的是手表的位置**」——
   /// 否则用户看着倒计时会以为发的是手机定位，而两者可能差几十公里。
   garmin,
+  /// 位置来自**外接 GPS 模块**（蓝牙 SPP / 串口上的 NMEA 0183，常架在车顶或
+  /// 窗外，比手机与手表都准；见 [AppState.nmeaGpsSupplying]）。
+  /// 与 [garmin] 同理：不是「不能上报」，而是「要告诉用户上报的是**模组**的
+  /// 位置」—— 否则用户会以为发的是手机定位。
+  spp,
   waitingFix,
   counting,
   imminent,

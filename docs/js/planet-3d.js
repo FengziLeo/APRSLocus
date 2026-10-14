@@ -627,15 +627,22 @@
      它们整体退场，聚回球时再一起回来。 */
 
   var pArr = [new Float32Array(cloud.count * 3), new Float32Array(cloud.count * 3)];
+  /* "家"（球面）那份位置另存一只**只读**的：两只乒乓缓冲翻几次就被形状写花了，
+     而"换回球"要的恰恰是开场那一份原样的坐标。以前 shapeFill("sphere") 读的是
+     pArr[0] —— 它只在开场时等于家，第一次换形状就被写成了别的形状，于是从那
+     一屏起"换回球"换回来的是上一个形状（实测：第 17 屏声明 sphere，球的像素
+     指纹离 beacon 2.7、离家 8.4 —— 屏幕上一直是那根塔）。 */
+  var homePos = new Float32Array(cloud.count * 3);
   (function () {
     var i, o;
     for (i = 0; i < cloud.count; i++) {
       o = i * 10;
-      pArr[0][i * 3] = cloud.data[o];
-      pArr[0][i * 3 + 1] = cloud.data[o + 1];
-      pArr[0][i * 3 + 2] = cloud.data[o + 2];
+      homePos[i * 3] = cloud.data[o];
+      homePos[i * 3 + 1] = cloud.data[o + 1];
+      homePos[i * 3 + 2] = cloud.data[o + 2];
     }
-    pArr[1].set(pArr[0]);                       // 两只都从"家"（球面）出发
+    pArr[0].set(homePos);
+    pArr[1].set(homePos);                       // 两只都从"家"（球面）出发
   })();
   var pBuf = [gl.createBuffer(), gl.createBuffer()];
   (function () {
@@ -707,9 +714,9 @@
 
   /* 把形状写进 out（长度 = 点数 × 3）。 */
   function shapeFill(name, out) {
-    var n = cloud.count, i, o, u, th, r, t, q, w, sp, gp, m, half, k2, a2, rr;
+    var n = cloud.count, i, o, u, th, r, t, q, w, sp, gp, m, half, k2, s, rr;
     if (name === "sphere") {                   // 家：原样那层球面
-      out.set(pArr[0]);
+      out.set(homePos);
       return;
     }
     if (name === "heart") {
@@ -763,43 +770,35 @@
       return;
     }
     if (name === "scatter") {
-      /* 结尾名单那几屏：整颗球散成一片星野 —— 名字写在星空里。
-         两层东西：
-         · 寻常粒子（星球本体 + 环带）散成一片铺满画面的尘：面上宽、纵深浅
-           （相机在四个半径外，太薄的一层会像一张贴纸，所以留一点厚度）；
-         · 符号点（名单上的每一个人）落在一条黄金角螺旋上：等分却不排队，
-           每一粒占着自己那一格，谁也压不住谁。序号就是螺旋上的第几格 ——
-           页面按同一个顺序铺名字，于是「第 n 个名字」永远落在同一个位置上。
-         ⚠ 这一支用**自己**的随机流：翻回去再散一次还是同一片星野（位置不动），
+      /* 结尾名单那几屏：名字落在**球面上**（维护者的原话：不要散开了，就在球的
+         表面）。球还是那颗球 —— 本体、环带、经纬线都在原位，只有名单上的
+         每一个人从球里升到球面外薄薄一层：
+         · 纬度按序号等分（y 均匀 = 球面上等面积），经度按黄金角错开 ——
+           等分却不排队，每一粒占着自己那一格，谁也压不住谁。序号就是第几格，
+           页面按同一个顺序铺名字，于是「第 n 个名字」永远落在同一个位置上；
+         · 半径 1.030 → 1.085：贴着球面一点点。压在球面上（r = 1）会与本体搅在
+           一起分不出谁是谁，离远了又不叫「在球上」了。
+         ⚠ 这一支用**自己**的随机流：翻回去再散一次还是同一片名单（位置不动），
            否则每回到这一屏，名单上的人就会换一个位置站。 */
       var rs = mulberry32(0x4150525a);
-      /* 星野要“铺满画面”：画面有多宽，螺旋就铺多宽 —— 取景半径有三套（窄屏 /
-         平板 / 桌面），同一串坐标的屏幕大小就不一样，所以在这里按当前画面收一下
-         （0.90 是留一圈边）。窗口比例变了不重铺：那是读者自己拉窄的。 */
-      var fitX = Math.min(1, 0.90 * canvas.width / (2 * Math.max(1, view.r) * 1.78));
-      var fitY = Math.min(1, 0.90 * canvas.height / (2 * Math.max(1, view.r) * 1.02));
+      out.set(homePos);                          // 其余一切照旧：球体与环带都还在原位
       for (i = 0; i < n; i++) {
+        if (symOrd[i] < 0) continue;             // 只有符号点（名单上的名字）动
         o = i * 3;
-        if (symOrd[i] >= 0) {
-          k2 = (symOrd[i] + 0.5) / Math.max(1, SYM.length);
-          a2 = symOrd[i] * 2.39996323;           // 黄金角（rad）：螺旋上的一格
-          rr = (0.34 + Math.sqrt(k2) * 1.44);    // 0.34 → 1.78：里外都匀，正中留一格空
-          out[o] = Math.cos(a2) * rr * fitX;
-          out[o + 1] = Math.sin(a2) * rr * 0.573 * fitY;   // 0.573 = 1.02/1.78：铺满宽屏
-          out[o + 2] = (rs() - 0.5) * 0.90;
-        } else {
-          a2 = rs() * Math.PI * 2;
-          rr = 0.22 + Math.pow(rs(), 0.62) * 3.10;
-          out[o] = Math.cos(a2) * rr;
-          out[o + 1] = Math.sin(a2) * rr * 0.60;
-          out[o + 2] = (rs() - 0.5) * 2.20;
-        }
+        k2 = (symOrd[i] + 0.5) / Math.max(1, SYM.length);
+        u = 1 - 2 * k2;                          // 纬度：球面上等面积
+        th = symOrd[i] * 2.39996323;             // 经度：黄金角错开（rad）
+        s = Math.sqrt(Math.max(0, 1 - u * u));
+        rr = 1.030 + rs() * 0.055;
+        out[o] = s * Math.cos(th) * rr;
+        out[o + 1] = u * rr;
+        out[o + 2] = s * Math.sin(th) * rr;
       }
       return;
     }
     /* 其余一律按**文字**处理：比如 `73`（火腿收尾那句话）。 */
     gp = glyph(name);
-    if (!gp) { out.set(pArr[0]); return; }
+    if (!gp) { out.set(homePos); return; }
     m = gp.length / 2;
     half = 1.02;                                // 半宽：与星球半径同量级
     for (i = 0; i < n; i++) {
@@ -822,7 +821,10 @@
     if (!/^[A-Za-z0-9]{1,8}$/.test(name)) return;
     shapeName = name;
     if (name !== "scatter") focusAt(-1);       // 离开星野：把点名收回
-    formTarget = (name === "sphere") ? 0 : 1;
+    /* "仪表"（环带 / 线框 / 卫星 / 海浪）什么时候退场：只有那几种"不是球"的
+       形状才要它们让位。scatter 现在是「球 + 球面上一层名字」——球还是球，
+       环带与经纬线照旧在，所以它也按 0 算。 */
+    formTarget = (name === "sphere" || name === "scatter") ? 0 : 1;
     shapeFill(name, _tmp);
     pArr[1 - bi].set(_tmp);
     gl.bindBuffer(gl.ARRAY_BUFFER, pBuf[1 - bi]);

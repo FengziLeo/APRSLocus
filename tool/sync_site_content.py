@@ -419,6 +419,59 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.2.0', 'date': '2026-10-14',
+        'items': [
+            ('new',
+             T('**外接 GPS 定位来源**：多了一条只读链路，接的是外接 GPS / 北斗模组'
+               '（蓝牙 SPP，或 USB-TTL 串口），它按标准吐 NMEA 0183 语句 —— 坐标常在 '
+               '`RMC`、海拔与精度在 `GGA`、日期只有 `ZDA` 有。同一秒里的几条语句被'
+               '**拼成一条**本机定位（而不是每条各算一次），同一个点不会被反复塞进轨迹。'
+               '位置优先级是一条明路：**模拟位置 ＞ 外接模块 ＞ 佳明手表 ＞ 手机 GPS**；'
+               '模块断流 30 秒自动交回手机，而网络/基站那种粗定位绝不会去盖模块'
+               '或手表给的点（它会拿一个偏几百米的质心把标记拽走）。',
+               '**外接 GPS 定位來源**：多了一條只讀鏈路，接的是外接 GPS / 北斗模組'
+               '（藍牙 SPP，或 USB-TTL 串列埠），它按標準吐 NMEA 0183 語句 —— 座標常在 '
+               '`RMC`、海拔與精度在 `GGA`、日期只有 `ZDA` 有。同一秒裡的好幾條語句被'
+               '**拼成一條**本機定位（而不是每條各算一次），同一個點不會被反覆塞進軌跡。'
+               '位置優先級是一條明路：**模擬位置 ＞ 外接模組 ＞ 佳明手錶 ＞ 手機 GPS**；'
+               '模組斷流 30 秒自動交回手機，而網路/基地臺那種粗定位絕不會去蓋模組'
+               '或手錶給的點（它會拿一個偏幾百米的質心把標記拽走）。',
+               '**External GPS as a position source**: there is a new receive-only link '
+               'for an external GPS / BeiDou module (Bluetooth SPP, or a USB-TTL serial '
+               'port) that speaks standard NMEA 0183 — the coordinates usually live in '
+               '`RMC`, the altitude and accuracy in `GGA`, and only `ZDA` carries a date. '
+               'Sentences from the same second are **assembled into one** position (not '
+               'one per sentence), so the same point never lands in the track twice. The '
+               'priority is stated outright: **simulated > external module > Garmin watch '
+               '> phone GPS**; the phone picks up again 30 s after the module goes quiet, '
+               'and a coarse network/cell fix never overwrites a point that came from the '
+               'module or the watch (it would drag the marker hundreds of metres away).')),
+            ('up',
+             T('**说清位置是谁给的**：设备页多一个「外接 GPS」子页（扫设备 / 绑定 / '
+               '连接 / 重启），下面摆着**定位接收的账** —— 收了几条语句、几条「语句'
+               '有效但还没定上」、几条校验不符被丢、几条其它 NMEA 被忽略（严格校验和'
+               '默认**开**，杂牌模组可以就地关掉）。信标横杠也不再只给一个看不出差别的'
+               '倒计时：位置来自外接模块时显示「外接 GPS 上报 · 45s」。这条链路'
+               '**只收不发**，界面上任何地方都不给它发射圆点。',
+               '**說清位置是誰給的**：裝置頁多一個「外接 GPS」子頁（掃裝置 / 綁定 / '
+               '連線 / 重啟），下面擺著**定位接收的帳** —— 收了幾條語句、幾條「語句'
+               '有效但還沒定上」、幾條校驗不符被丟、幾條其它 NMEA 被忽略（嚴格校驗和'
+               '預設**開**，雜牌模組可以就地關掉）。信標橫杠也不再只給一個看不出差別'
+               '的倒數：位置來自外接模組時顯示「外接 GPS 上報 · 45s」。這條鏈路'
+               '**只收不發**，界面上任何地方都不給它發射圓點。',
+               '**Saying where the position came from**: the device page gained an '
+               '"External GPS" sub-page (scan / bind / connect / restart) with **the '
+               'reception ledger** below it — how many sentences arrived, how many were '
+               '"valid but no fix yet", how many were dropped on a checksum mismatch and '
+               'how many other NMEA sentences were ignored (strict checksums are **on** by '
+               'default and can be turned off for the modules that really send bad ones). '
+               'The beacon bar no longer shows a countdown you cannot tell apart: with an '
+               'external module supplying the position it reads "External GPS · 45s". '
+               'This link is **receive-only**, and no transmission dot is drawn for it '
+               'anywhere.')),
+        ],
+    },
+    {
         'ver': 'v2.1.0', 'date': '2026-10-14',
         'items': [
             ('new',

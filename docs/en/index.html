@@ -597,6 +597,16 @@ html{overflow-x:hidden}
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.2.0</span>
+        <span class="cl-date">2026-10-14</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot new"></span><b>External GPS as a position source</b>: there is a new receive-only link for an external GPS / BeiDou module (Bluetooth SPP, or a USB-TTL serial port) that speaks standard NMEA 0183 — the coordinates usually live in <code>RMC</code>, the altitude and accuracy in <code>GGA</code>, and only <code>ZDA</code> carries a date. Sentences from the same second are <b>assembled into one</b> position (not one per sentence), so the same point never lands in the track twice. The priority is stated outright: <b>simulated > external module > Garmin watch > phone GPS</b>; the phone picks up again 30 s after the module goes quiet, and a coarse network/cell fix never overwrites a point that came from the module or the watch (it would drag the marker hundreds of metres away).</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>Saying where the position came from</b>: the device page gained an "External GPS" sub-page (scan / bind / connect / restart) with <b>the reception ledger</b> below it — how many sentences arrived, how many were "valid but no fix yet", how many were dropped on a checksum mismatch and how many other NMEA sentences were ignored (strict checksums are <b>on</b> by default and can be turned off for the modules that really send bad ones). The beacon bar no longer shows a countdown you cannot tell apart: with an external module supplying the position it reads "External GPS · 45s". This link is <b>receive-only</b>, and no transmission dot is drawn for it anywhere.</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.1.0</span>
         <span class="cl-date">2026-10-14</span>
       </div>

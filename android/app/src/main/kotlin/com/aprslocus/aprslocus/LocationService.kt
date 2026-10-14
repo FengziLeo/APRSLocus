@@ -420,6 +420,10 @@ class LocationService : Service() {
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setSilent(true)
+            // setOnlyAlertOnce：文字刷新（台站数/收包数/信标倒计时）不该再响一次。
+            // setSilent 管的是「这条通知本身静音」，但部分 ROM 会在文字变化时把
+            // 常驻通知当成新通知重新弹一遍；加上它才有「更新不打扰」的保证。
+            .setOnlyAlertOnce(true)
             .addAction(toggleAction)
             .addAction(exitAction)
             .build()

@@ -57,6 +57,20 @@ class LocService {
   /// 非 Android 平台无此服务，返回 false 表示调用方无需处理。
   bool _keepAliveMode = false;
 
+  /// 上一次真正交给系统的常驻通知文字，用于去重。
+  ///
+  /// 为什么必须去重：[updateNotification] 的调用点很密（每个定位回调、台次/收包
+  /// 统计变化、15 秒保活 tick、链路翻转…），而**文字没变的重发没有任何信息量**。
+  /// 代价是实实在在的：同一条文字反复 `notify()`，很多 ROM 会把常驻通知当成
+  /// 「又来一条」再弹一次（用户报的「反复弹出待确认上报」就是这个）。
+  String _lastNotifText = '';
+
+  /// 通知需要重发：服务刚 startForeground 过，原生手上只有占位文字
+  /// （`LocationService.onStartCommand` 会先写「APRSlocus 运行中」）。
+  /// 缺了这个标记，去重会把服务重启后的第一次刷新当成「没变」而跳过，
+  /// 通知就永远停在占位文字上。
+  bool _notifDirty = true;
+
   /// 启动「仅保活」：**不需要定位权限**，只为让应用在后台不被冻结。
   ///
   /// 用于用户的「模拟位置」模式：位置来自手动坐标/演示数据，不读 GPS，
@@ -68,6 +82,7 @@ class LocService {
       _listenEvents();
       await _channel.invokeMethod('startService', {'mode': 'keepalive'});
       _keepAliveMode = true;
+      _notifDirty = true; // 服务刚起：原生通知是占位文字，下一次刷新必须真发
       onStatus?.call('模拟位置 · 后台保活已启动');
       return true;
     } catch (e) {
@@ -157,6 +172,7 @@ class LocService {
       // 启动前台定位服务（携带定位模式）
       await _channel.invokeMethod('startService', {'mode': mode});
       _running = true;
+      _notifDirty = true; // 同上：服务刚起，去重不能把首次刷新吃掉
       onStatus?.call('GPS 定位中…');
       return true;
     } catch (e) {
@@ -259,13 +275,21 @@ class LocService {
   void stop() {
     _running = false;
     _keepAliveMode = false;
+    _notifDirty = true; // 服务停了，通知也没了：下次重发不能被去重挡住
     _sub?.cancel();
     _sub = null;
     _channel.invokeMethod('stopService').catchError((_) {});
   }
 
   /// 更新状态栏通知文字
+  ///
+  /// **文字没变就不重发**（服务刚重启过时会强制重发一次，见 [_notifDirty]）。
+  /// 去重的理由见 [_lastNotifText]：调用点太密，而同一条文字反复 `notify()`
+  /// 在部分 ROM 上会被当成新通知再弹一次 —— 用户报的「反复弹出待确认上报」。
   Future<void> updateNotification(String text) async {
+    if (!_notifDirty && text == _lastNotifText) return;
+    _lastNotifText = text;
+    _notifDirty = false;
     try {
       await _channel.invokeMethod('updateNotification', {'text': text});
     } catch (_) {}

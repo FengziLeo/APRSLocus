@@ -263,6 +263,12 @@ jobs:
       - name: Test manual report confirmation
         run: flutter test test/report_confirm_test.dart
 
+      # 常驻前台服务通知的去重（用户报「反复弹出待确认上报」）：通知文字没变时不能再
+      # 重复 notify()，但服务重启后必须重发一次。这两条错了**编译能过、analyze 也全绿**，
+      # 只会表现成「偶发多弹一次」或「文字永远不更新」，只能靠 CI 钉住。
+      - name: Test foreground notification dedupe
+        run: flutter test test/notification_dedupe_test.dart
+
       # 地形/等高线图层（v2.0.37）：Esri 地形瓦片是 z/y/x 坐标顺序、且必须判成
       # WGS-84。这两点写错了**编译能过、analyze 也全绿**，只会表现成「取到别的
       # 一张图」或「整图偏出 500m」，所以钉在 CI。

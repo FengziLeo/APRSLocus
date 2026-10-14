@@ -115,3 +115,19 @@ ol.steps { list-style: none; padding: 0; }
    ── */
 .section.narrow > .section-head,
 .section.narrow > .section-body { max-width: 1100px; margin-left: auto; margin-right: auto; }
+
+/* ═══════════════ 更新日志条目修正：一行 = 圆点 + 一段正文 ═══════════════
+   style.css 里 `.cl-item` 写的是 `display:flex; gap:10px`，本意是「圆点 + 正文」两栏。
+   可 flex 容器会把**行内子元素各自变成一个 flex item**：条目正文里的 <b>、<code>
+   被 blockify 之后，和夹在它们中间的那几段纯文本一起横排成一行，每一件都被压到
+   自己的 min-content —— 于是正文一行只剩十来个字，整条读起来像竖排。
+   （实测 1280px 视口：.cl-item 宽 666px，条内每行文字却只有 14~181px 宽。）
+
+   这里把那一行改回块级两栏：圆点绝对定位贴左边（left:0；正文 padding-left 17px
+   = 圆点 7px + 原来的 gap 10px），正文照常撑满整条。字号 / 颜色 / 间距 / 深浅两套
+   皮肤一个都没动 —— 只是让 style.css 那条规则的**原意**真的成立。
+
+   为什么写在这个文件：`.cl-item` 只有三语首页这一段有，而 style.css 被 47 个页面
+   共用，动它就得全站抬版本号（features.css 也是同样的理由单开一个文件）。 */
+.cl-item { display: block; position: relative; padding-left: 17px; }
+.cl-item > .cl-dot { position: absolute; left: 0; top: 8px; margin-top: 0; }

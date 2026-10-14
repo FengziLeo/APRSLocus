@@ -663,7 +663,7 @@
 
   /* 把形状写进 out（长度 = 点数 × 3）。 */
   function shapeFill(name, out) {
-    var n = cloud.count, i, o, u, th, r, t, q, sp, ang, gp, m, half;
+    var n = cloud.count, i, o, u, th, r, t, q, w, sp, gp, m, half;
     if (name === "sphere") {                   // 家：原样那层球面
       out.set(pArr[0]);
       return;
@@ -684,25 +684,36 @@
       }
       return;
     }
-    if (name === "pin") {
-      /* 地图针：上半一颗球头、下半一支往下的锥。"电波从哪来" —— 它先是一个点。 */
+    if (name === "beacon") {
+      /* 天线塔 + 一圈圈荡开的波纹。"电波从哪来" —— 它先是从**一个点**发出来的。
+         这里原来是"地图针"（上半一颗球头、下半一支往下的锥）：屏幕上看就是
+         一支麦克风（维护者第一眼就认成了麦克风，问"那个麦克风是什么意思"）。
+         换个认不错的：一根细塔，塔顶往外荡三圈波。 */
       for (i = 0; i < n; i++) {
         o = i * 3;
-        if (rnd3() < 0.40) {
+        u = rnd3();
+        if (u < 0.20) {                        // 塔身：一根细柱，塔底略宽
+          t = rnd3();
+          w = 0.014 + 0.032 * t;
+          out[o] = (rnd3() - 0.5) * w;
+          out[o + 1] = 0.28 - t * 1.13;
+          out[o + 2] = (rnd3() - 0.5) * w;
+        } else if (u < 0.32) {                 // 塔顶那颗灯
           u = rnd3() * 2 - 1;
           th = rnd3() * Math.PI * 2;
-          r = 0.40 * (0.80 + 0.20 * rnd3());
+          r = 0.12 * Math.pow(rnd3(), 0.4);
           sp = Math.sqrt(1 - u * u);
           out[o] = sp * Math.cos(th) * r;
-          out[o + 1] = 0.42 + u * r;
+          out[o + 1] = 0.34 + u * r;
           out[o + 2] = sp * Math.sin(th) * r;
-        } else {
-          t = Math.pow(rnd3(), 0.42);
-          ang = rnd3() * Math.PI * 2;
-          r = 0.40 * (1 - t) * (0.86 + 0.14 * rnd3());
-          out[o] = Math.cos(ang) * r;
-          out[o + 1] = 0.42 - t * 1.46;
-          out[o + 2] = Math.sin(ang) * r * 0.9;
+        } else {                               // 三圈波纹：以塔顶为心，一圈比一圈远
+          t = rnd3();
+          r = t < 0.33 ? 0.38 : (t < 0.66 ? 0.66 : 0.94);
+          r += (rnd3() - 0.5) * 0.024;
+          th = rnd3() * Math.PI * 2;
+          out[o] = Math.cos(th) * r;
+          out[o + 1] = 0.28 + Math.sin(th) * r;
+          out[o + 2] = (rnd3() - 0.5) * 0.06;     // 一点厚度：它仍然是个有体积的东西
         }
       }
       return;

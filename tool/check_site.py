@@ -449,10 +449,13 @@ def main():
     # 换形状（只有彩蛋页开）：位置两只乒乓缓冲 + aFrom/aTo + 三个 uniform，
     # 缺一个的表现都很安静 —— 屏翻过去了，点云还站在原地（或换成一片乱点）。
     # 环带 / 线框 / 卫星 / 流星不会跟着变形状，所以 uForm 必须把它们按下去。
+    # 解析式那两支（beacon / heart）单独钉名字：名字打错就悄悄退成"文字形状"，
+    # 而 "电波从哪来" 那屏要的就是那根塔 —— 上一版这里是 pin（球头 + 往下的锥），
+    # 屏幕上读成了麦克风，所以换掉了，别再写回去。
     chk('hero 换形状（乒乓位置缓冲 / 形状采样 / 仪表退场）',
         all(x in hero_js for x in ('aFrom', 'aTo', 'uMorph', 'uScatter', 'uForm', 'uShape',
                                    'shapeTo', 'shapeFill', 'bindShape', 'DECK'))
-        and "if (name === \"heart\")" in hero_js and "if (name === \"pin\")" in hero_js
+        and "if (name === \"heart\")" in hero_js and "if (name === \"beacon\")" in hero_js
         and 'createElement("canvas")' in hero_js and 'WU.uAlpha, m.wire * (1 -' in hero_js
         and 'shape: function (name)' in hero_js)
     # 着色器与脚本之间的名字必须对得上。名字打错的话 getUniformLocation 返回

@@ -30,7 +30,7 @@
 })();
 </script>
 <link rel="stylesheet" href="css/style.css?v=8">
-<link rel="stylesheet" href="css/hero-3d.css?v=21">
+<link rel="stylesheet" href="css/hero-3d.css?v=22">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
   /* 这页没有导航栏，主题按钮固定贴在右上角（只这一页用到，不进共享样式表；
@@ -289,7 +289,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide" data-shape="pin">
+  <section class="slide" data-shape="beacon">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>电波从哪来</h2>
@@ -940,7 +940,7 @@ html, body { height: auto; overflow: auto; }
     return true;
   }
   /* ── 1b. 天空：翻到哪一屏，点云就散开、再聚成那一屏的形状 ──
-     形状写在屏上的 data-shape（sphere / pin / heart / 73），取景写在 data-sky
+     形状写在屏上的 data-shape（sphere / beacon / heart / 73），取景写在 data-sky
      （full = 地图那一屏铺开，soft = 有正文的屏退到右上角）。两件事都不是
      CSS 自己能做的：形状得让 WebGL 那层重新采样点云。
      只在真的换了一个形状时才通知一次 —— 连续几屏没写 data-shape 的时候它
@@ -1074,8 +1074,8 @@ html, body { height: auto; overflow: auto; }
      gatherMs 2400 → 4400：开场那点云慢慢聚成一颗球，不是一下摆好；
      scrollEase 0.17 → 0.085：滚动缓动慢一倍，往下拉是滑过去的。
      deck: true：只有这页开 —— 装饰层是页面级固定层（翻屏不换），并且点云会
-     按各屏的 data-shape 换形状（散开 → 聚成地图针 / 一颗心 / 73）。 -->
+     按各屏的 data-shape 换形状（散开 → 聚成天线塔 / 一颗心 / 73）。 -->
 <script>window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085, deck: true };</script>
-<script src="js/planet-3d.js?v=21"></script>
+<script src="js/planet-3d.js?v=22"></script>
 </body>
 </html>

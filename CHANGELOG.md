@@ -1,5 +1,41 @@
 # 更新日志
 
+## [2.1.4] - 2026-10-14
+
+### 「待确认上报」不再反复弹
+
+- 常驻通知以前可能一秒重发一次：定位、台站、电量、倒计时……任何一点变化都会把通知文字
+  重设一遍，系统于是当成新通知再弹一回。现在**这句话没变就不去碰系统**，只在真的换了一句时
+  才更新；通知本身也标成「只提醒一次」，不再震动或抬头。
+- 更要紧的是根上那一处：链路抖一下（掉线后自动重连、被服务器踢、换发射来源），本次连接里
+  你已经点过的「开始上报」会被抹掉 —— 上报停住，界面与通知又跳回「待确认上报」，看起来
+  就是反复要你确认。现在只有**你自己点的**连接 / 断开 / 恢复出厂才作废这次确认；计划外
+  掉线、自己又连回来的，确认留着，接着上报，不用再点一遍。
+- 打开 App 仍然是未确认：这次确认不写盘，重开应用（或重装）一样要先点一次「开始上报」。
+  确认入口还是那颗实心按钮，不是弹窗。
+
+---
+
+## [2.1.4] - 2026-10-14 (English)
+
+### The "waiting for confirmation" prompt no longer keeps popping up
+
+- The persistent notification could be re-sent once a second: a fix, a station, the battery, the
+  countdown -- any change reset the notification text, and the system treated every rewrite as a
+  new notification and popped it again. It now **stays quiet while the text is unchanged**, and
+  the notification is flagged as alert-once, so it no longer buzzes or pops up.
+- More importantly, the root of it: a jitter in the link (an automatic reconnect after a drop, a
+  server-side disconnect, a switch of transmit source) used to wipe the "start reporting" tap you
+  had already made for the current connection -- reporting stopped and the UI and the notification
+  jumped back to "waiting for confirmation", which looked like the app asking over and over.
+  Now only **your own** connect / disconnect / factory reset voids that confirmation; a link that
+  dropped on its own and came back keeps it and carries on reporting, with no second tap.
+- Opening the app still counts as unconfirmed: the confirmation is not written to disk, so
+  restarting the app (or reinstalling it) asks for that one tap again. It is still a real button,
+  not a dialog.
+
+---
+
 ## [2.1.3] - 2026-10-14
 
 ### 修好「安卓取不到卫星数」

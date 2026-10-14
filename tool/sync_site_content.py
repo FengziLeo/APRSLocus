@@ -419,6 +419,36 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.4', 'date': '2026-10-14',
+        'items': [
+            ('fix',
+             T('**「待确认上报」不再反复弹**：常驻通知以前可能一秒重发一次（定位、台站、'
+               '电量、倒计时的任何变化都会重写通知文字），系统把它当成新通知再弹一回；'
+               '现在文字没变就不去碰系统，通知也标成「只提醒一次」。更根上的一处是：链路'
+               '抖一下（掉线后自动重连、被服务器踢、换发射来源）会把本次连接里你已经点过'
+               '的「开始上报」抹掉 —— 上报停住，界面与通知跳回「待确认上报」。现在只有你'
+               '自己点的连接 / 断开 / 恢复出厂才作废这次确认；计划外掉线、自己又连回来的，'
+               '确认留着，接着上报。',
+               '**「待確認上報」不再反覆彈**：常駐通知以前可能一秒重發一次（定位、臺站、'
+               '電量、倒數的任何變化都會重寫通知文字），系統把它當成新通知再彈一回；'
+               '現在文字沒變就不去碰系統，通知也標成「只提醒一次」。更根上的一處是：鏈路'
+               '抖一下（掉線後自動重連、被伺服器踢、換發射來源）會把本次連線裡你已經點過'
+               '的「開始上報」抹掉 —— 上報停住，介面與通知跳回「待確認上報」。現在只有你'
+               '自己點的連線 / 斷開 / 恢復出廠才作廢這次確認；計畫外掉線、自己又連回來的，'
+               '確認留著，接著上報。',
+               '**The "waiting for confirmation" prompt no longer keeps popping up**: the '
+               'persistent notification could be re-sent once a second (any change in the fix, '
+               'stations, battery or countdown rewrote its text) and the system popped it again '
+               'as a new notification; it now stays quiet while the text is unchanged, and is '
+               'flagged alert-once. More to the point: a jitter in the link (an automatic '
+               'reconnect, a server-side disconnect, a transmit-source switch) used to wipe the '
+               '"start reporting" tap already made for this connection, stopping reporting and '
+               'sending the UI and the notification back to "waiting for confirmation". Now '
+               'only your own connect / disconnect / factory reset voids it; a link that dropped '
+               'on its own and came back keeps the confirmation and carries on.')),
+        ],
+    },
+    {
         'ver': 'v2.1.3', 'date': '2026-10-14',
         'items': [
             ('fix',

@@ -8211,7 +8211,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get posSourcePrecedence =>
-      'Prioritas bila beberapa tersedia: simulasi/manual › Garmin (selama jam punya data langsung) › GPS ponsel';
+      'Prioritas bila beberapa tersedia: simulasi/manual › modul GPS eksternal › Garmin (selama jam punya data langsung) › GPS ponsel';
 
   @override
   String posSourceUsing(String src) {

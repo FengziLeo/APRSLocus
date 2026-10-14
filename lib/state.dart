@@ -868,7 +868,7 @@ class AppState extends ChangeNotifier {
   /// 失效时才激活手机 GPS 并替代，并发通知给用户，说明外置 GPS 失效」。
   ///
   /// 这里做成一个**可关的开关**，理由要说清楚：位置的优先级本来就已实现
-  /// （sim > garmin > phone，见 [positionSourceNow]），手机点根本抢不走手表的
+  /// （sim > spp > garmin > phone，见 [positionSourceNow]），手机点根本抢不走手表的
   /// 位置；这个开关多管一步 —— 干脆不让手机侧去点 GPS（省电）。
   /// 而它带来的额外风险是「手表数据静默断供时，手机也没在定位」，所以
   /// ① 默认开但可关；② 状态栏与日志都会明说现在是谁在供位（见 [_syncPhoneGps]）。

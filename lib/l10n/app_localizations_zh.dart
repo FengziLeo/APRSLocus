@@ -7852,7 +7852,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceMovedHint => '要启用 / 切换数据来源（链路），请到「设置 → 设备」';
 
   @override
-  String get posSourcePrecedence => '同时可用时的优先级：模拟/手动位置 › 佳明（手表有实时数据时）› 手机 GPS';
+  String get posSourcePrecedence => '同时可用时的优先级：模拟/手动位置 › 外接 GPS 模块 › 佳明（手表有实时数据时）› 手机 GPS';
 
   @override
   String posSourceUsing(String src) {
@@ -16843,7 +16843,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceMovedHint => '要啟用 / 切換資料來源（鏈路），請到「設定 → 裝置」';
 
   @override
-  String get posSourcePrecedence => '同時可用時的優先順序：模擬/手動位置 › 佳明（手錶有即時資料時）› 手機 GPS';
+  String get posSourcePrecedence => '同時可用時的優先順序：模擬/手動位置 › 外接 GPS 模組 › 佳明（手錶有即時資料時）› 手機 GPS';
 
   @override
   String posSourceUsing(String src) {

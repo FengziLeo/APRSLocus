@@ -8205,7 +8205,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get posSourcePrecedence =>
-      'Priority when several are available: simulated/manual › Garmin (while the watch has live data) › phone GPS';
+      'Priority when several are available: simulated/manual › external GPS module › Garmin (while the watch has live data) › phone GPS';
 
   @override
   String posSourceUsing(String src) {

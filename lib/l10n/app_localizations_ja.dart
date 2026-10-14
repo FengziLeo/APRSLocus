@@ -7950,7 +7950,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get posSourcePrecedence =>
-      '同時に使える場合の優先順位：シミュレート/手動 › Garmin（ウォッチに实时データがある間）› スマホ GPS';
+      '同時に使える場合の優先順位：シミュレート/手動 › 外付け GPS モジュール › Garmin（ウォッチにリアルタイムのデータがある間）› スマホ GPS';
 
   @override
   String posSourceUsing(String src) {

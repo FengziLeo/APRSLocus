@@ -39,13 +39,10 @@ HEAD = {
     'en': ('Friendly Links', 'Sites we are glad to link with.'),
 }
 
-# 页脚的锚点：新区块插在它**前面**。三语页的注释语言不同，故按语言给。
+# 锚点：新区块插在 `</main>` **前面** —— 友链是页面内容的一部分，
+# 应当留在 main 地标里（页脚在外）。三语页一样，故只用一条锚点。
 # 锚点找不到就报错，免得页面结构变了却静默插到别处。
-FOOTER_ANCHOR = {
-    'zh': '<!-- ═══════════ 页脚 ═══════════ -->',
-    'zh-TW': '<!-- ═══════════ 頁腳 ═══════════ -->',
-    'en': '<!-- ═══════════ Footer ═══════════ -->',
-}
+MAIN_CLOSE = '</main>'
 
 
 def pick(mapv, lang):
@@ -87,7 +84,8 @@ def render(links, lang):
            '    <h2>%s</h2>' % esc(title),
            '    <p>%s</p>' % esc(note),
            '  </div>',
-           '  <div class="links-grid">']
+           '  <div class="section-body">',
+           '    <div class="links-grid">']
     for lk in links:
         name = pick(lk.get('name'), lang)
         desc = pick(lk.get('desc'), lang)
@@ -100,11 +98,11 @@ def render(links, lang):
         if desc:
             text += '<span class="flink-desc">%s</span>' % esc(desc)
         out.append(
-            '    <a class="link-card reveal" href="%s" target="_blank" rel="noopener">\n'
-            '      %s\n'
-            '      <span class="link-card-text">%s</span>\n'
-            '    </a>' % (esc(url), img, text))
-    out += ['  </div>', '</section>', CLOSE]
+            '      <a class="link-card reveal" href="%s" target="_blank" rel="noopener">\n'
+            '        %s\n'
+            '        <span class="link-card-text">%s</span>\n'
+            '      </a>' % (esc(url), img, text))
+    out += ['    </div>', '  </div>', '</section>', CLOSE]
     return '\n'.join(out)
 
 
@@ -128,10 +126,11 @@ def main():
                 b += 1
             s = s[:a] + s[b:]
 
-        idx = s.find(FOOTER_ANCHOR[lang])
+        idx = s.find(MAIN_CLOSE)
         if idx < 0:
-            raise SystemExit('在 %s 里找不到页脚锚点 —— 页面结构变了？' % rel)
-        s = s[:idx] + render(links, lang) + '\n\n' + s[idx:]
+            raise SystemExit('在 %s 里找不到 </main> 锚点 —— 页面结构变了？' % rel)
+        # 规范化空白：块前空两行、块后紧跟 </main>，重跑才能得到零差异
+        s = s[:idx].rstrip('\n') + '\n\n\n' + render(links, lang) + '\n' + s[idx:]
 
         io.open(path, 'w', encoding='utf-8', newline='').write(s)
         print('%-24s 写入 %d 个友链（独立区块）' % (rel, len(links)))

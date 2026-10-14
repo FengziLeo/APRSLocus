@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-08",
+  "updated": "2026-10-14",
   "links": [
     {
       "name": {
@@ -56,6 +56,20 @@
       },
       "url": "https://openrf.radiowo.com",
       "logo": "assets/openrf.png"
+    },
+    {
+      "name": {
+        "zh": "APRSNET.CN",
+        "zh-TW": "APRSNET.CN",
+        "en": "APRSNET.CN"
+      },
+      "desc": {
+        "zh": "中文 APRS 入口",
+        "zh-TW": "中文 APRS 入口",
+        "en": "APRS portal in Chinese"
+      },
+      "url": "https://aprsnet.cn/",
+      "logo": "assets/aprsnet.png"
     }
   ]
 }

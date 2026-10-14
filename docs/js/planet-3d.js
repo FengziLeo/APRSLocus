@@ -997,7 +997,7 @@
   function projPoint(p) {
     var cy = Math.cos(yaw), sy = Math.sin(yaw);
     var x = p[0] * cy + p[2] * sy, y = p[1], z = p[2] * cy - p[0] * sy;
-    var cp2 = Math.cos(TILT + pitch), sp2 = Math.sin(TILT + pitch);
+    var cp2 = Math.cos(TILT + pitch + pitchOff), sp2 = Math.sin(TILT + pitch + pitchOff);
     var y2 = y * cp2 - z * sp2, z2 = y * sp2 + z * cp2;
     var aspect = canvas.width / Math.max(1, canvas.height);
     _pj.x = (x * ROLL_C - y2 * ROLL_S) * U_PROJ / aspect;
@@ -1009,13 +1009,17 @@
     var fk = reduce ? 1 : Math.min(1, dt * 3.4);
     focusK += ((focusOrd >= 0 ? 1 : 0) - focusK) * fk;
     var tx = 0, ty = 0, pj;
-    if (focusOrd >= 0) {
+    if (focusOrd >= 0 && !lookFree) {
       pj = projPoint(pointOf(focusOrd));
       tx = -(pj.x + view.cx * 2 - 1);     // 取反正好抵消：见 draw 里 uCenter 那一行
       ty = -(pj.y + 1 - view.cy * 2);
     }
-    ctrX += (tx - ctrX) * fk;
-    ctrY += (ty - ctrY) * fk;
+    /* 人自己拖过之后（lookFree）：这一层**冻在原地** —— 拖就只有转动，画面里别的
+       东西一个都不动。要是继续往 0 放，他一抚画面就自己滑一段；继续往那一粒上
+       追，又会和手指抢。收回时 lookFree 落下，这一层再自己滑回标准取景。 */
+    var ck = lookFree ? 0 : fk;
+    ctrX += (tx - ctrX) * ck;
+    ctrY += (ty - ctrY) * ck;
   }
   /* 球要转到哪个角度，那一粒才正对镜头：着色器里 x' = r·cos(θ−yaw)、
      z' = r·sin(θ−yaw)（θ = 那一粒在球面上的经度，z' > 0 的那一半朝观众）。
@@ -1024,6 +1028,28 @@
   function spotYaw() {
     var p = pointOf(focusOrd);
     return Math.atan2(p[2], p[0]) - Math.PI / 2;
+  }
+
+  /* ── 3d-b. 自己转视角（只有彩蛋页在「点着谁」的时候会喂它）──
+     上面那一套是**自动**的：点一粒星，镜头把它转到正对镜头、再摆到画面正中。
+     人一旦自己按住拖动，自动的那一半就得让位 —— 两边抢同一个角度，画面会一抖
+     一抖地往回跳（用户的原话：跳来跳去）。
+     拖的只有两个角：
+       · 左右 = 绕极轴的 yaw，直接改 tYaw —— 与自转、追星用的是同一个数：松手就
+         停在转到的位置（不弹回），收回之后自转从这个角度接着走，也不跳。
+       · 上下 = 叠在 pitch 上的一个小偏移，夹在 ±PITCH_MAX 里。球还是那颗球，
+         只是机位抬高 / 压低一点，不会把环带转成一条别的曲线。
+     两个角都走「每帧朝目标挪一档」的阻尼跟随（见 loop），拖得再快也不跳。
+     这里只管「能转」；什么时候允许转由页面说了算（见 hero.html 的 0b 段）。 */
+  var lookFree = false;                  // 人自己动过视角：自动追星让位
+  var pitchOff = 0, pitchOffTo = 0;      // 上下偏移（弧度）与它的目标
+  var PITCH_MAX = 0.40;                  // ±23°：够看出立体，又不会把环带转散
+  var YAW_PER_PX = 0.0034, PITCH_PER_PX = 0.0022;
+  function look(dx, dy) {
+    lookFree = true;
+    tYaw -= dx * YAW_PER_PX;             // 往右拖：球面跟着往右走（yaw 增大是往左）
+    pitchOffTo = Math.max(-PITCH_MAX, Math.min(PITCH_MAX, pitchOffTo + dy * PITCH_PER_PX));
+    start();
   }
   /* 那一粒现在在屏幕的哪儿（CSS 像素，已经把画布的偏移算进去）—— 每帧报给页面，
      页面把“他是谁 / 编号多少”那一行贴在那里：镜头飞的整段里它跟着那一粒走。
@@ -1036,16 +1062,23 @@
     var rct = canvas.getBoundingClientRect();
     if (!rct.width) return;
     var nx = (pj.x + bx) / pj.d, ny = (pj.y + by) / pj.d;
+    /* k 不只是「点名到几分」：那一粒被自己转出画面之后，这一行字也跟着淡掉 ——
+       别把它按在视口边上假装那一粒还在（页面拿 k 写 opacity）。 */
+    var edge = Math.max(Math.abs(nx), Math.abs(ny));
     PAGE.onSpot({
       x: rct.left + (0.5 + 0.5 * nx) * rct.width,
       y: rct.top + (0.5 - 0.5 * ny) * rct.height,
-      k: focusK
+      k: focusK * Math.max(0, Math.min(1, (1.05 - edge) / 0.25))
     });
   }
   function focusAt(ord) {
     var n2 = (ord === null || ord === undefined || ord < 0) ? -1 : ord | 0;
     if (n2 >= SYM.length) n2 = -1;
     focusOrd = n2;
+    /* 换一个目标（或收回）＝把「自动」那一半拿回来：球重新转到那一粒正对镜头，
+       上下也摆平 —— 人上一次拖出来的角度不算到下一个人头上。 */
+    lookFree = false;
+    pitchOffTo = 0;
     if (n2 >= 0) start();                 // 镜头要动起来（降级动效下它直接到位）
     return focusOrd;
   }
@@ -1097,7 +1130,8 @@
     /* 点名：镜头一边往那一粒上靠（见 chaseSpot），一边把机位收近到 0.62 倍；
        gDist 也是投影 / 点击命中读的同一个数，所以放在模块级上。 */
     gDist = camDist(h) / zoom / (1 + 0.62 * focusK);
-    var cp = Math.cos(TILT + pitch), sp = Math.sin(TILT + pitch);
+    var pv = TILT + pitch + pitchOff;            // 俯仰：自己拖出来的那点偏移也算进来
+    var cp = Math.cos(pv), sp = Math.sin(pv);
     var age = reduce ? 1 : (animT - burstAtT) / BURST_S;
     var burst = (age < 0 || age > 1) ? 0 : Math.pow(1 - age, 2);
     gl.viewport(0, 0, w, h);
@@ -1327,20 +1361,22 @@
     for (var mi = 0; mi < 3; mi++) mTint[mi] += (mTintTo[mi] - mTint[mi]) * mk;
     var k = Math.min(1, dt * 9);                   // 阻尼跟随（参考实现是每帧 0.1）
     /* 点名：自转先停住（点着谁，谁就该停在原地），球再转到那一粒正对镜头 ——
-       这样背面的人也看得到，而且它最后就落在画面正中。收回时自转自己转回来。 */
+       这样背面的人也看得到，而且它最后就落在画面正中。收回时自转自己转回来。
+       人自己拖过之后（lookFree）：角度归他，这一半不再出手。 */
     var spinNow = spin * (1 - focusK);
     if (spinNow) tYaw += spinNow * dt;
-    if (focusOrd >= 0) {
+    if (focusOrd >= 0 && !lookFree) {
       var da = Math.atan2(Math.sin(spotYaw() - tYaw), Math.cos(spotYaw() - tYaw));
       tYaw += da * (reduce ? 1 : Math.min(1, dt * 2.2));   // 走近的那一边（不绕远路）
     }
     yaw += (tYaw - yaw) * k;
+    pitchOff += (pitchOffTo - pitchOff) * Math.min(1, dt * 8);   // 上下偏移：与 yaw 同一条阻尼
     animT += dt;                                   // 动画时钟：只在这里走
     chaseSpot(dt);                                 // 点名：镜头往那一粒上追（第 3d 节）
     stepImpacts(dt);                               // 撞击槽：wait → fly → hit
     draw(animT);
     // 降级动效（prefers-reduced-motion）：自转本来就是 0，摆到位就停掉循环
-    if (reduce && Math.abs(tYaw - yaw) < 0.002) {
+    if (reduce && Math.abs(tYaw - yaw) < 0.002 && Math.abs(pitchOffTo - pitchOff) < 0.002) {
       running = false;
       return;
     }
@@ -1504,7 +1540,7 @@
         frame: { cx: +view.cx.toFixed(3), cy: +view.cy.toFixed(3), r: Math.round(view.r) },
         mode: dark ? "dark" : "light",
         yaw: +yaw.toFixed(3),
-        pitch: +pitch.toFixed(3),
+        pitch: +(pitch + pitchOff).toFixed(3),
         reduce: reduce,
         gate: gatherT0 > 0,
         gather: +gather.toFixed(3),
@@ -1515,6 +1551,7 @@
         sym: SYM.length,                           // 星野里可点的符号有几粒
         spot: focusOrd,                            // 现在点到第几个名字（-1 = 没点）
         focus: +focusK.toFixed(3),
+        look: lookFree,                            // 视角是自己拖的（自动追星已让位）
         morph: +morphP.toFixed(3),
         form: +form.toFixed(3),
         impacts: imps.filter(function (o) { return o.age >= 0; }).length,
@@ -1527,6 +1564,7 @@
     mood: function (name) { setMood(name); },         // 同一个名字也顺便换粒子的色温（第 3c 节）
     symbolAt: function (x, y) { return symbolAt(x, y); },   // 屏幕坐标 → 星野里的第几粒（第 3d 节）
     focusSymbol: function (ord) { return focusAt(ord); },   // 镜头飞到那一粒上（其余压暗）
-    unfocus: function () { return focusAt(-1); }            // 收回：回到星野全景
+    unfocus: function () { return focusAt(-1); },           // 收回：回到星野全景
+    look: function (dx, dy) { look(dx, dy); }               // 聚焦时自己转视角（像素位移）
   };
 })();

@@ -30,7 +30,7 @@
 })();
 </script>
 <link rel="stylesheet" href="css/style.css?v=8">
-<link rel="stylesheet" href="css/hero-3d.css?v=26">
+<link rel="stylesheet" href="css/hero-3d.css?v=27">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
   /* 这页没有导航栏，主题按钮固定贴在右上角（只这一页用到，不进共享样式表；
@@ -234,6 +234,18 @@
   .deck.pick .hero-toggle, .deck.pick .story-bgm, .deck.pick .story-mark,
   .deck.pick .deck-hint { opacity: 0 !important; pointer-events: none;
     transition: opacity .42s var(--ease); }
+
+  /* ── 点着谁的时候：按住画面拖动＝自己转这颗球 ──
+     星球平时是「只看不摸」的（.deck-sky 整层不吃指针事件，planet-3d.js 里也没有
+     指针接线）；这一页只在**点着谁**的那一屏破例：左右拖，球跟着转；上下拖，
+     机位抬高 / 压低一点。接线挂在 document 上（见页尾脚本的 0b 段），不依赖命中
+     哪一层，所以这里只给两件事：
+       · 指针形状 —— cursor 是继承属性，写在 .deck 上，整屏跟着变成「抓手」；
+       · touch-action: none —— 手指按住拖动时，浏览器别把它当成滚动 / 缩放手势
+         （不然 pointer 事件中途会被 cancel，拖到一半就断）。
+     收回（点空白 / Esc / 换屏）之后 .pick 一摘，这两条一起失效，星球照旧不接指针。 */
+  .deck.pick { cursor: grab; touch-action: none; }
+  .deck.pick.dragging { cursor: grabbing; }
 
 
 
@@ -1107,7 +1119,8 @@ html, body { height: auto; overflow: auto; }
      那一粒换成暖金，下面报出他在哪份名单上、他是谁、编号多少、他是干什么的
      （页面上写着分工的就用页面上的，没有的看 ROSTER_DESC）。
      点着谁的这一屏，其余东西（名单正文、主题按钮、音乐开关、署名、那句提示）
-     一起退开 —— 留下的就是能直接截下来发出去的那一张。点别处照旧往前走一屏。
+     一起退开 —— 留下的就是能直接截下来发出去的那一张。收回之后手势照旧。
+     点着人这一屏自己那套操作（拖转 / 收回 / 换人）写在 0b 段。”
      编号由名字本身哈希出来（两个 32 位 FNV-1a 拼 20 位）：没有随机数、没有时间，
      同一个呼号永远是同一串号 —— 名单增补、页面改版都不会动它。 */
   var nameList = (window.__deckNames && window.__deckNames.list) || [];
@@ -1128,7 +1141,11 @@ html, body { height: auto; overflow: auto; }
   var spotIn = spotBox ? spotBox.firstElementChild : null;
   if (window.__planet3dPage) {
     window.__planet3dPage.onSpot = function (o) {
-      if (!spotBox || !o) return;
+      if (!spotBox) return;
+      if (!o) { spotBox.style.opacity = ""; return; }   // 收回：位置与浓淡交回 CSS
+      /* k = 点名到几分 × 那一粒还在不在画面里：自己把球转开之后，这一行字跟着
+         淡掉（淡入淡出都在模块那一侧每帧推进一个数），所以这里直接写进 style。 */
+      if (typeof o.k === "number") spotBox.style.opacity = o.k.toFixed(3);
       var x = o.x, y = o.y, pad = 14;
       if (spotIn) {
         var w = spotIn.offsetWidth, h = spotIn.offsetHeight;
@@ -1214,6 +1231,8 @@ html, body { height: auto; overflow: auto; }
       if (spotDesc) spotDesc.textContent = descOf(el, spotTag ? spotTag.textContent : "");
       if (spotVerse) spotVerse.textContent = "「" + verseOf(call || txt) + "」";
       spotBox.title = txt;
+    } else {
+      spotBox.style.opacity = "";         // 收回：浓淡交回 CSS（.on 一摘就淡掉）
     }
     spotBox.classList.toggle("on", on);
   }
@@ -1222,10 +1241,10 @@ html, body { height: auto; overflow: auto; }
     paintSpot(-1);
     if (window.__planet3d && window.__planet3d.unfocus) window.__planet3d.unfocus();
   }
-  /* 点到星野里的一粒（或名单上的一个名字）就点名；点在别处交给翻屏。
-     名单上的名字是**精确目标**（点的就是它），星野里的符号得真的点到那一粒才认；
-     已经点着一个人时再从星野里点一下，这一下让给翻屏 —— 不能让星野把
-     “点一下继续”这个手势吃掉。点的是已点着的那一粒 → 收回（不翻屏）。 */
+  /* 点到星野里的一粒（或名单上的一个名字）就点名。名单上的名字是**精确目标**
+     （点的就是它）；星野里的符号得真的点到那一粒才认。点着一个人时再点星野里的
+     另一粒＝换人，点的就是当下那一粒＝收回。点空白处不归这里管 —— 页尾的 click
+     先把它收回去（见那里），不翻屏。 */
   function spotPick(e) {
     /* 名单是前面那段脚本建好的（必须早于本段，见 <audio> 下面那段注释）；
        万一它没跑到（旧缓存、页面被改过顺序），这里再要一次 —— 不要让“点了名字
@@ -1240,13 +1259,58 @@ html, body { height: auto; overflow: auto; }
     if (!onName && window.__planet3d.symbolAt) i = window.__planet3d.symbolAt(e.clientX, e.clientY);
     if (i < 0) return false;
     if (i === spotOrd) { spotOff(); return true; }
-    if (!onName && spotOrd >= 0) return false;
-    /* 让模块先点头：它那边的符号表与这份名单万一对不上（名字多过符号），
+    /* 点着一个人时再点星野里的另一粒：换到他身上（点得准才算 —— 名单那一层这时
+       是隐的，星野里那 13px 的命中圈是唯一的入口）；点空白处则由页尾的 click
+       先收回这一屏，不翻屏。
+       让模块先点头：它那边的符号表与这份名单万一对不上（名字多过符号），
        它回的就不是这个序号 —— 那一下退回翻屏，不要让页面“点了没反应”。 */
     if (window.__planet3d.focusSymbol(i) !== i) return false;
     paintSpot(i);
     return true;
   }
+
+  /* ── 0b. 聚焦之后：按住画面＝自己转这颗球 ──
+     点名那一半是自动的（球自己转到那一粒正对镜头、再把它摆到正中）。点着谁之后，
+     画面这一半就交回给人：按住拖动把球转到想看的那一面，自动那一半让位（见
+     planet-3d.js 的 look）。松手停在原地，不弹回去 —— 弹回去就是跳。
+     这一段只在「点着谁」的时候认手势（spotOrd >= 0），别的屏一律照旧：星球不接
+     指针。一次拖动（位移超过 4px）收尾的那一下不再算一次点击 —— 不然松手就把
+     这一屏翻走了。 */
+  var dragOn = false, dragX = 0, dragY = 0, dragMoved = 0, dragAte = false;
+  function canTurn() { return spotOrd >= 0 && window.__planet3d && window.__planet3d.look; }
+  function dragStop() {
+    if (!dragOn) return;
+    dragOn = false;
+    if (deck) deck.classList.remove("dragging");
+    if (dragMoved > 4) {
+      dragAte = true;
+      /* 400ms 后自己作废：那一下收尾的 click 每次都紧接着来，但万一它没来
+         （手松开在窗口外），也不至于把下一次点击吃掉。 */
+      window.setTimeout(function () { dragAte = false; }, 400);
+    }
+  }
+  document.addEventListener("pointerdown", function (e) {
+    if (!canTurn()) return;
+    if (e.button !== undefined && e.button !== 0) return;   // 只认左键 / 单指
+    dragOn = true; dragX = e.clientX; dragY = e.clientY; dragMoved = 0;
+    /* 把这一串指针收在它按下的那一层上：拖出窗口外松手也能收到 pointerup
+       （不然 dragOn 会一直挂着，下一次划动就成了「一边翻屏一边转球」）。 */
+    if (e.target && e.target.setPointerCapture) {
+      try { e.target.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+  });
+  document.addEventListener("pointermove", function (e) {
+    if (!dragOn) return;
+    var dx = e.clientX - dragX, dy = e.clientY - dragY;
+    dragX = e.clientX; dragY = e.clientY;
+    dragMoved += Math.abs(dx) + Math.abs(dy);
+    if (dragMoved < 4) return;                             // 手抖 / 轻点：还不算拖动
+    if (deck) deck.classList.add("dragging");
+    window.__planet3d.look(dx, dy);
+  });
+  document.addEventListener("pointerup", dragStop);
+  document.addEventListener("pointercancel", dragStop);
+  window.addEventListener("blur", dragStop);
 
   /* 从头读起：这一页是线性的，中途刷新回来不该落在半路上。 */
   if (window.history && "scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
@@ -1328,6 +1392,14 @@ html, body { height: auto; overflow: auto; }
   /* 一次手势只走一屏；该翻屏时才 preventDefault（该让正文自己滚的时候不拦） */
   function step(e, dir) {
     if (e && (e.ctrlKey || e.metaKey)) return;             // 缩放 / 系统手势不抢
+    /* 点着谁的时候，手势归「转视角」：往回（上滚 / 上滑）＝先退回星野，往前一律
+       不走 —— 看着一个人的时候顺手一下就把整屏翻走，那才是真的「跳」。 */
+    if (spotOrd >= 0) {
+      if (e && e.preventDefault) e.preventDefault();
+      /* 退出这一屏后，同一串惯性的后半段不再继续往回翻（lastStep 把 GAP 也吃上） */
+      if (dir < 0) { spotOff(); lastStep = Date.now(); }
+      return;
+    }
     if (e && scrollable(e.target, dir)) return;
     if (e && e.preventDefault) e.preventDefault();
     var now = Date.now();
@@ -1337,12 +1409,21 @@ html, body { height: auto; overflow: auto; }
   }
   document.addEventListener("click", function (e) {
     var t = e && e.target;
+    if (dragAte) return;                       // 刚拖完：那一下收尾的 click 不算数
     if (t && t.closest && t.closest("a, button, iframe, input, select, textarea")) return;
     if (spotPick(e)) return;                   // 点到星野里的某一粒：点名，不翻屏
+    /* 点着谁的时候，点空白处＝先收回（球自转回标准机位、名单回来），不翻屏 ——
+       不然点哪儿都整屏翻走，正是「跳来跳去」。再点一下才往前走。 */
+    if (spotOrd >= 0) { spotOff(); return; }
     advance();
   });
   document.addEventListener("keydown", function (e) {
     var k;
+    /* 点着谁的时候键盘也不翻屏：Esc / Backspace 退回星野（先看清，再翻页）。 */
+    if (spotOrd >= 0) {
+      if (e.key === "Escape" || e.key === "Backspace") { e.preventDefault(); spotOff(); }
+      return;
+    }
     for (k = 0; k < NEXT.length; k++) {
       if (NEXT[k] === e.key) { e.preventDefault(); advance(); return; }
     }
@@ -1355,6 +1436,7 @@ html, body { height: auto; overflow: auto; }
     if (e.touches && e.touches.length === 1) touchY = e.touches[0].clientY;
   }, { passive: true });
   window.addEventListener("touchmove", function (e) {
+    if (dragOn) return;                                    // 手指正在转球：这一串不算滑动手势
     if (!e.touches || !e.touches.length) return;
     var d = touchY - e.touches[0].clientY;
     if (Math.abs(d) < 24) return;                          // 横向划动 / 轻点：不抢
@@ -1423,6 +1505,6 @@ html, body { height: auto; overflow: auto; }
 <script src="js/main.js?v=8"></script>
 <!-- 名单、节奏覆盖已经在前面写好了（见 <audio> 下面那一段）—— 那一段必须先
      于页尾那段翻屏脚本：它做点击映射时读的就是那份名单。 -->
-<script src="js/planet-3d.js?v=26"></script>
+<script src="js/planet-3d.js?v=27"></script>
 </body>
 </html>

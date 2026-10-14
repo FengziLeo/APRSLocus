@@ -419,6 +419,50 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.2', 'date': '2026-10-14',
+        'items': [
+            ('new',
+             T('**信标可带上卫星数**：`SAT=nn` 是可选的备注字段，来源是正在供位的那个'
+               '来源 —— 手机 GPS（Android 读参与定位的颗数）或外接 GPS 模组的 `GGA` 语句。'
+               '默认关；来源不提供这个值时不发，而不是发一个会被读成「一颗星都没有」的 0。',
+               '**信標可帶上衛星數**：`SAT=nn` 是可選的備註欄位，來源是正在供位的那個'
+               '來源 —— 手機 GPS（Android 讀參與定位的顆數）或外接 GPS 模組的 `GGA` 語句。'
+               '預設關；來源不提供這個值時不發，而不是發一個會被讀成「一顆星都沒有」的 0。',
+               '**The beacon can carry the satellite count**: `SAT=nn` is an optional '
+               'comment field, fed by whichever source is supplying the position — '
+               'phone GPS (Android reads the satellites used in the fix) or the external '
+               'GPS module\'s `GGA` sentence. Off by default, and nothing is sent when '
+               'the source does not provide it, rather than a zero that reads as "no '
+               'satellites".')),
+            ('up',
+             T('**外接 GPS 设备页多了一张「当前定位」卡**：坐标、海拔、速度、航向、卫星数、'
+               '精度（含原始 HDOP）、定位类型（`GSA` 的 2D / 3D，也会明确说「模组没报」）、'
+               '模组时间（UTC）、触发语句与最近一条原始语句都在明面上；龄期（「N 秒前」）'
+               '每秒刷新，断流后一眼能看出「已经多久没有新定位」。',
+               '**外接 GPS 裝置頁多了一張「目前定位」卡**：座標、海拔、速度、航向、衛星數、'
+               '精度（含原始 HDOP）、定位類型（`GSA` 的 2D / 3D，也會明確說「模組沒報」）、'
+               '模組時間（UTC）、觸發語句與最近一條原始語句都在明面上；齡期（「N 秒前」）'
+               '每秒刷新，斷流後一眼能看出「已經多久沒有新定位」。',
+               '**A new "Current fix" card on the external GPS device page**: position, '
+               'altitude, speed, course, satellites, accuracy (with the raw HDOP), fix '
+               'type (2D / 3D from `GSA`, and an explicit "not reported"), module time '
+               '(UTC), the trigger sentence and the latest raw sentence are all out in '
+               'the open; the age ("N seconds ago") refreshes every second, so a '
+               'stalled stream shows at a glance how long ago the last fix was.')),
+            ('fix',
+             T('**不再说「连接 TNC」**：外接 GPS 与 PKWDWPL 设备页以前沿用 TNC 那一套'
+               '按钮文案，点下去看着像要连电台 —— 现在改成按设备说话（扫描设备 / 连接设备 /'
+               '已绑定设备…），只有真正的 TNC 页才说「连接 TNC」。',
+               '**不再說「連接 TNC」**：外接 GPS 與 PKWDWPL 裝置頁以前沿用 TNC 那一套'
+               '按鈕文案，點下去看起來像要連電台 —— 現在改成按裝置說話（掃描裝置 / 連接裝置 /'
+               '已綁定裝置…），只有真正的 TNC 頁才說「連接 TNC」。',
+               '**No more "Connect TNC"**: the external GPS and PKWDWPL device pages used '
+               'the TNC button wording, so tapping them looked like connecting a radio. '
+               'They now speak in terms of the device (Scan devices / Connect device / '
+               'Bound device …), and only the actual TNC page says "Connect TNC".')),
+        ],
+    },
+    {
         'ver': 'v2.1.1', 'date': '2026-10-14',
         'items': [
             ('new',

@@ -599,6 +599,17 @@ html{overflow-x:hidden}
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.1.2</span>
+        <span class="cl-date">2026-10-14</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot new"></span><b>信標可帶上衛星數</b>：<code>SAT=nn</code> 是可選的備註欄位，來源是正在供位的那個來源 —— 手機 GPS（Android 讀參與定位的顆數）或外接 GPS 模組的 <code>GGA</code> 語句。預設關；來源不提供這個值時不發，而不是發一個會被讀成「一顆星都沒有」的 0。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>外接 GPS 裝置頁多了一張「目前定位」卡</b>：座標、海拔、速度、航向、衛星數、精度（含原始 HDOP）、定位類型（<code>GSA</code> 的 2D / 3D，也會明確說「模組沒報」）、模組時間（UTC）、觸發語句與最近一條原始語句都在明面上；齡期（「N 秒前」）每秒刷新，斷流後一眼能看出「已經多久沒有新定位」。</div>
+        <div class="cl-item"><span class="cl-dot fix"></span><b>不再說「連接 TNC」</b>：外接 GPS 與 PKWDWPL 裝置頁以前沿用 TNC 那一套按鈕文案，點下去看起來像要連電台 —— 現在改成按裝置說話（掃描裝置 / 連接裝置 /已綁定裝置…），只有真正的 TNC 頁才說「連接 TNC」。</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.1.1</span>
         <span class="cl-date">2026-10-14</span>
       </div>

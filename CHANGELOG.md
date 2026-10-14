@@ -1,5 +1,21 @@
 # 更新日志
 
+## [2.1.2] - 2026-10-14
+
+- 信标备注可选带上卫星数（`SAT=nn`）：来源为手机 GPS（Android 读 GNSS 状态里参与定位的颗数）或外接 GPS 模组的 `GGA` 语句；默认关，来源不提供这个值时不发
+- 外接 GPS 设备页新增「当前定位」卡：坐标 / 海拔 / 速度 / 航向 / 卫星数 / 精度（含 HDOP）/ 定位类型（`GSA` 的 2D · 3D）/ 模组时间（UTC）/ 触发语句与最近一条原始语句，龄期每秒刷新
+- 外接 GPS 与 PKWDWPL 设备页不再沿用 TNC 的「连接 TNC」文案，改为按设备说话（扫描设备 / 连接设备 / 已绑定设备…）
+
+---
+
+## [2.1.2] - 2026-10-14 (English)
+
+- The beacon comment can optionally carry the satellite count (`SAT=nn`): the source is phone GPS (Android reads the satellites used in the fix from the GNSS status) or the external GPS module (the `GGA` sentence); off by default, and nothing is sent when the source does not provide it
+- A new "Current fix" card on the external GPS device page: position / altitude / speed / course / satellites / accuracy (with HDOP) / fix type (`GSA` 2D · 3D) / module time (UTC) / trigger sentence and the latest raw sentence, with the age refreshed every second
+- The external GPS and PKWDWPL device pages no longer borrow the TNC wording ("Connect TNC") and now speak in terms of the device (Scan devices / Connect device / Bound device …)
+
+---
+
 ## [2.1.1] - 2026-10-14
 
 - 新增外接 GPS 定位来源：蓝牙 SPP 或 USB 串口接入 NMEA 0183 模组（`RMC` / `GGA` / `GLL` / `ZDA` / `GSA` / `VTG`），作为本机位置，只收不发

@@ -597,6 +597,17 @@ html{overflow-x:hidden}
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.1.2</span>
+        <span class="cl-date">2026-10-14</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot new"></span><b>The beacon can carry the satellite count</b>: <code>SAT=nn</code> is an optional comment field, fed by whichever source is supplying the position — phone GPS (Android reads the satellites used in the fix) or the external GPS module's <code>GGA</code> sentence. Off by default, and nothing is sent when the source does not provide it, rather than a zero that reads as "no satellites".</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>A new "Current fix" card on the external GPS device page</b>: position, altitude, speed, course, satellites, accuracy (with the raw HDOP), fix type (2D / 3D from <code>GSA</code>, and an explicit "not reported"), module time (UTC), the trigger sentence and the latest raw sentence are all out in the open; the age ("N seconds ago") refreshes every second, so a stalled stream shows at a glance how long ago the last fix was.</div>
+        <div class="cl-item"><span class="cl-dot fix"></span><b>No more "Connect TNC"</b>: the external GPS and PKWDWPL device pages used the TNC button wording, so tapping them looked like connecting a radio. They now speak in terms of the device (Scan devices / Connect device / Bound device …), and only the actual TNC page says "Connect TNC".</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.1.1</span>
         <span class="cl-date">2026-10-14</span>
       </div>

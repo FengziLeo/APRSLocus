@@ -31,6 +31,7 @@ import 'net/aprs.dart';
 import 'audio.dart';
 import 'box.dart';
 import 'pkwdwpl.dart';
+import 'nmea_gps.dart';
 import 'diag.dart';
 import 'group_chat.dart';
 import 'strategy_map.dart';
@@ -2141,6 +2142,14 @@ class AppState extends ChangeNotifier {
   /// 且电台只单向输出。因此它参与「收」（台站上图/台账），不参与「发」。
   final PkwdwplLink pkwdwpl = PkwdwplLink();
 
+  /// 外接 GPS 链路（蓝牙 SPP 上的 NMEA 0183，**只收不发**）。
+  ///
+  /// 与 PKWDWPL 彻底分开的一条：那条连的是**电台**（收别人的航点），
+  /// 这条连的是外面的 GPS/北斗**模组**（收**我的位置**）。两者都是 NMEA 明文，
+  /// 但是两台设备、两种语义 —— 共用一条链路既连不上也解释不清。
+  /// 它进 [enabledSources]（与 PKWDWPL 同类：参与「收」，永不参与「发」）。
+  final NmeaGpsLink nmeaGps = NmeaGpsLink();
+
   /// APRSlocusBOX（小盒子）链路。
   ///
   /// ⚠ **不进 [enabledSources]**：盒子自己就上 APRS-IS、自己组报文，本应用
@@ -2160,6 +2169,9 @@ class AppState extends ChangeNotifier {
   bool get tncOn => enabledSources.contains(srcTnc);
   bool get audioOn => enabledSources.contains(srcAudio);
   bool get pkwdwplOn => enabledSources.contains(srcPkwdwpl);
+
+  /// 外接 GPS（蓝牙 SPP）是否已启用
+  bool get nmeaGpsOn => enabledSources.contains(srcNmeaGps);
 
   /// IC-705 Wi-Fi 直连是否已启用（多选接收）
   bool get icomLanOn => audioOn && audio.config.source == AudioSource.icomLan;
@@ -2464,6 +2476,7 @@ class AppState extends ChangeNotifier {
     if (deviceId == null || deviceId.isEmpty) return null;
     if (tnc.device?.id == deviceId) return srcTnc;
     if (pkwdwpl.device?.id == deviceId) return srcPkwdwpl;
+    if (nmeaGps.device?.id == deviceId) return srcNmeaGps;
     if (box.device?.id == deviceId) return srcBox;
     return null;
   }
@@ -2539,7 +2552,9 @@ class AppState extends ChangeNotifier {
       ? 'TNC（电台）'
       : (s == srcAudio
           ? '音频（声卡）'
-          : (s == srcPkwdwpl ? 'PKWDWPL（Kenwood）' : 'APRS-IS'));
+          : (s == srcPkwdwpl
+              ? 'PKWDWPL（Kenwood）'
+              : (s == srcNmeaGps ? '外接 GPS（蓝牙）' : 'APRS-IS')));
 
   static const String srcAprsIs = 'aprsis';
   static const String srcTnc = 'tnc';
@@ -2547,6 +2562,14 @@ class AppState extends ChangeNotifier {
 
   /// PKWDWPL（Kenwood 航点语句）——**只收不发**的来源
   static const String srcPkwdwpl = 'pkwdwpl';
+
+  /// 外接 GPS（蓝牙 SPP / NMEA 0183）——**只收不发**的来源。
+  ///
+  /// 它对应用的意义与其它来源不同：别的来源供的是**报文**（台站、消息），
+  /// 它供的是**我自己的位置**（见 [positionSourceNow]）。但生命周期完全同类
+  /// （扫设备 → 连 → 断 → 自动重连），所以照样进 [enabledSources] ——
+  /// 那样才能复用「勾选 / 连接 / 重连 / 设备占用」这套已经踩出来的机制。
+  static const String srcNmeaGps = 'spp';
 
   /// 盒子链路。**不属于**数据来源，只在「哪条链路占着设备」与
   /// 「重连时要照顾到它」这两件事上出现（见 [box] 的注释）。
@@ -2791,10 +2814,34 @@ class AppState extends ChangeNotifier {
       await box.disconnect(manual: false);
       _setLinkUp(srcBox, false);
     }
+    // 外接 GPS 与盒子同为**最低优先**的链路（它只供位置、不供报文）：
+    // 别的链路要用的设备正被它占着时，同样先断开让路。
+    if (s0 != srcNmeaGps &&
+        wantId != null &&
+        nmeaGps.connected &&
+        nmeaGps.device?.id == wantId) {
+      _log(
+        LogLevel.info,
+        '连接',
+        '外接 GPS 正占用 ${nmeaGps.device?.label}：已先断开它，把设备让给 '
+            '${_sourceName(s0)}。',
+      );
+      await nmeaGps.disconnect(manual: false);
+      _setLinkUp(srcNmeaGps, false);
+    }
     if (s0 == srcBox) {
       final owner = deviceBoundBy(box.device?.id);
       if (owner != null && owner != srcBox) {
         box.lastError = 'device-in-use';
+        return 'device-in-use';
+      }
+      return null;
+    }
+    if (s0 == srcNmeaGps) {
+      // 只读且优先级最低：设备被任何其它链路绑着就拒绝，绝不抢。
+      final owner = deviceBoundBy(nmeaGps.device?.id);
+      if (owner != null && owner != srcNmeaGps) {
+        nmeaGps.lastError = 'device-in-use';
         return 'device-in-use';
       }
       return null;
@@ -2837,6 +2884,7 @@ class AppState extends ChangeNotifier {
     if (src == srcTnc) return srcTnc;
     if (src == srcAudio) return srcAudio;
     if (src == srcPkwdwpl) return srcPkwdwpl;
+    if (src == srcNmeaGps) return srcNmeaGps;
     if (src == srcBox) return srcBox;
     return srcAprsIs;
   }
@@ -2848,6 +2896,8 @@ class AppState extends ChangeNotifier {
         return tnc.device?.id;
       case srcPkwdwpl:
         return pkwdwpl.device?.id;
+      case srcNmeaGps:
+        return nmeaGps.device?.id;
       case srcBox:
         return box.device?.id;
       default:
@@ -2874,9 +2924,13 @@ class AppState extends ChangeNotifier {
     if (!pkwdwplOn && isUp(srcPkwdwpl)) {
       await pkwdwpl.disconnect(manual: false);
     }
+    if (!nmeaGpsOn && isUp(srcNmeaGps)) {
+      await nmeaGps.disconnect(manual: false);
+    }
     _setLinkUp(srcTnc, tnc.connected);
     _setLinkUp(srcAudio, audio.connected);
     _setLinkUp(srcPkwdwpl, pkwdwpl.connected);
+    _setLinkUp(srcNmeaGps, nmeaGps.connected);
     // 连上新启用的（仅当本来就在工作）
     if (wasActive && !_userDisconnected) await _connect();
   }
@@ -2967,6 +3021,11 @@ class AppState extends ChangeNotifier {
             box.lastError == BoxStatus.noDevice ||
             box.lastError == BoxStatus.unsupported ||
             box.lastError == 'device-in-use';
+      case srcNmeaGps:
+        return nmeaGps.device == null ||
+            nmeaGps.lastError == NmeaGpsStatus.noDevice ||
+            nmeaGps.lastError == NmeaGpsStatus.unsupported ||
+            nmeaGps.lastError == 'device-in-use';
       default:
         return false;
     }
@@ -3555,6 +3614,9 @@ class AppState extends ChangeNotifier {
       await pkwdwpl.disconnect(manual: false);
     } catch (_) {}
     try {
+      await nmeaGps.disconnect(manual: false);
+    } catch (_) {}
+    try {
       await box.disconnect(manual: false);
     } catch (_) {}
     try {
@@ -4060,6 +4122,7 @@ class AppState extends ChangeNotifier {
       await tnc.load();
       await audio.load();
       await pkwdwpl.load();
+      await nmeaGps.load();
       await box.load();
       // 远程限制名单：启动就查一次（放在配置载入之后 —— 要用到 myFullCall）。
       // ⚠ 用 timeout 把"等它"限制在 400ms：只有 prefs 读 + 缓存比对这么快。
@@ -4411,6 +4474,7 @@ class AppState extends ChangeNotifier {
     _wireAudio();
     _wirePkwdwpl();
     _wireBox();
+    _wireNmeaGps();
     // 蓝牙心率带：状态变化只影响 UI 与信标备注，通知一次即可。
     bleHr.onChanged = () {
       if (_disposed) return;
@@ -4446,6 +4510,9 @@ class AppState extends ChangeNotifier {
     });
     _tickTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_disposed) return;
+      // 外接 GPS 的静默检测（连着但久久没有字节 → 状态转 silent）。
+      // 它刻意不自起 Timer：已经在跑的秒 tick 就是天然的心跳。
+      nmeaGps.heartbeat();
       // 自动定时上报仅在链路可用时进行；未连接不发送（避免误以为在上报）。
       // TNC 模式下还需用户显式开启「射频信标」（见 canAutoBeacon）。
       // 上报判据：**定时到了，或者走够了**（智能信标的距离打点）。
@@ -4700,6 +4767,7 @@ class AppState extends ChangeNotifier {
     // 应当立即释放，不能等进程被杀 —— BluetoothSocket 不关会占住电台，
     // 下次打开应用重连会失败。
     unawaited(pkwdwpl.disconnect(manual: false));
+    unawaited(nmeaGps.disconnect(manual: false));
     unawaited(box.disconnect(manual: false));
     unawaited(tnc.disconnect(manual: false));
     unawaited(audio.disconnect(manual: false));
@@ -4731,6 +4799,7 @@ class AppState extends ChangeNotifier {
     // pkwdwpl 的传输层持有一个 EventChannel 订阅，不释放会一直挂在平台通道上；
     // TNC 同样有 reader/writer 线程与 socket。
     unawaited(pkwdwpl.disconnect(manual: false));
+    nmeaGps.dispose();
     unawaited(box.disconnect(manual: false));
     unawaited(tnc.disconnect(manual: false));
     unawaited(audio.disconnect(manual: false));
@@ -5121,6 +5190,57 @@ class AppState extends ChangeNotifier {
     };
   }
 
+  /// 外接 GPS 链路的接线。
+  ///
+  /// 与其它链路最大的不同：**它不进台站管线**（没有 `_upsertStation`）。
+  /// 它供的是「我的位置」，所以只在 [_onNmeaGpsFix] 里处理。
+  void _wireNmeaGps() {
+    nmeaGps.onFix = (fix) {
+      if (_disposed) return;
+      _onNmeaGpsFix(fix);
+    };
+    nmeaGps.onClosed = () {
+      if (_disposed) return;
+      _setLinkUp(srcNmeaGps, false);
+      // 只读链路与 PKWDWPL 同理：断了不改 ConnPhase，
+      // 否则会把「发射来源」的正常状态文案盖掉。
+      final manual = _userDisconnected;
+      _log(
+        manual ? LogLevel.info : LogLevel.warn,
+        '连接',
+        manual ? '已手动断开外接 GPS 链路' : '外接 GPS 链路断开，稍后自动重连',
+      );
+      _notify();
+      _updateNotification();
+      if (!_userDisconnected && nmeaGps.config.autoReconnect) {
+        _scheduleReconnectIfNeeded();
+      }
+    };
+    nmeaGps.onStateChanged = () {
+      if (_disposed) return;
+      if (nmeaGpsOn) _notifyRx();
+    };
+  }
+
+  /// 外接 GPS 的一条定位。
+  ///
+  /// ⚠ 本步只保证「链路能连、能收、界面看得见」：把**每次连接的首条定位**
+  /// 记进日志（设备页与日志页能确认链路真的在出数据）。位置接管 ——
+  /// 优先级、共用 [_ingestExternalFix]、停手机 GPS —— 在下一处改。
+  void _onNmeaGpsFix(NmeaFix fix) {
+    if (nmeaGps.fixes == 1) {
+      _log(
+        LogLevel.info,
+        '外接 GPS',
+        '收到首条定位：${fix.lat.toStringAsFixed(5)}, '
+            '${fix.lng.toStringAsFixed(5)}'
+            '${fix.satellites == null ? '' : ' · ${fix.satellites} 颗星'}'
+            '${fix.accuracyM == null ? '' : ' · ±${fix.accuracyM!.toStringAsFixed(0)}m'}',
+      );
+    }
+    _notify();
+  }
+
   /// 一条 `$PKWDWPL` 语句 → 台站 + 报文记录。
   void _onPkwdwplFix(PkwdwplFix fix) {
     final p = ParsedPos(
@@ -5283,6 +5403,7 @@ class AppState extends ChangeNotifier {
       if (tncOn && !isUp(srcTnc)) await _connectTnc();
       if (audioOn && !isUp(srcAudio)) await _connectAudio();
       if (pkwdwplOn && !isUp(srcPkwdwpl)) await _connectPkwdwpl();
+      if (nmeaGpsOn && !isUp(srcNmeaGps)) await _connectNmeaGps();
       if (boxOn && !box.connected) await _connectBox();
     } finally {
       _connectingAll = false;
@@ -5525,6 +5646,48 @@ class AppState extends ChangeNotifier {
       // 记日志 + 自己的状态码就够了（界面上链路那行会显示红点）。
       _log(LogLevel.error, '连接',
           'PKWDWPL 连接失败（${pkwdwpl.lastError}），稍后自动重试');
+    }
+    _notify();
+    _updateNotification();
+    _scheduleReconnectIfNeeded();
+  }
+
+  /// 连接外接 GPS（蓝牙 SPP）。
+  ///
+  /// 与 PKWDWPL 同类的**只读**链路，但优先级更低：它不供报文、只供位置，
+  /// 所以遇到设备冲突就退（让它自己报 device-in-use，不抢别人的设备），
+  /// 也**不占 ConnPhase** —— 连不上只影响定位来源，不影响报文工作。
+  Future<void> _connectNmeaGps() async {
+    if (nmeaGps.connected) return;
+    final owner = deviceBoundBy(nmeaGps.device?.id);
+    if (owner != null && owner != srcNmeaGps) {
+      nmeaGps.lastError = 'device-in-use';
+      // lastDetail 也要写：设备页的错误提示读的是 lastDetail
+      nmeaGps.lastDetail = 'device-in-use';
+      _setLinkUp(srcNmeaGps, false);
+      _log(
+        LogLevel.warn,
+        '连接',
+        '${nmeaGps.device?.label} 正被 ${_sourceName(owner)} 占用，'
+            '外接 GPS 暂不连接（两条链路同时连会互相抢走接收数据）。',
+      );
+      _notify();
+      _updateNotification();
+      return;
+    }
+    connecting = true;
+    final name = nmeaGps.device?.label ?? '未绑定设备';
+    _log(LogLevel.info, '连接', '正在连接外接 GPS：$name');
+    _notify();
+    _updateNotification();
+    final ok = await nmeaGps.connect();
+    connecting = false;
+    _setLinkUp(srcNmeaGps, ok);
+    if (ok) {
+      _log(LogLevel.info, '连接', '外接 GPS 链路已建立 · $name（只收定位）');
+    } else {
+      _log(LogLevel.error, '连接',
+          '外接 GPS 连接失败（${nmeaGps.lastError}），稍后自动重试');
     }
     _notify();
     _updateNotification();
@@ -6491,6 +6654,11 @@ class AppState extends ChangeNotifier {
       // PKWDWPL：只要断连重连（没有参数需要重下发）
       await pkwdwpl.restart();
       _setLinkUp(srcPkwdwpl, pkwdwpl.connected);
+    }
+    if (nmeaGpsOn) {
+      // 外接 GPS：同样只需断连重连（模组不接受任何指令）
+      await nmeaGps.restart();
+      _setLinkUp(srcNmeaGps, nmeaGps.connected);
     }
     if (boxOn) {
       await box.restart();

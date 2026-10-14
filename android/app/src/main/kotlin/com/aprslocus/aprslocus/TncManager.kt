@@ -98,11 +98,27 @@ class TncManager(
         const val METHOD_CHANNEL_BOX = "com.aprslocus/box"
         const val EVENT_CHANNEL_BOX = "com.aprslocus/box_events"
 
+        /**
+         * 外接 GPS 模块（蓝牙 SPP）。
+         *
+         * 线上是**明文 NMEA 0183 行**（`$GPRMC` / `$GPGGA` …）。与 TNC / PKWDWPL
+         * 一样只搬字节，解析全在 Dart 侧（lib/nmea.dart 与 lib/nmea_gps.dart）。
+         *
+         * 为什么要独立通道而不蹭 PKWDWPL：两者虽然都是 NMEA 明文，但接的
+         * 是**两台不同设备**（一个是电台的航点输出，一个是外面的 GPS 模块），
+         * 而本类只维护一条 socket —— 共用通道会让「接 GPS」把电台那条顶掉。
+         */
+        const val METHOD_CHANNEL_GPS = "com.aprslocus/gps"
+        const val EVENT_CHANNEL_GPS = "com.aprslocus/gps_events"
+
         /** PKWDWPL 实例专用的权限 requestCode（与 TNC 的 0x7A31 区分开） */
         const val PERM_REQUEST_PKWDWPL = 0x7A32
 
-        /** 盒子实例专用的权限 requestCode（三个实例必须互不相同） */
+        /** 盒子实例专用的权限 requestCode（四个实例必须互不相同） */
         const val PERM_REQUEST_BOX = 0x7A33
+
+        /** 外接 GPS 实例专用的权限 requestCode（四个实例必须互不相同） */
+        const val PERM_REQUEST_GPS = 0x7A34
 
         /** 蓝牙串口服务（SPP）标准 UUID */
         private val SPP_UUID: UUID =

@@ -79,6 +79,11 @@ class MainActivity : FlutterActivity() {
     // （`CFG k=v` / `POS …`），解析全在 Dart 侧（lib/box.dart）。
     private var box: TncManager? = null
 
+    // 外接 GPS 模块（蓝牙 SPP）：字节搬运与前几条完全一样，线上是明文 NMEA
+    // 0183（`$GPRMC` / `$GPGGA` …），解析在 Dart 侧（lib/nmea.dart）。
+    // 独立通道 + 独立 socket：接 GPS 模块不能让电台那条链路断掉。
+    private var gps: TncManager? = null
+
     // 声卡 TNC（AFSK 1200）：同样只搬 PCM 采样，调制解调在 Dart 侧
     private var audio: AudioManager? = null
 
@@ -328,6 +333,17 @@ class MainActivity : FlutterActivity() {
         )
         box = boxManager
         wireSppLink(boxManager, TncManager.METHOD_CHANNEL_BOX, TncManager.EVENT_CHANNEL_BOX)
+
+        // ④ 外接 GPS 模块（NMEA 0183，位置来源）
+        val gpsManager = TncManager(
+            this,
+            TncManager.METHOD_CHANNEL_GPS,
+            TncManager.EVENT_CHANNEL_GPS,
+            TncManager.PERM_REQUEST_GPS,
+            onLinkChanged = { refreshBtActive() },
+        )
+        gps = gpsManager
+        wireSppLink(gpsManager, TncManager.METHOD_CHANNEL_GPS, TncManager.EVENT_CHANNEL_GPS)
 
         // BLE 心率带通道：扫描 → 连接 → 订阅标准心率服务 0x180D 的通知。
         //
@@ -1116,6 +1132,7 @@ class MainActivity : FlutterActivity() {
         tnc?.onRequestPermissionsResult(requestCode, grantResults)
         pkwdwpl?.onRequestPermissionsResult(requestCode, grantResults)
         box?.onRequestPermissionsResult(requestCode, grantResults)
+        gps?.onRequestPermissionsResult(requestCode, grantResults)
         audio?.onRequestPermissionsResult(requestCode, grantResults)
         bleHr?.onRequestPermissionsResult(requestCode, grantResults)
         if (requestCode != 100) return
@@ -1159,12 +1176,13 @@ class MainActivity : FlutterActivity() {
     /// 各自传值调用，「断开时该传什么」各写各的 —— 已经踩过一次：先断开的那条
     /// 链路会把仍在工作的那条的 connectedDevice 声明撤掉，落回「退到后台就收不到
     /// 报文」的坑（Android 14+ 后台访问蓝牙必须有这个前台服务类型）。所以改成：
-    /// **调用方都不传布尔值**，由这里统一统计四条链路里是否还有活着的。
+    /// **调用方都不传布尔值**，由这里统一统计五条链路里是否还有活着的。
     /// 任何「我这条链路断了所以整体不活跃」的判断都是错的，必须走这里。
     private fun refreshBtActive() {
         val anyActive = tnc?.isConnected() == true ||
             pkwdwpl?.isConnected() == true ||
             box?.isConnected() == true ||
+            gps?.isConnected() == true ||
             usbSerial?.isConnected() == true ||
             bleHr?.isConnected() == true
         setBtActive(anyActive)
@@ -1269,9 +1287,11 @@ class MainActivity : FlutterActivity() {
             box?.dispose()
             box = null
             pkwdwpl?.dispose()
+            gps?.dispose()
         } catch (_: Exception) {
         }
         pkwdwpl = null
+        gps = null
         // 传感器监听必须显式注销：否则 Activity 销毁后传感器仍在唤醒
         try {
             motion?.stop()

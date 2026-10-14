@@ -198,17 +198,28 @@
   .deck-spot-in { position: absolute; left: 0; top: 0; transform: translate(-50%, 26px);
     text-align: center; white-space: nowrap; }
   .deck-spot span { display: block; color: var(--text-faint); }
-  .deck-spot .spot-tag { font-size: 12.5px; letter-spacing: .3em; text-indent: .3em; }
+  /* 品牌那一行：logo 就是首页导航栏那颗同一张图（图标 + 字标）——
+     点名时右下角那枚签名是退开的，截图发出去时品牌得在这里。 */
+  .deck-spot .spot-brand { display: flex; align-items: center; justify-content: center;
+    gap: 10px; color: var(--text-dim); }
+  .deck-spot .spot-brand img { width: 30px; height: 30px; border-radius: var(--radius);
+    box-shadow: 0 8px 22px var(--shadow-cool); }
+  .deck-spot .spot-brand-name { font-size: 13px; font-weight: 700; letter-spacing: .26em;
+    text-indent: .26em; text-transform: uppercase; color: var(--text-dim); }
+  .deck-spot .spot-tag { margin-top: 15px; font-size: 12.5px; letter-spacing: .3em;
+    text-indent: .3em; }
   .deck-spot b { display: block; margin-top: 7px; font-size: clamp(30px, 5.6vw, 58px);
     font-weight: 800; line-height: 1.06; letter-spacing: .1em; text-indent: .1em;
     color: var(--accent); text-shadow: 0 14px 44px var(--shadow-color); }
   .deck-spot .spot-no { margin-top: 12px; font-family: var(--font-mono);
     font-size: clamp(12px, 1.5vw, 15px); letter-spacing: .2em; text-indent: .2em;
     color: var(--text-dim); }
-  /* 最后一行是他的描述：页面上有的就用页面上的（开发 / 贡献者那一行写了分工），
-     纯呼号名单没有的就用那一份名单自己的说法（见页尾脚本的 ROSTER_DESC）。 */
+  /* 最后两行：他是干什么的（页面上写着的就用页面上的），和一句诗。
+     诗按呼号选，同一个呼号永远是同一句（见页尾脚本的 VERSES / verseOf）。 */
   .deck-spot .spot-desc { margin-top: 10px; font-size: clamp(12px, 1.4vw, 14px);
     letter-spacing: .12em; text-indent: .12em; color: var(--text-dim); }
+  .deck-spot .spot-verse { margin-top: 16px; font-size: clamp(13px, 1.5vw, 15px);
+    letter-spacing: .14em; text-indent: .14em; color: var(--text-dim); }
 
   /* ── 点了一个名字：这一屏就只剩他 ──
      别的人不是“退到几乎看不见”，是**不显示** —— 正文那一整块连着名单一起退开，
@@ -344,18 +355,22 @@ html, body { height: auto; overflow: auto; }
 
   <!-- ── 星野点名的那一段（整页一层，同壁纸与天空层一样不在任何一屏里）──
        点一颗星、或点名单上的一个名字，这里报出他在哪份名单上、他是谁、编号多少、
-       他是干什么的（贴着那一粒）。编号是从名字**算**出来的（两个 32 位哈希拼 20 位）：
-       没有随机数、没有时间，同一个呼号永远是同一串号 —— 名单增补、页面改版都
-       不会变动它。名单那一行读的是这一屏自己的标题（已点亮用户 / 开发 …）；
-       描述那一行先看页面上有没有写（开发 / 贡献者都有分工），没有就用那一份
-       名单自己的说法（见下面脚本的 ROSTER_DESC）。
+       他是干什么的，上方是 logo，下面是一句诗（贴着那一粒）—— 这一屏能直接
+       截下来发出去。编号是从名字**算**出来的（两个 32 位哈希拼 20 位）：没有
+       随机数、没有时间，同一个呼号永远是同一串号；那句诗也按同一个哈希挑，
+       同一个呼号永远是同一句 —— 名单增补、页面改版都不会动它们。
+       名单那一行读的是这一屏自己的标题（已点亮用户 / 开发 …）；描述那一行先看
+       页面上写没写（开发 / 贡献者都有分工），没有就用那一份名单自己的说法
+       （见下面脚本的 ROSTER_DESC）。
        拿不到呼号的那几个（群组、每一位支持者）中间那行就空着，不编一个出来。 -->
   <div class="deck-spot" id="deckSpot" aria-live="polite">
     <div class="deck-spot-in">
+      <span class="spot-brand"><img src="assets/logo.png" alt="" width="30" height="30"><span class="spot-brand-name">APRSLocus</span></span>
       <span class="spot-tag" id="spotTag"></span>
       <b id="spotCall"></b>
       <span class="spot-no" id="spotNo"></span>
       <span class="spot-desc" id="spotDesc"></span>
+      <span class="spot-verse" id="spotVerse"></span>
     </div>
   </div>
 
@@ -1101,6 +1116,7 @@ html, body { height: auto; overflow: auto; }
   var spotNo = document.getElementById("spotNo");
   var spotTag = document.getElementById("spotTag");
   var spotDesc = document.getElementById("spotDesc");
+  var spotVerse = document.getElementById("spotVerse");
   var spotOrd = -1;
 
   /* 那一粒飞去哪儿，这一行字就跟到哪儿：模块每帧报一次它的屏幕位置
@@ -1126,21 +1142,40 @@ html, body { height: auto; overflow: auto; }
     };
   }
 
-  function starNo(s) {
+  /* 一次哈希，两串：星表编号与那句诗都从它来 —— 同一个呼号永远同一串号、
+     同一句诗，刷新多少次、名单增补都不变（没有随机数、没有时间）。 */
+  function hashOf(s) {
     var h1 = 0x811c9dc5, h2 = 0x9e3779b9, i, c;
     for (i = 0; i < s.length; i++) {
       c = s.charCodeAt(i);
       h1 = Math.imul(h1 ^ c, 0x01000193) >>> 0;
       h2 = Math.imul(h2 ^ (c * (i + 7)), 0x85ebca6b) >>> 0;
     }
+    return [h1, h2];
+  }
+  function starNo(s) {
+    var h = hashOf(s);
     /* 不用 BigInt（不必为此抬高门槛）：两串 32 位十进制各自补齐 10 位，
        拼起来就是 20 位长号。 */
-    var all = ("0000000000" + h1.toString(10)).slice(-10)
-      + ("0000000000" + h2.toString(10)).slice(-10);
-    var out = "";
+    var all = ("0000000000" + h[0].toString(10)).slice(-10)
+      + ("0000000000" + h[1].toString(10)).slice(-10);
+    var out = "", i;
     for (i = 0; i < 20; i += 4) out += (i ? " " : "") + all.substring(i, i + 4);
     return out;
   }
+  /* 那几行诗：截图发出去时得有一句像样的。按呼号挑一句（同一个呼号永远同一句），
+     只写在这儿，不改页面上已经写着的文案。 */
+  var VERSES = [
+    "天涯不过一句 73。",
+    "星星不说话，但它一直亮着。",
+    "这颗星上，有一粒是他的。",
+    "电波去过的地方，都算回家。",
+    "隔着几千公里，他也在。",
+    "所有的远，都已经被量过一遍。",
+    "星图上的每一点，都是一个声音。",
+    "星球转着，他的名字在上面。"
+  ];
+  function verseOf(s) { return VERSES[hashOf(s)[1] % VERSES.length]; }
   /* 他在哪一份名单上：读这一屏自己的标题（已点亮用户 / 开发 / 开山成员 · 15 位 …），
      不另编一个称呼 —— 页面上怎么写，这里就怎么叫。 */
   function rosterOf(el) {
@@ -1177,6 +1212,7 @@ html, body { height: auto; overflow: auto; }
       spotCall.textContent = call;                 // 拿不到呼号：这一行就空着
       spotNo.textContent = "星表编号 " + starNo(call || txt);
       if (spotDesc) spotDesc.textContent = descOf(el, spotTag ? spotTag.textContent : "");
+      if (spotVerse) spotVerse.textContent = "「" + verseOf(call || txt) + "」";
       spotBox.title = txt;
     }
     spotBox.classList.toggle("on", on);

@@ -53,7 +53,8 @@
      只有彩蛋页 docs/hero.html 写它：同一段画面，开场慢慢聚成球、滚动缓动
      调软一档 —— 那页是让人走进去读故事的，不是扫一眼就走。
      只放两个数，外加一个布尔 `deck`（那页的装饰层是页面级固定层、点云会换形状），
-      不做主题/颜色的覆盖：那是设计，不是节奏。 */
+     以及一个整数 `symbols`（那页的名单有多少个名字 → 星野里要补多少粒可点的
+     符号点，见第 3d 节）；不做主题/颜色的覆盖：那是设计，不是节奏。 */
   var PAGE = window.__planet3dPage || {};
 
   /* 彩蛋页还要多做一件事：点云会**换形状**（见第 3b 节）。它把 deck: true 写进
@@ -216,6 +217,12 @@
   /* ── 几何：交错 10 float/点 = pos(3) + col(3) + meta(尺寸, 呼吸频率, 呼吸幅度) + spin
         meta.z > 0 的点会自己呼吸（大小与亮度一起抖）；spin 是自己的角速度，
         0 = 跟着星球整体走（星球本体），非 0 = 自己转（环带 / 卫星轨道）。 ── */
+  /* 符号点的下标表：buildCloud 里排出来的台站式点（第 90 粒之后那些是彩蛋页
+     补的），序号 = 数组里的位置。彩蛋页把名单按同一个顺序铺下来，于是
+     「第 n 个名字」永远对应「第 n 粒符号」。三语首页不碰这张表（PAGE.symbols
+     不传 → 一粒都不补），几何逐点不变。 */
+  var SYM = [];
+
   function buildCloud() {
     var arr = [], col = [0, 0, 0], i, j, u, th, s, x, y, z, r, ang, ex, ez, live, fade, band, fine, g, c;
 
@@ -249,6 +256,7 @@
       // （抽样次数故意与上一版一致，星球几何因此逐点不变。）
       c = PAL.bright;
       g = 0.62 + rnd() * 0.70;
+      SYM.push(i);                    // 这一粒是符号点：下标 = 它在这张表里的位置
       arr.push(x, y, z, c[0] * g, c[1] * g, c[2] * g,
         0.0140 + rnd() * 0.0105,
         0.9 + rnd() * 2.4,
@@ -277,6 +285,28 @@
           0.6 + rnd() * 1.5,
           0.20 + 0.25 * fade,
           rate);
+      }
+    }
+
+    /* 彩蛋页的星野：名单上的每一个人都得有自己那一粒可点的符号。前 90 粒就是
+       上面那批台站点，这里按 PAGE.symbols 补满（补到与名单人数一样多）。
+       ⚠ 只补在**所有既有采样之后**，而且只在 DECK 时补 —— 三语首页的点、
+       环、台站一个字节都没动，同一颗星还是每次刷新都一样。 */
+    if (DECK) {
+      var extra = Math.max(0, (PAGE.symbols | 0) - SYM.length);
+      for (i = 0; i < extra; i++) {
+        u = rnd() * 2 - 1;
+        th = rnd() * Math.PI * 2;
+        s = Math.sqrt(1 - u * u);
+        x = s * Math.cos(th); y = u; z = s * Math.sin(th);
+        c = PAL.bright;
+        g = 0.62 + rnd() * 0.70;
+        SYM.push(arr.length / 10);    // 下标 = 补进来这一粒的位置
+        arr.push(x, y, z, c[0] * g, c[1] * g, c[2] * g,
+          0.0140 + rnd() * 0.0105,
+          0.9 + rnd() * 2.4,
+          0.80 + rnd() * 0.20,
+          0);
       }
     }
 
@@ -331,6 +361,7 @@
     "uniform vec3 uImpDir1; uniform float uImpAge1;",  //   （负数 = 这一槽在等下一颗）
     "uniform vec3 uImpDir2; uniform float uImpAge2;",
     "uniform vec2 uCenter; uniform vec3 uTint; uniform vec3 uStn;",
+    "uniform vec3 uSpot; uniform float uSpotK;",       // 点名：被点到的那一粒（模型空间）+ 点名强度 0→1
     "varying vec3 vCol;",
     "varying float vFade;",
     "void main() {",
@@ -403,14 +434,19 @@
     "  float k = mix(1.0, 0.34 + 1.20 * tw, aMeta.z) * lam;",
     "  k *= 1.0 + body * uWave * (max(wv, 0.0) * 0.75 + rip * 3.0);",    // 波峰亮、撞击那圈最亮
     "  k *= 1.0 - uForm * smoothstep(1.20, 1.30, length(aPos));",       // 环带：换形状就退场
+    // 点名（彩蛋页的星野）：只留那一粒亮着，其余压下去。距离用 home 算 ——
+    // 与位置是同一条链（换形状途中也跟著走），不是拿屏幕坐标事后估的。
+    "  float dsp = distance(home, uSpot);",
+    "  float near = exp(-dsp * dsp * 26.0) * uSpotK;",   // 它自己 ≈ 1，越远越接近 0
+    "  k *= mix(1.0, 0.20 + 2.10 * near, uSpotK);",      // 其余压暗，点到的那一粒更亮
     "  float pick = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719)) + uSeed) * 43758.5453);",
     "  float flare = uBurst * step(0.95, pick);",
     "  k *= 1.0 + 1.6 * flare;",
-    "  gl_PointSize = clamp(aMeta.x * uPxScale * uPxGain / max(d, 0.35) * k * (0.30 + 0.70 * gp), uMinPx * uPxGain, uMaxSize * uPxGain);",
+    "  gl_PointSize = clamp(aMeta.x * uPxScale * uPxGain / max(d, 0.35) * k * (0.30 + 0.70 * gp) * (1.0 + 0.55 * near), uMinPx * uPxGain, uMaxSize * uPxGain);",
     "  float isStn = step(0.5, aMeta.z);",              // 台站 / 卫星：比本体亮一大截的那一类
     "  vec3 base = mix(aCol, uStn * (0.72 + 0.62 * aCol.b), isStn);",
     "  vCol = base * uTint * k;",
-    "  vFade = ((0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6 + rip * 0.9 * uWave) * (0.10 + 0.90 * gp) * (1.0 - uForm * smoothstep(1.20, 1.30, length(aPos)));",
+    "  vFade = ((0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6 + rip * 0.9 * uWave) * (0.10 + 0.90 * gp) * (1.0 - uForm * smoothstep(1.20, 1.30, length(aPos))) * mix(1.0, 0.34 + 1.30 * near, uSpotK);",
     "}"
   ].join("\n");
 
@@ -517,6 +553,14 @@
   gl.useProgram(prog);
 
   var cloud = buildCloud();
+  /* 点 → 符号序号（-1 = 寻常粒子）。换形状时按它把符号点摆到各自的格子上，
+     点击时按它把名字对回符号。 */
+  var symOrd = new Int32Array(cloud.count);
+  (function () {
+    var i;
+    for (i = 0; i < symOrd.length; i++) symOrd[i] = -1;
+    for (i = 0; i < SYM.length; i++) if (SYM[i] < cloud.count) symOrd[SYM[i]] = i;
+  })();
   var STRIDE = 10 * 4;
   var buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
@@ -553,7 +597,7 @@
     "uPxScale",
     "uMaxSize", "uMinPx", "uPxGain", "uTime", "uCenter", "uTint", "uStn", "uAlpha", "uBurst", "uSeed", "uGather",
     "uWave", "uImpDir0", "uImpAge0", "uImpDir1", "uImpAge1", "uImpDir2", "uImpAge2",
-    "uMorph", "uScatter", "uShape", "uForm"
+    "uMorph", "uScatter", "uShape", "uForm", "uSpot", "uSpotK"
   ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
 
   function bindPointers() {
@@ -663,7 +707,7 @@
 
   /* 把形状写进 out（长度 = 点数 × 3）。 */
   function shapeFill(name, out) {
-    var n = cloud.count, i, o, u, th, r, t, q, w, sp, gp, m, half;
+    var n = cloud.count, i, o, u, th, r, t, q, w, sp, gp, m, half, k2, a2, rr;
     if (name === "sphere") {                   // 家：原样那层球面
       out.set(pArr[0]);
       return;
@@ -718,6 +762,41 @@
       }
       return;
     }
+    if (name === "scatter") {
+      /* 结尾名单那几屏：整颗球散成一片星野 —— 名字写在星空里。
+         两层东西：
+         · 寻常粒子（星球本体 + 环带）散成一片铺满画面的尘：面上宽、纵深浅
+           （相机在四个半径外，太薄的一层会像一张贴纸，所以留一点厚度）；
+         · 符号点（名单上的每一个人）落在一条黄金角螺旋上：等分却不排队，
+           每一粒占着自己那一格，谁也压不住谁。序号就是螺旋上的第几格 ——
+           页面按同一个顺序铺名字，于是「第 n 个名字」永远落在同一个位置上。
+         ⚠ 这一支用**自己**的随机流：翻回去再散一次还是同一片星野（位置不动），
+           否则每回到这一屏，名单上的人就会换一个位置站。 */
+      var rs = mulberry32(0x4150525a);
+      /* 星野要“铺满画面”：画面有多宽，螺旋就铺多宽 —— 取景半径有三套（窄屏 /
+         平板 / 桌面），同一串坐标的屏幕大小就不一样，所以在这里按当前画面收一下
+         （0.90 是留一圈边）。窗口比例变了不重铺：那是读者自己拉窄的。 */
+      var fitX = Math.min(1, 0.90 * canvas.width / (2 * Math.max(1, view.r) * 1.78));
+      var fitY = Math.min(1, 0.90 * canvas.height / (2 * Math.max(1, view.r) * 1.02));
+      for (i = 0; i < n; i++) {
+        o = i * 3;
+        if (symOrd[i] >= 0) {
+          k2 = (symOrd[i] + 0.5) / Math.max(1, SYM.length);
+          a2 = symOrd[i] * 2.39996323;           // 黄金角（rad）：螺旋上的一格
+          rr = (0.34 + Math.sqrt(k2) * 1.44);    // 0.34 → 1.78：里外都匀，正中留一格空
+          out[o] = Math.cos(a2) * rr * fitX;
+          out[o + 1] = Math.sin(a2) * rr * 0.573 * fitY;   // 0.573 = 1.02/1.78：铺满宽屏
+          out[o + 2] = (rs() - 0.5) * 0.90;
+        } else {
+          a2 = rs() * Math.PI * 2;
+          rr = 0.22 + Math.pow(rs(), 0.62) * 3.10;
+          out[o] = Math.cos(a2) * rr;
+          out[o + 1] = Math.sin(a2) * rr * 0.60;
+          out[o + 2] = (rs() - 0.5) * 2.20;
+        }
+      }
+      return;
+    }
     /* 其余一律按**文字**处理：比如 `73`（火腿收尾那句话）。 */
     gp = glyph(name);
     if (!gp) { out.set(pArr[0]); return; }
@@ -742,6 +821,7 @@
     if (!DECK || typeof name !== "string" || name === shapeName) return;
     if (!/^[A-Za-z0-9]{1,8}$/.test(name)) return;
     shapeName = name;
+    if (name !== "scatter") focusAt(-1);       // 离开星野：把点名收回
     formTarget = (name === "sphere") ? 0 : 1;
     shapeFill(name, _tmp);
     pArr[1 - bi].set(_tmp);
@@ -879,6 +959,92 @@
   }
   function camDist(h) { return U_PROJ * h / (2 * Math.max(1, view.r)); }
 
+  /* ── 3d. 点名：镜头飞到某一粒星上（只有彩蛋页用）──
+     结尾名单那几屏里，点一粒星、或点名单上的一个名字，都是同一件事：
+     镜头飞过去停在它上面，其余压暗，左下角报出这是谁、编号多少。
+
+     镜头那一半分两件事：
+       · 中心偏移 —— **解析**算出来，不是“朝画面里它现在的位置一点点挪”：
+         后者是个反馈环，星球还在转，追不稳。投影里中心是加在 sc 上的偏移，
+         取它的相反数，那一粒就正好落在画面正中（与机位远近无关）。
+       · 机位收近到 0.62 倍 —— 星野从“铺满画面”变成“一颗星占住画面”。
+     着色器那一半只认两件事：那一粒在哪（模型空间，与 home 同一套）、点名到几分。
+     位置读**目标形状缓冲**（pArr[bi]），换形状时也就是它现在待的地方。 */
+  var focusOrd = -1;                     // 名单里第几个人的那一粒（-1 = 没点谁）
+  var focusK = 0;                        // 点名强度 0 → 1（镜头、收近、压暗一起吃它）
+  var ctrX = 0, ctrY = 0;                // 中心偏移（投影中心那一套，见 draw 里的 uCenter）
+  var gDist = 1;                         // 这一帧的机位距离（draw / 投影 / 点击 都读它）
+  var _sp = [0, 0, 0];
+  function pointOf(idx) {
+    var i = SYM[idx] * 3;
+    _sp[0] = pArr[bi][i]; _sp[1] = pArr[bi][i + 1]; _sp[2] = pArr[bi][i + 2];
+    return _sp;
+  }
+  function spotPoint() {
+    if (focusOrd < 0 || focusOrd >= SYM.length) { _sp[0] = 0; _sp[1] = 0; _sp[2] = 0; return _sp; }
+    return pointOf(focusOrd);
+  }
+  /* 模型空间的一点 → 投影里的中间量（照抄顶点着色器那几行：自转 → 俯仰 →
+     绕视轴 roll → 除 aspect。x / y 是加进 gl_Position 之前的 sc，d 是深度）。 */
+  var _pj = { x: 0, y: 0, d: 1 };
+  function projPoint(p) {
+    var cy = Math.cos(yaw), sy = Math.sin(yaw);
+    var x = p[0] * cy + p[2] * sy, y = p[1], z = p[2] * cy - p[0] * sy;
+    var cp2 = Math.cos(TILT + pitch), sp2 = Math.sin(TILT + pitch);
+    var y2 = y * cp2 - z * sp2, z2 = y * sp2 + z * cp2;
+    var aspect = canvas.width / Math.max(1, canvas.height);
+    _pj.x = (x * ROLL_C - y2 * ROLL_S) * U_PROJ / aspect;
+    _pj.y = (x * ROLL_S + y2 * ROLL_C) * U_PROJ;
+    _pj.d = Math.max(0.35, gDist - z2);
+    return _pj;
+  }
+  function chaseSpot(dt) {
+    var fk = reduce ? 1 : Math.min(1, dt * 3.4);
+    focusK += ((focusOrd >= 0 ? 1 : 0) - focusK) * fk;
+    var tx = 0, ty = 0, pj;
+    if (focusOrd >= 0) {
+      pj = projPoint(pointOf(focusOrd));
+      tx = -(pj.x + view.cx * 2 - 1);     // 取反正好抵消：见 draw 里 uCenter 那一行
+      ty = -(pj.y + 1 - view.cy * 2);
+    }
+    ctrX += (tx - ctrX) * fk;
+    ctrY += (ty - ctrY) * fk;
+  }
+  function focusAt(ord) {
+    var n2 = (ord === null || ord === undefined || ord < 0) ? -1 : ord | 0;
+    if (n2 >= SYM.length) n2 = -1;
+    focusOrd = n2;
+    if (n2 >= 0) start();                 // 镜头要动起来（降级动效下它直接到位）
+    return focusOrd;
+  }
+  /* 点到星野里的哪一粒了？传点击事件的 CSS 坐标，返回那一粒的序号（没点到 -1）。
+     坐标先按画布自己的矩形折回画布内 —— 天空层有时被 CSS 缩放过
+     （.deck[data-sky="soft"]），只按视口坐标算会整体偏掉。命中按**屏幕上的距离**
+     （近的赢），只认星野那一种形状：别的形状上这些序号没有意义。
+     ⚠ 命中半径故意紧跟粒子的自己大小（桌面 13px / 触屏 20px）：星野里“点一下”
+       是翻屏的手势，圈开大了就会把它整片吃掉（整片星野都变成“点中某个人”）。 */
+  var COARSE = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  function symbolAt(cssX, cssY) {
+    if (!DECK || shapeName !== "scatter" || !SYM.length) return -1;
+    var r = canvas.getBoundingClientRect();
+    if (!r.width || !r.height) return -1;
+    var ox = cssX - r.left, oy = cssY - r.top;
+    var bx = view.cx * 2 - 1 + ctrX * focusK, by = 1 - view.cy * 2 + ctrY * focusK;
+    var lim = COARSE ? 20 : 13;
+    var best = lim * lim, pick = -1, i, pj, nx, ny, ex, ey, dd;
+    for (i = 0; i < SYM.length; i++) {
+      pj = projPoint(pointOf(i));
+      nx = (pj.x + bx) / pj.d;
+      ny = (pj.y + by) / pj.d;
+      if (nx < -1.05 || nx > 1.05 || ny < -1.05 || ny > 1.05) continue;
+      ex = (0.5 + 0.5 * nx) * r.width - ox;
+      ey = (0.5 - 0.5 * ny) * r.height - oy;
+      dd = ex * ex + ey * ey;
+      if (dd < best) { best = dd; pick = i; }
+    }
+    return pick;
+  }
+
   /* ── 动画时钟 animT ──
      所有"看时间"的效果（浪、撞击、自转、卫星、读数闪点）都吃这一刻钟，它只在
      真正画帧的时候往前走。用绝对的 performance.now() 的话，页面滚出视口暂停
@@ -896,7 +1062,9 @@
     var f = frame(w, h);
     var m = MODES[dark ? "dark" : "light"];
     var zoom = reduce ? 1 : 1 + 0.20 * (1 - gather);   // 入场：从更近的机位缓缓退回
-    var dist = camDist(h) / zoom;
+    /* 点名：镜头一边往那一粒上靠（见 chaseSpot），一边把机位收近到 0.62 倍；
+       gDist 也是投影 / 点击命中读的同一个数，所以放在模块级上。 */
+    gDist = camDist(h) / zoom / (1 + 0.62 * focusK);
     var cp = Math.cos(TILT + pitch), sp = Math.sin(TILT + pitch);
     var age = reduce ? 1 : (animT - burstAtT) / BURST_S;
     var burst = (age < 0 || age > 1) ? 0 : Math.pow(1 - age, 2);
@@ -906,8 +1074,11 @@
     gl.blendFunc(gl.SRC_ALPHA, m.add ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
     gl.uniform3f(U.uTint, m.tint[0] * mTint[0], m.tint[1] * mTint[1], m.tint[2] * mTint[2]);
     gl.uniform3f(U.uStn, m.stn[0], m.stn[1], m.stn[2]);
+    var sp3 = spotPoint();                        // 点名：被点到的那一粒在哪（模型空间）
+    gl.uniform3f(U.uSpot, sp3[0], sp3[1], sp3[2]);
+    gl.uniform1f(U.uSpotK, focusK);
     gl.uniform1f(U.uAlpha, m.alpha);
-    gl.uniform2f(U.uCenter, f.cx * 2 - 1, 1 - f.cy * 2);
+    gl.uniform2f(U.uCenter, f.cx * 2 - 1 + ctrX * focusK, 1 - f.cy * 2 + ctrY * focusK);
     gl.uniform1f(U.uCosY, Math.cos(yaw));
     gl.uniform1f(U.uSinY, Math.sin(yaw));
     gl.uniform1f(U.uCosP, cp);
@@ -915,7 +1086,7 @@
     gl.uniform1f(U.uCosR, ROLL_C);
     gl.uniform1f(U.uSinR, ROLL_S);
     gl.uniform1f(U.uSpinT, reduce ? 0 : now);
-    gl.uniform1f(U.uDist, dist);
+    gl.uniform1f(U.uDist, gDist);
     gl.uniform1f(U.uProj, U_PROJ);
     gl.uniform1f(U.uAspect, w / h);
     gl.uniform1f(U.uPxScale, (h / 2) * U_PROJ);
@@ -951,10 +1122,10 @@
     gl.uniform1f(WU.uSinP, sp);
     gl.uniform1f(WU.uCosR, ROLL_C);
     gl.uniform1f(WU.uSinR, ROLL_S);
-    gl.uniform1f(WU.uDist, dist);
+    gl.uniform1f(WU.uDist, gDist);
     gl.uniform1f(WU.uProj, U_PROJ);
     gl.uniform1f(WU.uAspect, w / h);
-    gl.uniform2f(WU.uCenter, f.cx * 2 - 1, 1 - f.cy * 2);
+    gl.uniform2f(WU.uCenter, f.cx * 2 - 1 + ctrX * focusK, 1 - f.cy * 2 + ctrY * focusK);
     gl.uniform3f(WU.uColor, m.wireCol[0], m.wireCol[1], m.wireCol[2]);
     var wireIn = reduce ? 1 : Math.max(0, Math.min(1, (gather - 0.40) / 0.60));
     gl.uniform1f(WU.uGather, wireIn);
@@ -1124,6 +1295,7 @@
     yaw += (tYaw - yaw) * k;
     if (spin) { tYaw += spin * dt; yaw += spin * dt; }
     animT += dt;                                   // 动画时钟：只在这里走
+    chaseSpot(dt);                                 // 点名：镜头往那一粒上追（第 3d 节）
     stepImpacts(dt);                               // 撞击槽：wait → fly → hit
     draw(animT);
     // 降级动效（prefers-reduced-motion）：自转本来就是 0，摆到位就停掉循环
@@ -1299,6 +1471,9 @@
         animT: +animT.toFixed(2),
         shape: shapeName,
         mood: mName || "deep",
+        sym: SYM.length,                           // 星野里可点的符号有几粒
+        spot: focusOrd,                            // 现在点到第几个名字（-1 = 没点）
+        focus: +focusK.toFixed(3),
         morph: +morphP.toFixed(3),
         form: +form.toFixed(3),
         impacts: imps.filter(function (o) { return o.age >= 0; }).length,
@@ -1308,6 +1483,9 @@
     },
     flash: function () { flash(0); },
     shape: function (name) { shapeTo(name); },        // 彩蛋页翻屏时换形状（见第 3b 节）
-    mood: function (name) { setMood(name); }          // 同一个名字也顺便换粒子的色温（第 3c 节）
+    mood: function (name) { setMood(name); },         // 同一个名字也顺便换粒子的色温（第 3c 节）
+    symbolAt: function (x, y) { return symbolAt(x, y); },   // 屏幕坐标 → 星野里的第几粒（第 3d 节）
+    focusSymbol: function (ord) { return focusAt(ord); },   // 镜头飞到那一粒上（其余压暗）
+    unfocus: function () { return focusAt(-1); }            // 收回：回到星野全景
   };
 })();

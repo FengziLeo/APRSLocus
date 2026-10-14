@@ -30,7 +30,7 @@
 })();
 </script>
 <link rel="stylesheet" href="css/style.css?v=8">
-<link rel="stylesheet" href="css/hero-3d.css?v=24">
+<link rel="stylesheet" href="css/hero-3d.css?v=25">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
   /* 这页没有导航栏，主题按钮固定贴在右上角（只这一页用到，不进共享样式表；
@@ -180,6 +180,20 @@
     columns: 4 120px; column-gap: 22px;
     font-size: 15px; line-height: 2.05; color: var(--text); }
   .name-list li { break-inside: avoid; }
+  /* 名单上的名字是**能点的**（点它 = 点亮它的那粒符号，镜头飞过去）——
+     这里只给一个指针提示，不动任何 token、不动排版。 */
+  .lit-list li, .name-list li, .c-name { cursor: pointer; }
+
+  /* ── 星野点名的那一行 ──
+     点一颗星、或点名单上的一个名字，左下角报出这是谁、编号多少。
+     只是一行字（没有卡片、没有边框）；也不吃指针事件 —— 翻屏还能点。 */
+  .deck-spot { position: fixed; left: clamp(20px, 6vw, 96px); bottom: 26px; z-index: 90;
+    pointer-events: none; opacity: 0; transform: translateY(8px);
+    transition: opacity .45s var(--ease), transform .45s var(--ease); }
+  .deck-spot.on { opacity: 1; transform: none; }
+  .deck-spot b { display: block; font-size: 15px; letter-spacing: .04em; color: var(--text); }
+  .deck-spot span { display: block; margin-top: 3px; font-family: var(--font-mono);
+    font-size: 12.5px; letter-spacing: .08em; color: var(--text-dim); }
 
 
   /* 页脚那句「点一下继续」：第一下之后才出现，走到最后一屏自己退场。 */
@@ -265,6 +279,7 @@ html, body { height: auto; overflow: auto; }
 .slide-inner { max-height: none; overflow: visible; }
 .rise, .hero-copy > * { opacity: 1 !important; transform: none !important; animation: none !important; }
 .deck-hint { display: none; }
+.deck-spot { display: none; }
 </style></noscript>
 
 <main id="main">
@@ -295,6 +310,16 @@ html, body { height: auto; overflow: auto; }
     <canvas class="planet-canvas" id="planetCanvas" role="img"
             aria-label="3D 星球：APRS 台站分布、环带与卫星轨道示意"></canvas>
     <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
+  </div>
+
+  <!-- ── 星野点名的那一行（整页一层，同壁纸与天空层一样不在任何一屏里）──
+       点一颗星、或点名单上的一个名字，这里报出这是谁、编号多少。
+       编号是从名字**算**出来的（两个 32 位哈希拼 20 位）：没有随机数、没有时间，
+       同一个呼号永远是同一串号 —— 名单增补、页面改版都不会变动它。
+       拿不到呼号的那几个（群组、每一位支持者）第一行就空着，不编一个出来。 -->
+  <div class="deck-spot" id="deckSpot" aria-live="polite">
+    <b id="spotCall"></b>
+    <span id="spotNo"></span>
   </div>
 
   <section class="slide">
@@ -487,7 +512,11 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <!-- ── 结尾那几屏（名单）：整颗球散成一片星野，名单上的每个人都是其中一粒 ──
+       名字写在星空里，不是写在卡片上：点一粒星、或点名单上的一个名字，
+       镜头就飞过去停在它上面，左下角报出这是谁。取景改回 full（散开的那一屏
+       铺满画面，不再缩到右上角），否则飞过去只剩一小块。 -->
+  <section class="slide" data-shape="scatter" data-sky="full">
     <div class="slide-inner rise">
       <div class="cgroup">
             <div class="cgroup-title">开发</div>
@@ -503,7 +532,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-sky="full">
     <div class="slide-inner rise">
       <div class="cgroup">
             <div class="cgroup-title">开山成员 · 15 位</div>
@@ -528,7 +557,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-sky="full">
     <div class="slide-inner rise">
       <div class="cgroup">
             <div class="cgroup-title">早期成员 · 38 位</div>
@@ -576,7 +605,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-sky="full">
     <div class="slide-inner rise">
       <div class="cgroup">
             <div class="cgroup-title">赞助</div>
@@ -602,13 +631,13 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-sky="full">
     <div class="slide-inner rise">
       <p class="cta-line">完整称号、简介与徽标在 <a href="member-card.html">荣誉墙</a>。</p>
     </div>
   </section>
 
-  <section class="slide" data-shape="sphere" data-wall="roster">
+  <section class="slide" data-shape="scatter" data-sky="full" data-wall="roster">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>已点亮用户</h2>
@@ -617,7 +646,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-sky="full">
     <div class="slide-inner slide-lit rise">
       <ul class="lit-list">
         <li>BA3MFT</li>
@@ -942,7 +971,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide" data-wall="bloom">
+  <section class="slide" data-sky="full" data-wall="bloom">
     <div class="slide-inner slide-line rise">
       <p>名单之外，还有一整片正在应答的天空。</p>
     </div>
@@ -1000,6 +1029,73 @@ html, body { height: auto; overflow: auto; }
   var NEXT = [" ", "Enter", "ArrowRight", "ArrowDown", "PageDown"];
   var PREV = ["ArrowUp", "ArrowLeft", "PageUp", "Backspace"];
 
+  /* ── 0. 星野点名 ──
+     结尾那几屏，整颗球散成一片星野，名单上的每个人就是星野里的一粒符号
+     （名字有多少个，模块就补多少粒 —— 见 planet-3d.js 的 scatter）。
+     点一粒星、或点名单上的一个名字，是同一件事：镜头飞过去停在那一粒上，
+     其余压暗，左下角报出他是谁、编号多少。点别处照旧往前走一屏。
+     编号由名字本身哈希出来（两个 32 位 FNV-1a 拼 20 位）：没有随机数、没有时间，
+     同一个呼号永远是同一串号 —— 名单增补、页面改版都不会动它。 */
+  var nameList = (window.__deckNames && window.__deckNames.list) || [];
+  var spotBox = document.getElementById("deckSpot");
+  var spotCall = document.getElementById("spotCall");
+  var spotNo = document.getElementById("spotNo");
+  var spotOrd = -1;
+
+  function starNo(s) {
+    var h1 = 0x811c9dc5, h2 = 0x9e3779b9, i, c;
+    for (i = 0; i < s.length; i++) {
+      c = s.charCodeAt(i);
+      h1 = Math.imul(h1 ^ c, 0x01000193) >>> 0;
+      h2 = Math.imul(h2 ^ (c * (i + 7)), 0x85ebca6b) >>> 0;
+    }
+    /* 不用 BigInt（不必为此抬高门槛）：两串 32 位十进制各自补齐 10 位，
+       拼起来就是 20 位长号。 */
+    var all = ("0000000000" + h1.toString(10)).slice(-10)
+      + ("0000000000" + h2.toString(10)).slice(-10);
+    var out = "";
+    for (i = 0; i < 20; i += 4) out += (i ? " " : "") + all.substring(i, i + 4);
+    return out;
+  }
+  function paintSpot(ord) {
+    spotOrd = ord;
+    if (!spotBox) return;
+    var on = ord >= 0;
+    if (on) {
+      var el = nameList[ord];
+      var txt = ((el && el.textContent) || "").replace(/\s+/g, " ").trim();
+      var call = (txt.match(/^[A-Z]{1,2}[0-9][A-Z]{1,4}/) || [""])[0];
+      spotCall.textContent = call;                 // 拿不到呼号：这一行就空着
+      spotNo.textContent = "星表编号 " + starNo(call || txt);
+      spotBox.title = txt;
+    }
+    spotBox.classList.toggle("on", on);
+  }
+  function spotOff() {
+    if (spotOrd < 0) return;
+    paintSpot(-1);
+    if (window.__planet3d && window.__planet3d.unfocus) window.__planet3d.unfocus();
+  }
+  /* 点到星野里的一粒（或名单上的一个名字）就点名；点在别处交给翻屏。
+     名单上的名字是**精确目标**（点的就是它），星野里的符号得真的点到那一粒才认；
+     已经点着一个人时再从星野里点一下，这一下让给翻屏 —— 不能让星野把
+     “点一下继续”这个手势吃掉。点的是已点着的那一粒 → 收回（不翻屏）。 */
+  function spotPick(e) {
+    if (!nameList.length || curShape !== "scatter" || !window.__planet3d) return false;
+    var t = e.target, i = -1, k, onName = false;
+    if (t && t.nodeType === 1) {
+      for (k = 0; k < nameList.length; k++) if (nameList[k] === t) { i = k; break; }
+    }
+    onName = i >= 0;
+    if (!onName && window.__planet3d.symbolAt) i = window.__planet3d.symbolAt(e.clientX, e.clientY);
+    if (i < 0) return false;
+    if (i === spotOrd) { spotOff(); return true; }
+    if (!onName && spotOrd >= 0) return false;
+    paintSpot(i);
+    window.__planet3d.focusSymbol(i);
+    return true;
+  }
+
   /* 从头读起：这一页是线性的，中途刷新回来不该落在半路上。 */
   if (window.history && "scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
   window.scrollTo(0, 0);
@@ -1014,6 +1110,7 @@ html, body { height: auto; overflow: auto; }
     var el = slides[cur];
     el.classList.add("on");
     sky(el);
+    spotOff();          // 翻屏就把点名收回：下一屏多半已经不是那片星野了
     var inner = el.querySelector(".slide-inner");
     if (inner) inner.scrollTop = 0;
     /* 万一某一屏里还带着画布：display:none 时量到的是 0，露脸的下一帧补一次尺寸。
@@ -1088,6 +1185,7 @@ html, body { height: auto; overflow: auto; }
   document.addEventListener("click", function (e) {
     var t = e && e.target;
     if (t && t.closest && t.closest("a, button, iframe, input, select, textarea")) return;
+    if (spotPick(e)) return;                   // 点到星野里的某一粒：点名，不翻屏
     advance();
   });
   document.addEventListener("keydown", function (e) {
@@ -1174,10 +1272,22 @@ html, body { height: auto; overflow: auto; }
      gatherMs 2400 → 4400：开场那点云慢慢聚成一颗球，不是一下摆好；
      scrollEase 0.17 → 0.085：滚动缓动慢一倍，往下拉是滑过去的。
      deck: true：只有这页开 —— 装饰层是页面级固定层（翻屏不换），并且点云会
-     按各屏的 data-shape 换形状（散开 → 聚成天线塔 / 一颗心 / 73）。
+     按各屏的 data-shape 换形状（散开 → 聚成天线塔 / 一颗心 / 73 / 一片星野）。
      zoom / pxSize：这页的星球大一圆（×1.18）、粒子粗一档（×1.35）——
-     三语首页不传这两个键，星球与粒子与之前逐像素一致。 -->
-<script>window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085, deck: true, zoom: 1.18, pxSize: 1.35 };</script>
-<script src="js/planet-3d.js?v=24"></script>
+     三语首页不传这两个键，星球与粒子与之前逐像素一致。
+     symbols：结尾名单那一章，点云散成一片星野（scatter），名单上的每个人
+     都是星野里一粒可点的符号 —— 所以先把名单数出来交给模块（前 90 粒是星球
+     本来就有的台站符号，模块自己接上）。名单只在这里读一次，页尾脚本做点击
+     映射时读的是同一份（__deckNames），少一处不一致的机会。 -->
+<script>
+(function () {
+  var sel = ".slide .lit-list li, .slide .name-list li, .slide .c-name";
+  var list = [].slice.call(document.querySelectorAll(sel));
+  window.__deckNames = { sel: sel, list: list };
+  window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085, deck: true,
+    zoom: 1.18, pxSize: 1.35, symbols: list.length };
+})();
+</script>
+<script src="js/planet-3d.js?v=25"></script>
 </body>
 </html>

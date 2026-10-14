@@ -1,5 +1,44 @@
 # 更新日志
 
+## [2.1.3] - 2026-10-14
+
+### 修好「安卓取不到卫星数」
+
+- 有人的安卓手机上，信标设置页的「当前卫星数」一直是一个「—」，于是 `SAT=nn` 也永远发不出去
+  —— 不是应用坏了，是**取数这条路只铺了一半**：新机型普遍不再往定位结果里塞卫星数；作为退路的
+  系统 GNSS 状态里，「哪几颗参与了定轨」这一位又并非所有 ROM 都填（有些机型上它恒为否）。
+  现在按三级取数：定位自带的数 → 参与定轨的颗数 → **在视颗数**（也就是「现在看到几颗星」），
+  能拿到哪一级就用哪一级。宁可给出「看到几颗」，也不假装平台什么都没说。
+- 另一处静默的坑：卫星监听注册失败（权限比服务晚一步授予、GPS 引擎刚启动、个别 ROM 拒绝）
+  之后**不会再试一次**，卫星数就永远停在「不知道」。现在只要拿到实时 GPS 定位，就会按
+  30 秒退避重新注册，让它自己长回来。
+- 设置页那个「—」也终于有了说法：直接写清「当前来源未提供卫星数 —— 网络定位没有卫星，
+  部分机型 / 系统也不返回该数据」，不再是一个没人解释的破折号。
+
+---
+
+## [2.1.3] - 2026-10-14 (English)
+
+### "Android cannot get the satellite count", fixed
+
+- On some Android phones the beacon settings page kept showing a dash for "Satellites now",
+  so `SAT=nn` was never sent either. The app was not broken so much as **only half the road
+  was paved**: newer devices no longer put a satellite count into the location object, and in
+  the GNSS status used as the fallback, the "used in fix" flag is not filled in by every ROM
+  (on some it is always false). The count is now taken in three steps: the number attached to
+  the fix -> the satellites used in the fix -> **satellites in view** (i.e. how many are being
+  seen right now), using whichever level is available. Better to report how many are visible
+  than to pretend the platform said nothing.
+- A second silent trap: once the GNSS listener failed to register (permission granted a beat
+  after the service started, the GPS engine just coming up, the odd ROM refusing), **it was
+  never tried again**, so the count stayed at "unknown" forever. It is now re-registered with a
+  30-second backoff whenever a live GPS fix arrives, so it heals itself.
+- The dash on the settings page finally has a caption: it says plainly that the current source
+  does not provide a satellite count -- network positioning has no satellites, and some devices
+  or ROMs do not report the data -- instead of leaving an unexplained dash.
+
+---
+
 ## [2.1.2] - 2026-10-14
 
 - 信标备注可选带上卫星数（`SAT=nn`）：来源为手机 GPS（Android 读 GNSS 状态里参与定位的颗数）或外接 GPS 模组的 `GGA` 语句；默认关，来源不提供这个值时不发

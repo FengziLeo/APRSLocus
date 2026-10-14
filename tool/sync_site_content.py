@@ -419,6 +419,29 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.3', 'date': '2026-10-14',
+        'items': [
+            ('fix',
+             T('**修好「安卓取不到卫星数」**：新机型普遍不再往定位结果里塞卫星数，'
+               '退路的系统 GNSS 状态里「哪几颗参与了定轨」也不是每台机器都填 —— 于是'
+               '信标设置页的「当前卫星数」一直是一个「—」。现在按三级取数：定位自带的数 → '
+               '参与定轨的颗数 → **在视颗数**，哪一级有值就用哪一级；监听注册失败也会'
+               '每 30 秒自己重试一次，不再永久停在「不知道」。',
+               '**修好「安卓取不到衛星數」**：新機型普遍不再往定位結果裡塞衛星數，'
+               '退路的系統 GNSS 狀態裡「哪幾顆參與了定軌」也不是每台機器都填 —— 於是'
+               '信標設定頁的「目前衛星數」一直是一個「—」。現在按三級取數：定位自帶的數 → '
+               '參與定軌的顆數 → **在視顆數**，哪一級有值就用哪一級；監聽註冊失敗也會'
+               '每 30 秒自己重試一次，不再永久停在「不知道」。',
+               '**"Android cannot get the satellite count" fixed**: newer devices no '
+               'longer attach a satellite count to the fix, and the GNSS-status fallback '
+               'does not fill in "used in fix" on every device -- so the beacon settings '
+               'page kept showing a dash. The count is now read in three steps: attached '
+               'to the fix -> used in fix -> **satellites in view**, using whichever has '
+               'a value; a failed listener registration also retries itself every 30 '
+               'seconds instead of staying "unknown" forever.')),
+        ],
+    },
+    {
         'ver': 'v2.1.2', 'date': '2026-10-14',
         'items': [
             ('new',

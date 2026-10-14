@@ -599,6 +599,15 @@ html{overflow-x:hidden}
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.1.3</span>
+        <span class="cl-date">2026-10-14</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot fix"></span><b>修好「安卓取不到卫星数」</b>：新机型普遍不再往定位结果里塞卫星数，退路的系统 GNSS 状态里「哪几颗参与了定轨」也不是每台机器都填 —— 于是信标设置页的「当前卫星数」一直是一个「—」。现在按三级取数：定位自带的数 → 参与定轨的颗数 → <b>在视颗数</b>，哪一级有值就用哪一级；监听注册失败也会每 30 秒自己重试一次，不再永久停在「不知道」。</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.1.2</span>
         <span class="cl-date">2026-10-14</span>
       </div>

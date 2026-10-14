@@ -27,6 +27,13 @@ void main() {
   String withSum(String body) =>
       '\$$body*${NmeaChecksum.format(NmeaChecksum.compute(body))}';
 
+  /// 一条（或几条）语句 → 一段字节流。
+  ///
+  /// ⚠ 终止符不是装饰：[NmeaLineSplitter] 只在 `\r\n` 处切行，不带终止符的
+  /// 语句会一直留在缓冲里 —— 断言拿到的永远是空列表（第一版就是这么错的：
+  /// 分帧逻辑本身没问题，是测试没把行尾发出去）。
+  List<int> bytes(String sentences) => '$sentences\r\n'.codeUnits;
+
   /// 注入时钟：新鲜期/静默/节流全是时间行为，拨表比 sleep 稳
   late DateTime now;
   NmeaGpsLink newLink(_FakeTransport t) {
@@ -50,7 +57,7 @@ void main() {
       final link = newLink(t);
       final got = <NmeaFix>[];
       link.onFix = got.add;
-      t.onBytes!(('$gga\r\n$rmc\r\n').codeUnits);
+      t.onBytes!(bytes('$gga\r\n$rmc'));
 
       expect(got, hasLength(1), reason: '同一秒内按 kEmitInterval 节流');
       // 断言取链路最后合成的那条（= RMC 到达时补齐了 GGA 的海拔/精度）
@@ -74,9 +81,9 @@ void main() {
       final link = newLink(t);
       final got = <NmeaFix>[];
       link.onFix = got.add;
-      t.onBytes!(rmc.codeUnits);
+      t.onBytes!(bytes(rmc));
       now = now.add(const Duration(seconds: 2));
-      t.onBytes!(rmc.codeUnits);
+      t.onBytes!(bytes(rmc));
       expect(got, hasLength(2));
       expect(link.fixes, 2);
     });
@@ -86,10 +93,9 @@ void main() {
       final link = newLink(t);
       final got = <NmeaFix>[];
       link.onFix = got.add;
-      t.onBytes!(withSum(
-              'GPGSV,3,1,11,01,05,000,00,02,10,000,00,03,15,000,00,04,20,000,00')
-          .codeUnits);
-      t.onBytes!(withSum('PMTK001,314,3').codeUnits);
+      t.onBytes!(bytes(withSum(
+          'GPGSV,3,1,11,01,05,000,00,02,10,000,00,03,15,000,00,04,20,000,00')));
+      t.onBytes!(bytes(withSum('PMTK001,314,3')));
       expect(got, isEmpty);
       expect(link.ignored, 2);
       expect(link.rejected, 0);
@@ -101,9 +107,8 @@ void main() {
       final link = newLink(t);
       final dev = TncDevice(id: 'aa:bb', name: 'GPS 模组');
       expect(await link.connect(dev), isTrue);
-      t.onBytes!(withSum(
-              'GPGGA,123519,4807.038,N,01131.000,E,0,08,0.9,545.4,M,46.9,M,')
-          .codeUnits);
+      t.onBytes!(bytes(withSum(
+          'GPGGA,123519,4807.038,N,01131.000,E,0,08,0.9,545.4,M,46.9,M,')));
       expect(link.noFixYet, 1);
       expect(link.rejected, 0);
       expect(link.lastFix, isNull);
@@ -117,10 +122,8 @@ void main() {
       final got = <NmeaFix>[];
       link.onFix = got.add;
       // 标准 RMC 的校验和故意写错一个字符
-      t.onBytes!(
-          (r'$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6B'
-                  '\r\n')
-              .codeUnits);
+      t.onBytes!(bytes(
+          r'$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6B'));
       expect(got, isEmpty);
       expect(link.rejected, 1);
       expect(link.checksumMismatches, 1);
@@ -133,10 +136,8 @@ void main() {
       link.config.strictChecksum = false;
       final got = <NmeaFix>[];
       link.onFix = got.add;
-      t.onBytes!(
-          (r'$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6B'
-                  '\r\n')
-              .codeUnits);
+      t.onBytes!(bytes(
+          r'$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6B'));
       expect(got, hasLength(1));
       expect(link.fixes, 1);
       expect(link.checksumMismatches, 1);
@@ -147,7 +148,7 @@ void main() {
     test('断开重连后装配缓存被清空（不拿上一条链路的日期拼新点）', () async {
       final t = _FakeTransport();
       final link = newLink(t);
-      t.onBytes!(rmc.codeUnits);
+      t.onBytes!(bytes(rmc));
       expect(link.lastFix!.utc, isNotNull);
       await link.disconnect();
       expect(link.lastFix, isNull);
@@ -169,7 +170,7 @@ void main() {
       expect(link.silent, isTrue);
       expect(link.status, NmeaGpsStatus.silent);
 
-      t.onBytes!(rmc.codeUnits);
+      t.onBytes!(bytes(rmc));
       expect(link.status, NmeaGpsStatus.connected);
       expect(link.silent, isFalse);
     });
@@ -177,7 +178,7 @@ void main() {
     test('定位超过 30 秒没更新 → 不再算「外接 GPS 在供位」', () {
       final t = _FakeTransport();
       final link = newLink(t);
-      t.onBytes!(rmc.codeUnits);
+      t.onBytes!(bytes(rmc));
       expect(link.fresh, isTrue);
       now = now.add(const Duration(seconds: 31));
       expect(link.fresh, isFalse);

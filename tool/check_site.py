@@ -401,11 +401,19 @@ def main():
             and not any(x in hp for x in ('hero-cta', 'hero-actions', 'hero-release',
                                           'heroDownload', 'heroDlText', 'releases'))
             and 'class="nav"' not in hp and '<footer' not in hp)
-        # 天空层是**整页一层**（.deck 的第一个孩子），不在任何一屏里 —— 搬回某一屏里
+        # 天空层是**整页一层**（顶在 .deck 里、不在任何一屏里）—— 搬回某一屏里
         # 就回到了上一版：翻到别的屏，点云跟着那一屏一起消失，也就无所谓换形状了。
-        chk('hero 故事页：天空层整页一层（不在任何一屏里）',
-            hp.index('class="hero-decor deck-sky"') < hp.index('<section class="slide"')
+        # 壁纸压在它下面，所以顺手把三层的前后顺序一起钉住：壁纸 → 天空层 → 第一屏。
+        chk('hero 故事页：壁纸压底 + 天空层整页一层（不在任何一屏里）',
+            hp.index('class="deck-wall"') < hp.index('class="hero-decor deck-sky"')
+            < hp.index('<section class="slide"')
             and 'data-sky="full"' in hp and '.deck-sky.no-3d .planet-canvas' in hp)
+        # 换天色与换形状一样横跨两处：屏上的 data-wall（声明）与翻屏时的那一次换档。
+        # 只声明不调用 = 壁纸从头到尾一个色，看着就像"没做"。
+        chk('hero 故事页：逐屏声明天色 + 翻屏时换档（两层交叉淡入）',
+            hp.count('data-wall=') >= 5 and 'function wallTo(' in hp
+            and '.deck-wall i.w-bloom' in hp and '.deck-wall i.on' in hp
+            and 'wallLayers[1 - wallTop]' in hp and 'var(--shadow-color)' in hp)
         # 换形状这件事横跨两处：屏上的 data-shape（声明）与翻屏时的那一次调用。
         # 只写数据不调用，或是调用时把参数写错，表现都是"翻屏了，但点云动都没动"。
         chk('hero 故事页：各屏声明形状 + 翻屏时通知脚本换形状',

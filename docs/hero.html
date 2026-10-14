@@ -87,6 +87,55 @@
     .deck-sky .planet-canvas, .deck-sky .planet-fallback { transition: none; }
   }
 
+  /* ── 壁纸（整页一层，见 body 里那个 .deck-wall）──
+     翻到换天色的那几屏，整页颜色换一档：两层 <i> 叠着交叉淡入，形状与浓淡都写在
+     色阶类里，脚本只管换档。色阶只用站内已有的光晕 token（冷蓝 / 暖橙 / 暗角），
+     深浅两套主题各自跟手 —— 这里没有第二个色系，也没有写死的颜色。
+     浓淡靠「同一层叠几遍」：token 的 alpha 是定值，叠两遍就是两倍浓；
+     换位置换浓淡，于是一页里有六档能认出来的天色。
+     底下那点漂移（几个 % 的位移与缩放）只是让壁纸别像一张贴死的纸。 */
+  .deck-wall { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .deck-wall i { position: absolute; inset: -6%; opacity: 0;
+    transition: opacity 1.35s var(--ease);
+    animation: wallDrift 48s ease-in-out infinite alternate; }
+  .deck-wall i.on { opacity: 1; }
+  @keyframes wallDrift {
+    from { transform: translate3d(-1.2%, -0.8%, 0) scale(1.03); }
+    to { transform: translate3d(1.2%, 1.2%, 0) scale(1.07); }
+  }
+  /* 一档一屏天色。不写色阶 = deep（这页本来的夜，什么都不加）。 */
+  /* 星球与那个数字：光聚在星球身上，旁边慢慢暗下去 */
+  .deck-wall i.w-bloom { background-image:
+      radial-gradient(76% 60% at 62% 46%, var(--halo-cool), transparent 64%),
+      radial-gradient(76% 60% at 62% 46%, var(--halo-cool), transparent 64%),
+      radial-gradient(48% 38% at 62% 44%, var(--halo-cool), transparent 72%); }
+  /* 电波那一章：低处一整片，像天线脚下荡开的光；左边留一点暖 */
+  .deck-wall i.w-wave { background-image:
+      radial-gradient(124% 54% at 50% 98%, var(--halo-cool), transparent 70%),
+      radial-gradient(124% 54% at 50% 98%, var(--halo-cool), transparent 70%),
+      radial-gradient(76% 40% at 12% 86%, var(--halo-warm), transparent 72%); }
+  /* 夜里那几屏：压下去 —— 只在右上留一点冷光，四周收成暗角 */
+  .deck-wall i.w-night { background-image:
+      radial-gradient(84% 66% at 80% 10%, var(--halo-cool), transparent 66%),
+      radial-gradient(132% 112% at 50% 50%, transparent 36%, var(--shadow-color) 100%); }
+  /* 等你自己那一格：中间一点亮，四周还是暗的 */
+  .deck-wall i.w-spark { background-image:
+      radial-gradient(44% 36% at 50% 64%, var(--halo-cool), transparent 66%),
+      radial-gradient(44% 36% at 50% 64%, var(--halo-cool), transparent 66%),
+      radial-gradient(120% 100% at 50% 50%, transparent 44%, var(--shadow-color) 100%); }
+  /* 名单那几屏：暖光从左边抬起来，冷光退到右上角当边 */
+  .deck-wall i.w-warm { background-image:
+      radial-gradient(88% 70% at 20% 76%, var(--halo-warm), transparent 68%),
+      radial-gradient(88% 70% at 20% 76%, var(--halo-warm), transparent 68%),
+      radial-gradient(70% 58% at 88% 8%, var(--halo-cool), transparent 70%); }
+  /* 三百多个呼号那一屏：上冷下暖，摊平收淡，别跟正文抢 */
+  .deck-wall i.w-roster { background-image:
+      radial-gradient(130% 58% at 50% 0%, var(--halo-cool), transparent 70%),
+      radial-gradient(130% 88% at 50% 106%, var(--halo-warm), transparent 74%); }
+  @media (prefers-reduced-motion: reduce) {
+    .deck-wall i { animation: none; transition: none; }
+  }
+
   /* ── 一屏一句 ──
      正文不再挤成一段：一章的每一句各占一屏，所以这一句是本屏唯一的东西。
      同一支字、同一个灰（token 没动），只是字号比正文那一栏大一点。 */
@@ -181,6 +230,8 @@ html, body { height: auto; overflow: auto; }
 /* 天空层是脚本画出来的（这页的星球、星尘、网格都在那里）：没有脚本它就是一层
    空东西，别让它铺在正文上面。 */
 .deck-sky { display: none; }
+/* 壁纸也是脚本换档的（没有脚本就是一整块死色）：同样收起来 */
+.deck-wall { display: none; }
 .deck { position: static; }
 .slide { position: static; display: block; min-height: 0; height: auto; padding: 96px 20px; }
 .slide.hero { padding-top: var(--hero-pad-top, 140px); padding-bottom: 0; }
@@ -198,7 +249,13 @@ html, body { height: auto; overflow: auto; }
      屏与屏之间没有别的机关：前一屏收起、这一屏亮出来，CSS 动画自己起跑。 -->
 <div class="deck" id="deck" role="region" aria-label="一个关于电波的故事">
 
-  <!-- ── 天空层：整页共用一层，不在任何一屏里（就是 .deck 的第一个孩子）──
+  <!-- ── 壁纸：整页一层，压在最底下（壁纸之上才是星尘、网格、星球）──
+       翻到换天色的那几屏，整页颜色换一档；色阶写在屏上的 data-wall（见页尾脚本）。
+       两层 <i> 叠着交叉淡入 —— 一层动不了两个透明度，所以要两只。
+       它不接指针事件，也不接焦点：它就是天色。 -->
+  <div class="deck-wall" id="deckWall" aria-hidden="true"><i></i><i></i></div>
+
+  <!-- ── 天空层：整页共用一层，不在任何一屏里（就钉在 .deck 里）──
        网格、星尘、3D 星球、以及没有 WebGL 时的静态球都在这一层。
        上一版它长在"地图那一屏"里面，翻屏就跟着那一屏一起消失；现在它钉在
        页面底下不换，翻屏时点云才有机会散开、再聚成下一屏的形状。
@@ -227,7 +284,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide hero" id="hero" data-sky="full">
+  <section class="slide hero" id="hero" data-sky="full" data-wall="bloom">
   <!-- 装饰层不在这儿了 —— 它搬到了 #deck 的第一个孩子（.deck-sky，页面级固定层，
        见下面那份注释）。以前它长在这一屏里，翻屏就跟着消失；现在整页共用一层，
        翻屏时点云才有机会散开、再聚成下一屏的形状。 -->
@@ -250,7 +307,7 @@ html, body { height: auto; overflow: auto; }
 
 </section>
 
-  <section class="slide">
+  <section class="slide" data-wall="bloom">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>那个数字是谁的</h2>
@@ -289,7 +346,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide" data-shape="beacon">
+  <section class="slide" data-shape="beacon" data-wall="wave">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>电波从哪来</h2>
@@ -340,7 +397,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide" data-shape="sphere">
+  <section class="slide" data-shape="sphere" data-wall="night">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>夜里还亮着的那些点</h2>
@@ -373,7 +430,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-wall="spark">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>下一格等你来补</h2>
@@ -394,7 +451,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide" data-shape="heart">
+  <section class="slide" data-shape="heart" data-wall="warm">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>感谢名单</h2>
@@ -524,7 +581,7 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide" data-shape="sphere">
+  <section class="slide" data-shape="sphere" data-wall="roster">
     <div class="slide-inner">
       <div class="section-head rise">
         <h2>已点亮用户</h2>
@@ -858,19 +915,19 @@ html, body { height: auto; overflow: auto; }
     </div>
   </section>
 
-  <section class="slide">
+  <section class="slide" data-wall="bloom">
     <div class="slide-inner slide-line rise">
       <p>名单之外，还有一整片正在应答的天空。</p>
     </div>
   </section>
 
-  <section class="slide" data-shape="heart">
+  <section class="slide" data-shape="heart" data-wall="warm">
     <div class="slide-inner slide-line rise">
       <p>谢谢你们 —— 名单上的每一个名字，和名单外的每一次应答。</p>
     </div>
   </section>
 
-  <section class="slide" data-shape="73">
+  <section class="slide" data-shape="73" data-wall="bloom">
     <div class="slide-inner slide-slogan rise">
       <p>那颗星球还在转，那个数字还在往上走 —— 下一次让它亮起来的，可能就是你。</p>
     </div>
@@ -903,6 +960,7 @@ html, body { height: auto; overflow: auto; }
 <script>
 (function () {
   var deck = document.getElementById("deck");
+  var wall = document.getElementById("deckWall");
   var hint = document.getElementById("deckHint");
   var audio = document.getElementById("bgm");
   var btn = document.getElementById("bgmToggle");
@@ -939,13 +997,25 @@ html, body { height: auto; overflow: auto; }
     if (hint) hint.classList.toggle("on", begun && cur < last);
     return true;
   }
-  /* ── 1b. 天空：翻到哪一屏，点云就散开、再聚成那一屏的形状 ──
+  /* ── 1b. 天空与壁纸：翻到哪一屏，点云散开、聚成那一屏的形状，整页天色也换一档 ──
      形状写在屏上的 data-shape（sphere / beacon / heart / 73），取景写在 data-sky
-     （full = 地图那一屏铺开，soft = 有正文的屏退到右上角）。两件事都不是
-     CSS 自己能做的：形状得让 WebGL 那层重新采样点云。
-     只在真的换了一个形状时才通知一次 —— 连续几屏没写 data-shape 的时候它
-     什么都不做（点云就静静挂在背景里）。 */
-  var curShape = "sphere";
+     （full = 地图那一屏铺开，soft = 有正文的屏退到右上角），天色写在 data-wall。
+     这三件事都不是 CSS 自己能做的：形状得让 WebGL 那层重新采样点云。
+     只在真的换了的时候才动一次 —— 连续几屏没写 data-shape / data-wall 的时候它
+     什么都不做（点云静静挂在背景里，天色也沿用上一屏那一档）。 */
+  var curShape = "sphere", curWall = "", wallTop = 0;
+  var wallLayers = wall ? wall.getElementsByTagName("i") : [];
+  /* 换天色：新色阶写进**暗着**的那一层，再把它点亮、把原来那层按下去。
+     色阶名是从页里取的，拼进 class 之前还是先看一眼字符集。 */
+  function wallTo(name) {
+    if (!wallLayers.length || name === curWall || !/^[a-z]{2,10}$/.test(name)) return;
+    curWall = name;
+    var next = wallLayers[1 - wallTop];
+    next.className = "w-" + name;
+    next.classList.add("on");
+    wallLayers[wallTop].classList.remove("on");
+    wallTop = 1 - wallTop;
+  }
   function sky(el) {
     var mode = (el && el.getAttribute("data-sky")) || "soft";
     if (deck.getAttribute("data-sky") !== mode) deck.setAttribute("data-sky", mode);
@@ -954,6 +1024,8 @@ html, body { height: auto; overflow: auto; }
       curShape = s2;
       window.__planet3d.shape(s2);
     }
+    var w2 = el && el.getAttribute("data-wall");
+    if (w2) wallTo(w2);
   }
 
   function advance() {

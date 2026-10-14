@@ -184,15 +184,18 @@
      这里只给一个指针提示，不动任何 token、不动排版。 */
   .lit-list li, .name-list li, .c-name { cursor: pointer; }
 
-  /* ── 星野点名的那一行 ──
-     点一颗星、或点名单上的一个名字，左下角报出这是谁、编号多少。
-     只是一行字（没有卡片、没有边框）；也不吃指针事件 —— 翻屏还能点。 */
-  .deck-spot { position: fixed; left: clamp(20px, 6vw, 96px); bottom: 26px; z-index: 90;
-    pointer-events: none; opacity: 0; transform: translateY(8px);
-    transition: opacity .45s var(--ease), transform .45s var(--ease); }
-  .deck-spot.on { opacity: 1; transform: none; }
-  .deck-spot b { display: block; font-size: 15px; letter-spacing: .04em; color: var(--text); }
-  .deck-spot span { display: block; margin-top: 3px; font-family: var(--font-mono);
+  /* ── 点名的那一行：贴在那一粒星旁边 ──
+     不是页脚那一条，而是跟着那一粒走的一行字：位置由 planet-3d.js
+     每帧报回来（PAGE.onSpot）—— 镜头飞的整段里它跟着飞，
+     最后停在画面正中那颗金点下面。只是一行字（没有卡片、
+     没有边框）；也不吃指针事件 —— 翻屏还能点。 */
+  .deck-spot { position: fixed; left: 0; top: 0; z-index: 90;
+    pointer-events: none; opacity: 0; transition: opacity .5s var(--ease); }
+  .deck-spot.on { opacity: 1; }
+  .deck-spot-in { position: absolute; left: 0; top: 0; transform: translate(-50%, 24px);
+    text-align: center; white-space: nowrap; }
+  .deck-spot b { display: block; font-size: 17px; letter-spacing: .06em; color: var(--accent); }
+  .deck-spot span { display: block; margin-top: 4px; font-family: var(--font-mono);
     font-size: 12.5px; letter-spacing: .08em; color: var(--text-dim); }
 
   /* ── 点了一个名字：名单不动 ──
@@ -318,13 +321,15 @@ html, body { height: auto; overflow: auto; }
   </div>
 
   <!-- ── 星野点名的那一行（整页一层，同壁纸与天空层一样不在任何一屏里）──
-       点一颗星、或点名单上的一个名字，这里报出这是谁、编号多少。
+       点一颗星、或点名单上的一个名字，这里报出这是谁、编号多少（贴着那一粒）。
        编号是从名字**算**出来的（两个 32 位哈希拼 20 位）：没有随机数、没有时间，
        同一个呼号永远是同一串号 —— 名单增补、页面改版都不会变动它。
        拿不到呼号的那几个（群组、每一位支持者）第一行就空着，不编一个出来。 -->
   <div class="deck-spot" id="deckSpot" aria-live="polite">
-    <b id="spotCall"></b>
-    <span id="spotNo"></span>
+    <div class="deck-spot-in">
+      <b id="spotCall"></b>
+      <span id="spotNo"></span>
+    </div>
   </div>
 
   <section class="slide">
@@ -1057,7 +1062,7 @@ html, body { height: auto; overflow: auto; }
      结尾那几屏，名单上的每个人就是球面上的一粒符号
      （名字有多少个，模块就补多少粒 —— 见 planet-3d.js 的 scatter）。
      点一粒星、或点名单上的一个名字，是同一件事：镜头飞过去停在那一粒上，
-     那一粒换成暖金，左下角报出他是谁、编号多少。点别处照旧往前走一屏。
+     那一粒换成暖金，旁边报出他是谁、编号多少。点别处照旧往前走一屏。
      编号由名字本身哈希出来（两个 32 位 FNV-1a 拼 20 位）：没有随机数、没有时间，
      同一个呼号永远是同一串号 —— 名单增补、页面改版都不会动它。 */
   var nameList = (window.__deckNames && window.__deckNames.list) || [];
@@ -1065,6 +1070,17 @@ html, body { height: auto; overflow: auto; }
   var spotCall = document.getElementById("spotCall");
   var spotNo = document.getElementById("spotNo");
   var spotOrd = -1;
+
+  /* 那一粒飞去哪儿，这一行字就跟到哪儿：模块每帧报一次它的屏幕位置
+     （planet-3d.js 的 reportSpot），这里只管把它挪过去 —— 镜头飞的整段里
+     它是跟着那一粒一起过去的，不是页脚那一条。收回时模块报 null：不用管，
+     .on 一摘就淡掉了。 */
+  if (window.__planet3dPage) {
+    window.__planet3dPage.onSpot = function (o) {
+      if (!spotBox || !o) return;
+      spotBox.style.transform = "translate3d(" + o.x.toFixed(1) + "px," + o.y.toFixed(1) + "px,0)";
+    };
+  }
 
   /* 点了谁：把他滚进视野 —— 那一长条里他排到哪儿，都别让读者自己去找。
      名单本身一个字都不动：点名是 3D 那一层的事。 */

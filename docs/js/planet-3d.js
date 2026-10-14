@@ -1017,6 +1017,31 @@
     ctrX += (tx - ctrX) * fk;
     ctrY += (ty - ctrY) * fk;
   }
+  /* 球要转到哪个角度，那一粒才正对镜头：着色器里 x' = r·cos(θ−yaw)、
+     z' = r·sin(θ−yaw)（θ = 那一粒在球面上的经度，z' > 0 的那一半朝观众）。
+     取 x' = 0、z' > 0 —— yaw = θ − π/2。半径多少都一样，所以名字层不论在
+     球面内外都适用。 */
+  function spotYaw() {
+    var p = pointOf(focusOrd);
+    return Math.atan2(p[2], p[0]) - Math.PI / 2;
+  }
+  /* 那一粒现在在屏幕的哪儿（CSS 像素，已经把画布的偏移算进去）—— 每帧报给页面，
+     页面把“他是谁 / 编号多少”那一行贴在那里：镜头飞的整段里它跟着那一粒走。
+     只有彩蛋页会接这个回调（__planet3dPage.onSpot）；三语首页不接 → 什么都不发生。 */
+  function reportSpot(f) {
+    if (typeof PAGE.onSpot !== "function") return;
+    if (!DECK || focusOrd < 0 || focusOrd >= SYM.length) { PAGE.onSpot(null); return; }
+    var pj = projPoint(pointOf(focusOrd));
+    var bx = f.cx * 2 - 1 + ctrX * focusK, by = 1 - f.cy * 2 + ctrY * focusK;
+    var rct = canvas.getBoundingClientRect();
+    if (!rct.width) return;
+    var nx = (pj.x + bx) / pj.d, ny = (pj.y + by) / pj.d;
+    PAGE.onSpot({
+      x: rct.left + (0.5 + 0.5 * nx) * rct.width,
+      y: rct.top + (0.5 - 0.5 * ny) * rct.height,
+      k: focusK
+    });
+  }
   function focusAt(ord) {
     var n2 = (ord === null || ord === undefined || ord < 0) ? -1 : ord | 0;
     if (n2 >= SYM.length) n2 = -1;
@@ -1085,6 +1110,7 @@
     gl.uniform3f(U.uSpot, sp3[0], sp3[1], sp3[2]);
     gl.uniform1f(U.uSpotK, focusK);
     gl.uniform3f(U.uHot, m.hot[0], m.hot[1], m.hot[2]);
+    reportSpot(f);                                // 那一行字贴到那一粒旁边（第 3d 节）
     gl.uniform1f(U.uAlpha, m.alpha);
     gl.uniform2f(U.uCenter, f.cx * 2 - 1 + ctrX * focusK, 1 - f.cy * 2 + ctrY * focusK);
     gl.uniform1f(U.uCosY, Math.cos(yaw));
@@ -1300,8 +1326,15 @@
     var mk = Math.min(1, dt * 1.6);
     for (var mi = 0; mi < 3; mi++) mTint[mi] += (mTintTo[mi] - mTint[mi]) * mk;
     var k = Math.min(1, dt * 9);                   // 阻尼跟随（参考实现是每帧 0.1）
+    /* 点名：自转先停住（点着谁，谁就该停在原地），球再转到那一粒正对镜头 ——
+       这样背面的人也看得到，而且它最后就落在画面正中。收回时自转自己转回来。 */
+    var spinNow = spin * (1 - focusK);
+    if (spinNow) tYaw += spinNow * dt;
+    if (focusOrd >= 0) {
+      var da = Math.atan2(Math.sin(spotYaw() - tYaw), Math.cos(spotYaw() - tYaw));
+      tYaw += da * (reduce ? 1 : Math.min(1, dt * 2.2));   // 走近的那一边（不绕远路）
+    }
     yaw += (tYaw - yaw) * k;
-    if (spin) { tYaw += spin * dt; yaw += spin * dt; }
     animT += dt;                                   // 动画时钟：只在这里走
     chaseSpot(dt);                                 // 点名：镜头往那一粒上追（第 3d 节）
     stepImpacts(dt);                               // 撞击槽：wait → fly → hit

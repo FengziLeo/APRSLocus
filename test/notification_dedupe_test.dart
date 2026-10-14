@@ -39,8 +39,10 @@ void main() {
     loc = LocService();
   });
 
-  tearDown(() async {
-    await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+  tearDown(() {
+    // 注意 setMockMethodCallHandler 返回 void（不能 await）—— 仓库里其它
+    // 用它的测试（test/icom_lan_android_network_test.dart）也都没 await。
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
   });
 

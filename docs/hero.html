@@ -195,6 +195,16 @@
   .deck-spot span { display: block; margin-top: 3px; font-family: var(--font-mono);
     font-size: 12.5px; letter-spacing: .08em; color: var(--text-dim); }
 
+  /* ── 点了谁，就只看谁 ──
+     点到一个人之后，名单上别的人退到几乎看不见（只留一点影子，仍占着原位，
+     版面不跳），被点到的那一个照旧亮着、旁边那一行（角色说明之类）也跟着退开。
+     状态是 .deck.pick 加在那一个身上的 .pick-on；换人只是换一个类名。 */
+  .lit-list li, .name-list li, .c-name, .c-role { transition: opacity .5s var(--ease); }
+  .deck.pick .lit-list li:not(.pick-on),
+  .deck.pick .name-list li:not(.pick-on),
+  .deck.pick .c-name:not(.pick-on),
+  .deck.pick .c-role:not(.pick-on) { opacity: .07; }
+
 
   /* 页脚那句「点一下继续」：第一下之后才出现，走到最后一屏自己退场。 */
   .deck-hint { position: fixed; left: 0; right: 0; bottom: 20px; z-index: 95;
@@ -1060,6 +1070,20 @@ html, body { height: auto; overflow: auto; }
   var spotCall = document.getElementById("spotCall");
   var spotNo = document.getElementById("spotNo");
   var spotOrd = -1;
+  var pickEl = null;
+
+  /* 点了谁：名单上只留他一个（别的人退到看不见），并把他滚进视野 ——
+     那一长条里他排到哪儿，都别让读者自己去找。 */
+  function setPick(ord) {
+    if (pickEl) { pickEl.classList.remove("pick-on"); pickEl = null; }
+    var el = ord >= 0 ? nameList[ord] : null;
+    if (el) {
+      el.classList.add("pick-on");
+      pickEl = el;
+      if (el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "auto" });
+    }
+    if (deck) deck.classList.toggle("pick", !!el);
+  }
 
   function starNo(s) {
     var h1 = 0x811c9dc5, h2 = 0x9e3779b9, i, c;
@@ -1078,6 +1102,7 @@ html, body { height: auto; overflow: auto; }
   }
   function paintSpot(ord) {
     spotOrd = ord;
+    setPick(ord);
     if (!spotBox) return;
     var on = ord >= 0;
     if (on) {

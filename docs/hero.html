@@ -184,28 +184,41 @@
      这里只给一个指针提示，不动任何 token、不动排版。 */
   .lit-list li, .name-list li, .c-name { cursor: pointer; }
 
-  /* ── 点名的那一行：贴在那一粒星旁边 ──
-     不是页脚那一条，而是跟着那一粒走的一行字：位置由 planet-3d.js
-     每帧报回来（PAGE.onSpot）—— 镜头飞的整段里它跟着飞，
-     最后停在画面正中那颗金点下面。只是一行字（没有卡片、
-     没有边框）；也不吃指针事件 —— 翻屏还能点。 */
+  /* ── 点名的那一段：贴在那一粒星下面 ──
+     跟着那一粒走的一小段字：位置由 planet-3d.js 每帧报回来（PAGE.onSpot）——
+     镜头飞的整段里它跟着飞，最后停在画面正中那一颗金点下面。
+     排的是“能直接截下来发出去”的那一版：一行小字说明他在哪份名单上、
+     呼号撑到海报那一档、星表编号跟在下面一行等宽的码。
+     没有卡片、没有边框、没有底；也不吃指针事件 —— 翻屏还能点。
+     （letter-spacing 会在行尾多出一个字距，居中就偏半个 —— 用同值的
+     text-indent 抵回来。） */
   .deck-spot { position: fixed; left: 0; top: 0; z-index: 90;
     pointer-events: none; opacity: 0; transition: opacity .5s var(--ease); }
   .deck-spot.on { opacity: 1; }
-  .deck-spot-in { position: absolute; left: 0; top: 0; transform: translate(-50%, 24px);
+  .deck-spot-in { position: absolute; left: 0; top: 0; transform: translate(-50%, 26px);
     text-align: center; white-space: nowrap; }
-  .deck-spot b { display: block; font-size: 17px; letter-spacing: .06em; color: var(--accent); }
-  .deck-spot span { display: block; margin-top: 4px; font-family: var(--font-mono);
-    font-size: 12.5px; letter-spacing: .08em; color: var(--text-dim); }
+  .deck-spot span { display: block; color: var(--text-faint); }
+  .deck-spot .spot-tag { font-size: 12.5px; letter-spacing: .3em; text-indent: .3em; }
+  .deck-spot b { display: block; margin-top: 7px; font-size: clamp(30px, 5.6vw, 58px);
+    font-weight: 800; line-height: 1.06; letter-spacing: .1em; text-indent: .1em;
+    color: var(--accent); text-shadow: 0 14px 44px var(--shadow-color); }
+  .deck-spot .spot-no { margin-top: 12px; font-family: var(--font-mono);
+    font-size: clamp(12px, 1.5vw, 15px); letter-spacing: .2em; text-indent: .2em;
+    color: var(--text-dim); }
 
   /* ── 点了一个名字：这一屏就只剩他 ──
      别的人不是“退到几乎看不见”，是**不显示** —— 正文那一整块连着名单一起退开，
-     这一屏成了他一个人的单独一页：球面上一颗金星，旁边一行他是谁、编号多少
-     （见 .deck-spot）。收回（再点那一粒 / 翻屏）时整块原样回来。
+     这一屏成了他一个人的单独一页：球面上一颗金星，下面叫他一声
+     （呼号 / 星表编号，见 .deck-spot）。收回（再点那一粒 / 翻屏）时整块原样回来。
      opacity 必须带 !important：.rise 上那条 deckRise 动画 fill 的是 both，
      会把普通声明盖掉。 */
   .deck.pick .slide.on .slide-inner { opacity: 0 !important; visibility: hidden;
     pointer-events: none; transition: opacity .42s var(--ease), visibility 0s .42s; }
+  /* 他这一屏上没有别的东西：右上角那颗主题按钮、右下角的音乐开关与署名、
+     底下那句「点一下继续」一起退开 —— 留下的就是能直接截下来的那一张。 */
+  .deck.pick .hero-toggle, .deck.pick .story-bgm, .deck.pick .story-mark,
+  .deck.pick .deck-hint { opacity: 0 !important; pointer-events: none;
+    transition: opacity .42s var(--ease); }
 
 
 
@@ -325,15 +338,17 @@ html, body { height: auto; overflow: auto; }
     <div class="planet-fallback" aria-hidden="true"><i class="pf-globe"></i><i class="pf-ring"></i></div>
   </div>
 
-  <!-- ── 星野点名的那一行（整页一层，同壁纸与天空层一样不在任何一屏里）──
-       点一颗星、或点名单上的一个名字，这里报出这是谁、编号多少（贴着那一粒）。
-       编号是从名字**算**出来的（两个 32 位哈希拼 20 位）：没有随机数、没有时间，
-       同一个呼号永远是同一串号 —— 名单增补、页面改版都不会变动它。
-       拿不到呼号的那几个（群组、每一位支持者）第一行就空着，不编一个出来。 -->
+  <!-- ── 星野点名的那一段（整页一层，同壁纸与天空层一样不在任何一屏里）──
+       点一颗星、或点名单上的一个名字，这里报出他在哪份名单上、他是谁、编号多少
+       （贴着那一粒）。编号是从名字**算**出来的（两个 32 位哈希拼 20 位）：没有
+       随机数、没有时间，同一个呼号永远是同一串号 —— 名单增补、页面改版都不会
+       变动它。名单那一行读的是这一屏自己的标题（已点亮用户 / 开发 …）。
+       拿不到呼号的那几个（群组、每一位支持者）中间那行就空着，不编一个出来。 -->
   <div class="deck-spot" id="deckSpot" aria-live="polite">
     <div class="deck-spot-in">
+      <span class="spot-tag" id="spotTag"></span>
       <b id="spotCall"></b>
-      <span id="spotNo"></span>
+      <span class="spot-no" id="spotNo"></span>
     </div>
   </div>
 
@@ -1067,13 +1082,16 @@ html, body { height: auto; overflow: auto; }
      结尾那几屏，名单上的每个人就是球面上的一粒符号
      （名字有多少个，模块就补多少粒 —— 见 planet-3d.js 的 scatter）。
      点一粒星、或点名单上的一个名字，是同一件事：镜头飞过去停在那一粒上，
-     那一粒换成暖金，旁边报出他是谁、编号多少。点别处照旧往前走一屏。
+     那一粒换成暖金，下面报出他在哪份名单上、他是谁、编号多少。
+     点着谁的这一屏，其余东西（名单正文、主题按钮、音乐开关、署名、那句提示）
+     一起退开 —— 留下的就是能直接截下来发出去的那一张。点别处照旧往前走一屏。
      编号由名字本身哈希出来（两个 32 位 FNV-1a 拼 20 位）：没有随机数、没有时间，
      同一个呼号永远是同一串号 —— 名单增补、页面改版都不会动它。 */
   var nameList = (window.__deckNames && window.__deckNames.list) || [];
   var spotBox = document.getElementById("deckSpot");
   var spotCall = document.getElementById("spotCall");
   var spotNo = document.getElementById("spotNo");
+  var spotTag = document.getElementById("spotTag");
   var spotOrd = -1;
 
   /* 那一粒飞去哪儿，这一行字就跟到哪儿：模块每帧报一次它的屏幕位置
@@ -1114,6 +1132,13 @@ html, body { height: auto; overflow: auto; }
     for (i = 0; i < 20; i += 4) out += (i ? " " : "") + all.substring(i, i + 4);
     return out;
   }
+  /* 他在哪一份名单上：读这一屏自己的标题（已点亮用户 / 开发 / 开山成员 · 15 位 …），
+     不另编一个称呼 —— 页面上怎么写，这里就怎么叫。 */
+  function rosterOf(el) {
+    var host = el && el.closest ? el.closest(".slide") : null;
+    var head = host ? host.querySelector("h2, .cgroup-title") : null;
+    return head ? (head.textContent || "").replace(/\s+/g, " ").trim() : "";
+  }
   function paintSpot(ord) {
     spotOrd = ord;
     if (deck) deck.classList.toggle("pick", ord >= 0);   // 这一屏交给他一个人
@@ -1123,6 +1148,7 @@ html, body { height: auto; overflow: auto; }
       var el = nameList[ord];
       var txt = ((el && el.textContent) || "").replace(/\s+/g, " ").trim();
       var call = (txt.match(/^[A-Z]{1,2}[0-9][A-Z]{1,4}/) || [""])[0];
+      if (spotTag) spotTag.textContent = rosterOf(el);
       spotCall.textContent = call;                 // 拿不到呼号：这一行就空着
       spotNo.textContent = "星表编号 " + starNo(call || txt);
       spotBox.title = txt;

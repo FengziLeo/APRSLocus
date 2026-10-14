@@ -4126,5 +4126,17 @@
   "linkNoPaired": "Perangkat tidak ditemukan -- pasangkan dulu di pengaturan Bluetooth sistem, atau sambungkan kabel serial USB (OTG)",
   "beaconIncludeSats": "Satelit",
   "beaconSatsNow": "Satelit saat ini",
-  "beaconSatsHint": "Jumlah satelit berasal dari sumber yang sedang memasok posisi -- GPS ponsel (Android) atau modul GPS eksternal (kalimat GGA). SAT=nn adalah kolom komentar non-standar (seperti STEPS=) yang di peta pihak ketiga hanya tampil sebagai teks komentar; bila sumbernya tidak memberi nilai, tidak ada yang dikirim, bukan angka nol."
+  "beaconSatsHint": "Jumlah satelit berasal dari sumber yang sedang memasok posisi -- GPS ponsel (Android) atau modul GPS eksternal (kalimat GGA). SAT=nn adalah kolom komentar non-standar (seperti STEPS=) yang di peta pihak ketiga hanya tampil sebagai teks komentar; bila sumbernya tidak memberi nilai, tidak ada yang dikirim, bukan angka nol.",
+  "extGpsFixTitle": "Posisi saat ini",
+  "extGpsFixSubtitle": "Posisi terakhir yang dilaporkan modul -- koordinat dan usianya dua angka yang paling layak dipantau di sini",
+  "extGpsFixAge": "Posisi terakhir",
+  "extGpsFixType": "Tipe posisi",
+  "extGpsFixType2d": "Posisi 2D",
+  "extGpsFixType3d": "Posisi 3D",
+  "extGpsFixTypeNoFix": "Belum ada posisi (menurut GSA)",
+  "extGpsFixTypeNone": "Tidak dilaporkan (tanpa GSA)",
+  "extGpsFixUtc": "Waktu modul (UTC)",
+  "extGpsFixSource": "Kalimat pemicu",
+  "extGpsFixRaw": "Kalimat terakhir",
+  "extGpsFixHint": "Akurasi diperkirakan dari HDOP (sekitar HDOP x 5 m), bukan hasil pengukuran; tipe posisi berasal dari kalimat GSA, jadi modul yang hanya mengirim RMC/GGA tidak punya baris itu; waktu modul berasal dari satelit dan mungkin belum tersinkron."
 }

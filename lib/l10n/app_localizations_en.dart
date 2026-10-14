@@ -9398,4 +9398,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get beaconSatsHint => "The satellite count comes from whichever source is supplying position -- phone GPS (Android) or the external GPS module (GGA sentence). SAT=nn is a non-standard comment field (like STEPS=) that third-party maps only show as comment text; when the source does not provide it, nothing is sent rather than a zero.";
 
+  @override
+  String get extGpsFixTitle => "Current fix";
+
+  @override
+  String get extGpsFixSubtitle => "The latest fix the module reported -- position and age are the two numbers worth watching here";
+
+  @override
+  String get extGpsFixAge => "Last fix";
+
+  @override
+  String get extGpsFixType => "Fix type";
+
+  @override
+  String get extGpsFixType2d => "2D fix";
+
+  @override
+  String get extGpsFixType3d => "3D fix";
+
+  @override
+  String get extGpsFixTypeNoFix => "No fix (per GSA)";
+
+  @override
+  String get extGpsFixTypeNone => "Not reported (no GSA)";
+
+  @override
+  String get extGpsFixUtc => "Module time (UTC)";
+
+  @override
+  String get extGpsFixSource => "Trigger sentence";
+
+  @override
+  String get extGpsFixRaw => "Latest sentence";
+
+  @override
+  String get extGpsFixHint => "Accuracy is estimated from HDOP (about HDOP x 5 m), not measured; the fix type comes from GSA, so a module that only sends RMC/GGA has no such line; module time comes from the satellites and may not be synced yet.";
+
 }

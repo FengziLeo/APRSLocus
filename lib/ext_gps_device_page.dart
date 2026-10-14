@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'net/tnc.dart';
+import 'nmea.dart';
 import 'nmea_gps.dart';
 import 'settings_widgets.dart';
 import 'state.dart';
@@ -38,6 +39,13 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
   bool _supported = true;
   bool _busy = false;
 
+  /// 「当前定位」卡里那句「N 秒前」自己走秒用的 —— 除了它什么都不做。
+  ///
+  /// 模组正常吐数据时上层每秒都会 notify（定位上抛按秒节流），界面本来就在重建；
+  /// 但一旦断流就再也没人 notify 了 —— 而「已经好几分钟没有新定位」恰恰是
+  /// 那时最该看见的一件事。所以只在这个页面上补一个只读的秒 tick。
+  Timer? _ageTimer;
+
   AppState get st => widget.state;
   NmeaGpsLink get link => widget.state.nmeaGps;
 
@@ -45,6 +53,16 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
   void initState() {
     super.initState();
     unawaited(_probe());
+    _ageTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted || !link.connected || link.lastFix == null) return;
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _ageTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _probe() async {
@@ -154,7 +172,7 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
   /// 这条链路**现在到底在干什么** —— 三档必须分开说，否则用户只能靠猜：
   ///   * 连着却没收到任何语句 → 供电 / 被别的 App 占着（接线问题）；
   ///   * 收到语句但还没定上 → 模组在搜星（等一会儿就好）；
-  ///   * 有定位 → 正常，显示星数与精度。
+  ///   * 有定位 → 正常，不提示（下面那张卡里全是数）。
   Widget? _liveHint(S s) {
     if (!link.connected) return null;
     if (link.silent) return SettingsHint(s.extGpsSilent, color: C.orange);
@@ -176,6 +194,13 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
         body: Column(children: [
           _bindCard(s),
           const SizedBox(height: 16),
+          // 「当前定位」只在连着时出现：断开后 lastFix 已被清掉
+          // （见 [NmeaGpsLink._resetData]），摆一张全是「—」的卡只会让人
+          // 以为定位坏了。
+          if (link.connected) ...[
+            _fixCard(s),
+            const SizedBox(height: 16),
+          ],
           _statCard(s),
           const SizedBox(height: 24),
         ]),
@@ -340,13 +365,157 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
     );
   }
 
-  /// ② 定位接收统计 + 校验严格度
+  /// ② 当前定位：模组最近报上来的那一条（用户 2026-10-14：「加更详细的显示」）
+  ///
+  /// 与下面那张统计卡的分工：统计卡是「这条链路收得好不好」（收了多少条、
+  /// 丢了多少），这张是「现在这个点是什么」—— 一个是链路台账，一个是定位本身。
+  /// 之前只有 `定位接收 · N` 那一行时，用户看不到当前坐标/星数/精度到底是多少。
+  Widget _fixCard(S s) {
+    final fix = link.lastFix;
+    final hint = _liveHint(s);
+    return SettingsSectionCard(
+      title: s.extGpsFixTitle,
+      subtitle: s.extGpsFixSubtitle,
+      icon: Icons.my_location_rounded,
+      color: C.green,
+      children: fix == null
+          ? [hint ?? SettingsHint(s.extGpsWaitingFix, color: C.blue)]
+          : [
+              // 龄期放第一行：它是「这条定位还能不能用」的唯一判据 ——
+              // 30 秒没有新点，位置来源就交回手机 GPS（[NmeaGpsLink.kFixFresh]）。
+              SettingsRow2(
+                s.extGpsFixAge,
+                _ageText(s),
+                valueColor: link.fresh ? C.green : C.orange,
+              ),
+              SettingsRow2(s.latitude, fix.lat.toStringAsFixed(6)),
+              SettingsRow2(s.longitude, fix.lng.toStringAsFixed(6)),
+              SettingsRow2(
+                s.altitude,
+                fix.altM == null ? '—' : '${fix.altM!.toStringAsFixed(1)} m',
+                valueColor: fix.altM == null ? C.grey : C.ink,
+              ),
+              SettingsRow2(
+                s.speed,
+                fix.speedKmh == null
+                    ? '—'
+                    : '${fix.speedKmh!.toStringAsFixed(1)} km/h',
+                valueColor: fix.speedKmh == null ? C.grey : C.ink,
+              ),
+              SettingsRow2(
+                s.course,
+                fix.courseDeg == null
+                    ? '—'
+                    : '${fix.courseDeg!.toStringAsFixed(0)}°',
+                valueColor: fix.courseDeg == null ? C.grey : C.ink,
+              ),
+              SettingsRow2(
+                s.extGpsSatellites,
+                fix.satellites == null ? '—' : '${fix.satellites}',
+                valueColor: (fix.satellites ?? 0) > 0 ? C.green : C.grey,
+              ),
+              SettingsRow2(
+                s.extGpsAccuracy,
+                _accuracyText(fix),
+                valueColor: fix.accuracyM == null ? C.grey : C.ink,
+              ),
+              SettingsRow2(
+                s.extGpsFixType,
+                _fixTypeText(s),
+                valueColor: link.fixType.isEmpty ? C.grey : C.ink,
+              ),
+              SettingsRow2(
+                s.extGpsFixUtc,
+                _utcText(fix),
+                valueColor: fix.utc == null ? C.grey : C.ink,
+              ),
+              // 触发语句与原始语句：模组在发什么，比任何统计都直接 ——
+              // 同一个模组换固件后「发 RMC 还是 GGA、有没有 GSA」是会变的，
+              // 而这几件事决定了上面几行有没有值。
+              SettingsRow2(s.extGpsFixSource, fix.source),
+              _rawSentence(s, fix.raw),
+              SettingsHint(s.extGpsFixHint),
+            ],
+    );
+  }
+
+  /// 「N 秒前 / N 分前 / N 小时前」：复用已有的相对时间键，不另造一套格式。
+  String _ageText(S s) {
+    final at = link.lastFix?.at;
+    if (at == null) return '—';
+    final sec = DateTime.now().difference(at).inSeconds;
+    if (sec < 60) return s.secondsAgo(sec < 0 ? 0 : sec);
+    final min = sec ~/ 60;
+    if (min < 60) return s.minutesAgo(min);
+    return s.hoursAgo(min ~/ 60);
+  }
+
+  /// 精度行：HDOP 估算值 + 模组报的原始 HDOP（两者都没有就一个「—」）。
+  ///
+  /// 两个都写出来是因为它们不是一回事：`±N m` 是给人看的估算
+  /// （[NmeaFix.accuracyM] = HDOP × 5 m），`HDOP` 是模组原值 ——
+  /// 拿它才能跟别的软件对上。
+  String _accuracyText(NmeaFix fix) {
+    final parts = <String>[];
+    if (fix.accuracyM != null) {
+      parts.add('±${fix.accuracyM!.toStringAsFixed(0)} m');
+    }
+    if (fix.hdop != null) parts.add('HDOP ${fix.hdop!.toStringAsFixed(1)}');
+    return parts.isEmpty ? '—' : parts.join(' · ');
+  }
+
+  /// GSA 报的定位类型；`''` = 这个模组不发 GSA（只发 RMC/GGA 的很常见）。
+  String _fixTypeText(S s) {
+    switch (link.fixType) {
+      case '3':
+        return s.extGpsFixType3d;
+      case '2':
+        return s.extGpsFixType2d;
+      case '1':
+        return s.extGpsFixTypeNoFix;
+      default:
+        return s.extGpsFixTypeNone;
+    }
+  }
+
+  /// 模组时间（UTC）：来自卫星，可能还没同步上（没电池的模组会回到 2000 年）。
+  ///
+  /// 所以它只是参考值 —— 「这条定位新不新鲜」一律按**本机时钟**判断
+  /// （见 [NmeaFix.at] 与 [_ageText]），用模组时间会得出荒唐的结论。
+  String _utcText(NmeaFix fix) {
+    final t = fix.utc;
+    if (t == null) return '—';
+    return '${t.toIso8601String().substring(0, 19).replaceFirst('T', ' ')} UTC';
+  }
+
+  /// 最近一条原始语句（等宽）。GGA 一条就有 70 多个字符，交给 Text 自己换行。
+  Widget _rawSentence(S s, String raw) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(s.extGpsFixRaw, style: ts(11, c: C.slate)),
+          const SizedBox(height: 4),
+          Text(
+            raw,
+            style: ts(10, c: C.slate, h: 1.35)
+                .copyWith(fontFamily: 'monospace'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ③ 定位接收统计 + 校验严格度
   ///
   /// 为什么要分开计数「还没定上 / 校验不符 / 其它 NMEA」：这条链路收不到定位
   /// 只有三种可能（语句有效但模组还没定上、校验不符被丢、压根不是 NMEA），
   /// 三个计数能把它们分开 —— 否则用户只能靠猜。
+  ///
+  /// 星数与精度不在这里：它们是「当前定位」的属性，摆在上面那张卡里 ——
+  /// 同一个数在两张卡上各出现一次，用户会以为哪个才是准的。
   Widget _statCard(S s) {
-    final live = _liveHint(s);
     return SettingsSectionCard(
       title: s.extGpsStatTitle,
       subtitle: s.extGpsDeviceDesc,
@@ -354,16 +523,6 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
       color: C.cyan,
       children: [
         SettingsRow2(s.extGpsStats('${link.fixes}'), '${link.rxBytes} B'),
-        SettingsRow2(
-          s.extGpsSatellites,
-          link.satellites == null ? '—' : '${link.satellites}',
-          valueColor: link.satellites == null ? C.grey : C.ink,
-        ),
-        SettingsRow2(
-          s.extGpsAccuracy,
-          link.accuracyM == null ? '—' : '±${link.accuracyM!.toStringAsFixed(0)} m',
-          valueColor: link.accuracyM == null ? C.grey : C.ink,
-        ),
         SettingsRow2(
           s.extGpsStatNoFix,
           '${link.noFixYet}',
@@ -384,7 +543,6 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
           '${link.ignored}',
           valueColor: C.slate,
         ),
-        if (live != null) live,
         SettingsSwitch(
           s.extGpsStrictChecksum,
           value: link.config.strictChecksum,

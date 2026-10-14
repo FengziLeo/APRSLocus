@@ -909,6 +909,98 @@ KEYS = {
         'sebagai teks komentar; bila sumbernya tidak memberi nilai, tidak ada yang '
         'dikirim, bukan angka nol.',
     ),
+
+    # ── 外接 GPS 设备页的「当前定位」卡（用户 2026-10-14：「GPS 连接页面加更详细的
+    # 显示」）──
+    #
+    # 这一页以前只有链路统计（收了多少条），看不到**当前这个点是什么**：坐标、
+    # 海拔、速度、星数、精度、模组时间都只在别处一闪而过。这组文案给那几条行用。
+    # 纬度/经度/高度/速度/航向/精度/卫星 这些行标签复用已有键（latitude 等），
+    # 这里只加这张卡自己的标题与解释，避免同一个词在两处各写一份。
+    'extGpsFixTitle': (
+        '当前定位', '目前定位',
+        'Current fix', '現在の測位',
+        'Posición actual', 'Posisi saat ini',
+    ),
+    'extGpsFixSubtitle': (
+        '模组最近报上来的那一条定位 —— 坐标与龄期是这一页最该盯的两个数',
+        '模組最近報上來的這一條定位 —— 座標與齡期是這一頁最該盯的兩個數',
+        'The latest fix the module reported -- position and age are the two numbers '
+        'worth watching here',
+        'モジュールが最後に報告した測位 —— 座標と経過時間がこの画面で一番見るべき数字です',
+        'La última posición que reportó el módulo: la posición y la antigüedad son '
+        'los dos datos que conviene mirar aquí',
+        'Posisi terakhir yang dilaporkan modul -- koordinat dan usianya dua angka '
+        'yang paling layak dipantau di sini',
+    ),
+    # 「N 秒/分/小时前」复用已有的 secondsAgo/minutesAgo/hoursAgo，这里只加行标签。
+    'extGpsFixAge': (
+        '最近定位', '最近定位',
+        'Last fix', '最新の測位',
+        'Última posición', 'Posisi terakhir',
+    ),
+    'extGpsFixType': (
+        '定位类型', '定位類型',
+        'Fix type', '測位種別',
+        'Tipo de posición', 'Tipe posisi',
+    ),
+    'extGpsFixType2d': (
+        '二维定位（2D）', '二維定位（2D）',
+        '2D fix', '2D 測位',
+        'Posición 2D', 'Posisi 2D',
+    ),
+    'extGpsFixType3d': (
+        '三维定位（3D）', '三維定位（3D）',
+        '3D fix', '3D 測位',
+        'Posición 3D', 'Posisi 3D',
+    ),
+    'extGpsFixTypeNoFix': (
+        '未定位（GSA 说还没定上）', '未定位（GSA 說還沒定上）',
+        'No fix (per GSA)', '未測位（GSA が未測位と報告）',
+        'Sin posición (según GSA)', 'Belum ada posisi (menurut GSA)',
+    ),
+    'extGpsFixTypeNone': (
+        '模组没报（不发 GSA）', '模組沒報（不發 GSA）',
+        'Not reported (no GSA)', '報告なし（GSA 未対応）',
+        'No lo informa (sin GSA)', 'Tidak dilaporkan (tanpa GSA)',
+    ),
+    'extGpsFixUtc': (
+        '模组时间（UTC）', '模組時間（UTC）',
+        'Module time (UTC)', 'モジュール時刻（UTC）',
+        'Hora del módulo (UTC)', 'Waktu modul (UTC)',
+    ),
+    # 让用户知道这个点是从哪条语句拼出来的：模组发 RMC 还是 GGA、有没有 GSA，
+    # 一眼可见（同一个模组换固件后行为会变）。
+    'extGpsFixSource': (
+        '触发语句', '觸發語句',
+        'Trigger sentence', 'トリガー文',
+        'Sentencia que lo produjo', 'Kalimat pemicu',
+    ),
+    'extGpsFixRaw': (
+        '最近语句', '最近語句',
+        'Latest sentence', '最新の文',
+        'Última sentencia', 'Kalimat terakhir',
+    ),
+    'extGpsFixHint': (
+        '精度是按 HDOP 估算的（≈ HDOP × 5 m），不是实测值；定位类型来自 GSA 语句，'
+        '只发 RMC/GGA 的模组没有这一项；「模组时间」来自卫星，可能还没同步上。',
+        '精度是依 HDOP 估算的（≈ HDOP × 5 m），不是實測值；定位類型來自 GSA 語句，'
+        '只發 RMC/GGA 的模組沒有這一項；「模組時間」來自衛星，可能還沒同步上。',
+        'Accuracy is estimated from HDOP (about HDOP x 5 m), not measured; the fix '
+        'type comes from GSA, so a module that only sends RMC/GGA has no such line; '
+        'module time comes from the satellites and may not be synced yet.',
+        '精度は HDOP からの推定値（約 HDOP × 5 m）で、実測値ではありません。測位種別は '
+        'GSA 文に由来するため、RMC/GGA しか出さないモジュールにはこの行がありません。'
+        'モジュール時刻は衛星由来なので、まだ同期していない場合があります。',
+        'La precisión se estima a partir del HDOP (unos HDOP x 5 m), no es una '
+        'medida; el tipo de posición viene de la sentencia GSA, así que un módulo que '
+        'solo envía RMC/GGA no tiene esa línea; la hora del módulo viene de los '
+        'satélites y puede que aún no esté sincronizada.',
+        'Akurasi diperkirakan dari HDOP (sekitar HDOP x 5 m), bukan hasil pengukuran; '
+        'tipe posisi berasal dari kalimat GSA, jadi modul yang hanya mengirim RMC/GGA '
+        'tidak punya baris itu; waktu modul berasal dari satelit dan mungkin belum '
+        'tersinkron.',
+    ),
 }
 
 # ── 占位符声明（可空）──

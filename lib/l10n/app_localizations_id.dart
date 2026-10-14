@@ -9408,4 +9408,40 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get beaconSatsHint => "Jumlah satelit berasal dari sumber yang sedang memasok posisi -- GPS ponsel (Android) atau modul GPS eksternal (kalimat GGA). SAT=nn adalah kolom komentar non-standar (seperti STEPS=) yang di peta pihak ketiga hanya tampil sebagai teks komentar; bila sumbernya tidak memberi nilai, tidak ada yang dikirim, bukan angka nol.";
 
+  @override
+  String get extGpsFixTitle => "Posisi saat ini";
+
+  @override
+  String get extGpsFixSubtitle => "Posisi terakhir yang dilaporkan modul -- koordinat dan usianya dua angka yang paling layak dipantau di sini";
+
+  @override
+  String get extGpsFixAge => "Posisi terakhir";
+
+  @override
+  String get extGpsFixType => "Tipe posisi";
+
+  @override
+  String get extGpsFixType2d => "Posisi 2D";
+
+  @override
+  String get extGpsFixType3d => "Posisi 3D";
+
+  @override
+  String get extGpsFixTypeNoFix => "Belum ada posisi (menurut GSA)";
+
+  @override
+  String get extGpsFixTypeNone => "Tidak dilaporkan (tanpa GSA)";
+
+  @override
+  String get extGpsFixUtc => "Waktu modul (UTC)";
+
+  @override
+  String get extGpsFixSource => "Kalimat pemicu";
+
+  @override
+  String get extGpsFixRaw => "Kalimat terakhir";
+
+  @override
+  String get extGpsFixHint => "Akurasi diperkirakan dari HDOP (sekitar HDOP x 5 m), bukan hasil pengukuran; tipe posisi berasal dari kalimat GSA, jadi modul yang hanya mengirim RMC/GGA tidak punya baris itu; waktu modul berasal dari satelit dan mungkin belum tersinkron.";
+
 }

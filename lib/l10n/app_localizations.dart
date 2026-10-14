@@ -16392,6 +16392,78 @@ abstract class AppLocalizations {
   /// **'卫星数来自正在供位的那个来源 —— 手机 GPS（Android）或外接 GPS 模组（GGA 语句）。SAT=nn 是非标准备注字段（与 STEPS= 同类），第三方地图只会当备注文字显示；来源不提供这个值时不会发送，而不是发一个 0。'**
   String get beaconSatsHint;
 
+  /// No description provided for @extGpsFixTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前定位'**
+  String get extGpsFixTitle;
+
+  /// No description provided for @extGpsFixSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'模组最近报上来的那一条定位 —— 坐标与龄期是这一页最该盯的两个数'**
+  String get extGpsFixSubtitle;
+
+  /// No description provided for @extGpsFixAge.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近定位'**
+  String get extGpsFixAge;
+
+  /// No description provided for @extGpsFixType.
+  ///
+  /// In zh, this message translates to:
+  /// **'定位类型'**
+  String get extGpsFixType;
+
+  /// No description provided for @extGpsFixType2d.
+  ///
+  /// In zh, this message translates to:
+  /// **'二维定位（2D）'**
+  String get extGpsFixType2d;
+
+  /// No description provided for @extGpsFixType3d.
+  ///
+  /// In zh, this message translates to:
+  /// **'三维定位（3D）'**
+  String get extGpsFixType3d;
+
+  /// No description provided for @extGpsFixTypeNoFix.
+  ///
+  /// In zh, this message translates to:
+  /// **'未定位（GSA 说还没定上）'**
+  String get extGpsFixTypeNoFix;
+
+  /// No description provided for @extGpsFixTypeNone.
+  ///
+  /// In zh, this message translates to:
+  /// **'模组没报（不发 GSA）'**
+  String get extGpsFixTypeNone;
+
+  /// No description provided for @extGpsFixUtc.
+  ///
+  /// In zh, this message translates to:
+  /// **'模组时间（UTC）'**
+  String get extGpsFixUtc;
+
+  /// No description provided for @extGpsFixSource.
+  ///
+  /// In zh, this message translates to:
+  /// **'触发语句'**
+  String get extGpsFixSource;
+
+  /// No description provided for @extGpsFixRaw.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近语句'**
+  String get extGpsFixRaw;
+
+  /// No description provided for @extGpsFixHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'精度是按 HDOP 估算的（≈ HDOP × 5 m），不是实测值；定位类型来自 GSA 语句，只发 RMC/GGA 的模组没有这一项；「模组时间」来自卫星，可能还没同步上。'**
+  String get extGpsFixHint;
+
 }
 
 class _AppLocalizationsDelegate

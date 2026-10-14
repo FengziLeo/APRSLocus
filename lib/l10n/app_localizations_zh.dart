@@ -9018,6 +9018,42 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get beaconSatsHint => "卫星数来自正在供位的那个来源 —— 手机 GPS（Android）或外接 GPS 模组（GGA 语句）。SAT=nn 是非标准备注字段（与 STEPS= 同类），第三方地图只会当备注文字显示；来源不提供这个值时不会发送，而不是发一个 0。";
 
+  @override
+  String get extGpsFixTitle => "当前定位";
+
+  @override
+  String get extGpsFixSubtitle => "模组最近报上来的那一条定位 —— 坐标与龄期是这一页最该盯的两个数";
+
+  @override
+  String get extGpsFixAge => "最近定位";
+
+  @override
+  String get extGpsFixType => "定位类型";
+
+  @override
+  String get extGpsFixType2d => "二维定位（2D）";
+
+  @override
+  String get extGpsFixType3d => "三维定位（3D）";
+
+  @override
+  String get extGpsFixTypeNoFix => "未定位（GSA 说还没定上）";
+
+  @override
+  String get extGpsFixTypeNone => "模组没报（不发 GSA）";
+
+  @override
+  String get extGpsFixUtc => "模组时间（UTC）";
+
+  @override
+  String get extGpsFixSource => "触发语句";
+
+  @override
+  String get extGpsFixRaw => "最近语句";
+
+  @override
+  String get extGpsFixHint => "精度是按 HDOP 估算的（≈ HDOP × 5 m），不是实测值；定位类型来自 GSA 语句，只发 RMC/GGA 的模组没有这一项；「模组时间」来自卫星，可能还没同步上。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18032,5 +18068,41 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get beaconSatsHint => "衛星數來自正在供位的那個來源 —— 手機 GPS（Android）或外接 GPS 模組（GGA 語句）。SAT=nn 是非標準備註欄位（與 STEPS= 同類），第三方地圖只會當備註文字顯示；來源不提供這個值時不會發送，而不是發一個 0。";
+
+  @override
+  String get extGpsFixTitle => "目前定位";
+
+  @override
+  String get extGpsFixSubtitle => "模組最近報上來的這一條定位 —— 座標與齡期是這一頁最該盯的兩個數";
+
+  @override
+  String get extGpsFixAge => "最近定位";
+
+  @override
+  String get extGpsFixType => "定位類型";
+
+  @override
+  String get extGpsFixType2d => "二維定位（2D）";
+
+  @override
+  String get extGpsFixType3d => "三維定位（3D）";
+
+  @override
+  String get extGpsFixTypeNoFix => "未定位（GSA 說還沒定上）";
+
+  @override
+  String get extGpsFixTypeNone => "模組沒報（不發 GSA）";
+
+  @override
+  String get extGpsFixUtc => "模組時間（UTC）";
+
+  @override
+  String get extGpsFixSource => "觸發語句";
+
+  @override
+  String get extGpsFixRaw => "最近語句";
+
+  @override
+  String get extGpsFixHint => "精度是依 HDOP 估算的（≈ HDOP × 5 m），不是實測值；定位類型來自 GSA 語句，只發 RMC/GGA 的模組沒有這一項；「模組時間」來自衛星，可能還沒同步上。";
 
 }

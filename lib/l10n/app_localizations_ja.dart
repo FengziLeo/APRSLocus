@@ -9119,4 +9119,40 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get beaconSatsHint => "衛星数は現在位置を供給している側（スマートフォン GPS（Android）または外付け GPS モジュールの GGA）から取ります。SAT=nn は非標準のコメント欄（STEPS= と同類）で、サードパーティの地図ではコメント文字列として表示されるだけです。供給側が値を出さないときは 0 ではなく何も送りません。";
 
+  @override
+  String get extGpsFixTitle => "現在の測位";
+
+  @override
+  String get extGpsFixSubtitle => "モジュールが最後に報告した測位 —— 座標と経過時間がこの画面で一番見るべき数字です";
+
+  @override
+  String get extGpsFixAge => "最新の測位";
+
+  @override
+  String get extGpsFixType => "測位種別";
+
+  @override
+  String get extGpsFixType2d => "2D 測位";
+
+  @override
+  String get extGpsFixType3d => "3D 測位";
+
+  @override
+  String get extGpsFixTypeNoFix => "未測位（GSA が未測位と報告）";
+
+  @override
+  String get extGpsFixTypeNone => "報告なし（GSA 未対応）";
+
+  @override
+  String get extGpsFixUtc => "モジュール時刻（UTC）";
+
+  @override
+  String get extGpsFixSource => "トリガー文";
+
+  @override
+  String get extGpsFixRaw => "最新の文";
+
+  @override
+  String get extGpsFixHint => "精度は HDOP からの推定値（約 HDOP × 5 m）で、実測値ではありません。測位種別は GSA 文に由来するため、RMC/GGA しか出さないモジュールにはこの行がありません。モジュール時刻は衛星由来なので、まだ同期していない場合があります。";
+
 }

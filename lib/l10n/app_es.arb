@@ -4126,5 +4126,17 @@
   "linkNoPaired": "No se encontró ningún dispositivo: empareja primero en los ajustes de Bluetooth del sistema, o conecta el cable serie USB (OTG)",
   "beaconIncludeSats": "Satélites",
   "beaconSatsNow": "Satélites ahora",
-  "beaconSatsHint": "El número de satélites procede de la fuente que está aportando la posición: el GPS del teléfono (Android) o el módulo GPS externo (sentencia GGA). SAT=nn es un campo de comentario no estándar (como STEPS=) que los mapas de terceros solo muestran como texto; si la fuente no lo aporta, no se envía nada en lugar de un cero."
+  "beaconSatsHint": "El número de satélites procede de la fuente que está aportando la posición: el GPS del teléfono (Android) o el módulo GPS externo (sentencia GGA). SAT=nn es un campo de comentario no estándar (como STEPS=) que los mapas de terceros solo muestran como texto; si la fuente no lo aporta, no se envía nada en lugar de un cero.",
+  "extGpsFixTitle": "Posición actual",
+  "extGpsFixSubtitle": "La última posición que reportó el módulo: la posición y la antigüedad son los dos datos que conviene mirar aquí",
+  "extGpsFixAge": "Última posición",
+  "extGpsFixType": "Tipo de posición",
+  "extGpsFixType2d": "Posición 2D",
+  "extGpsFixType3d": "Posición 3D",
+  "extGpsFixTypeNoFix": "Sin posición (según GSA)",
+  "extGpsFixTypeNone": "No lo informa (sin GSA)",
+  "extGpsFixUtc": "Hora del módulo (UTC)",
+  "extGpsFixSource": "Sentencia que lo produjo",
+  "extGpsFixRaw": "Última sentencia",
+  "extGpsFixHint": "La precisión se estima a partir del HDOP (unos HDOP x 5 m), no es una medida; el tipo de posición viene de la sentencia GSA, así que un módulo que solo envía RMC/GGA no tiene esa línea; la hora del módulo viene de los satélites y puede que aún no esté sincronizada."
 }

@@ -4126,5 +4126,17 @@
   "linkNoPaired": "デバイスが見つかりません · 先にシステムの Bluetooth 設定でペアリングするか、USB シリアルケーブル（OTG）を接続してください",
   "beaconIncludeSats": "衛星数",
   "beaconSatsNow": "現在の衛星数",
-  "beaconSatsHint": "衛星数は現在位置を供給している側（スマートフォン GPS（Android）または外付け GPS モジュールの GGA）から取ります。SAT=nn は非標準のコメント欄（STEPS= と同類）で、サードパーティの地図ではコメント文字列として表示されるだけです。供給側が値を出さないときは 0 ではなく何も送りません。"
+  "beaconSatsHint": "衛星数は現在位置を供給している側（スマートフォン GPS（Android）または外付け GPS モジュールの GGA）から取ります。SAT=nn は非標準のコメント欄（STEPS= と同類）で、サードパーティの地図ではコメント文字列として表示されるだけです。供給側が値を出さないときは 0 ではなく何も送りません。",
+  "extGpsFixTitle": "現在の測位",
+  "extGpsFixSubtitle": "モジュールが最後に報告した測位 —— 座標と経過時間がこの画面で一番見るべき数字です",
+  "extGpsFixAge": "最新の測位",
+  "extGpsFixType": "測位種別",
+  "extGpsFixType2d": "2D 測位",
+  "extGpsFixType3d": "3D 測位",
+  "extGpsFixTypeNoFix": "未測位（GSA が未測位と報告）",
+  "extGpsFixTypeNone": "報告なし（GSA 未対応）",
+  "extGpsFixUtc": "モジュール時刻（UTC）",
+  "extGpsFixSource": "トリガー文",
+  "extGpsFixRaw": "最新の文",
+  "extGpsFixHint": "精度は HDOP からの推定値（約 HDOP × 5 m）で、実測値ではありません。測位種別は GSA 文に由来するため、RMC/GGA しか出さないモジュールにはこの行がありません。モジュール時刻は衛星由来なので、まだ同期していない場合があります。"
 }

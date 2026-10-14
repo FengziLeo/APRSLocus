@@ -9457,4 +9457,40 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get beaconSatsHint => "El número de satélites procede de la fuente que está aportando la posición: el GPS del teléfono (Android) o el módulo GPS externo (sentencia GGA). SAT=nn es un campo de comentario no estándar (como STEPS=) que los mapas de terceros solo muestran como texto; si la fuente no lo aporta, no se envía nada en lugar de un cero.";
 
+  @override
+  String get extGpsFixTitle => "Posición actual";
+
+  @override
+  String get extGpsFixSubtitle => "La última posición que reportó el módulo: la posición y la antigüedad son los dos datos que conviene mirar aquí";
+
+  @override
+  String get extGpsFixAge => "Última posición";
+
+  @override
+  String get extGpsFixType => "Tipo de posición";
+
+  @override
+  String get extGpsFixType2d => "Posición 2D";
+
+  @override
+  String get extGpsFixType3d => "Posición 3D";
+
+  @override
+  String get extGpsFixTypeNoFix => "Sin posición (según GSA)";
+
+  @override
+  String get extGpsFixTypeNone => "No lo informa (sin GSA)";
+
+  @override
+  String get extGpsFixUtc => "Hora del módulo (UTC)";
+
+  @override
+  String get extGpsFixSource => "Sentencia que lo produjo";
+
+  @override
+  String get extGpsFixRaw => "Última sentencia";
+
+  @override
+  String get extGpsFixHint => "La precisión se estima a partir del HDOP (unos HDOP x 5 m), no es una medida; el tipo de posición viene de la sentencia GSA, así que un módulo que solo envía RMC/GGA no tiene esa línea; la hora del módulo viene de los satélites y puede que aún no esté sincronizada.";
+
 }

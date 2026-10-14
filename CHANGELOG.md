@@ -2,54 +2,23 @@
 
 ## [2.1.1] - 2026-10-14
 
-### 外接 GPS：车顶那个模组，现在能直接当本机定位来源
-
-- 多了一条**只读链路**，接的是**外接 GPS / 北斗模组**（蓝牙 SPP，或 USB-TTL 串口）——
-  它按标准吐 NMEA 0183 语句（`RMC` / `GGA` / `GLL` / `ZDA` / `GSA` / `VTG`）。坐标常在
-  `$GPRMC`、海拔与精度在 `$GPGGA`、日期只有 `$GPZDA` 有，应用把同一秒里的几条语句
-  **拼成一条**本机定位（而不是每条各算一次），所以同一个点不会被反复塞进轨迹。
-- 位置优先级是一条明路：**模拟位置 ＞ 外接模块 ＞ 佳明手表 ＞ 手机 GPS**。模块断流 30 秒
-  （过隧道、短暂失锁）自动交回手机 GPS；反向不行 —— 网络/基站那种「粗定位」绝不会去
-  盖掉模块或手表给的点（它会拿一个偏几百米的质心把标记拽走）。
-- 设备页多一个「外接 GPS」子页：扫已配对设备 → 绑定 → 连接 / 断开 / 重启，下面是
-  **定位接收的账** —— 收了几条语句、几条「语句有效但还没定上」、几条校验不符被丢、
-  几条其它 NMEA 被忽略。三种「收不到定位」的原因分得清，不用猜。严格校验和默认**开**
-  （模组按标准发语句，校验不符基本只有线路噪声一种解释），杂牌模组可以就地关掉。
-- 信标横杠会明说**位置是谁给的**：来自外接模块时显示「外接 GPS 上报 · 45s」，而不是
-  一条看不出差别的普通倒计时（与佳明那一档同一个理由）。这条链路**只收不发**，界面上
-  任何地方都不给它发射圆点。
-- Android 侧多了一条独立的蓝牙 SPP 通道（与 TNC / PKWDWPL 同一套权限与通道约定），
-  桌面端走串口；六种语言的文案同时补齐。
+- 新增外接 GPS 定位来源：蓝牙 SPP 或 USB 串口接入 NMEA 0183 模组（`RMC` / `GGA` / `GLL` / `ZDA` / `GSA` / `VTG`），作为本机位置，只收不发
+- 位置优先级：模拟位置 ＞ 外接模块 ＞ 佳明手表 ＞ 手机 GPS；模组断流 30 秒自动交回手机 GPS
+- 数据来源卡：「位置来源」列出手机 GPS / 外接模块 / 佳明，并写明上述优先级
+- 新增设备页「外接 GPS」子页：扫描 / 绑定 / 连接 / 断开 / 重启，以及定位接收统计（定位条数、待定位、校验不符、忽略的语句）
+- 信标横杠显示位置来源，如「外接 GPS 上报 · 45s」
+- 自动重连与严格校验和（默认开启，可针对模组关闭）
 
 ---
 
 ## [2.1.1] - 2026-10-14 (English)
 
-### An external GPS: the module on the roof is now a position source of its own
-
-- There is a new **receive-only link** for an **external GPS / BeiDou module** (Bluetooth SPP,
-  or a USB-TTL serial port) that speaks standard NMEA 0183 (`RMC` / `GGA` / `GLL` / `ZDA` /
-  `GSA` / `VTG`). The coordinates usually live in `$GPRMC`, the altitude and accuracy in
-  `$GPGGA`, and only `$GPZDA` carries a date — sentences from the same second are **assembled
-  into one** position (not one per sentence), so the same point never lands in the track twice.
-- The position priority is now stated outright: **simulated position > external module >
-  Garmin watch > phone GPS**. Thirty seconds after the module goes quiet (a tunnel, a brief
-  loss of lock) the phone takes over again — but never the other way round: a coarse
-  network/cell fix will not overwrite a point that came from the module or the watch (it would
-  drag the marker hundreds of metres away).
-- The device page has a new "External GPS" sub-page: scan for paired devices → bind → connect /
-  disconnect / restart, and below that, **the reception ledger** — how many sentences arrived,
-  how many were "valid but no fix yet", how many were dropped on a checksum mismatch, and how
-  many other NMEA sentences were ignored. The three reasons a module produces no position are
-  told apart instead of guessed at. Strict checksums are **on** by default (a standard module
-  sending a bad checksum almost always means line noise) and can be turned off for the cheap
-  ones that really do.
-- The beacon bar now says **where the position came from**: "External GPS · 45s" instead of an
-  ordinary countdown you cannot tell apart (the same reasoning as the Garmin entry). This link is
-  **receive-only**, and no transmission dot is drawn for it anywhere.
-- Android gained a fourth native Bluetooth SPP channel (same permissions and channel
-  conventions as TNC / PKWDWPL), serial ports cover the desktop builds, and all six languages
-  were brought along.
+- New external GPS position source: an NMEA 0183 module (`RMC` / `GGA` / `GLL` / `ZDA` / `GSA` / `VTG`) over Bluetooth SPP or a USB serial port, used for this device's own position and receive-only
+- Position priority: simulated > external module > Garmin watch > phone GPS; the phone takes over 30 s after the module stops sending
+- Data source card: the position-source section lists phone GPS / external module / Garmin with that priority
+- New "External GPS" device sub-page: scan / bind / connect / disconnect / restart, plus reception stats (fixes, waiting for a fix, checksum failures, ignored sentences)
+- Beacon bar shows the position source, e.g. "External GPS · 45s"
+- Auto-reconnect and strict checksums (on by default, can be turned off per module)
 
 ---
 

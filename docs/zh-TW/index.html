@@ -603,8 +603,8 @@ html{overflow-x:hidden}
         <span class="cl-date">2026-10-14</span>
       </div>
       <div class="cl-body">
-        <div class="cl-item"><span class="cl-dot new"></span><b>外接 GPS 定位來源</b>：多了一條只讀鏈路，接的是外接 GPS / 北斗模組（藍牙 SPP，或 USB-TTL 串列埠），它按標準吐 NMEA 0183 語句 —— 座標常在 <code>RMC</code>、海拔與精度在 <code>GGA</code>、日期只有 <code>ZDA</code> 有。同一秒裡的好幾條語句被<b>拼成一條</b>本機定位（而不是每條各算一次），同一個點不會被反覆塞進軌跡。位置優先級是一條明路：<b>模擬位置 ＞ 外接模組 ＞ 佳明手錶 ＞ 手機 GPS</b>；模組斷流 30 秒自動交回手機，而網路/基地臺那種粗定位絕不會去蓋模組或手錶給的點（它會拿一個偏幾百米的質心把標記拽走）。</div>
-        <div class="cl-item"><span class="cl-dot up"></span><b>說清位置是誰給的</b>：裝置頁多一個「外接 GPS」子頁（掃裝置 / 綁定 / 連線 / 重啟），下面擺著<b>定位接收的帳</b> —— 收了幾條語句、幾條「語句有效但還沒定上」、幾條校驗不符被丟、幾條其它 NMEA 被忽略（嚴格校驗和預設<b>開</b>，雜牌模組可以就地關掉）。信標橫杠也不再只給一個看不出差別的倒數：位置來自外接模組時顯示「外接 GPS 上報 · 45s」。這條鏈路<b>只收不發</b>，界面上任何地方都不給它發射圓點。</div>
+        <div class="cl-item"><span class="cl-dot new"></span><b>外接 GPS 定位來源</b>：藍牙 SPP / USB 串列埠接入 NMEA 0183 模組（<code>RMC</code> / <code>GGA</code> / <code>GLL</code> / <code>ZDA</code> / <code>GSA</code> / <code>VTG</code>），作為本機位置，只收不發。位置優先級：模擬位置 ＞ 外接模組 ＞ 佳明手錶 ＞ 手機 GPS。</div>
+        <div class="cl-item"><span class="cl-dot up"></span><b>裝置頁新增「外接 GPS」子頁</b>：掃描 / 綁定 / 連線 / 斷開 / 重啟，以及定位接收統計；資料來源卡把手機 GPS / 外接模組 / 佳明列在一處並寫明優先級；信標橫杠顯示位置來源（如「外接 GPS 上報 · 45s」）。</div>
       </div>
     </div>
     <div class="cl-version reveal">

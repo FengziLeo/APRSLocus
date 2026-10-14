@@ -2423,6 +2423,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
       if (st.icomLanOn) S.of(context).icomLanTitle,
       if (st.audioDeviceOn) S.of(context).dataSourceAudio,
       if (st.pkwdwplOn) S.of(context).dataSourcePkwdwpl,
+      if (st.nmeaGpsOn) S.of(context).dataSourceNmeaGps,
     ];
     final txIdx = [
       if (st.aprsIsOn) AppState.srcAprsIs,
@@ -2430,6 +2431,9 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
       if (st.icomLanOn) AppState.srcAudio,
       if (st.audioDeviceOn) AppState.srcAudio,
       if (st.pkwdwplOn) AppState.srcPkwdwpl,
+      // 外接 GPS 只收不发（不进 canTransmit），所以永远不会是 dataSource；
+      // 列出来只为与上一行**逐位对齐**（两个列表靠下标配对）。
+      if (st.nmeaGpsOn) AppState.srcNmeaGps,
     ].indexOf(st.dataSource);
     final srcLabel = names.isEmpty
         ? 'APRS-IS'

@@ -358,9 +358,14 @@ class _BoxDevicePageState extends State<BoxDevicePage> {
     // 症状是「能发不能收」，从界面上根本看不出原因。
     final owner = st.deviceBoundBy(d.id);
     final usedByOther = !selected && owner != null && owner != AppState.srcBox;
-    final ownerName = owner == AppState.srcTnc
-        ? 'TNC'
-        : (owner == AppState.srcPkwdwpl ? 'PKWDWPL' : '');
+    // 短名：TNC / PKWDWPL 是协议与设备类别名（不翻译，与状态胶囊的用词一致），
+    // 外接 GPS 则取本地化名字 —— 写死中文会让非中文界面漏出中文。
+    final ownerName = switch (owner) {
+      AppState.srcTnc => 'TNC',
+      AppState.srcPkwdwpl => 'PKWDWPL',
+      AppState.srcNmeaGps => s.dataSourceNmeaGps,
+      _ => '',
+    };
     return InkWell(
       onTap: usedByOther
           ? null

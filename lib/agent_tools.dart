@@ -313,7 +313,7 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'set_connection_source',
     description:
-        'Enable or disable a link source (aprsis, tnc, audio, pkwdwpl); call '
+        'Enable or disable a link source (aprsis, tnc, audio, pkwdwpl, spp); call '
         '"connect" to actually bring links up.',
     mutating: true,
     parameters: {
@@ -321,7 +321,7 @@ final List<AgentToolSpec> kAgentTools = [
       'properties': {
         'source': {
           'type': 'string',
-          'description': 'aprsis, tnc, audio or pkwdwpl.',
+          'description': 'aprsis, tnc, audio, pkwdwpl or spp.',
         },
         'enabled': {
           'type': 'boolean',
@@ -1095,6 +1095,7 @@ Future<AgentToolOutcome> executeAgentTool(
             'tnc': st.tncOn,
             'audio': st.audioOn,
             'pkwdwpl': st.pkwdwplOn,
+            'spp': st.nmeaGpsOn,
           },
           'data_notice_accepted': st.dataNoticeAccepted,
         },
@@ -2018,7 +2019,7 @@ Future<AgentToolOutcome> executeAgentTool(
         final src = _val(args, 'source').trim().toLowerCase();
         final on = _asBool(args['enabled']);
         if (on == null) return _err('"enabled" must be true or false.');
-        const valid = {'aprsis', 'tnc', 'audio', 'pkwdwpl'};
+        const valid = {'aprsis', 'tnc', 'audio', 'pkwdwpl', 'spp'};
         if (!valid.contains(src)) {
           return _err('source must be one of ${valid.join(', ')}.');
         }

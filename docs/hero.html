@@ -1011,6 +1011,25 @@ html, body { height: auto; overflow: auto; }
      不写 controls —— 开关就是上面那颗音符，播放器控件那一条不该出现在这里。 -->
 <audio id="bgm" loop preload="auto" src="https://music.163.com/song/media/outer/url?id=1903408779.mp3"></audio>
 
+<!-- ── 名单与节奏：这段必须在**页尾那段翻屏脚本之前** ──
+     名单只读一次（名字有多少个 → 星野里要补多少粒可点的符号），翻屏脚本做点击
+     映射、模块铺星野，读的都是这同一份（window.__deckNames / PAGE.symbols）：
+     少一处不一致的机会，也少一个“名单读在建立之前”的空数组。
+     节奏覆盖（PAGE）必须在 planet-3d.js 之前写好：它一进来就读这个对象，
+     之后再改没用 —— gatherMs 2400 → 4400（开场慢慢聚成一颗球），
+     scrollEase 0.17 → 0.085（往下拉是滑过去的），deck: true（只有这页开：
+     装饰层是页面级固定层，点云按各屏 data-shape 换形状），zoom / pxSize
+     （星球大一圆、粒子粗一档）；三语首页不传这些键，逐像素与以前一致。 -->
+<script>
+(function () {
+  var sel = ".slide .lit-list li, .slide .name-list li, .slide .c-name";
+  var list = [].slice.call(document.querySelectorAll(sel));
+  window.__deckNames = { sel: sel, list: list };
+  window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085, deck: true,
+    zoom: 1.18, pxSize: 1.35, symbols: list.length };
+})();
+</script>
+
 <!-- 这一页是分屏 deck：脚本只管两件事 —— 翻屏与音乐。第一下点按同时把音乐
      叫起来（浏览器只认手势里起的声音），所以那一屏写的就是「点一下」。 -->
 <script>
@@ -1081,6 +1100,10 @@ html, body { height: auto; overflow: auto; }
      已经点着一个人时再从星野里点一下，这一下让给翻屏 —— 不能让星野把
      “点一下继续”这个手势吃掉。点的是已点着的那一粒 → 收回（不翻屏）。 */
   function spotPick(e) {
+    /* 名单是前面那段脚本建好的（必须早于本段，见 <audio> 下面那段注释）；
+       万一它没跑到（旧缓存、页面被改过顺序），这里再要一次 —— 不要让“点了名字
+       没反应”这种事再出现第二次。 */
+    if (!nameList.length && window.__deckNames) nameList = window.__deckNames.list || [];
     if (!nameList.length || curShape !== "scatter" || !window.__planet3d) return false;
     var t = e.target, i = -1, k, onName = false;
     if (t && t.nodeType === 1) {
@@ -1091,8 +1114,10 @@ html, body { height: auto; overflow: auto; }
     if (i < 0) return false;
     if (i === spotOrd) { spotOff(); return true; }
     if (!onName && spotOrd >= 0) return false;
+    /* 让模块先点头：它那边的符号表与这份名单万一对不上（名字多过符号），
+       它回的就不是这个序号 —— 那一下退回翻屏，不要让页面“点了没反应”。 */
+    if (window.__planet3d.focusSymbol(i) !== i) return false;
     paintSpot(i);
-    window.__planet3d.focusSymbol(i);
     return true;
   }
 
@@ -1268,26 +1293,8 @@ html, body { height: auto; overflow: auto; }
 <!-- 与首页同一份脚本：main.js 负责 body.loaded / 显形 / 主题 / 首屏粒子，
      planet-3d.js 负责星球与那个会跳的数字。两个 ?v= 与三语首页保持一致。 -->
 <script src="js/main.js?v=8"></script>
-<!-- 节奏覆盖必须在 planet-3d.js 之前写好：它一进来就读这个对象，之后再改没用。
-     gatherMs 2400 → 4400：开场那点云慢慢聚成一颗球，不是一下摆好；
-     scrollEase 0.17 → 0.085：滚动缓动慢一倍，往下拉是滑过去的。
-     deck: true：只有这页开 —— 装饰层是页面级固定层（翻屏不换），并且点云会
-     按各屏的 data-shape 换形状（散开 → 聚成天线塔 / 一颗心 / 73 / 一片星野）。
-     zoom / pxSize：这页的星球大一圆（×1.18）、粒子粗一档（×1.35）——
-     三语首页不传这两个键，星球与粒子与之前逐像素一致。
-     symbols：结尾名单那一章，点云散成一片星野（scatter），名单上的每个人
-     都是星野里一粒可点的符号 —— 所以先把名单数出来交给模块（前 90 粒是星球
-     本来就有的台站符号，模块自己接上）。名单只在这里读一次，页尾脚本做点击
-     映射时读的是同一份（__deckNames），少一处不一致的机会。 -->
-<script>
-(function () {
-  var sel = ".slide .lit-list li, .slide .name-list li, .slide .c-name";
-  var list = [].slice.call(document.querySelectorAll(sel));
-  window.__deckNames = { sel: sel, list: list };
-  window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085, deck: true,
-    zoom: 1.18, pxSize: 1.35, symbols: list.length };
-})();
-</script>
+<!-- 名单、节奏覆盖已经在前面写好了（见 <audio> 下面那一段）—— 那一段必须先
+     于页尾那段翻屏脚本：它做点击映射时读的就是那份名单。 -->
 <script src="js/planet-3d.js?v=25"></script>
 </body>
 </html>

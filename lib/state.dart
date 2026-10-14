@@ -31,6 +31,10 @@ import 'net/aprs.dart';
 import 'audio.dart';
 import 'box.dart';
 import 'pkwdwpl.dart';
+// ⚠ 外接 GPS 的定位类型（NmeaFix）**定义在 nmea.dart**，而 nmea_gps.dart
+// 只是 import 它（Dart 的 import 不传递）。少了这一行，本机 `flutter analyze`
+// 报 Type 'NmeaFix' not found —— 编译不过（CI 在 b500924 上就是这么红的）。
+import 'nmea.dart';
 import 'nmea_gps.dart';
 import 'diag.dart';
 import 'group_chat.dart';

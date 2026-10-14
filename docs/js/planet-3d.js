@@ -362,6 +362,7 @@
     "uniform vec3 uImpDir2; uniform float uImpAge2;",
     "uniform vec2 uCenter; uniform vec3 uTint; uniform vec3 uStn;",
     "uniform vec3 uSpot; uniform float uSpotK;",       // 点名：被点到的那一粒（模型空间）+ 点名强度 0→1
+    "uniform vec3 uHot;",                             // 点名那一粒换个颜色（暖金）
     "varying vec3 vCol;",
     "varying float vFade;",
     "void main() {",
@@ -434,19 +435,21 @@
     "  float k = mix(1.0, 0.34 + 1.20 * tw, aMeta.z) * lam;",
     "  k *= 1.0 + body * uWave * (max(wv, 0.0) * 0.75 + rip * 3.0);",    // 波峰亮、撞击那圈最亮
     "  k *= 1.0 - uForm * smoothstep(1.20, 1.30, length(aPos));",       // 环带：换形状就退场
-    // 点名（彩蛋页的星野）：只留那一粒亮着，其余压下去。距离用 home 算 ——
-    // 与位置是同一条链（换形状途中也跟著走），不是拿屏幕坐标事后估的。
+    // 点名（彩蛋页的星野）：那一粒换成暖金、大一圈，其余只压一档（不是抹掉）。
+    // 距离用 home 算、uSpot 也传那一粒在**当前形状**里的位置（uShape = 1 时
+    // 着色器里的 home 就是它）—— 两边同一个坐标系，落定与途中都对得上。
     "  float dsp = distance(home, uSpot);",
-    "  float near = exp(-dsp * dsp * 26.0) * uSpotK;",   // 它自己 ≈ 1，越远越接近 0
-    "  k *= mix(1.0, 0.20 + 2.10 * near, uSpotK);",      // 其余压暗，点到的那一粒更亮
+    "  float hot = exp(-dsp * dsp * 110.0) * uSpotK;",   // 它自己 ≈ 1，越远越接近 0
+    "  k *= mix(1.0, 0.52 + 1.50 * hot, uSpotK);",
     "  float pick = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719)) + uSeed) * 43758.5453);",
     "  float flare = uBurst * step(0.95, pick);",
     "  k *= 1.0 + 1.6 * flare;",
-    "  gl_PointSize = clamp(aMeta.x * uPxScale * uPxGain / max(d, 0.35) * k * (0.30 + 0.70 * gp) * (1.0 + 0.55 * near), uMinPx * uPxGain, uMaxSize * uPxGain);",
+    "  gl_PointSize = clamp(aMeta.x * uPxScale * uPxGain / max(d, 0.35) * k * (0.30 + 0.70 * gp) * (1.0 + 0.85 * hot), uMinPx * uPxGain, uMaxSize * uPxGain);",
     "  float isStn = step(0.5, aMeta.z);",              // 台站 / 卫星：比本体亮一大截的那一类
     "  vec3 base = mix(aCol, uStn * (0.72 + 0.62 * aCol.b), isStn);",
     "  vCol = base * uTint * k;",
-    "  vFade = ((0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6 + rip * 0.9 * uWave) * (0.10 + 0.90 * gp) * (1.0 - uForm * smoothstep(1.20, 1.30, length(aPos))) * mix(1.0, 0.34 + 1.30 * near, uSpotK);",
+    "  vCol = mix(vCol, uHot * (0.50 + 0.85 * k), hot);",   // 点名的那一粒：暖金（其余粒子一个都不动色）
+    "  vFade = ((0.30 + 0.70 * clamp(p.z * 0.85 + 0.62, 0.0, 1.0)) * (0.72 + 0.55 * aMeta.z * tw) + flare * 0.6 + rip * 0.9 * uWave) * (0.10 + 0.90 * gp) * (1.0 - uForm * smoothstep(1.20, 1.30, length(aPos))) * mix(1.0, 0.62 + 0.95 * hot, uSpotK);",
     "}"
   ].join("\n");
 
@@ -597,7 +600,7 @@
     "uPxScale",
     "uMaxSize", "uMinPx", "uPxGain", "uTime", "uCenter", "uTint", "uStn", "uAlpha", "uBurst", "uSeed", "uGather",
     "uWave", "uImpDir0", "uImpAge0", "uImpDir1", "uImpAge1", "uImpDir2", "uImpAge2",
-    "uMorph", "uScatter", "uShape", "uForm", "uSpot", "uSpotK"
+    "uMorph", "uScatter", "uShape", "uForm", "uSpot", "uSpotK", "uHot"
   ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
 
   function bindPointers() {
@@ -854,12 +857,14 @@
     light: {
       add: false, tint: [1.00, 1.00, 1.00], alpha: 1.00,
       wire: 0.42, wireCol: [0.012, 0.412, 0.631],       // #0369A1（--cyan-deep）
-      stn: [0.114, 0.435, 0.816]                        // #1D6FD0（--cyan 白天档）
+      stn: [0.114, 0.435, 0.816],                       // #1D6FD0（--cyan 白天档）
+      hot: [0.78, 0.50, 0.04]                           // 点名那一粒：暖金（白天档的琥珀那一档）
     },
     dark: {
       add: true, tint: [1.00, 1.08, 1.24], alpha: 0.88,
       wire: 0.55, wireCol: [0.302, 0.639, 1.000],       // #4DA3FF（--cyan）
-      stn: [0.847, 0.867, 0.890]                        // #D8DDE3：铝白，加色下最亮
+      stn: [0.847, 0.867, 0.890],                       // #D8DDE3：铝白，加色下最亮
+      hot: [1.00, 0.72, 0.14]                           // 点名那一粒：暖金（同 --grad-text 的 #ffb000 那一档）
     }
   };
   var dark = false;
@@ -1076,9 +1081,10 @@
     gl.blendFunc(gl.SRC_ALPHA, m.add ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
     gl.uniform3f(U.uTint, m.tint[0] * mTint[0], m.tint[1] * mTint[1], m.tint[2] * mTint[2]);
     gl.uniform3f(U.uStn, m.stn[0], m.stn[1], m.stn[2]);
-    var sp3 = spotPoint();                        // 点名：被点到的那一粒在哪（模型空间）
+    var sp3 = spotPoint();                        // 点名：被点到的那一粒（当前形状里的位置）
     gl.uniform3f(U.uSpot, sp3[0], sp3[1], sp3[2]);
     gl.uniform1f(U.uSpotK, focusK);
+    gl.uniform3f(U.uHot, m.hot[0], m.hot[1], m.hot[2]);
     gl.uniform1f(U.uAlpha, m.alpha);
     gl.uniform2f(U.uCenter, f.cx * 2 - 1 + ctrX * focusK, 1 - f.cy * 2 + ctrY * focusK);
     gl.uniform1f(U.uCosY, Math.cos(yaw));

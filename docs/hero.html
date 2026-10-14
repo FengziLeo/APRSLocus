@@ -195,15 +195,10 @@
   .deck-spot span { display: block; margin-top: 3px; font-family: var(--font-mono);
     font-size: 12.5px; letter-spacing: .08em; color: var(--text-dim); }
 
-  /* ── 点了谁，就只看谁 ──
-     点到一个人之后，名单上别的人退到几乎看不见（只留一点影子，仍占着原位，
-     版面不跳），被点到的那一个照旧亮着、旁边那一行（角色说明之类）也跟着退开。
-     状态是 .deck.pick 加在那一个身上的 .pick-on；换人只是换一个类名。 */
-  .lit-list li, .name-list li, .c-name, .c-role { transition: opacity .5s var(--ease); }
-  .deck.pick .lit-list li:not(.pick-on),
-  .deck.pick .name-list li:not(.pick-on),
-  .deck.pick .c-name:not(.pick-on),
-  .deck.pick .c-role:not(.pick-on) { opacity: .07; }
+  /* ── 点了一个名字：名单不动 ──
+     不做“其余名字退开”那种隐去：名单照旧整份读得下去，点名是 3D 那一层的事 ——
+     那一粒换暖金、镜头飞过去，信息贴在星球旁边（见 .deck-spot）。 */
+
 
 
   /* 页脚那句「点一下继续」：第一下之后才出现，走到最后一屏自己退场。 */
@@ -1059,10 +1054,10 @@ html, body { height: auto; overflow: auto; }
   var PREV = ["ArrowUp", "ArrowLeft", "PageUp", "Backspace"];
 
   /* ── 0. 星野点名 ──
-     结尾那几屏，整颗球散成一片星野，名单上的每个人就是星野里的一粒符号
+     结尾那几屏，名单上的每个人就是球面上的一粒符号
      （名字有多少个，模块就补多少粒 —— 见 planet-3d.js 的 scatter）。
      点一粒星、或点名单上的一个名字，是同一件事：镜头飞过去停在那一粒上，
-     其余压暗，左下角报出他是谁、编号多少。点别处照旧往前走一屏。
+     那一粒换成暖金，左下角报出他是谁、编号多少。点别处照旧往前走一屏。
      编号由名字本身哈希出来（两个 32 位 FNV-1a 拼 20 位）：没有随机数、没有时间，
      同一个呼号永远是同一串号 —— 名单增补、页面改版都不会动它。 */
   var nameList = (window.__deckNames && window.__deckNames.list) || [];
@@ -1070,19 +1065,12 @@ html, body { height: auto; overflow: auto; }
   var spotCall = document.getElementById("spotCall");
   var spotNo = document.getElementById("spotNo");
   var spotOrd = -1;
-  var pickEl = null;
 
-  /* 点了谁：名单上只留他一个（别的人退到看不见），并把他滚进视野 ——
-     那一长条里他排到哪儿，都别让读者自己去找。 */
-  function setPick(ord) {
-    if (pickEl) { pickEl.classList.remove("pick-on"); pickEl = null; }
+  /* 点了谁：把他滚进视野 —— 那一长条里他排到哪儿，都别让读者自己去找。
+     名单本身一个字都不动：点名是 3D 那一层的事。 */
+  function revealName(ord) {
     var el = ord >= 0 ? nameList[ord] : null;
-    if (el) {
-      el.classList.add("pick-on");
-      pickEl = el;
-      if (el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "auto" });
-    }
-    if (deck) deck.classList.toggle("pick", !!el);
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "auto" });
   }
 
   function starNo(s) {
@@ -1102,7 +1090,7 @@ html, body { height: auto; overflow: auto; }
   }
   function paintSpot(ord) {
     spotOrd = ord;
-    setPick(ord);
+    revealName(ord);
     if (!spotBox) return;
     var on = ord >= 0;
     if (on) {

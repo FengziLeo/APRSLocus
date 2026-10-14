@@ -386,6 +386,11 @@ class NmeaGpsLink {
   /// 一行 → 一条定位（公开可见是为了让测试直接喂句子，不必造字节流）。
   void _handleLine(String line, {DateTime? now}) {
     final at = now ?? _now();
+    // 严格度以 [config] 为唯一真源，每条语句前同步一次：设备页那个开关是直接
+    // 改 config 的（不重连也要立刻生效），而 _asm 手里只有构造时抄的一份 ——
+    // 不同步的话「关了开关但语句照旧被丢」，用户只能靠重连碰运气。
+    // 代价是一次 bool 赋值（每秒至多几十条语句）。
+    _asm.strictChecksum = config.strictChecksum;
     final fix = _asm.feed(line, now: at);
     if (fix != null) {
       rxFrames++;

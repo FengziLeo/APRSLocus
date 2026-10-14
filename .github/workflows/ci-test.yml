@@ -348,6 +348,14 @@ jobs:
       - name: Test IC-705 hotspot network routing
         run: flutter test test/icom_lan_android_network_test.dart test/icom_lan_udp_channel_test.dart
 
+      # 外接 GPS（蓝牙 SPP / NMEA 0183）的解析与装配：度分换算、XOR 校验、
+      # talker 不区分（GP/GN/BD）、状态位与质量位（V / 0 只能算 noFix 不能算失败）、
+      # 多条语句合并成一条定位。这几件全是「编译能过、analyze 全绿」的纯逻辑，
+      # 而错了的表现是「位置偏到另一个城市」或「一直显示未定位」——
+      # 本机没有模块可接，只能靠这份测试钉住。
+      - name: Test external GPS NMEA parsing
+        run: flutter test test/nmea_test.dart
+
       - name: Analyze (tolerate known vector_map false positive)
         shell: bash
         run: |

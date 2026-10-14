@@ -25,7 +25,14 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'nmea.dart';
 import 'net/tnc.dart';
+
+/// 行分帧（[NmeaLineSplitter]）与 NMEA 通用件（校验和、`$` 重同步）现在住在
+/// `nmea.dart` —— 外接 GPS 链路要的是**同一件事**，共用一份才不会出现
+/// 「同一个修复只落在一半的链路上」。这里再导出一次，让老调用点
+/// （含 `test/pkwdwpl_test.dart`）不必改 import。
+export 'nmea.dart' show NmeaLineSplitter;
 
 /// 解析失败原因（数据层只给稳定错误码，文案在 UI 层本地化）
 enum PkwdwplErrorCode {
@@ -194,27 +201,11 @@ class PkwdwplFix {
 
 /// 把 `ddmmyy` + `hhmmss` 组合成 UTC 时间；任一字段非法则返回 null。
 ///
-/// 世纪归属：两位年份按「<= 79 视为 20xx，否则 19xx」处理（与 APRS 惯例一致，
-/// 且 2000 年前的采集设备已不会再出现）。
-DateTime? combineUtc(String utcDate, String utcTime) {
-  final d = utcDate.trim();
-  final t = utcTime.trim();
-  if (d.length < 6) return null;
-  final day = int.tryParse(d.substring(0, 2));
-  final month = int.tryParse(d.substring(2, 4));
-  final yy = int.tryParse(d.substring(4, 6));
-  if (day == null || month == null || yy == null) return null;
-  if (day < 1 || day > 31 || month < 1 || month > 12) return null;
-  var hour = 0, minute = 0, second = 0;
-  if (t.length >= 6) {
-    hour = int.tryParse(t.substring(0, 2)) ?? 0;
-    minute = int.tryParse(t.substring(2, 4)) ?? 0;
-    second = int.tryParse(t.substring(4, 6)) ?? 0;
-  }
-  final year = yy <= 79 ? 2000 + yy : 1900 + yy;
-  if (hour > 23 || minute > 59 || second > 60) return null;
-  return DateTime.utc(year, month, day, hour, minute, second);
-}
+/// 实现已搬到 `nmea.dart` 的 `nmeaCombineUtc`（外接 GPS 链路要用同一套日期
+/// 规则，包括两位年份的世纪归属）。保留这个同名函数，是因为它是
+/// `PkwdwplFix.utcDateTime` 的公开 API，改名字会连带改测试与调用点。
+DateTime? combineUtc(String utcDate, String utcTime) =>
+    nmeaCombineUtc(utcDate, utcTime);
 
 /// `$PKWDWPL` 语句解析器（纯函数，便于单测）。
 class PkwdwplParser {
@@ -396,85 +387,12 @@ class PkwdwplChecksum {
       value.toRadixString(16).toUpperCase().padLeft(2, '0');
 }
 
-/// 把**字节流**切成一行行文本。
-///
-/// 为什么必须要有它：蓝牙/串口回调**不按行对齐** —— 一条语句可能被切成
-/// 两三块送达，一次回调也可能挤进好几条。少了分帧就会出现「时好时坏、
-/// 偶尔整条丢」这种最难查的症状。
-///
-/// 兼容 `\r\n` / `\n` / `\r`（Kenwood 用 `\r\n`，但不同固件有差异），
-/// 并有缓冲上限：线路噪声会产生超长「行」，无上限的话内存会被吃光。
-class NmeaLineSplitter {
-  NmeaLineSplitter({this.maxBuffer = 8192});
-
-  /// 单行缓冲上限（字节）。超出即丢弃并计数，避免噪声吃光内存。
-  final int maxBuffer;
-
-  final List<int> _buf = <int>[];
-
-  /// 因超长被丢弃的字节数（界面/日志可据此判断线路质量）
-  int overflows = 0;
-
-  /// 溢出后是否处于「重新同步」状态。
-  ///
-  /// 为什么要这个状态：溢出时只清空缓冲**不够** —— 那条超长垃圾行的**剩余
-  /// 字节**会继续往缓冲里塞，于是下一个正常语句会被拼上垃圾尾巴
-  /// （症状：收到 `A$PKWDWPL,X` 这种前面多一两个字符的句子，校验和必然不符，
-  /// 而线路本身是好的）。噪声行往往**不带行结束符**，靠 `\r\n` 定位也pin
-  /// 不上。NMEA 语句只可能以 `$` 开头，所以「看见 `$` 就当新语句开始」是
-  /// 这个场景下唯一可靠的重新同步锚点。
-  bool _resync = false;
-
-  /// 语句起始符 `$`
-  static const int _dollar = 0x24;
-
-  /// 喂入一段字节，返回本次切出的完整行（已去空白，跳过空行）。
-  List<String> feed(List<int> bytes) {
-    final out = <String>[];
-    for (final b in bytes) {
-      final isTerminator = b == 0x0A || b == 0x0D;
-      if (_resync) {
-        // 垃圾行到此为止；或遇到 `$`（新语句开头）→ 恢复正常累积
-        if (isTerminator) {
-          _resync = false;
-        } else if (b == _dollar) {
-          _resync = false;
-          _buf.add(b);
-        }
-        continue;
-      }
-      if (isTerminator) {
-        if (_buf.isEmpty) continue;
-        final line = _decode(_buf);
-        _buf.clear();
-        final t = line.trim();
-        if (t.isNotEmpty) out.add(t);
-        continue;
-      }
-      _buf.add(b & 0xFF);
-      if (_buf.length > maxBuffer) {
-        overflows += _buf.length;
-        _buf.clear();
-        _resync = true;
-      }
-    }
-    return out;
-  }
-
-  /// 丢弃未成行的残留（断开重连时调用，避免半条语句跨链路拼出乱码）
-  void reset() {
-    _buf.clear();
-    _resync = false;
-  }
-
-  static String _decode(List<int> bytes) {
-    try {
-      return latin1.decode(bytes, allowInvalid: true);
-    } catch (_) {
-      return '';
-    }
-  }
-}
+// ─── 行分帧 ───
+//
+// 这里原本就地实现了一份 `NmeaLineSplitter`。它已搬到 `nmea.dart`：外接 GPS
+// 链路（`nmea_gps.dart`）需要**完全同一套**分帧（半包/粘包、`$` 重同步、
+// 缓冲上限），复制一份的唯一结局是两边的修复各自漂移。
+// 老调用点由本文件顶部的 `export` 接住。
 
 /// 链路状态码（UI 负责本地化）
 class PkwdwplStatus {

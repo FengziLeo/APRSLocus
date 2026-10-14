@@ -4090,5 +4090,7 @@
   "connectingAliyun": "Checking for updates via Aliyun OSS ☁️",
   "icomAudioSampleRate": "Audio sample rate",
   "icomAudioFmtValue": "12000 Hz (LPCM 16-bit mono)",
-  "icomLanHotspotRoutingHint": "After joining the radio hotspot, radio traffic is bound to that Wi-Fi LAN while mobile data stays on APRS-IS. If the system treats the hotspot as the default internet route, turn off \"auto-switch network\" in that Wi-Fi's advanced settings."
+  "icomLanHotspotRoutingHint": "After joining the radio hotspot, radio traffic is bound to that Wi-Fi LAN while mobile data stays on APRS-IS. If the system treats the hotspot as the default internet route, turn off \"auto-switch network\" in that Wi-Fi's advanced settings.",
+  "posSrcSpp": "external GPS module",
+  "locationExtGps": "external GPS (Bluetooth)"
 }

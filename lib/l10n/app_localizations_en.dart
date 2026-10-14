@@ -9286,4 +9286,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get agentNoFinalAnswer => "Reached the per-turn limit for tool actions, so no conclusion could be produced. Send “continue” to let it carry on.";
 
+  @override
+  String get posSrcSpp => 'external GPS module';
+
+  @override
+  String get locationExtGps => 'external GPS (Bluetooth)';
+
 }

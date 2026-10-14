@@ -4755,5 +4755,7 @@
   "connectingAliyun": "正在通过阿里云 OSS 检查更新 ☁️",
   "icomAudioSampleRate": "音频采样率",
   "icomAudioFmtValue": "12000 Hz (LPCM 16-bit 单声道)",
-  "icomLanHotspotRoutingHint": "连上电台热点后，电台数据会绑定到 Wi-Fi 局域网，移动数据仍用于 APRS-IS 上网；若系统把这条热点当成了默认上网通道，请在该 Wi-Fi 的高级设置里关闭「自动切换网络」。"
+  "icomLanHotspotRoutingHint": "连上电台热点后，电台数据会绑定到 Wi-Fi 局域网，移动数据仍用于 APRS-IS 上网；若系统把这条热点当成了默认上网通道，请在该 Wi-Fi 的高级设置里关闭「自动切换网络」。",
+  "posSrcSpp": "外接 GPS 模块",
+  "locationExtGps": "外接 GPS（蓝牙）"
 }

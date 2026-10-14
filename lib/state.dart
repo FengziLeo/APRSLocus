@@ -296,6 +296,11 @@ class AppState extends ChangeNotifier {
   /// 上一个佳明点：只用来算航向（佳明的点没有航向字段，见 [bearingDeg]）。
   GarminPoint? _lastGarminPoint;
 
+  /// 外接 GPS 模块的上一帧：同样只用来算航向（模组只发 GGA/GLL 时没有航向
+  /// 字段）。注：判「还新不新鲜」看链路自己的时间戳（见 [externalFixFresh]），
+  /// 不用这一帧的时间。
+  NmeaFix? _lastNmeaFix;
+
   /// 佳明 LiveTrack 的分享链接与开关状态。
   String garminUrl = '';
   bool garminOn = false;
@@ -351,75 +356,22 @@ class AppState extends ChangeNotifier {
   /// 这里只做三件必须做的事：更新位置、写轨迹（同一套抽稀）、跟随过滤中心。
   void _onGarminPoint(GarminPoint p) {
     if (_disposed) return;
-    final first = !myHasFix;
-    myLat = p.lat;
-    myLng = p.lng;
-    myHasFix = true;
-    myFixAt = DateTime.now();
-    _pendingSavedPos = false; // 手表给的是真实点，可以上报
-    myFixCoarse = false; // 手表 GPS，不是粗定位
-    myAccuracy = 0; // 佳明页面不给精度 → 0 = 未知（不画精度圈）
-    if (p.altM != null) myAlt = p.altM;
-    if (p.speedMps != null) mySpeed = p.speedMps! * 3.6;
-    if (p.hr != null && p.hr! > 0) {
-      myHr = p.hr;
-      myHrAt = DateTime.now();
-      _checkHrAlarm();
-    }
-    _checkCrash();
-    // 航向：佳明的点里没有这个字段，用**前后两点**算（见 bearingDeg 的注释）。
-    // 没有上一个点（首个点）时不改 —— 保留手机 GPS 的最后已知航向，比瞎指北好。
     final prev = _lastGarminPoint;
-    if (prev != null) {
-      final b = bearingDeg(prev.lat, prev.lng, p.lat, p.lng);
-      if (b != null) myCourse = b;
-    }
     _lastGarminPoint = p;
-    // 转弯打点的航向样本（见 lib/turn_dot.dart）。佳明的点比手机 GPS 稀得多
-    // （十几秒到一分钟一个），而那道物理门的阈值是**按 dt 折算**的（40°/秒），
-    // 所以这里可以放心直接喂：稀疏序列不会被误杀，只是也不受它保护。
-    if ((mySpeed ?? 0) >= _kTurnMinSpeedKmh) {
-      _turnDot.onCourse(myCourse, DateTime.now());
-    }
-    locStatus = '佳明 LiveTrack';
-    // 跳变守卫的参照点也要跟着走：否则手机 GPS 接回来的那一刻会被误判成跳变
-    _lastFixLat = p.lat;
-    _lastFixLng = p.lng;
-    _lastFixTime = DateTime.now();
-    _hadLiveFix = true;
-    // 轨迹：与 GPS 同一套「按速度自适应抽稀」，但不受静止防抖影响
-    // （佳明的点本身就是干净的；静止时手表也会给点，画出来才对）。
-    final last = myTrack.isEmpty ? null : myTrack.last;
-    final minDistM =
-        PosQuality.trackMinDistM(speedKmh: (p.speedMps ?? 0) * 3.6);
-    final movedM = last == null
-        ? double.infinity
-        : haversine(last.lat, last.lng, p.lat, p.lng) * 1000;
-    if (last == null || movedM > minDistM) {
-      myTrack.add(TrackPt(p.lat, p.lng, DateTime.now()));
-      if (myTrack.length > maxTrackPts) {
-        myTrack.removeRange(0, myTrack.length - maxTrackPts);
-      }
-      // 历史台账（按天落盘）：GPS 那条路径写在同一个条件里，佳明这条也必须写 ——
-      // 不写的话「佳明接管期间」在历史记录里是**一段空白**（而手机 GPS 正好被让位，
-      // 两边都不记，用户回头看会觉得那一段路凭空消失）。
-      TrackLogStore.instance.record(
-        lat: p.lat,
-        lng: p.lng,
-        speedKmh: (p.speedMps ?? 0) * 3.6,
-        course: myCourse,
-        alt: p.altM,
-        accuracyM: 0,
-        // 佳明轨迹点自带心率，上面已经把有效值写进 [myHr]（issue #17）
-        hr: myHr,
-      );
-      // 佳明接管期间的里程也要记，否则那段路在里程里是空白（与台账一致）
-      if (last != null) _addMileage(movedM / 1000.0);
-    }
-    if (filterFollow) {
-      filterLat = p.lat;
-      filterLng = p.lng;
-    }
+    final first = _ingestExternalFix(
+      p.lat,
+      p.lng,
+      status: '佳明 LiveTrack',
+      altM: p.altM,
+      speedKmh: p.speedMps == null ? null : p.speedMps! * 3.6,
+      // 航向：佳明的点里没有这个字段，用**前后两点**算（见 bearingDeg 的注释）。
+      // 没有上一个点（首个点）时不改 —— 保留手机 GPS 的最后已知航向，比瞎指北好。
+      prevLat: prev?.lat,
+      prevLng: prev?.lng,
+      hr: p.hr,
+      // 佳明页面不给精度 → 0 = 未知（不画精度圈）
+      accuracyM: 0,
+    );
     if (first) {
       _log(
         LogLevel.info,
@@ -427,8 +379,101 @@ class AppState extends ChangeNotifier {
         'LiveTrack 首个点 ${p.lat.toStringAsFixed(5)}, ${p.lng.toStringAsFixed(5)}',
       );
     }
+  }
+
+  /// 外接位置源（佳明 LiveTrack / 外接 GPS 模块）带来的一次定位 → 「我」的位置。
+  ///
+  /// 为什么两条源共用一个函数：它们要做的**是同一件事** —— 更新我的位置、
+  /// 按速度抽稀写轨迹与历史台账、跟随过滤中心、跳变参照点跟着走；
+  /// 差别只在两处：来源文案（[status]）与「这条源自带什么字段」
+  /// （佳明带心率、外接 GPS 带航向/精度/海拔）。各写一份的结局已经见过：
+  /// 同一个修复只会落在其中一半路径上（佳明接管期间里程/台账空白就是这么来的）。
+  ///
+  /// 返回**是不是本次进程的首个点**（调用方据此打自己的「首个点」日志）。
+  bool _ingestExternalFix(
+    double lat,
+    double lng, {
+    required String status,
+    double? altM,
+    double? speedKmh,
+    double? courseDeg,
+    double? prevLat,
+    double? prevLng,
+    int? hr,
+    double accuracyM = 0,
+  }) {
+    final first = !myHasFix;
+    myLat = lat;
+    myLng = lng;
+    myHasFix = true;
+    myFixAt = DateTime.now();
+    _pendingSavedPos = false; // 外部源给的是真实点，可以上报
+    myFixCoarse = false; // 外部源不是粗定位
+    myAccuracy = accuracyM;
+    if (altM != null) myAlt = altM;
+    if (speedKmh != null) mySpeed = speedKmh;
+    if (hr != null && hr > 0) {
+      myHr = hr;
+      myHrAt = DateTime.now();
+      _checkHrAlarm();
+    }
+    _checkCrash();
+    // 航向：本条没给就用**前后两点**算（佳明的点里没有航向字段；
+    // 外接 GPS 模组只发 GGA/GLL 时也没有）。没有上一个点时不改 ——
+    // 保留手机 GPS 的最后已知航向，比瞎指北好。
+    final course = courseDeg ??
+        (prevLat == null || prevLng == null
+            ? null
+            : bearingDeg(prevLat, prevLng, lat, lng));
+    if (course != null) myCourse = course;
+    // 转弯打点的航向样本（见 lib/turn_dot.dart）。外部源的点比手机 GPS 稀得多
+    // （佳明十几秒到一分钟一个），而那道物理门的阈值是**按 dt 折算**的（40°/秒），
+    // 所以这里可以放心直接喂：稀疏序列不会被误杀，只是也不受它保护。
+    if ((mySpeed ?? 0) >= _kTurnMinSpeedKmh) {
+      _turnDot.onCourse(myCourse, DateTime.now());
+    }
+    // 跳变守卫的参照点也要跟着走：否则手机 GPS 接回来的那一刻会被误判成跳变
+    _lastFixLat = lat;
+    _lastFixLng = lng;
+    _lastFixTime = DateTime.now();
+    _hadLiveFix = true;
+    // 轨迹：与 GPS 同一套「按速度自适应抽稀」，但不受静止防抖影响
+    // （外面的点本身就是干净的；停着不动时手表/模块也会给点，画出来才对）。
+    final speed = speedKmh ?? 0;
+    final last = myTrack.isEmpty ? null : myTrack.last;
+    final minDistM = PosQuality.trackMinDistM(speedKmh: speed);
+    final movedM = last == null
+        ? double.infinity
+        : haversine(last.lat, last.lng, lat, lng) * 1000;
+    if (last == null || movedM > minDistM) {
+      myTrack.add(TrackPt(lat, lng, DateTime.now()));
+      if (myTrack.length > maxTrackPts) {
+        myTrack.removeRange(0, myTrack.length - maxTrackPts);
+      }
+      // 历史台账（按天落盘）：GPS 那条路径写在同一个条件里，这里也必须写 ——
+      // 不写的话「外部源接管期间」在历史记录里是**一段空白**（而手机 GPS 正好被
+      // 让位，两边都不记，用户回头看会觉得那一段路凭空消失）。
+      TrackLogStore.instance.record(
+        lat: lat,
+        lng: lng,
+        speedKmh: speed,
+        course: myCourse,
+        alt: altM,
+        accuracyM: accuracyM,
+        // 轨迹点自带的心率（佳明有），没有就是当前心率带的值
+        hr: myHr,
+      );
+      // 接管期间的里程也要记，否则那段路在里程里是空白（与台账一致）
+      if (last != null) _addMileage(movedM / 1000.0);
+    }
+    if (filterFollow) {
+      filterLat = lat;
+      filterLng = lng;
+    }
+    locStatus = status;
     _notify();
     _updateNotification();
+    return first;
   }
 
   /// 收到分享进来的文本（佳明 App 的 LiveTrack 链接）。
@@ -463,6 +508,19 @@ class AppState extends ChangeNotifier {
     _notify();
   }
 
+  /// 是否有**新鲜的外接位置源**在供位（外接 GPS 模块或佳明 LiveTrack）。
+  ///
+  /// 抽出来是因为两处判据必须一致：位置优先级 [positionSourceNow]，
+  /// 以及「外接源接管时停手机 GPS」[_syncPhoneGps]。各写一遍的话迟早出现
+  /// 「一处认为外接源在跑、另一处认为没在跑」—— 那正是「位置在两路之间
+  /// 来回跳」的经典成因。
+  bool get externalFixFresh =>
+      nmeaGpsSupplying || (garmin.on && garmin.fresh);
+
+  /// 外接 GPS **模块**是否正在供位（它与佳明同在 [externalFixFresh] 里，
+  /// 但日志与状态行要能分清是谁）
+  bool get nmeaGpsSupplying => nmeaGpsOn && nmeaGps.fresh;
+
   /// **现在是谁在供位置** —— 位置来源的唯一出口。
   ///
   /// 用户问过「如果选了佳明定位来源，定位上报页那个定位来源不重复了吗？听谁的？」
@@ -472,9 +530,14 @@ class AppState extends ChangeNotifier {
   /// 现在两处都读这一个 getter，并在界面上把优先级写明。
   ///
   /// 优先级（与 `_onFix` 完全一致，不要在这里另立一套）：
-  ///   `sim`（模拟/手动）＞ `garmin`（手表有实时数据时）＞ `phone`（手机 GPS）
+  ///   `sim`（模拟/手动）＞ `spp`（外接 GPS 模块）＞ `garmin`（手表）＞ `phone`（手机 GPS）
+  ///
+  /// 为什么外接 GPS 排在佳明前面：那个模块是**用户亲手接上去的**位置源
+  /// （常常架在车顶/窗外），精度与频率都高于手腕上那只表；而佳明手表
+  /// 十几秒到一分钟才一个点、且位置在腕上。
   PositionSourceNow get positionSourceNow {
     if (useSimLocation) return PositionSourceNow.sim;
+    if (nmeaGpsOn && nmeaGps.fresh) return PositionSourceNow.spp;
     if (garmin.on && garmin.fresh) return PositionSourceNow.garmin;
     if (myHasFix || loc.running) return PositionSourceNow.phone;
     return PositionSourceNow.none;
@@ -825,12 +888,13 @@ class AppState extends ChangeNotifier {
   /// 很便宜：只在**状态翻转**时才做事（不翻转时就是两次判断）。
   void _syncPhoneGps() {
     if (useSimLocation) return;
-    final ext = garmin.on && garmin.fresh;
+    final ext = externalFixFresh;
     if (extGpsStandby && ext && !_phoneGpsPaused) {
       _phoneGpsPaused = true;
       loc.stop();
       locStatus = '外置 GPS 供位 · 手机 GPS 已待机';
-      _log(LogLevel.info, '定位', '外置 GPS（佳明）接管，手机 GPS 已待机');
+      _log(LogLevel.info, '定位',
+          '外置 GPS（${nmeaGpsSupplying ? '外接模块' : '佳明'}）接管，手机 GPS 已待机');
       return;
     }
     if (_phoneGpsPaused && (!ext || !extGpsStandby)) {
@@ -5226,23 +5290,38 @@ class AppState extends ChangeNotifier {
     };
   }
 
-  /// 外接 GPS 的一条定位。
+  /// 外接 GPS 的一条定位 → 「我」的位置。
   ///
-  /// ⚠ 本步只保证「链路能连、能收、界面看得见」：把**每次连接的首条定位**
-  /// 记进日志（设备页与日志页能确认链路真的在出数据）。位置接管 ——
-  /// 优先级、共用 [_ingestExternalFix]、停手机 GPS —— 在下一处改。
+  /// 与佳明走同一个 [_ingestExternalFix]（轨迹/台账/里程/过滤中心都在那里），
+  /// 差别只在本函数提供的三个来源字段（海拔/速度航向/精度）。
   void _onNmeaGpsFix(NmeaFix fix) {
-    if (nmeaGps.fixes == 1) {
+    final prev = _lastNmeaFix;
+    _lastNmeaFix = fix;
+    final first = _ingestExternalFix(
+      fix.lat,
+      fix.lng,
+      status: '外接 GPS（蓝牙）',
+      altM: fix.altM,
+      speedKmh: fix.speedKmh,
+      courseDeg: fix.courseDeg,
+      // 模组只发 GGA/GLL 时没有航向 → 用前后两点算（见 _ingestExternalFix）
+      prevLat: prev?.lat,
+      prevLng: prev?.lng,
+      // 精度由 HDOP 估算（见 NmeaFix.accuracyM）；没有 HDOP 时是 null → 0 = 未知
+      accuracyM: fix.accuracyM ?? 0,
+    );
+    // 日志只打两次：本进程首个点、以及**每次连接的首条定位** ——
+    // 每条都打会把日志页刷满（模组每秒 1~10 条），而这两条才是排查时真正要看的。
+    if (first || nmeaGps.fixes == 1) {
       _log(
         LogLevel.info,
         '外接 GPS',
-        '收到首条定位：${fix.lat.toStringAsFixed(5)}, '
+        '收到定位：${fix.lat.toStringAsFixed(5)}, '
             '${fix.lng.toStringAsFixed(5)}'
             '${fix.satellites == null ? '' : ' · ${fix.satellites} 颗星'}'
             '${fix.accuracyM == null ? '' : ' · ±${fix.accuracyM!.toStringAsFixed(0)}m'}',
       );
     }
-    _notify();
   }
 
   /// 一条 `$PKWDWPL` 语句 → 台站 + 报文记录。
@@ -6077,6 +6156,12 @@ class AppState extends ChangeNotifier {
   ) async {
     if (_disposed) return;
     if (useSimLocation) return; // 模拟位置模式下忽略 GPS 数据
+    // ── 外接 GPS 模块在跑且还新鲜时，**手机 GPS 让位**（与佳明同理）──
+    //
+    // 优先级：sim > 外接 GPS 模块 > 佳明 > 手机（见 [positionSourceNow]）。
+    // 这两档没有合并成一句 `externalFixFresh`：哪条源在供位必须能单独看出来
+    // （下面佳明那一行还是 CI 钉住的判据）。
+    if (nmeaGpsOn && nmeaGps.fresh) return;
     // ── 佳明 LiveTrack 在跑且还新鲜时，**手机 GPS 让位** ──
     //
     // 两路同时在更新「我的位置」会互相打架：手表比手机准，而手机一侧随时可能
@@ -6122,6 +6207,10 @@ class AppState extends ChangeNotifier {
     // 上报横杠多半显示着正常的倒计时（beaconPhase = counting），
     // 用户完全看不出「正在发一个错坐标」。宁可保持上一个（手表的）位置，等真 GPS 接回来。
     if (coarse && garmin.on) return;
+    // 外接 GPS 模块同理：它是**更准的位置源**（常常架在车顶/窗外），
+    // 而粗定位点干的就是「拿一个偏几百米的基站质心去替换真实位置」。
+    // 它不新鲜（拔了 / 断流）时手机 GPS 会自然接回来，但不能让粗点抢。
+    if (coarse && nmeaGpsOn) return;
     if (coarse) {
       final gapSec = _lastFixTime == null
           ? 1 << 30
@@ -9593,7 +9682,7 @@ class AppState extends ChangeNotifier {
 ///
 /// 抽成枚举而不是字符串：界面要按它选文案/颜色，用中文串比较必然漂
 /// （本仓库在 [BeaconPhase] 上已经踩过一次）。
-enum PositionSourceNow { sim, garmin, phone, none }
+enum PositionSourceNow { sim, spp, garmin, phone, none }
 
 /// 步数在界面上的四种状态（issue #23）。
 ///

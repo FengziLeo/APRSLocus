@@ -9007,4 +9007,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get agentNoFinalAnswer => "このターンの連続操作回数の上限に達し、結論を出せませんでした。「続けて」と送ると続きを実行します。";
 
+  @override
+  String get posSrcSpp => '外付け GPS モジュール';
+
+  @override
+  String get locationExtGps => '外付け GPS（Bluetooth）';
+
 }

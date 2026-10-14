@@ -154,6 +154,9 @@ String localizedLocationStatus(BuildContext context, String value) {
   // 这里是**白名单**，新增一个状态串不登记就会在非中文界面漏出中文
   // （tool/check_pos_quality.py 会把「所有 locStatus 字面量都已登记」当断言查）。
   if (value == '佳明 LiveTrack') return s.locationGarmin;
+  // 外接 GPS 模块（蓝牙 SPP / USB-TTL 上的 NMEA 0183）：与手机 GPS、
+  // 佳明并列的第三种来源。同样是白名单，不登记就会在非中文界面漏出中文。
+  if (value == '外接 GPS（蓝牙）') return s.locationExtGps;
   if (value == '请授予定位权限…') return s.locationPermission;
   if (value == 'GPS 定位中…') return s.gpsLocating;
   // 外置 GPS（佳明）与手机 GPS 的交接（issue #21-4）：三档都要登记 ——

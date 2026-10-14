@@ -9296,4 +9296,10 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get agentNoFinalAnswer => "Batas aksi per giliran tercapai dan kesimpulan tidak bisa dibuat. Kirim \"lanjutkan\" agar ia meneruskan.";
 
+  @override
+  String get posSrcSpp => 'modul GPS eksternal';
+
+  @override
+  String get locationExtGps => 'GPS eksternal (Bluetooth)';
+
 }

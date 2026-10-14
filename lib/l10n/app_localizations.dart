@@ -16176,6 +16176,18 @@ abstract class AppLocalizations {
   /// **'已达到本轮的连续操作次数上限，没能给出结论。再发一句「继续」让它接着做。'**
   String get agentNoFinalAnswer;
 
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'外接 GPS 模块'**
+  String get posSrcSpp;
+
+  /// 外接 GPS 模块（蓝牙 SPP / NMEA 0183）。
+  ///
+  /// In zh, this message translates to:
+  /// **'外接 GPS（蓝牙）'**
+  String get locationExtGps;
+
 }
 
 class _AppLocalizationsDelegate

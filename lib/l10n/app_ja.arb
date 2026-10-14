@@ -4090,5 +4090,7 @@
   "connectingAliyun": "Alibaba Cloud OSS で更新を確認中 ☁️",
   "icomAudioSampleRate": "オーディオサンプルレート",
   "icomAudioFmtValue": "12000 Hz (LPCM 16-bit モノラル)",
-  "icomLanHotspotRoutingHint": "無線機のホットスポットに接続すると、無線機の通信は Wi-Fi に、APRS-IS はモバイルデータに振り分けられます。システムがこのホットスポットを既定のインターネット経路にした場合は、その Wi-Fi の詳細設定で「自動ネットワーク切り替え」をオフにしてください。"
+  "icomLanHotspotRoutingHint": "無線機のホットスポットに接続すると、無線機の通信は Wi-Fi に、APRS-IS はモバイルデータに振り分けられます。システムがこのホットスポットを既定のインターネット経路にした場合は、その Wi-Fi の詳細設定で「自動ネットワーク切り替え」をオフにしてください。",
+  "posSrcSpp": "外付け GPS モジュール",
+  "locationExtGps": "外付け GPS（Bluetooth）"
 }

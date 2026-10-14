@@ -8906,6 +8906,12 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get agentNoFinalAnswer => "已达到本轮的连续操作次数上限，没能给出结论。再发一句「继续」让它接着做。";
 
+  @override
+  String get posSrcSpp => '外接 GPS 模块';
+
+  @override
+  String get locationExtGps => '外接 GPS（蓝牙）';
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -17808,5 +17814,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get agentNoFinalAnswer => "已達到本輪的連續操作次數上限，沒能給出結論。再送一句「繼續」讓它接著做。";
+
+  @override
+  String get posSrcSpp => '外接 GPS 模組';
+
+  @override
+  String get locationExtGps => '外接 GPS（藍牙）';
 
 }

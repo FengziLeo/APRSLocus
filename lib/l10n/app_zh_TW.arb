@@ -4678,5 +4678,7 @@
   "connectingAliyun": "正在透過阿里雲 OSS 檢查更新 ☁️",
   "icomAudioSampleRate": "音訊取樣率",
   "icomAudioFmtValue": "12000 Hz (LPCM 16-bit 單聲道)",
-  "icomLanHotspotRoutingHint": "連上電台熱點後，電台資料會綁定到 Wi-Fi 區域網路，行動數據仍用於 APRS-IS 上網；若系統把這條熱點當成預設上網通道，請在該 Wi-Fi 的進階設定裡關閉「自動切換網路」。"
+  "icomLanHotspotRoutingHint": "連上電台熱點後，電台資料會綁定到 Wi-Fi 區域網路，行動數據仍用於 APRS-IS 上網；若系統把這條熱點當成預設上網通道，請在該 Wi-Fi 的進階設定裡關閉「自動切換網路」。",
+  "posSrcSpp": "外接 GPS 模組",
+  "locationExtGps": "外接 GPS（藍牙）"
 }

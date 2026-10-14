@@ -2101,6 +2101,8 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
     switch (st.positionSourceNow) {
       case PositionSourceNow.sim:
         return s.posSrcSim;
+      case PositionSourceNow.spp:
+        return s.posSrcSpp;
       case PositionSourceNow.garmin:
         return s.posSrcGarmin;
       case PositionSourceNow.phone:

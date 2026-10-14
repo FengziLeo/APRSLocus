@@ -50,7 +50,7 @@ void main() {
       final link = newLink(t);
       final got = <NmeaFix>[];
       link.onFix = got.add;
-      t.onBytes!((gga '\r\n' rmc '\r\n').codeUnits);
+      t.onBytes!(('$gga\r\n$rmc\r\n').codeUnits);
 
       expect(got, hasLength(1), reason: '同一秒内按 kEmitInterval 节流');
       // 断言取链路最后合成的那条（= RMC 到达时补齐了 GGA 的海拔/精度）

@@ -30,7 +30,7 @@
 })();
 </script>
 <link rel="stylesheet" href="css/style.css?v=8">
-<link rel="stylesheet" href="css/hero-3d.css?v=22">
+<link rel="stylesheet" href="css/hero-3d.css?v=23">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
   /* 这页没有导航栏，主题按钮固定贴在右上角（只这一页用到，不进共享样式表；
@@ -65,6 +65,8 @@
   /* ── 天空层（整页一层，见 body 里那个 .deck-sky）──
      固定在视口底下、不吃指针事件；翻屏时它不动，只有星球那两块在动：
      地图那一屏铺开（full），有正文的屏退到右上角、压暗一档（soft）。
+     退开时只缩到 .72（上一版 .58）：缩太小的时候，散开聚成的形状（天线塔、
+     那颗心、73）就成了一团小图 —— 这一层是主角，得占得住画面。
      动的是**星球那块画布**，不是整层：星尘与网格是背景底纹，跟着一起缩放只会
      变成一块糊掉的底（网格是重复底图，缩放后线宽也跟着变）。transform-origin
      放在星球在屏幕上的位置（62% 46%），所以缩小的过程中它始终待在右上方那个点，
@@ -75,7 +77,7 @@
   }
   .deck[data-sky="soft"] .deck-sky .planet-canvas,
   .deck[data-sky="soft"] .deck-sky .planet-fallback {
-    transform: scale(.58) translate3d(15%, -14%, 0); opacity: .48;
+    transform: scale(.72) translate3d(13%, -12%, 0); opacity: .52;
   }
   /* 没有 WebGL：退回纯 CSS 星球。hero-3d.css 里那两条是按 .hero 写的，
      而这页的装饰层不在 .hero 里面，所以选择器得跟着换成 .deck-sky。 */
@@ -1146,8 +1148,10 @@ html, body { height: auto; overflow: auto; }
      gatherMs 2400 → 4400：开场那点云慢慢聚成一颗球，不是一下摆好；
      scrollEase 0.17 → 0.085：滚动缓动慢一倍，往下拉是滑过去的。
      deck: true：只有这页开 —— 装饰层是页面级固定层（翻屏不换），并且点云会
-     按各屏的 data-shape 换形状（散开 → 聚成天线塔 / 一颗心 / 73）。 -->
-<script>window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085, deck: true };</script>
-<script src="js/planet-3d.js?v=22"></script>
+     按各屏的 data-shape 换形状（散开 → 聚成天线塔 / 一颗心 / 73）。
+     zoom / pxSize：这页的星球大一圆（×1.18）、粒子粗一档（×1.35）——
+     三语首页不传这两个键，星球与粒子与之前逐像素一致。 -->
+<script>window.__planet3dPage = { gatherMs: 4400, scrollEase: 0.085, deck: true, zoom: 1.18, pxSize: 1.35 };</script>
+<script src="js/planet-3d.js?v=23"></script>
 </body>
 </html>

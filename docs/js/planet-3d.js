@@ -319,7 +319,7 @@
     "uniform float uSpinT;",
     "uniform float uDist; uniform float uProj; uniform float uAspect;",
     "uniform float uCosR; uniform float uSinR;",        // 画面 roll（机位斜着摆）
-    "uniform float uPxScale; uniform float uMaxSize; uniform float uMinPx;",
+    "uniform float uPxScale; uniform float uMaxSize; uniform float uMinPx; uniform float uPxGain;",
     "uniform float uTime; uniform float uBurst; uniform float uSeed;",
     "uniform float uGather;",                          // 入场进度 0 → 1
     "uniform float uWave;",                            // 星面海浪（0 = 关 / 已经不是星球了）
@@ -406,7 +406,7 @@
     "  float pick = fract(sin(dot(aPos, vec3(12.9898, 78.233, 37.719)) + uSeed) * 43758.5453);",
     "  float flare = uBurst * step(0.95, pick);",
     "  k *= 1.0 + 1.6 * flare;",
-    "  gl_PointSize = clamp(aMeta.x * uPxScale / max(d, 0.35) * k * (0.30 + 0.70 * gp), uMinPx, uMaxSize);",
+    "  gl_PointSize = clamp(aMeta.x * uPxScale * uPxGain / max(d, 0.35) * k * (0.30 + 0.70 * gp), uMinPx * uPxGain, uMaxSize * uPxGain);",
     "  float isStn = step(0.5, aMeta.z);",              // 台站 / 卫星：比本体亮一大截的那一类
     "  vec3 base = mix(aCol, uStn * (0.72 + 0.62 * aCol.b), isStn);",
     "  vCol = base * uTint * k;",
@@ -551,7 +551,7 @@
   var U = {};
   ["uCosY", "uSinY", "uCosP", "uSinP", "uSpinT", "uDist", "uProj", "uAspect", "uCosR", "uSinR",
     "uPxScale",
-    "uMaxSize", "uMinPx", "uTime", "uCenter", "uTint", "uStn", "uAlpha", "uBurst", "uSeed", "uGather",
+    "uMaxSize", "uMinPx", "uPxGain", "uTime", "uCenter", "uTint", "uStn", "uAlpha", "uBurst", "uSeed", "uGather",
     "uWave", "uImpDir0", "uImpAge0", "uImpDir1", "uImpAge1", "uImpDir2", "uImpAge2",
     "uMorph", "uScatter", "uShape", "uForm"
   ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
@@ -842,13 +842,18 @@
   }
 
   /* ── 取景：view.r 是星球本体的屏幕半径，view.cx/cy 是它在 hero 里的相对位置。
-        相机距离由 r 反推，所以换屏不会"忽大忽小"，环带始终切出右缘。 ── */
+        相机距离由 r 反推，所以换屏不会"忽大忽小"，环带始终切出右缘。
+        VIEW_ZOOM / PX_GAIN 两个倍数只有故事页给（__planet3dPage）：那页的星球
+        是主角，要大一圆；它的粒子（台站符号也在其中）要粗一档才看得清。
+        三语首页不传这两个键 → 逐一等于上一版，没动。 ── */
   var view = { cx: 0.715, cy: 0.475, r: 1 };
+  var VIEW_ZOOM = PAGE.zoom || 1;
+  var PX_GAIN = PAGE.pxSize || 1;
   function frame(w, h) {
     var aspect = w / Math.max(1, h);
-    if (aspect > 1.25) { view.cx = 0.715; view.cy = 0.475; view.r = 0.325 * h; }     // 桌面：偏右
-    else if (aspect > 0.95) { view.cx = 0.60; view.cy = 0.42; view.r = 0.27 * h; }   // 横屏平板
-    else { view.cx = 0.50; view.cy = 0.30; view.r = 0.34 * w; }                      // 窄屏：上三分之一居中
+    if (aspect > 1.25) { view.cx = 0.715; view.cy = 0.475; view.r = 0.325 * h * VIEW_ZOOM; }   // 桌面：偏右
+    else if (aspect > 0.95) { view.cx = 0.60; view.cy = 0.42; view.r = 0.27 * h * VIEW_ZOOM; } // 横屏平板
+    else { view.cx = 0.50; view.cy = 0.30; view.r = 0.34 * w * VIEW_ZOOM; }                    // 窄屏：上三分之一居中
     return view;
   }
   function camDist(h) { return U_PROJ * h / (2 * Math.max(1, view.r)); }
@@ -895,6 +900,7 @@
     gl.uniform1f(U.uPxScale, (h / 2) * U_PROJ);
     gl.uniform1f(U.uMaxSize, Math.max(14, 15 * DPR));
     gl.uniform1f(U.uMinPx, Math.max(1, 2.0 * DPR));
+    gl.uniform1f(U.uPxGain, PX_GAIN);
     gl.uniform1f(U.uTime, reduce ? 0 : now);
     gl.uniform1f(U.uBurst, burst);
     gl.uniform1f(U.uSeed, burstSeed);

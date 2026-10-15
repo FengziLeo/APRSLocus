@@ -335,7 +335,15 @@ let PEOPLE=[
  {call:"BI8AQ",who:{zh:"前方无线电俱乐部","zh-TW":"前方無線電俱樂部",en:"Qianfang Radio Club"},
   role:{zh:"分享传播","zh-TW":"分享傳播",en:"Community sharing"},
   brief:{zh:"把 APRSlocus 讲给更多同好听，让种子自己发芽。","zh-TW":"把 APRSlocus 講給更多同好聽，讓種子自己發芽。",en:"Told more hams about APRSlocus, letting the seeds sprout on their own."},
-  honors:["sower"],primary:"sower",c:"#047857",grp:"support"}
+  honors:["sower"],primary:"sower",c:"#047857",grp:"support"},
+ /* BG7QZC：赠我以琼瑶（与 members.json v65 对齐；本名单是「取不到 JSON」时的兜底，
+    因此只列精选成员，不是全量）。
+    ⚠️ `honors` 必须显式写出 —— 只给 grp:"support" 会被上面 honorDefsOf 的
+    兜底映射成 [earlyMember, mostBrain]（那是 BA3RZL 的组合），离线时徽章就错了。 */
+ {call:"BG7QZC",who:{zh:"BG7QZC","zh-TW":"BG7QZC",en:"BG7QZC"},
+  role:{zh:"赞助支持","zh-TW":"贊助支持",en:"Sponsorship support"},
+  brief:{zh:"以琼瑶寄意，愿这束电波一直有人应答。","zh-TW":"以瓊瑶寄意，願這束電波一直有人應答。",en:"Sending jade with good will — may this signal always find an answer."},
+  honors:["jadeGift"],primary:"jadeGift",c:"#0e566b",grp:"support"}
 ];
 /* 团体/赞助项（无呼号） */
 let GROUPS=[

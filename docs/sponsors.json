@@ -1,6 +1,6 @@
 {
-  "version": 12,
-  "updated": "2026-10-12",
+  "version": 13,
+  "updated": "2026-10-15",
   "sponsors": [
     {
       "kind": "group",
@@ -135,6 +135,16 @@
         "zh": "赠我以琼琚 · 琼琚有价，清音无价",
         "zh-TW": "贈我以瓊琚 · 瓊琚有價，清音無價",
         "en": "Gifted with jade — jade has a price, but a clear tone is priceless."
+      }
+    },
+    {
+      "kind": "jade",
+      "name": "BG7QZC",
+      "desc": "赠我以琼琚 · 琼琚虽微，长波可寄",
+      "descs": {
+        "zh": "赠我以琼琚 · 琼琚虽微，长波可寄",
+        "zh-TW": "贈我以瓊琚 · 瓊琚雖微，長波可寄",
+        "en": "Gifted with jade — small as it is, the long wave carries it far."
       }
     },
     {

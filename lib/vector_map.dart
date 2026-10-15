@@ -47,6 +47,14 @@ class VectorMapView extends StatefulWidget {
   final String action;
   final bool showTracks;
 
+  /// 锁定地图中心（[MapPage] 的 `_followMe`）：开着时**我的位置一变就把相机
+  /// 对回我身上**，缩放不动。
+  ///
+  /// 为什么要在这一层做：矢量底图的相机在 flutter_map 自己手里，完全不看
+  /// MapPage 的 `_pan` —— 自绘瓦片底图那边是在 build 里重算 `_pan`，这一条
+  /// 没有对应的落点，只能在这里跟。
+  final bool follow;
+
   /// 显示台站热力图（矢量地图以前完全没有这一层，见 MapPage._showHeatmap）。
   final bool showHeatmap;
 
@@ -78,6 +86,7 @@ class VectorMapView extends StatefulWidget {
     this.actionSeq = 0,
     this.action = '',
     this.showTracks = true,
+    this.follow = false,
     this.showHeatmap = false,
     this.heatLevel = 1,
     this.showStationLabels = false,
@@ -118,6 +127,20 @@ class _VectorMapViewState extends State<VectorMapView> {
       _focusOn(widget.focusLat!, widget.focusLng!);
     }
     if (widget.actionSeq != old.actionSeq) _handleAction();
+    // 锁定地图中心：我的位置变了（或是刚打开锁定）就把相机对回我身上。
+    // 与 [_handleAction] 里的 myLoc 同一手法（同样是 didUpdateWidget 里动相机），
+    // 只是它由按钮触发、这条由定位点触发。
+    final myMoved = widget.myLat != old.myLat || widget.myLng != old.myLng;
+    if (widget.follow &&
+        (myMoved || !old.follow) &&
+        _mapReady &&
+        widget.myLat != null &&
+        widget.myLng != null) {
+      _map.move(
+        LatLng(widget.myLat!, widget.myLng!),
+        _map.camera.zoom,
+      );
+    }
   }
 
   /// 处理外部动作（以视图中心缩放 / 定位到我）

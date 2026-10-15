@@ -93,6 +93,18 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Offset _pan = Offset.zero;
   bool _showTracks = true;
   bool _heatEnabled = true; // 低缩放热力图开关
+
+  /// 锁定地图中心：开着时地图一直把**我的位置**摆在中心（用户要求
+  /// 「添加锁定地图中心按钮，我的位置自动居中」）。
+  ///
+  /// 与上面那颗「定位」的分工：定位是**跳一次**，锁定是**一直跟着** ——
+  /// 自己走动（或新定位点到达）时地图跟着走。两种动作会自动解锁：
+  /// 拖地图（见下方 Listener）、点了某个台站要聚焦过去（见 [_handleViewFocus]）——
+  /// 用户一动手就是要自己看，不该在下一帧被拽回中心。
+  bool _followMe = false;
+
+  /// 按下时的指针位置，只用于判断「这是拖还是点」（见 build 里的 Listener）。
+  Offset? _dragStart;
   /// 缩小到该级别以下时自动显示热力图（按网格统计台站密度）。
   ///
   /// 6.5 → 9.0（用户反馈「热力图不容易触发」）：6.5 已经是「省/区域」级，
@@ -130,11 +142,13 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   final ValueNotifier<Offset?> _hover = ValueNotifier(null);
 
   /// 右侧工具列**单列**的总高：3 个工具钮（3×38 + 2×6 间隙）+ 组间 6
-  /// + 5 个缩放钮（5×38 + 4×6 间隙）= 346。
+  /// + 6 个缩放钮（6×38 + 5×6 间隙）= 390。
   ///
   /// 只用来判断「要不要分两列」（见 [_rightToolbar]）。以前那里是一个裸的
   /// 「520」，看不出与按钮尺寸的关系 —— 改一颗按钮的高度就得重新猜阈值。
-  static const double _kToolbarColH = 346;
+  /// ⚠ 缩放钮加了「锁定地图中心」这一颗之后，这个数必须跟着涨：
+  /// `check_landscape_layout.py` 就是按它判断「矮横屏要不要分两列」的。
+  static const double _kToolbarColH = 390;
 
   // 脉冲动画（移动/选中标记）
   late final AnimationController _pulse;
@@ -445,6 +459,19 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           builder: (ctx, constraints) {
             final size = Size(constraints.maxWidth, constraints.maxHeight);
             _lastSize = size;
+            // 锁定地图中心：每次状态刷新（多半是收到一条新的定位点）都把地图对回
+            // 我的位置。这里**只改写 `_pan`、不 setState** —— 本帧的地图本来就会拿
+            // 新的 `_pan` 去画，再 setState 只是白多一帧重建。
+            //
+            // 矢量底图不走 `_pan`（相机在 flutter_map 自己手里），那一条由
+            // [VectorMapView.follow] 负责，两条口径一致。
+            final st0 = widget.state;
+            if (_followMe &&
+                st0.myHasFix &&
+                st0.myLat != null &&
+                st0.myLng != null) {
+              _pan = _panFor(st0.myLat!, st0.myLng!, _zoom);
+            }
             final vis = _visible;
             final searched = widget.searchQuery.trim().isNotEmpty;
             // 矮横屏（小屏手机横放，以及「窗口很宽但很矮」的桌面窗口）：
@@ -461,10 +488,12 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             // 顶部锚点的基准：所有顶部浮层从 14 挪到「外壳顶栏之下」
             final double topBase = 14 + widget.topInset;
             // 贴底控件（比例尺/坐标条、上报横杠）在 2.0 里会被卡片顶上来。
-            // 顶到右侧工具列（约 390 高）那一段就会同时压住工具列与顶栏 ——
+            // 顶到右侧工具列（约 434 高）那一段就会同时压住工具列与顶栏 ——
             // 这正是「混乱」的来源。所以按顶栏之下的可用高度判断：
-            // 不够就**不显示**，而不是硬塞进去。440 ≈ 工具列高 + 间隙。
-            final bool roomForBottom = availH > 440;
+            // 不够就**不显示**，而不是硬塞进去。484 ≈ 工具列高 + 间隙
+            // （阈值一直跟着 [_kToolbarColH] 涨：工具列长高了，贴底控件就得
+            // 更晚才出现，不然两者会在矮屏上叠在一起）。
+            final bool roomForBottom = availH > 484;
             if (widget.frozen) {
               // 冻结：停掉脉冲动画。它是地图这边**唯一的每帧**重绘来源
               // （`_pulse.repeat()` 会驱动所有移动台站的扩散圈逐帧重建），
@@ -490,58 +519,82 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 ),
                 // 瓦片地图（RepaintBoundary 隔离重绘）
                 RepaintBoundary(
-                  child: MouseRegion(
-                    onHover: (e) => _hover.value = e.localPosition,
-                    onExit: (_) => _hover.value = null,
-                    child: _isVector
-                        ? VectorMapView(
-                            stations: _visible,
-                            styleUrl: vectorStyleUrlFor(_currentMapType.name),
-                            stationsVersion: widget.state.stationsVersion,
-                            myCall: widget.state.myFullCall,
-      showHeatmap: _showHeatmap,
-      heatLevel: widget.state.heatLevel,
-                            myHasFix: widget.state.myHasFix,
-                            myLat: widget.state.myLat,
-                            myLng: widget.state.myLng,
-                            myCourse: widget.state.myCourse,
-                            myTrack: widget.state.myTrack,
-                            selectedCall: _selected?.call,
-                            selectedTrack: _selected?.track ?? const [],
-                            selectedColor: _selected?.color,
-                            focusSeq: widget.state.mapFocusSeq,
-                            focusLat: widget.state.mapFocus?.lat,
-                            focusLng: widget.state.mapFocus?.lng,
-                            actionSeq: _mapActionSeq,
-                            action: _mapAction,
-                            showTracks: _showTracks,
-                            // 设置里可强制「无论密度/缩放都显示标签」
-                            showStationLabels: widget.state.mapLabelsAlways,
-                            onTap: _handleMapLatLng,
-                            onStationTap: (s) {
-                              _openDetail(s);
-                              _selected = s;
-                              // 这里照常同步脉冲：选中态要在屏幕上看得见。
-                              // 若此刻处于冻结（面板正在动），下一帧 build 会把
-                              // 它再停掉 —— 用户的点击反馈优先于省这一两帧。
-                              _syncPulse();
-                            },
-                          )
-                        : TileMapView(
-                            centerLat: _projBase.$1,
-                            centerLng: _projBase.$2,
-                            zoom: _zoom,
-                            pan: _pan,
-                            onPan: _panDelta,
-                            onViewChanged: _setView,
-                            // 滚轮：瞬时围绕焦点缩放，跟手不飘
-                            onZoomRequest: (z, p) => _animateTo(z, p),
-                            onTap: _handleMapTap,
-                            mapType: _currentMapType,
-                            // 离线地图：缓存开关与「仅离线」模式（设置页可改）
-                            cacheEnabled: widget.state.tileCacheOn,
-                            offlineOnly: widget.state.offlineOnly,
-                          ),
+                  // 锁定地图中心时的「拖一下就解锁」：一拖就是要自己看，
+                  // 不该在下一帧被拽回中心（与沉浸页的跟随按钮同口径）。
+                  //
+                  // 用原始指针事件而不是手势回调：自绘瓦片底图的手势在
+                  // TileMapView 自己手里、矢量底图在 flutter_map 手里，两条
+                  // 路都得覆盖；`Listener` 只观察、不参与手势竞技，所以
+                  // 「点台站」「点地图选点」这些点击一个都不受影响。
+                  child: Listener(
+                    onPointerDown: (e) => _dragStart = e.position,
+                    onPointerMove: (e) {
+                      final start = _dragStart;
+                      if (!_followMe || start == null) return;
+                      // 6px 以内算「点」，不算拖 —— 手指按下去总会抖一点，
+                      // 用 0 阈值会把每一次点击都当成拖动。
+                      if ((e.position - start).distance < 6) return;
+                      _dragStart = null;
+                      setState(() => _followMe = false);
+                    },
+                    onPointerUp: (_) => _dragStart = null,
+                    onPointerCancel: (_) => _dragStart = null,
+                    child: MouseRegion(
+                      onHover: (e) => _hover.value = e.localPosition,
+                      onExit: (_) => _hover.value = null,
+                      child: _isVector
+                          ? VectorMapView(
+                              stations: _visible,
+                              styleUrl: vectorStyleUrlFor(_currentMapType.name),
+                              stationsVersion: widget.state.stationsVersion,
+                              myCall: widget.state.myFullCall,
+        showHeatmap: _showHeatmap,
+        heatLevel: widget.state.heatLevel,
+                              myHasFix: widget.state.myHasFix,
+                              myLat: widget.state.myLat,
+                              myLng: widget.state.myLng,
+                              myCourse: widget.state.myCourse,
+                              myTrack: widget.state.myTrack,
+                              selectedCall: _selected?.call,
+                              selectedTrack: _selected?.track ?? const [],
+                              selectedColor: _selected?.color,
+                              focusSeq: widget.state.mapFocusSeq,
+                              focusLat: widget.state.mapFocus?.lat,
+                              focusLng: widget.state.mapFocus?.lng,
+                              actionSeq: _mapActionSeq,
+                              action: _mapAction,
+                              showTracks: _showTracks,
+                              // 锁定地图中心：矢量底图的相机在 flutter_map 手里，
+                              // 由它自己跟（见 VectorMapView.follow）
+                              follow: _followMe,
+                              // 设置里可强制「无论密度/缩放都显示标签」
+                              showStationLabels: widget.state.mapLabelsAlways,
+                              onTap: _handleMapLatLng,
+                              onStationTap: (s) {
+                                _openDetail(s);
+                                _selected = s;
+                                // 这里照常同步脉冲：选中态要在屏幕上看得见。
+                                // 若此刻处于冻结（面板正在动），下一帧 build 会把
+                                // 它再停掉 —— 用户的点击反馈优先于省这一两帧。
+                                _syncPulse();
+                              },
+                            )
+                          : TileMapView(
+                              centerLat: _projBase.$1,
+                              centerLng: _projBase.$2,
+                              zoom: _zoom,
+                              pan: _pan,
+                              onPan: _panDelta,
+                              onViewChanged: _setView,
+                              // 滚轮：瞬时围绕焦点缩放，跟手不飘
+                              onZoomRequest: (z, p) => _animateTo(z, p),
+                              onTap: _handleMapTap,
+                              mapType: _currentMapType,
+                              // 离线地图：缓存开关与「仅离线」模式（设置页可改）
+                              cacheEnabled: widget.state.tileCacheOn,
+                              offlineOnly: widget.state.offlineOnly,
+                            ),
+                    ),
                   ),
                 ),
                 // 我的位置轨迹线（不挡手势）
@@ -733,8 +786,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       children: [
                         // ── 右侧工具列 ──
                         // 此前用 14 / 58 / 102 / 146 四个硬编码 top 各自 Positioned，
-                        // 而 `_zoomCtrl()` 含 5 个按钮（放大/缩小/轨迹/热力图/定位，一直排到
-                        // 404），矮屏上必然打架。改成「单列顺序排布」后结构上不可能再重叠；
+                        // 而 `_zoomCtrl()` 含 6 个按钮（放大/缩小/轨迹/热力图/定位/锁定，一直
+                        // 排到 448），矮屏上必然打架。改成「单列顺序排布」后结构上不可能再重叠；
                         // 手机横放时**再分两列**（见 `_rightToolbar`，否则最下面的「定位」会被裁掉）。
                         Positioned(
                           right: 14,
@@ -836,6 +889,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         setState(() {
           _zoom = 14.0;
           _pan = _panFor(focus.lat, focus.lng, 14.0);
+          // 跳到某个台站 = 用户要看那个点，锁定随之解除：留着的话下一帧就被
+          // 「锁定地图中心」拽回我的位置，用户根本看不到刚聚焦的台站。
+          _followMe = false;
         });
       });
       return true;
@@ -2050,6 +2106,37 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             } else {
               _animateTo(11.0, Offset.zero);
             }
+          },
+        ),
+        SizedBox(height: 6),
+        // ── 锁定地图中心 ──
+        //
+        // 与上面那颗「定位」配成一对：定位是**跳一次**（还会把缩放拉到 15），
+        // 锁定是**一直跟着** —— 开了之后自己走动时地图持续把我的位置摆在中心，
+        // 缩放交给用户（锁定只管位置，不抢缩放）。
+        //
+        // 图标用 gps_fixed / gps_not_fixed 这一对：它就是「定位是否锁在我身上」
+        // 的通用符号，比再画一颗准星更不容易被认成别的意思。
+        RoundIconBtn(
+          _followMe
+              ? Icons.gps_fixed_rounded
+              : Icons.gps_not_fixed_rounded,
+          tooltip: _followMe
+              ? S.of(context).unlockMapCenter
+              : S.of(context).lockMapCenter,
+          color: _followMe ? C.blue : C.slate,
+          onTap: () {
+            final st = widget.state;
+            final turnOn = !_followMe;
+            if (turnOn &&
+                st.myHasFix &&
+                st.myLat != null &&
+                st.myLng != null) {
+              // 打开就立刻居中一次（不缩放），否则要等到下一个定位点才生效，
+              // 按下去像没反应。
+              _setView(_zoom, _panFor(st.myLat!, st.myLng!, _zoom));
+            }
+            setState(() => _followMe = turnOn);
           },
         ),
       ],

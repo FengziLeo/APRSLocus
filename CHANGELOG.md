@@ -1,5 +1,33 @@
 # 更新日志
 
+## [2.1.5] - 2026-10-15
+
+### 地图跟着你走，连不上会告诉你为什么
+
+- 地图右侧多了一颗「锁定地图中心」。点开以后你走动时地图一直把你的位置摆在中间，不用每次
+  手动回中。缩放还是你自己掌握，锁定只管位置。开始拖地图，或者点了某个台站要聚焦过去，
+  锁定就自动解开，不会把人拽回去。
+- 关于页新增「伙伴」一节，收录 APRSNET.CN。
+- 服务器地址没填时点「连接」，不再只是转圈等超时。设置页的服务器一栏会标出「未配置」并写明
+  原因，点连接则弹一句提示，附一个直达连接设置的入口。
+
+---
+
+## [2.1.5] - 2026-10-15 (English)
+
+### The map follows you, and a link that cannot work says so
+
+- A new "lock map centre" button on the map toolbar. While it is on, the map keeps your position
+  in the middle as you move, so there is no need to recentre by hand. Zoom stays yours; the lock
+  only holds the position. Dragging the map, or focusing a station, releases it instead of pulling
+  the view back.
+- The About page gained a "Partners" section listing APRSNET.CN.
+- With no server address set, tapping Connect no longer just spins until it times out: the server
+  field carries an "unset" badge with the reason, and Connect pops a note with a one-tap way into
+  the connection settings.
+
+---
+
 ## [2.1.4] - 2026-10-14
 
 ### 「待确认上报」不再反复弹

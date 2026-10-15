@@ -419,6 +419,34 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.5', 'date': '2026-10-15',
+        'items': [
+            ('new',
+             T('**地图跟着你走**：右侧工具列多了一颗「锁定地图中心」。点开以后你走动时'
+               '地图一直把你的位置摆在中间，不用每次手动回中；缩放仍由你掌握。拖地图、'
+               '或者点某个台站聚焦过去，锁定自动解开。',
+               '**地圖跟著你走**：右側工具列多了一顆「鎖定地圖中心」。點開以後你走動時'
+               '地圖一直把你的位置擺在中間，不用每次手動回中；縮放仍由你掌握。拖地圖、'
+               '或者點某個臺站聚焦過去，鎖定自動解開。',
+               '**The map follows you**: the right toolbar gained a "lock map centre" '
+               'button. With it on, the map keeps your position in the middle as you move, '
+               'so there is no need to recentre by hand, and zoom stays yours. Dragging the '
+               'map, or focusing a station, releases the lock.')),
+            ('new',
+             T('关于页新增「伙伴」一节，收录 APRSNET.CN。',
+               '關於頁新增「夥伴」一節，收錄 APRSNET.CN。',
+               'The About page gained a Partners section listing APRSNET.CN.')),
+            ('fix',
+             T('**服务器地址没填时点「连接」不再只是转圈**：设置页的服务器一栏会标出'
+               '「未配置」并写明原因，点连接则弹一句提示，附一个直达连接设置的入口。',
+               '**伺服器位址沒填時點「連線」不再只是轉圈**：設定頁的伺服器一欄會標出'
+               '「未配置」並寫明原因，點連線則彈一句提示，附一個直達連線設定的入口。',
+               '**Tapping Connect with no server address no longer just spins**: the '
+               'server field shows an "unset" badge with the reason, and Connect pops a '
+               'note with a one-tap way into the connection settings.')),
+        ],
+    },
+    {
         'ver': 'v2.1.4', 'date': '2026-10-14',
         'items': [
             ('fix',

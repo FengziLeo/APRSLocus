@@ -729,6 +729,23 @@ class _AboutPageState extends State<AboutPage>
                             ],
                           ),
                         ),
+                        const SizedBox(height: 22),
+
+                        // ── 伙伴 ──
+                        _sectionHeader(
+                          t.partners,
+                          Icons.handshake_rounded,
+                          C.blue,
+                        ),
+                        const SizedBox(height: 12),
+                        SoftCard(
+                          padding: EdgeInsets.zero,
+                          child: _partnerRow(
+                            name: 'APRSNET.CN',
+                            desc: t.partnerAprsnetCnDesc,
+                            url: 'https://aprsnet.cn/',
+                          ),
+                        ),
 
                         const SizedBox(height: 28),
                         const SizedBox(height: 22),
@@ -1503,6 +1520,51 @@ class _AboutPageState extends State<AboutPage>
               style: ts(12, c: C.blue, w: FontWeight.w600),
             ),
             const SizedBox(width: 4),
+            Icon(Icons.open_in_new_rounded, size: 14, color: C.grey),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 伙伴行：站名 + 一句介绍。
+  ///
+  /// 为什么单开一行而不是复用 [_linkRow]：那些行的右边是「值」——短标签
+  /// （GPL-3.0、GitHub）。伙伴这一行要说的是**一个站 + 它的那句话**，
+  /// 塞进「左标签 + 右值」会把那句话挤成右边一小串。
+  ///
+  /// 用户明确要求那句描述**单独一行**：站名在上、描述在下，行尾一个外链箭头。
+  Widget _partnerRow({
+    required String name,
+    required String desc,
+    required String url,
+  }) {
+    return InkWell(
+      onTap: () =>
+          launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.public_rounded, size: 15, color: C.blue),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: ts(12, w: FontWeight.w700),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 3),
+                  Text(desc, style: ts(11, c: C.grey)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
             Icon(Icons.open_in_new_rounded, size: 14, color: C.grey),
           ],
         ),

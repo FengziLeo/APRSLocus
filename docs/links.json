@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-14",
+  "updated": "2026-10-15",
   "links": [
     {
       "name": {
@@ -69,7 +69,7 @@
         "en": "APRS portal in Chinese"
       },
       "url": "https://aprsnet.cn/",
-      "logo": "assets/aprsnet.png"
+      "logo": "assets/aprsnet.png?v=2"
     }
   ]
 }

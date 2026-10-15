@@ -50,7 +50,8 @@
 > `contrib` / `quote` / `tags` 三语都写，但**只写在 `members.json` 一处**即可 ——
 > `member-card.html` 的 `toPeople()` 取值顺序是
 > `it.contrib || 兜底名单.contrib || 空`，**在线内容优先**；兜底名单那条保持精简，避免两处漂移。
-> 最近的完整范例：**BH7GZB**（v53，开发人员）、**BA7NFI**（v55，播种）。
+> 最近的完整范例：**BH7GZB**（v53，开发人员）、**BA7NFI**（v55，播种）、
+> **BI8AQ**（v63，播种）。
 
 ### 示例
 

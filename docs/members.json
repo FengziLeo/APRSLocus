@@ -1,6 +1,6 @@
 {
-  "version": 62,
-  "updated": "2026-10-12",
+  "version": 63,
+  "updated": "2026-10-15",
   "developers": [
     {
       "call": "BG7LZQ",
@@ -1817,6 +1817,54 @@
         "jadeGift"
       ],
       "primary": "jadeGift"
+    },
+    {
+      "call": "BI8AQ",
+      "who": {
+        "zh": "BI8AQ",
+        "zh-TW": "BI8AQ",
+        "en": "BI8AQ"
+      },
+      "role": {
+        "zh": "分享传播",
+        "zh-TW": "分享傳播",
+        "en": "Community sharing"
+      },
+      "brief": {
+        "zh": "把 APRSlocus 讲给更多同好听，让种子自己发芽。",
+        "zh-TW": "把 APRSlocus 講給更多同好聽，讓種子自己發芽。",
+        "en": "Told more hams about APRSlocus, letting the seeds sprout on their own."
+      },
+      "contrib": {
+        "zh": "在社交媒体上分享 APRSlocus，写下自己的使用记录，也把它推荐给还没听说过的同好。",
+        "zh-TW": "在社群媒體上分享 APRSlocus，寫下自己的使用紀錄，也把它推薦給還沒聽說過的同好。",
+        "en": "Shares APRSlocus on social media, posting field notes and recommending it to hams who have not heard of it yet."
+      },
+      "quote": {
+        "zh": "撒出去的种子，总会在某个频点上长起来。",
+        "zh-TW": "撒出去的種子，總會在某個頻點上長起來。",
+        "en": "Seeds scattered will sprout on some frequency."
+      },
+      "tags": {
+        "zh": [
+          "社交分享",
+          "社区传播"
+        ],
+        "zh-TW": [
+          "社群分享",
+          "社群傳播"
+        ],
+        "en": [
+          "Social sharing",
+          "Community reach"
+        ]
+      },
+      "c": "#2E9E5B",
+      "grp": "support",
+      "honors": [
+        "sower"
+      ],
+      "primary": "sower"
     }
   ],
   "groups": [

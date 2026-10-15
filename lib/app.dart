@@ -20,6 +20,7 @@ import 'agent_auth_page.dart';
 import 'early_member.dart';
 import 'honor_celebration.dart';
 import 'l10n/app_localizations.dart';
+import 'settings_pages.dart';
 import 'update_prompt.dart';
 import 'agent_ui.dart';
 
@@ -81,6 +82,17 @@ class _AppState extends State<App> {
 
   /// 用于取得 Navigator 之下的 context / overlay（庆祝层要插在它上面）
   final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
+
+  /// 全局弹提示用的 messenger（见 [_maybePromptNoServer]）。
+  ///
+  /// 挂在 MaterialApp 上而不是各页的 Scaffold 上：连接入口有 7 处（首页、外壳、
+  /// 面板、设置两处、首次引导…），提示只能有一个来源，否则「哪里弹得出来」取决于
+  /// 用户当时停在哪一页。
+  final GlobalKey<ScaffoldMessengerState> _msgKey =
+      GlobalKey<ScaffoldMessengerState>();
+
+  /// 上次弹过的「服务器地址没填」序号（见 [AppState.connectNoServerSeq]）。
+  int _lastNoServerSeq = 0;
 
   /// 智能体聊天框的 Overlay 条目 —— 挂在根 Navigator 的 Overlay 里，
   /// 因此位于所有路由之上（切页不丢），且能拿到 Navigator / Overlay 祖先。
@@ -200,6 +212,46 @@ class _AppState extends State<App> {
     _showHonorCelebration(honor);
   }
 
+  /// 连接被「服务器地址没填」拦下 → 弹一句原因 + 一个直达连接设置的入口。
+  ///
+  /// 用序号而不是布尔量：连续点几次「连接」要能各弹一次（第一次的提示可能已经
+  /// 飘走了），布尔量第二次点就变成「值没变、不弹」。
+  ///
+  /// 文案复用未连接横幅那句 `linkNoServer`（「还没填服务器地址 · 点一下去设置里填」）：
+  /// 同一件事在界面上的两种说法必须是同一句，否则用户会以为它们说的不是一回事。
+  void _maybePromptNoServer() {
+    final seq = _state.connectNoServerSeq;
+    if (seq == _lastNoServerSeq) return;
+    _lastNoServerSeq = seq;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final messenger = _msgKey.currentState;
+      // 语言取自 Navigator 之下的 context（本类的 context 在 MaterialApp 之上，
+      // 取不到当前语言 —— 见 _insertCelebration 的同一条注释）。
+      final ctx = _navKey.currentContext;
+      if (messenger == null || ctx == null) return;
+      final l = AppLocalizations.of(ctx);
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(SnackBar(
+        content: Text(l.linkNoServer),
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: l.goSettings,
+          onPressed: _openConnSettings,
+        ),
+      ));
+    });
+  }
+
+  /// 打开「连接设置」页（提示里那个「去设置」的动作）。
+  void _openConnSettings() {
+    final nav = _navKey.currentState;
+    if (nav == null) return;
+    nav.push(MaterialPageRoute(
+      builder: (_) => ConnectionSettingsPage(state: _state),
+    ));
+  }
+
   void _showHonorCelebration(Honor honor) {
     final overlay = _navKey.currentState?.overlay;
     if (overlay == null) {
@@ -250,6 +302,7 @@ class _AppState extends State<App> {
     return MaterialApp(
       key: ValueKey('app_${_state.reloadTick}'),
       navigatorKey: _navKey,
+      scaffoldMessengerKey: _msgKey,
       title: 'APRSlocus',
       debugShowCheckedModeBanner: false,
       theme: _themeFor(Brightness.light),
@@ -325,6 +378,9 @@ class _AppState extends State<App> {
       // 智能体不对普通用户开放：签完告知还不够，本机呼号要**在官网授权名单里**。
       // 未授权时弹授权/申请页（承诺书邮寄到 AgentAllow.kApplyEmail）。
       if (_state.pendingAgentAuth) return AgentAuthPage(state: _state);
+      // 「服务器地址没填」：点连接被拦下（见 AppState.connectBlockedNoServer）时
+      // 弹一句说明 + 一键去设置（用户要求：同 Passcode 填 -1 的验证提示一样）。
+      _maybePromptNoServer();
           // 启动后检查一次新版本：有则弹提醒（同一版本只提醒一次）。
           // 放在 home 的 builder 里是为了拿到 **Navigator 之下**的 context
           // （showDialog 需要它）。

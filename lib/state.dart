@@ -2330,6 +2330,28 @@ class AppState extends ChangeNotifier {
     _notify();
   }
 
+  /// ── 服务器地址没填 ──
+  ///
+  /// 用户要求：没有配置服务器时要点出**连不上的原因**并提示去配置，与 Passcode
+  /// 填 -1 的验证提示一个口径。这个自增序号是「弹一次」的信号（外壳监听它的变化，
+  /// 见 `app.dart`）—— 拦在 [toggleConnect] 这个唯一的口子上，7 个连接入口都覆盖得到。
+  int connectNoServerSeq = 0;
+
+  /// 这条链路现在**必然连不上**：启用了 APRS-IS 却没填服务器地址。
+  ///
+  /// 只看「服务器地址」一项，与外壳那条未连接横幅的原因文案（`linkNoServer`）同一判据。
+  /// 例外：Web 平台可以只填 WebSocket 地址（`wsUrl`）—— 那种配置能连上，不算没配置。
+  bool get connectBlockedNoServer =>
+      aprsIsOn &&
+      aprs.server.trim().isEmpty &&
+      (aprs.wsUrl == null || aprs.wsUrl!.trim().isEmpty);
+
+  /// 点连接时被上面那条拦下：记一次序号，交给外壳弹提示。
+  void markConnectNoServer() {
+    connectNoServerSeq++;
+    _notify();
+  }
+
   /// ── 智能体使用告知 ──
   ///
   /// 启用智能体前必须签署（与「数据与网络使用告知」相互独立、各签各的）：
@@ -6883,6 +6905,16 @@ class AppState extends ChangeNotifier {
     if (!dataNoticeAccepted) {
       pendingDataNotice = true;
       _notify();
+      return;
+    }
+    // ── 服务器地址没填：连不上去，先把原因说出来（用户要求：同 Passcode 填 -1 的
+    // 验证提示一样，要「提示原因 + 提示配置」）──
+    //
+    // 拦在这里而不是让 `aprs.connect()` 去失败：地址为空时它只会拿到一个主机名
+    // 解析错误，用户看到的是「正在连接…」转几圈然后自动重试，界面上没有一句
+    // 能读的说明。而且这一拦**不消耗**「开始上报」的确认（[beaconArmed] 不动）。
+    if (connectBlockedNoServer) {
+      markConnectNoServer();
       return;
     }
     // 用户自己发起连接（[toggleConnect] 的入口有 7 处）：算新的一次连接，

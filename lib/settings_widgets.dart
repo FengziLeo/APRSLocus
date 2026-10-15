@@ -203,6 +203,12 @@ class SettingsInput extends StatelessWidget {
   final FocusNode? focusNode;
   final String? tip;
 
+  /// 标签右侧的小徽标（例：「未验证」/「未配置」）。
+  ///
+  /// 与 Passcode 那一行的「未验证」一样：这一项没填会让**整条链路连不上**，
+  /// 而输入框本身是看不出这件事的（空框和"还没轮到我填"长得一样）。
+  final String? badge;
+
   /// 为空时显示的占位提示。默认用通用的「点击输入」。
   ///
   /// ── 为什么要加这个参数（用户反馈）──
@@ -224,7 +230,8 @@ class SettingsInput extends StatelessWidget {
       this.onEditingComplete,
       this.focusNode,
       this.tip,
-      this.hint});
+      this.hint,
+      this.badge});
 
   @override
   Widget build(BuildContext context) {
@@ -245,6 +252,19 @@ class SettingsInput extends StatelessWidget {
                 message: tip,
                 child: Icon(Icons.help_outline_rounded,
                     size: 14, color: C.greyLight),
+              ),
+            ],
+            if (badge != null) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: C.orangeBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(badge!,
+                    style: ts(9, c: C.orange, w: FontWeight.w700)),
               ),
             ],
           ]),

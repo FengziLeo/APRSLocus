@@ -2318,11 +2318,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
         SettingsRow2(S.of(context).connection,
             localizedConnectionInfo(context, st.connInfo)),
         Divider(height: 1, color: C.border),
-        SettingsInput(S.of(context).server, _server,
-            onChanged: (v) {
-          st.aprs.server = v.trim();
-          _checkConfigDirty();
-        }),
+        _serverInput(),
         SettingsInput(S.of(context).port, _port,
             onChanged: (v) {
           final n = int.tryParse(v);
@@ -2378,6 +2374,49 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           ),
         ],
       ],
+    );
+  }
+
+  /// 服务器地址输入（没填时给「未配置」徽标 + 一句原因）。
+  ///
+  /// 用户要求：没有配置服务器时要点出**连不上的原因**并提示去配置，与 Passcode
+  /// 填 -1 的验证提示一个口径。服务器这一项空了以后，点多少次「连接」都不会成功，
+  /// 而空输入框自己看不出这件事。
+  ///
+  /// 挂在 ValueListenableBuilder 上是为了让徽标与这句话**逐字**跟着输入走：
+  /// `_checkConfigDirty()` 只在「脏」翻转时才 setState（把原本就有的地址删空时
+  /// 它不翻），跟着它刷会留下一个过期的徽标。
+  Widget _serverInput() {
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: _server,
+      builder: (_, v, _) {
+        final missing = v.text.trim().isEmpty;
+        return Column(children: [
+          SettingsInput(
+            S.of(context).server,
+            _server,
+            badge: missing ? S.of(context).serverMissing : null,
+            onChanged: (x) {
+              st.aprs.server = x.trim();
+              _checkConfigDirty();
+            },
+          ),
+          if (missing)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 6, 14, 8),
+              child: Row(children: [
+                Icon(Icons.warning_amber_rounded, size: 14, color: C.red),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    S.of(context).serverMissingWarning,
+                    style: ts(10.5, c: C.red, h: 1.4),
+                  ),
+                ),
+              ]),
+            ),
+        ]);
+      },
     );
   }
 

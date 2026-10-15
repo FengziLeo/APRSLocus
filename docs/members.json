@@ -1,5 +1,5 @@
 {
-  "version": 63,
+  "version": 64,
   "updated": "2026-10-15",
   "developers": [
     {
@@ -1821,9 +1821,9 @@
     {
       "call": "BI8AQ",
       "who": {
-        "zh": "BI8AQ",
-        "zh-TW": "BI8AQ",
-        "en": "BI8AQ"
+        "zh": "前方无线电俱乐部",
+        "zh-TW": "前方無線電俱樂部",
+        "en": "Qianfang Radio Club"
       },
       "role": {
         "zh": "分享传播",

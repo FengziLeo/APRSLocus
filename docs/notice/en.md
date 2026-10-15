@@ -10,6 +10,18 @@ We are working with the Qingling mirror service on this and will post an update 
 
 ---
 
+## 🥚 A small easter egg in 2.1.0: tap, and the planet turns around
+
+The egg is on the **About** page — the spot you most likely pass every day.
+
+That slowly turning star on the cover is not a picture. **Give it a light tap**: it shudders, turns around, and drops you into a page of story. There is a planet turning there too, a number that keeps climbing, people who keep watch on the airwaves — and the people who built this thing alongside them.
+
+There is sound on that page; turn your speakers up. No long press, no five-second wait — one tap and the story arrives. Changed your mind? One more tap turns the cover back, and the story stays closed.
+
+The rest is yours to see.
+
+---
+
 ## 📮 We would like to hear from you
 
 APRSLocus has walked a while with 510+ users now. Where it goes next is partly your call: what feels awkward, what is missing, what we should fix first.

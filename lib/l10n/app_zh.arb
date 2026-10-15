@@ -4818,5 +4818,11 @@
   "extGpsFixSource": "触发语句",
   "extGpsFixRaw": "最近语句",
   "extGpsFixHint": "精度是按 HDOP 估算的（≈ HDOP × 5 m），不是实测值；定位类型来自 GSA 语句，只发 RMC/GGA 的模组没有这一项；「模组时间」来自卫星，可能还没同步上。",
-  "beaconSatsUnknown": "当前来源未提供卫星数：网络定位（基站 / Wi-Fi）本身没有卫星，部分 Android 机型 / 系统也不返回该数据。"
+  "beaconSatsUnknown": "当前来源未提供卫星数：网络定位（基站 / Wi-Fi）本身没有卫星，部分 Android 机型 / 系统也不返回该数据。",
+  "lockMapCenter": "锁定地图中心",
+  "unlockMapCenter": "取消锁定地图中心",
+  "partners": "伙伴",
+  "partnerAprsnetCnDesc": "信标不止，回响不息",
+  "serverMissing": "未配置",
+  "serverMissingWarning": "服务器地址没填 · 连不上 APRS-IS，先填一个服务器地址再连接"
 }

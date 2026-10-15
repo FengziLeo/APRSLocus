@@ -4139,5 +4139,11 @@
   "extGpsFixSource": "Kalimat pemicu",
   "extGpsFixRaw": "Kalimat terakhir",
   "extGpsFixHint": "Akurasi diperkirakan dari HDOP (sekitar HDOP x 5 m), bukan hasil pengukuran; tipe posisi berasal dari kalimat GSA, jadi modul yang hanya mengirim RMC/GGA tidak punya baris itu; waktu modul berasal dari satelit dan mungkin belum tersinkron.",
-  "beaconSatsUnknown": "Sumber saat ini tidak menyediakan jumlah satelit: lokasi jaringan (seluler / Wi-Fi) tidak punya satelit, dan sebagian perangkat atau ROM Android tidak melaporkan datanya."
+  "beaconSatsUnknown": "Sumber saat ini tidak menyediakan jumlah satelit: lokasi jaringan (seluler / Wi-Fi) tidak punya satelit, dan sebagian perangkat atau ROM Android tidak melaporkan datanya.",
+  "lockMapCenter": "Kunci pusat peta",
+  "unlockMapCenter": "Buka kunci pusat peta",
+  "partners": "Mitra",
+  "partnerAprsnetCnDesc": "Beacon tak berhenti, gema tak pernah padam",
+  "serverMissing": "Belum diisi",
+  "serverMissingWarning": "Alamat server belum diisi · APRS-IS tidak bisa dihubungi, isi dulu sebelum menyambung"
 }

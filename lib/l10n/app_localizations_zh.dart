@@ -9057,6 +9057,24 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get beaconSatsUnknown => "当前来源未提供卫星数：网络定位（基站 / Wi-Fi）本身没有卫星，部分 Android 机型 / 系统也不返回该数据。";
 
+  @override
+  String get lockMapCenter => "锁定地图中心";
+
+  @override
+  String get unlockMapCenter => "取消锁定地图中心";
+
+  @override
+  String get partners => "伙伴";
+
+  @override
+  String get partnerAprsnetCnDesc => "信标不止，回响不息";
+
+  @override
+  String get serverMissing => "未配置";
+
+  @override
+  String get serverMissingWarning => "服务器地址没填 · 连不上 APRS-IS，先填一个服务器地址再连接";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18110,5 +18128,23 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get beaconSatsUnknown => "目前來源未提供衛星數：網路定位（基地台 / Wi-Fi）本身沒有衛星，部分 Android 機型 / 系統也不返回該資料。";
+
+  @override
+  String get lockMapCenter => "鎖定地圖中心";
+
+  @override
+  String get unlockMapCenter => "取消鎖定地圖中心";
+
+  @override
+  String get partners => "夥伴";
+
+  @override
+  String get partnerAprsnetCnDesc => "信標不止，回響不息";
+
+  @override
+  String get serverMissing => "未設定";
+
+  @override
+  String get serverMissingWarning => "伺服器位址沒填 · 連不上 APRS-IS，先填一個伺服器位址再連線";
 
 }

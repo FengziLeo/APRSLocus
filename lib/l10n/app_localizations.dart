@@ -16470,6 +16470,42 @@ abstract class AppLocalizations {
   /// **'当前来源未提供卫星数：网络定位（基站 / Wi-Fi）本身没有卫星，部分 Android 机型 / 系统也不返回该数据。'**
   String get beaconSatsUnknown;
 
+  /// No description provided for @lockMapCenter.
+  ///
+  /// In zh, this message translates to:
+  /// **'锁定地图中心'**
+  String get lockMapCenter;
+
+  /// No description provided for @unlockMapCenter.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消锁定地图中心'**
+  String get unlockMapCenter;
+
+  /// No description provided for @partners.
+  ///
+  /// In zh, this message translates to:
+  /// **'伙伴'**
+  String get partners;
+
+  /// No description provided for @partnerAprsnetCnDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'信标不止，回响不息'**
+  String get partnerAprsnetCnDesc;
+
+  /// No description provided for @serverMissing.
+  ///
+  /// In zh, this message translates to:
+  /// **'未配置'**
+  String get serverMissing;
+
+  /// No description provided for @serverMissingWarning.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务器地址没填 · 连不上 APRS-IS，先填一个服务器地址再连接'**
+  String get serverMissingWarning;
+
 }
 
 class _AppLocalizationsDelegate

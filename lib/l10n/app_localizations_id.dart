@@ -9447,4 +9447,22 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get beaconSatsUnknown => "Sumber saat ini tidak menyediakan jumlah satelit: lokasi jaringan (seluler / Wi-Fi) tidak punya satelit, dan sebagian perangkat atau ROM Android tidak melaporkan datanya.";
 
+  @override
+  String get lockMapCenter => "Kunci pusat peta";
+
+  @override
+  String get unlockMapCenter => "Buka kunci pusat peta";
+
+  @override
+  String get partners => "Mitra";
+
+  @override
+  String get partnerAprsnetCnDesc => "Beacon tak berhenti, gema tak pernah padam";
+
+  @override
+  String get serverMissing => "Belum diisi";
+
+  @override
+  String get serverMissingWarning => "Alamat server belum diisi · APRS-IS tidak bisa dihubungi, isi dulu sebelum menyambung";
+
 }

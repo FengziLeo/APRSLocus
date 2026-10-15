@@ -9158,4 +9158,22 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get beaconSatsUnknown => "現在の取得元は衛星数を提供していません。ネットワーク測位（基地局 / Wi-Fi）に衛星はなく、一部の Android 端末 / ROM もこのデータを返しません。";
 
+  @override
+  String get lockMapCenter => "地図の中心を固定";
+
+  @override
+  String get unlockMapCenter => "地図の中心の固定を解除";
+
+  @override
+  String get partners => "パートナー";
+
+  @override
+  String get partnerAprsnetCnDesc => "ビーコンは止まらず、こだまは消えない";
+
+  @override
+  String get serverMissing => "未設定";
+
+  @override
+  String get serverMissingWarning => "サーバーアドレスが未入力 · APRS-IS に接続できません。先に入力してから接続してください";
+
 }

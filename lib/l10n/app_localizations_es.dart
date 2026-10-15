@@ -9496,4 +9496,22 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get beaconSatsUnknown => "La fuente actual no proporciona el número de satélites: la ubicación por red (celda / Wi-Fi) no tiene satélites, y algunos dispositivos o ROM de Android no informan del dato.";
 
+  @override
+  String get lockMapCenter => "Bloquear el centro del mapa";
+
+  @override
+  String get unlockMapCenter => "Desbloquear el centro del mapa";
+
+  @override
+  String get partners => "Socios";
+
+  @override
+  String get partnerAprsnetCnDesc => "El balizamiento no se detiene, el eco no se apaga";
+
+  @override
+  String get serverMissing => "Sin configurar";
+
+  @override
+  String get serverMissingWarning => "Falta la dirección del servidor · no se puede conectar a APRS-IS, escribe una antes de conectar";
+
 }

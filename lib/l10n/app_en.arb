@@ -4139,5 +4139,11 @@
   "extGpsFixSource": "Trigger sentence",
   "extGpsFixRaw": "Latest sentence",
   "extGpsFixHint": "Accuracy is estimated from HDOP (about HDOP x 5 m), not measured; the fix type comes from GSA, so a module that only sends RMC/GGA has no such line; module time comes from the satellites and may not be synced yet.",
-  "beaconSatsUnknown": "The current source does not provide a satellite count: network positioning (cell / Wi-Fi) has no satellites, and some Android devices or ROMs do not report the data."
+  "beaconSatsUnknown": "The current source does not provide a satellite count: network positioning (cell / Wi-Fi) has no satellites, and some Android devices or ROMs do not report the data.",
+  "lockMapCenter": "Lock map center",
+  "unlockMapCenter": "Unlock map center",
+  "partners": "Partners",
+  "partnerAprsnetCnDesc": "Beacons keep going, echoes keep answering",
+  "serverMissing": "Not set",
+  "serverMissingWarning": "No server address set · APRS-IS cannot be reached, fill one in before connecting"
 }

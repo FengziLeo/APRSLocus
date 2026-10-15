@@ -54,27 +54,27 @@ PAGES = [
 
 # 官网公告卡片的头部（kicker / 标题 / 英文小字 / 导语）。
 # 为什么不从 md 的 `#` 标题推：md 标题是横幅摘要那一行
-# （「v2.1.0 已正式推送 · APRSLocus 进入以维护为主的稳定阶段」），
+# （「请勿更新 Qingling 渠道上的 2.2.0 版本」），
 # 而卡片标题要的是短标题 + 右侧小字 + 导语，推不出来（也不该推）。
 # ⚠ 换一期公告时这里必须一起改，否则会出现「正文是新的、标题还是上一期」。
 HEAD = {
     'zh': {
-        'kicker': '🎉 v2.1.0 已正式推送',
-        'title': '稳下来，继续转 —— 2.1.0 与一份彩蛋',
-        'en': 'maintenance-first from here on',
-        'sub': '功能日臻完善。从 2.1.0 起，APRSLocus 进入以维护为主的稳定发展阶段 —— 顺带，还有一份藏在「关于」页里的彩蛋。',
+        'kicker': '⚠️ 请勿更新 2.2.0',
+        'title': 'Qingling 渠道上的 2.2.0 是误发的测试包',
+        'en': 'do not update on Qingling',
+        'sub': 'Qingling 渠道上出现了一个 2.2.0 版本，它是误发的测试包。请不要更新。已经装上的话，请先卸载 2.2.0，再安装 2.1.5。我们正在和 Qingling 镜像服务一起处理。',
     },
     'zh_TW': {
-        'kicker': '🎉 v2.1.0 已正式推送',
-        'title': '穩下來，繼續轉 —— 2.1.0 與一份彩蛋',
-        'en': 'maintenance-first from here on',
-        'sub': '功能日臻完善。從 2.1.0 起，APRSLocus 進入以維護為主的穩定發展階段 —— 順帶，還有一份藏在「關於」頁裡的彩蛋。',
+        'kicker': '⚠️ 請勿更新 2.2.0',
+        'title': 'Qingling 渠道上的 2.2.0 是誤發的測試包',
+        'en': 'do not update on Qingling',
+        'sub': 'Qingling 渠道上出現了一個 2.2.0 版本，它是誤發的測試包。請不要更新。已經裝上的話，請先卸載 2.2.0，再安裝 2.1.5。我們正在和 Qingling 鏡像服務一起處理。',
     },
     'en': {
-        'kicker': '🎉 v2.1.0 is out',
-        'title': 'Steady from here on — 2.1.0 and a small easter egg',
-        'en': 'a maintenance-first phase',
-        'sub': 'The feature set is where we want it. From 2.1.0 on, APRSLocus enters a maintenance-first, stable phase — plus one small easter egg hidden on the About page.',
+        'kicker': '⚠️ Do not update to 2.2.0',
+        'title': 'The 2.2.0 build on the Qingling channel is a test package released by mistake',
+        'en': 'do not update on Qingling',
+        'sub': 'A 2.2.0 build has appeared on the Qingling channel. It is a test package released by mistake. If you already installed it, uninstall 2.2.0 first, then install 2.1.5. We are working with the Qingling mirror service on this.',
     },
 }
 

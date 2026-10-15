@@ -18,9 +18,19 @@ v2.1.0 已经正式推送。这一版把该收的尾都收了，功能日臻完�
 
 ---
 
+## 🌐 中文资料站：aprsnet.cn
+
+这些年写客户端时攒下的中文资料，现在有了自己的地方：**[aprsnet.cn](https://aprsnet.cn/)**。
+
+站上讲清楚 APRS 是什么，也讲信标参数怎么填、一条报文里每段是什么意思。还有一份[官方 TOCALL 查询](https://aprsnet.cn/tocall.html)：粘一整行报文进去，看对面是什么设备。APRS-IS 的中文文档也[收在文档页](https://aprsnet.cn/docs.html)。
+
+这一站和客户端由同一个作者维护。站是独立的，只管中文资料和查询工具，客户端的更新还是以这边为准。
+
+---
+
 ## 📮 想听听你的声音
 
-APRSLocus 已经陪 420+ 位用户走过一段路。下一步往哪儿走，我们想听你说：哪里别扭、还缺什么、最该先修的是哪一个。
+APRSLocus 已经陪 510+ 位用户走过一段路。下一步往哪儿走，我们想听你说：哪里别扭、还缺什么、最该先修的是哪一个。
 
 **[点击进入调查问卷](https://ccncqe00x1e4.feishu.cn/share/base/form/shrcnWcCKNxzSMvlGP54DCrnAZg)**
 

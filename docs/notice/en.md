@@ -18,9 +18,19 @@ The rest is yours to see.
 
 ---
 
+## 🌐 A Chinese reference site: aprsnet.cn
+
+The Chinese notes gathered while building this client now have a home of their own: **[aprsnet.cn](https://aprsnet.cn/)**.
+
+It explains what APRS is, how to fill in beacon settings, and what each part of a packet means. It also carries an [official TOCALL lookup](https://aprsnet.cn/tocall.html): paste a whole packet line and see what the other station is running. The Chinese APRS-IS documentation is [collected there](https://aprsnet.cn/docs.html) too.
+
+Both the site and the app are kept by the same author. The site stands on its own: it holds the Chinese reference material and the lookup tools, while app updates still come from here.
+
+---
+
 ## 📮 We would like to hear from you
 
-APRSLocus has walked a while with 420+ users now. Where it goes next is partly your call: what feels awkward, what is missing, what we should fix first.
+APRSLocus has walked a while with 510+ users now. Where it goes next is partly your call: what feels awkward, what is missing, what we should fix first.
 
 **[Take the survey](https://ccncqe00x1e4.feishu.cn/share/base/form/shrcnWcCKNxzSMvlGP54DCrnAZg)**
 

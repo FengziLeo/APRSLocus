@@ -41,9 +41,14 @@ class Gpx {
   /// [days] 不必有序（`loadAll()` 给的是倒序，调用方传进来什么就按什么顺序写，
   /// 但内部按 `day` 升序排一次 —— 文件里日期从早到晚更好读）。
   /// [now] 只用于 `<metadata><time>`，测试里固定住它才有可比的输出。
+  /// 一个点都没有的那天不写进去（见下面的 `used`）。
   static String encode(List<DayTrack> days, {DateTime? now}) {
     final sorted = List<DayTrack>.from(days)
       ..sort((a, b) => a.day.compareTo(b.day));
+    // 一个点都没有的那天不写进文件：空的 `<trk>` 在 Strava / Google Earth
+    // 里会多出一条零长度行程。metadata 的日期也只用真有轨迹的那些天 ——
+    // 否则文件头写着「14 到 16」，里面却只有 15 与 16 两条。
+    final used = sorted.where((d) => d.points.isNotEmpty).toList();
     final b = StringBuffer()
       ..writeln('<?xml version="1.0" encoding="UTF-8"?>')
       ..writeln(
@@ -55,16 +60,15 @@ class Gpx {
         ' http://www.topografix.com/GPX/1/1/gpx.xsd">',
       );
 
-    final from = sorted.isEmpty ? null : sorted.first.day;
-    final to = sorted.isEmpty ? null : sorted.last.day;
+    final from = used.isEmpty ? null : used.first.day;
+    final to = used.isEmpty ? null : used.last.day;
     b
       ..writeln('  <metadata>')
       ..writeln('    <name>${_esc(_metaName(from, to))}</name>')
       ..writeln('    <time>${_isoUtc(now ?? DateTime.now())}</time>')
       ..writeln('  </metadata>');
 
-    for (final d in sorted) {
-      if (d.points.isEmpty) continue;
+    for (final d in used) {
       b
         ..writeln('  <trk>')
         ..writeln('    <name>${_esc(d.day)}</name>');

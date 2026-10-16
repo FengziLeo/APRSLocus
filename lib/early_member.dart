@@ -438,6 +438,7 @@ void _seedDefaults() {
     'BH2WIX': ['jadeGift'],
     'BI8AQ': ['sower'],
     'BG7QZC': ['jadeGift'],
+    'BH4HGA': ['jadeGift'],
   };
   _primariesCache = {
     'BG7LZQ': 'kaishan',
@@ -458,6 +459,7 @@ void _seedDefaults() {
     'BH2WIX': 'jadeGift',
     'BI8AQ': 'sower',
     'BG7QZC': 'jadeGift',
+    'BH4HGA': 'jadeGift',
   };
 }
 

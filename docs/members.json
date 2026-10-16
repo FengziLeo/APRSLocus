@@ -1,6 +1,6 @@
 {
-  "version": 65,
-  "updated": "2026-10-15",
+  "version": 66,
+  "updated": "2026-10-16",
   "developers": [
     {
       "call": "BG7LZQ",
@@ -1892,6 +1892,54 @@
         "zh": "琼琚虽微，长波可寄。",
         "zh-TW": "瓊琚雖微，長波可寄。",
         "en": "Small as the jade is, the long wave carries it far."
+      },
+      "tags": {
+        "zh": [
+          "馈赠支持",
+          "赞助"
+        ],
+        "zh-TW": [
+          "饋贈支持",
+          "贊助"
+        ],
+        "en": [
+          "Gift support",
+          "Sponsorship"
+        ]
+      },
+      "c": "#0EA5B7",
+      "grp": "support",
+      "honors": [
+        "jadeGift"
+      ],
+      "primary": "jadeGift"
+    },
+    {
+      "call": "BH4HGA",
+      "who": {
+        "zh": "BH4HGA",
+        "zh-TW": "BH4HGA",
+        "en": "BH4HGA"
+      },
+      "role": {
+        "zh": "赞助支持",
+        "zh-TW": "贊助支持",
+        "en": "Sponsorship support"
+      },
+      "brief": {
+        "zh": "以琼琚相赠，愿这束电波有去有回。",
+        "zh-TW": "以瓊琚相贈，願這束電波有去有回。",
+        "en": "Gifted with jade, so this signal may go out and come back."
+      },
+      "contrib": {
+        "zh": "馈赠支持 APRSlocus 的持续开发与运营，让这盏信标灯一直亮着。",
+        "zh-TW": "饋贈支持 APRSlocus 的持續開發與營運，讓這盞信標燈一直亮著。",
+        "en": "Gifted support for APRSlocus's ongoing development and operation, keeping the beacon lit."
+      },
+      "quote": {
+        "zh": "琼琚在手，回响不息。",
+        "zh-TW": "瓊琚在手，回響不息。",
+        "en": "Jade in hand — the echo goes on."
       },
       "tags": {
         "zh": [

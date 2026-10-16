@@ -32,7 +32,11 @@ class _StationsPageState extends State<StationsPage> {
   /// 刻意**不做持久化**：每次进入台站面板都默认回到台站列表，
   /// 不记忆上次选择（与需求一致）。
   bool _statsMode = false;
-  String _sort = 'call';
+
+  /// 排序方式存在 [AppState.stationSort]（落盘 + 进备份）：用户要求
+  /// 「排序按钮能记忆」—— 每次进面板都从头按呼号排很烦。
+  /// 这里只读，改动走 [AppState.setStationSort]。
+  String get _sort => widget.state.stationSort;
   final _searchCtrl = TextEditingController();
   Timer? _searchDebounce; // 搜索防抖：台站多时避免逐字重建列表
 
@@ -891,7 +895,9 @@ class _StationsPageState extends State<StationsPage> {
     };
     return PopupMenuButton<String>(
       initialValue: _sort,
-      onSelected: (v) => setState(() => _sort = v),
+      // setState 是为了**列表立刻重排**：本页只订阅台站数据流，AppState 的
+      // 通知不一定把这一页带起来。
+      onSelected: (v) => setState(() => widget.state.setStationSort(v)),
       offset: const Offset(0, 28),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(

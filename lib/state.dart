@@ -3329,6 +3329,17 @@ class AppState extends ChangeNotifier {
     _notify();
   }
 
+  /// 设置台站列表的排序方式（见 [stationSort]）。
+  ///
+  /// 非法值直接忽略：这颗入口只有四个选项，谁传进来的脏值都不该把列表排序弄成
+  /// 「按呼号升序」以外的第三种行为，更不该写进偏好文件。
+  void setStationSort(String v) {
+    if (!stationSorts.contains(v) || v == stationSort) return;
+    stationSort = v;
+    persist();
+    _notify();
+  }
+
   /// 设置自定义主题色
   void setThemeColor(String hex) {
     final v = hex.trim().replaceAll('#', '').toUpperCase();
@@ -3600,6 +3611,21 @@ class AppState extends ChangeNotifier {
   /// 糊成一片，所以原逻辑只在 `台站数 <= 60 || 缩放 >= 13` 时才画。
   /// 打开后忽略该阈值、**始终**绘制 —— 栅格与矢量两套地图共用。
   bool mapLabelsAlways = false;
+
+  /// 台站列表的排序方式（台站面板统计行右端那颗排序入口）。
+  ///
+  /// 取值 [stationSorts] 之一，认不出的值（改坏 / 将来改名字）一律回到 `call`。
+  /// 用户要求「排序要能记忆」—— 每次进面板都要重选一遍很烦，所以落盘、也进备份。
+  String stationSort = 'call';
+
+  /// [stationSort] 的合法取值（同时也是排序入口的菜单顺序）。
+  static const List<String> stationSorts = [
+    'call',
+    'recent',
+    'distance',
+    'status',
+  ];
+
   int maxStations = 100000; // 台站上限（默认无限制，可下调）
 
   /// 数据包列表上限（历史记录条数）。原先硬编码 200，偏少。
@@ -3868,6 +3894,7 @@ class AppState extends ChangeNotifier {
     filterRadius = 300;
     heatLevel = 1;
     mapLabelsAlways = false;
+    stationSort = 'call';
     maxStations = 100000;
     maxPackets = 2000;
     onlineWindowMin = 5;
@@ -4223,6 +4250,11 @@ class AppState extends ChangeNotifier {
       filterRadius = p.getInt('filterRadius') ?? filterRadius;
       heatLevel = (p.getInt('heatLevel') ?? heatLevel).clamp(0, 2);
       mapLabelsAlways = p.getBool('mapLabelsAlways') ?? mapLabelsAlways;
+      // 台站排序：认不出的值（改坏 / 旧版本号）回到默认的按呼号排
+      final savedSort = p.getString('stationSort');
+      if (savedSort != null && stationSorts.contains(savedSort)) {
+        stationSort = savedSort;
+      }
       maxStations = p.getInt('maxStations') ?? maxStations;
       maxPackets = p.getInt('maxPackets') ?? maxPackets;
       onlineWindowMin = p.getInt('onlineWindowMin') ?? onlineWindowMin;
@@ -4515,6 +4547,7 @@ class AppState extends ChangeNotifier {
     await p.setInt('filterRadius', filterRadius);
     await p.setInt('heatLevel', heatLevel);
     await p.setBool('mapLabelsAlways', mapLabelsAlways);
+    await p.setString('stationSort', stationSort);
     await p.setInt('maxStations', maxStations);
     await p.setInt('maxPackets', maxPackets);
     await p.setInt('onlineWindowMin', onlineWindowMin);

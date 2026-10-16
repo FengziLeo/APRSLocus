@@ -120,7 +120,8 @@ class _StationsPageState extends State<StationsPage> {
       builder: (context, _) {
         final st = widget.state;
         final list = _list(st);
-        // 横屏屏幕矮：隐藏统计框，避免头部过高溢出
+        // 横屏屏幕矮：统计行的四个计数藏起来省高度（统计面板那一档照旧），
+        // 但排序入口保留 —— 见下面的筛选行
         final landscape =
             MediaQuery.of(context).orientation == Orientation.landscape;
         return Padding(
@@ -215,8 +216,8 @@ class _StationsPageState extends State<StationsPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // 统计行
-                    if (!landscape)
+                    // 竖屏：统计行 + 排序入口一行，筛选行在下面。
+                    if (!landscape) ...[
                       Row(
                         children: [
                           _statMini(
@@ -243,9 +244,23 @@ class _StationsPageState extends State<StationsPage> {
                           _sortMenu(),
                         ],
                       ),
-                    if (!landscape) SizedBox(height: 6),
-                    // 筛选行：单行横向滚动 chips，即点即筛（不含 FMO）
-                    _chipBar(context),
+                      SizedBox(height: 6),
+                    ],
+                    // 筛选行：单行横向滚动 chips，即点即筛（不含 FMO）。
+                    //
+                    // 横屏屏幕矮，四个计数藏起来省一行高度；但**排序入口必须留下**
+                    // （用户报的「横屏下筛选按钮消失」）：它原本和计数挤在同一行，
+                    // 一起藏掉就等于横屏下改不了排序。改成把排序放在筛选行右端。
+                    if (landscape)
+                      Row(
+                        children: [
+                          Expanded(child: _chipBar(context)),
+                          const SizedBox(width: 8),
+                          _sortMenu(),
+                        ],
+                      )
+                    else
+                      _chipBar(context),
                   ],
                 ),
               ),

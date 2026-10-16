@@ -1,10 +1,8 @@
-# Do not update to 2.2.0 on the Qingling channel
+# The Qingling channel is back
 
-A 2.2.0 build has appeared on the Qingling channel. It is a test package released by mistake. Please do not update to it.
+The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-If you already installed it, uninstall 2.2.0 first, then install 2.1.5. 2.1.5 is the current release.
-
-We are working with the Qingling mirror service on this and will post an update here.
+Checking for updates now returns the latest stable version, 2.1.5. If you installed 2.2.0, uninstall it first, then install 2.1.5.
 
 **[Download 2.1.5](https://aprslocushk.oss.theez.top/APRSLocus_2.1.5.apk)**
 

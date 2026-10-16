@@ -46,8 +46,30 @@ class MainActivity : FlutterActivity() {
     // 这次要读的字节上限。由 Dart 传进来：图标 2MB、背景图 8MB ——
     // 上限必须**在读之前**就知道，否则大文件照样会把内存吃爆。
     private var pickMaxBytes = MAX_ICON_BYTES
+
+    /// 导出文件写「公共下载目录」的权限请求（Android 9 及以下）。
+    ///
+    /// 单独的 requestCode：`onRequestPermissionsResult` 按 code 分派，
+    /// 与定位（100）/ 计步（200）/ 蓝牙（各自）混用会让两边同时命中、
+    /// 把对方还没完成的 Result 误 resolve。
+    private var pendingLegacyExport: PendingExport? = null
+
+    /// 一次待落盘的导出（Android 9 及以下：拿到存储权限后再写）。
+    ///
+    /// [content] / [bytes] 二选一：文本导出（ADIF / GPX / 备份）给前者，二进制
+    /// （WAV）给后者。两者「先要权限、拿到再写」的时机完全一样，所以共用这一条
+    /// 暂存路径，别各写一套。
+    private class PendingExport(
+        val result: MethodChannel.Result,
+        val filename: String,
+        val mime: String,
+        val content: String?,
+        val bytes: ByteArray?
+    )
+
     private companion object {
         const val REQ_PICK_BACKUP = 4711
+        const val EXPORT_PERM_CODE = 4712
 
         // 备份文本上限：读进来要整体转成 String 传给 Dart，
         // 不设上限的话一个误选的几个 G 的文件就能把应用 OOM 掉。
@@ -641,15 +663,15 @@ class MainActivity : FlutterActivity() {
                 "saveToDownloads" -> {
                     val filename = call.argument<String>("filename") ?: "export.adi"
                     val content = call.argument<String>("content") ?: ""
-                    // 备份是 application/json，ADIF/音频保持 text/plain。
+                    // 备份是 application/json，ADIF/GPX/音频保持 text/plain。
                     // 不能都写 text/plain：部分系统会据此给文件名追加 .txt。
                     val mime = call.argument<String>("mimeType") ?: "text/plain"
-                    val path = saveToDownloads(filename, content, mime)
-                    if (path == null) {
-                        result.error("SAVE_FAILED", "保存失败", null)
-                    } else {
-                        result.success(path)
-                    }
+                    // Android 9 及以下：没有 MediaStore，写**公共**下载目录要
+                    // WRITE_EXTERNAL_STORAGE。先要权限，拿到后再真正落盘 ——
+                    // 不能「没权限就当失败」：那等于旧机器上导出功能直接不可用。
+                    startExport(
+                        PendingExport(result, filename, mime, content = content, bytes = null)
+                    )
                 }
                 // 音频 WAV 导出：二进制不能走 saveToDownloads（那条按 UTF-8 写文本）
                 "saveBytesToDownloads" -> {
@@ -667,14 +689,22 @@ class MainActivity : FlutterActivity() {
                         if (bytes == null) {
                             result.error("BAD_DATA", "文件内容解码失败", null)
                         } else {
-                            val path = saveBytesToDownloads(filename, bytes, mime)
-                            if (path == null) {
-                                result.error("SAVE_FAILED", "保存失败", null)
-                            } else {
-                                result.success(path)
-                            }
+                            // 音频也走同一条「先要权限」的路：否则旧机器上会悄悄
+                            // 落到应用私有目录，照着提示去找却找不到。
+                            startExport(
+                                PendingExport(
+                                    result, filename, mime, content = null, bytes = bytes
+                                )
+                            )
                         }
                     }
+                }
+                // 导出后直接分享：同一份文本当文件交给系统分享面板
+                "shareFile" -> {
+                    val filename = call.argument<String>("filename") ?: "export.gpx"
+                    val content = call.argument<String>("content") ?: ""
+                    val mime = call.argument<String>("mimeType") ?: "text/plain"
+                    result.success(shareFileTo(filename, content, mime))
                 }
                 // 备份导入：拉起系统文件选择器，返回 {name, content}
                 // 用户取消返回 null；文件过大 / 读失败走 error
@@ -829,8 +859,10 @@ class MainActivity : FlutterActivity() {
     ///
     /// - Android 10（API 29）及以上：走 MediaStore，**无需任何存储权限**
     ///   （应用向 Downloads 集合插入自己的内容不需要 WRITE_EXTERNAL_STORAGE）。
-    /// - Android 9 及以下：写入应用的外部私有目录（同样无需权限；
-    ///   在那些系统版本上该目录可被文件管理器直接浏览）。
+    /// - Android 9 及以下：写入**公共**的「下载」目录（用户要求「放在文件
+    ///   目录，可以公共读」）。这是唯一一处需要 WRITE_EXTERNAL_STORAGE 的
+    ///   地方，且只在 24~28 上要（调用方已先要权限，见 `saveToDownloads`
+    ///   那条通道的分派）。
     private fun saveToDownloads(
         filename: String,
         content: String,
@@ -838,6 +870,42 @@ class MainActivity : FlutterActivity() {
     ): String? = saveToDownloads(filename, mime) {
         it.write(content.toByteArray(Charsets.UTF_8))
     }
+
+    /// 落盘一次导出：旧系统上先要存储权限（拿到后由 `onRequestPermissionsResult`
+    /// 补做），其余情况直接写。
+    private fun startExport(job: PendingExport) {
+        if (needsLegacyStorage()) {
+            pendingLegacyExport = job
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                EXPORT_PERM_CODE,
+            )
+        } else {
+            finishExport(job)
+        }
+    }
+
+    /// 把一次导出落盘并回给 Dart（权限到手 / 不需要权限时都走这里）。
+    private fun finishExport(job: PendingExport) {
+        val bin = job.bytes
+        val path = if (bin != null) {
+            saveBytesToDownloads(job.filename, bin, job.mime)
+        } else {
+            saveToDownloads(job.filename, job.content ?: "", job.mime)
+        }
+        if (path == null) {
+            job.result.error("SAVE_FAILED", "保存失败", null)
+        } else {
+            job.result.success(path)
+        }
+    }
+
+    /// 是否需要先要 WRITE_EXTERNAL_STORAGE：只有 Android 9 及以下写公共目录才要。
+    private fun needsLegacyStorage(): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
+            checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+            PackageManager.PERMISSION_GRANTED
 
     /// 二进制版本（音频 WAV 导出用）。
     ///
@@ -863,6 +931,11 @@ class MainActivity : FlutterActivity() {
     ): String? {
         // 文件名来自 Dart，做一次净化，避免路径穿越
         val safe = filename.replace('/', '_').replace('\\', '_')
+        // 音频 WAV 属于音乐/音频类型：放进 Downloads 的 Audio 子目录更整齐，
+        // 也让系统文件管理器的分类视图能直接找到（导出后要能一眼找到，
+        // 才能拿它去给 Direwolf / 电台解）。两个分支（MediaStore / 旧版公共
+        // 目录）都要用，所以判断提到 if 外面，避免两处各写一遍走偏。
+        val isAudio = safe.lowercase().endsWith(".wav")
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val values = ContentValues().apply {
@@ -870,10 +943,6 @@ class MainActivity : FlutterActivity() {
                     put(MediaStore.MediaColumns.MIME_TYPE, mime)
                 }
                 val resolver = contentResolver
-                // 音频 WAV 属于音乐/音频类型：放进 Downloads 的 Audio 子目录更整齐，
-                // 也让系统文件管理器的分类视图能直接找到（导出后要能一眼找到，
-                // 才能拿它去给 Direwolf / 电台解）。
-                val isAudio = safe.lowercase().endsWith(".wav")
                 values.put(
                     MediaStore.MediaColumns.RELATIVE_PATH,
                     if (isAudio) {
@@ -915,10 +984,34 @@ class MainActivity : FlutterActivity() {
                     "Download/$safe"
                 }
             } else {
-                val dir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: filesDir
-                val f = File(dir, safe)
-                f.outputStream().use { write(it) }
-                f.absolutePath
+                // Android 9 及以下：没有 MediaStore，直接写**公共**下载目录。
+                // 用户要求「放在文件目录，可以公共读」：私有目录（以前的写法）
+                // 文件管理器里根本看不到，等于导出完找不到。写公共目录需要
+                // WRITE_EXTERNAL_STORAGE，调用方已先要过权限（见导出通道那条分派）。
+                val pub = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS
+                )
+                val dir = if (isAudio) File(pub, "APRSlocusAudio") else pub
+                val wrote = if (dir.exists() || dir.mkdirs()) {
+                    try {
+                        File(dir, safe).outputStream().use { write(it) }
+                        true
+                    } catch (_: Exception) {
+                        false
+                    }
+                } else {
+                    false
+                }
+                if (wrote) {
+                    if (isAudio) "Download/APRSlocusAudio/$safe" else "Download/$safe"
+                } else {
+                    // 拿不到权限 / 建不出目录时退回应用私有目录：
+                    // 宁可用户要多找一步，也不要「导出直接失败」。
+                    val priv = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: filesDir
+                    val f = File(priv, safe)
+                    f.outputStream().use { write(it) }
+                    f.absolutePath
+                }
             }
         } catch (_: Exception) {
             null
@@ -949,6 +1042,29 @@ class MainActivity : FlutterActivity() {
         } catch (_: Exception) {
             // 无可用分享目标时静默失败
         }
+    }
+
+    /// 系统分享面板（文件版）：把导出内容写进 cacheDir/share/，以 FileProvider
+    /// 的 content:// URI 交给其他 App（微信 / QQ / 邮件 / 网盘）。
+    ///
+    /// 为什么不能直接分享 file://：Android 7 起应用向外发 file:// 会抛
+    /// FileUriExposedException，应用当场崩溃。必须走 FileProvider。
+    /// 返回是否真的拉起了分享面板（没有可用目标时回 false，让 UI 如实提示）。
+    private fun shareFileTo(filename: String, content: String, mime: String): Boolean = try {
+        val safe = filename.replace('/', '_').replace('\\', '_')
+        val dir = File(cacheDir, "share").apply { mkdirs() }
+        val f = File(dir, safe)
+        f.writeBytes(content.toByteArray(Charsets.UTF_8))
+        val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", f)
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = mime
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(send, "分享 APRSlocus"))
+        true
+    } catch (_: Exception) {
+        false
     }
 
     /// 冷启动的分享入口。
@@ -1135,6 +1251,15 @@ class MainActivity : FlutterActivity() {
         gps?.onRequestPermissionsResult(requestCode, grantResults)
         audio?.onRequestPermissionsResult(requestCode, grantResults)
         bleHr?.onRequestPermissionsResult(requestCode, grantResults)
+        // 导出落盘的存储权限（仅 Android 9 及以下会走到这里）：拿到权限后把
+        // 暂存的这次导出补做完。无论允许还是拒绝都要回一次 Result ——
+        // 拒绝时 saveToDownloads 会退到私有目录，导出仍然成功，不会被卡住。
+        if (requestCode == EXPORT_PERM_CODE) {
+            val pending = pendingLegacyExport
+            pendingLegacyExport = null
+            if (pending != null) finishExport(pending)
+            return
+        }
         if (requestCode != 100) return
         val ok = hasPermissions()
         permCompleter?.success(ok)

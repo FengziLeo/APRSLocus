@@ -196,9 +196,11 @@ class _TrackHistoryPageState extends State<TrackHistoryPage> {
       return;
     }
 
+    final name = Gpx.fileName(fromDay, toDay);
+    final xml = Gpx.encode(days);
     final path = await backup_io.saveBackupFile(
-      Gpx.fileName(fromDay, toDay),
-      Gpx.encode(days),
+      name,
+      xml,
       mimeType: 'application/gpx+xml',
     );
     if (!mounted) return;
@@ -212,6 +214,18 @@ class _TrackHistoryPageState extends State<TrackHistoryPage> {
               ? loc.gpxExportFailed
               : '${loc.gpxExported(nDays, nPoints)}\n${loc.gpxSavedTo(path)}',
         ),
+        // 落盘之后还能直接分享出去：只躺在「下载」目录里，用户还得自己去
+        // 文件管理器翻一遍再发给别人，这一步能省则省。
+        action: backup_io.shareToSystemSupported
+            ? SnackBarAction(
+                label: loc.shareToSystem,
+                onPressed: () => backup_io.shareTextFile(
+                  name,
+                  xml,
+                  mimeType: 'application/gpx+xml',
+                ),
+              )
+            : null,
       ),
     );
   }

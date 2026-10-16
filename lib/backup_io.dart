@@ -187,6 +187,32 @@ Future<String?> saveBackupFile(
   }
 }
 
+/// 把导出文本交给系统分享面板（微信 / QQ / 邮件 / 网盘…）。
+///
+/// 只有 Android 有：原生把内容写进 cacheDir/share/ 再经 FileProvider 分享
+/// （Android 7 起直接发 file:// 会崩）。桌面/Web 回 false，UI 据此不显示按钮。
+Future<bool> shareTextFile(
+  String filename,
+  String content, {
+  String mimeType = 'text/plain',
+}) async {
+  if (defaultTargetPlatform != TargetPlatform.android) return false;
+  try {
+    final r = await _exportChannel.invokeMethod<bool>('shareFile', {
+      'filename': filename,
+      'content': content,
+      'mimeType': mimeType,
+    });
+    return r == true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/// 当前平台有没有系统分享面板（决定导出提示里要不要出那个按钮）。
+bool get shareToSystemSupported =>
+    defaultTargetPlatform == TargetPlatform.android;
+
 /// 读取本机全部历史轨迹（原始按天 JSON：`day → DayTrack.toJson()`），
 /// 供导出时拼入备份。存储未就绪（初始化失败）时返回空表，导出照常进行。
 Future<Map<String, Object?>> loadTrackDays() =>

@@ -62,19 +62,19 @@ HEAD = {
         'kicker': '✅ 通道已恢复',
         'title': '清零通道已恢复，误发的 2.2.0 已下架',
         'en': 'Qingling channel restored',
-        'sub': 'Qingling（清零）渠道上误发的 2.2.0 已经下架，通道恢复正常。现在检查更新会拿到最新正式版 2.1.5。之前装过 2.2.0 的话，请先卸载 2.2.0，再安装 2.1.5。',
+        'sub': 'Qingling（清零）渠道上误发的 2.2.0 已经下架，通道恢复正常。现在检查更新会拿到最新正式版 2.1.6。之前装过 2.2.0 的话，请先卸载 2.2.0，再安装 2.1.6。',
     },
     'zh_TW': {
         'kicker': '✅ 管道已恢復',
         'title': '清零通道已恢復，誤發的 2.2.0 已下架',
         'en': 'Qingling channel restored',
-        'sub': 'Qingling（清零）管道上誤發的 2.2.0 已經下架，管道恢復正常。現在檢查更新會拿到最新正式版 2.1.5。之前裝過 2.2.0 的話，請先卸載 2.2.0，再安裝 2.1.5。',
+        'sub': 'Qingling（清零）管道上誤發的 2.2.0 已經下架，管道恢復正常。現在檢查更新會拿到最新正式版 2.1.6。之前裝過 2.2.0 的話，請先卸載 2.2.0，再安裝 2.1.6。',
     },
     'en': {
         'kicker': '✅ Channel restored',
         'title': 'The Qingling channel is back, the mistaken 2.2.0 is gone',
         'en': 'Qingling channel restored',
-        'sub': 'The 2.2.0 build published on the Qingling channel by mistake has been taken down, and the channel works normally again. Checking for updates now returns the latest stable version, 2.1.5. If you installed 2.2.0, uninstall it first, then install 2.1.5.',
+        'sub': 'The 2.2.0 build published on the Qingling channel by mistake has been taken down, and the channel works normally again. Checking for updates now returns the latest stable version, 2.1.6. If you installed 2.2.0, uninstall it first, then install 2.1.6.',
     },
 }
 

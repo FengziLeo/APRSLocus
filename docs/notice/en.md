@@ -2,9 +2,9 @@
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-Checking for updates now returns the latest stable version, 2.1.5. If you installed 2.2.0, uninstall it first, then install 2.1.5.
+Checking for updates now returns the latest stable version, 2.1.6. If you installed 2.2.0, uninstall it first, then install 2.1.6.
 
-**[Download 2.1.5](https://aprslocushk.oss.theez.top/APRSLocus_2.1.5.apk)**
+**[Download 2.1.6](https://github.com/dariondong/APRSLocus/releases/download/v2.1.6/APRSLocus_2.1.6.apk)**
 
 ---
 

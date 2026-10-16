@@ -2,9 +2,9 @@
 
 Qingling（清零）管道上誤發的 2.2.0 已經下架，管道恢復正常。
 
-現在檢查更新會拿到最新正式版 2.1.5。之前裝過 2.2.0 的話，請先卸載 2.2.0，再安裝 2.1.5。
+現在檢查更新會拿到最新正式版 2.1.6。之前裝過 2.2.0 的話，請先卸載 2.2.0，再安裝 2.1.6。
 
-**[下載 2.1.5](https://aprslocushk.oss.theez.top/APRSLocus_2.1.5.apk)**
+**[下載 2.1.6](https://github.com/dariondong/APRSLocus/releases/download/v2.1.6/APRSLocus_2.1.6.apk)**
 
 ---
 

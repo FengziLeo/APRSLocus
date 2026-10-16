@@ -4145,5 +4145,18 @@
   "partners": "Mitra",
   "partnerAprsnetCnDesc": "Beacon tak berhenti, gema tak pernah padam",
   "serverMissing": "Belum diisi",
-  "serverMissingWarning": "Alamat server belum diisi · APRS-IS tidak bisa dihubungi, isi dulu sebelum menyambung"
+  "serverMissingWarning": "Alamat server belum diisi · APRS-IS tidak bisa dihubungi, isi dulu sebelum menyambung",
+  "historyExportGpx": "Ekspor GPX",
+  "gpxRangeTitle": "Pilih rentang waktu",
+  "gpxRangeToday": "Hari ini",
+  "gpxRangeWeek": "7 hari terakhir",
+  "gpxRangeMonth": "30 hari terakhir",
+  "gpxRangeYear": "1 tahun terakhir",
+  "gpxRangeCustom": "Rentang khusus",
+  "gpxRangeEmpty": "Tidak ada titik jejak di rentang ini.",
+  "gpxExported": "Mengekspor {days} hari, {points} titik jejak",
+  "gpxExportFailed": "Ekspor gagal. Periksa izin penyimpanan atau ruang kosong.",
+  "gpxSavedTo": "Disimpan ke: {path}",
+  "@gpxExported": {"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}},
+  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}}
 }

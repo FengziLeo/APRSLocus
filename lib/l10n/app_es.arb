@@ -4145,5 +4145,18 @@
   "partners": "Socios",
   "partnerAprsnetCnDesc": "El balizamiento no se detiene, el eco no se apaga",
   "serverMissing": "Sin configurar",
-  "serverMissingWarning": "Falta la dirección del servidor · no se puede conectar a APRS-IS, escribe una antes de conectar"
+  "serverMissingWarning": "Falta la dirección del servidor · no se puede conectar a APRS-IS, escribe una antes de conectar",
+  "historyExportGpx": "Exportar GPX",
+  "gpxRangeTitle": "Elige el intervalo",
+  "gpxRangeToday": "Hoy",
+  "gpxRangeWeek": "Últimos 7 días",
+  "gpxRangeMonth": "Últimos 30 días",
+  "gpxRangeYear": "Último año",
+  "gpxRangeCustom": "Intervalo personalizado",
+  "gpxRangeEmpty": "No hay puntos de traza en este intervalo.",
+  "gpxExported": "Exportados {days} día(s), {points} punto(s)",
+  "gpxExportFailed": "Falló la exportación: revisa el permiso de almacenamiento o el espacio libre.",
+  "gpxSavedTo": "Guardado en: {path}",
+  "@gpxExported": {"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}},
+  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}}
 }

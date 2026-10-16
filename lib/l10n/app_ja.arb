@@ -4145,5 +4145,18 @@
   "partners": "パートナー",
   "partnerAprsnetCnDesc": "ビーコンは止まらず、こだまは消えない",
   "serverMissing": "未設定",
-  "serverMissingWarning": "サーバーアドレスが未入力 · APRS-IS に接続できません。先に入力してから接続してください"
+  "serverMissingWarning": "サーバーアドレスが未入力 · APRS-IS に接続できません。先に入力してから接続してください",
+  "historyExportGpx": "GPX を書き出す",
+  "gpxRangeTitle": "書き出す期間を選ぶ",
+  "gpxRangeToday": "今日",
+  "gpxRangeWeek": "過去 7 日間",
+  "gpxRangeMonth": "過去 30 日間",
+  "gpxRangeYear": "過去 1 年",
+  "gpxRangeCustom": "期間を指定",
+  "gpxRangeEmpty": "この期間に軌跡点がありません。",
+  "gpxExported": "{days} 日分・{points} 点を書き出しました",
+  "gpxExportFailed": "書き出しに失敗しました。ストレージの権限や空き容量を確認してください。",
+  "gpxSavedTo": "保存先：{path}",
+  "@gpxExported": {"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}},
+  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}}
 }

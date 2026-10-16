@@ -16506,6 +16506,72 @@ abstract class AppLocalizations {
   /// **'服务器地址没填 · 连不上 APRS-IS，先填一个服务器地址再连接'**
   String get serverMissingWarning;
 
+  /// No description provided for @historyExportGpx.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出 GPX'**
+  String get historyExportGpx;
+
+  /// No description provided for @gpxRangeTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择要导出的时间范围'**
+  String get gpxRangeTitle;
+
+  /// No description provided for @gpxRangeToday.
+  ///
+  /// In zh, this message translates to:
+  /// **'今天'**
+  String get gpxRangeToday;
+
+  /// No description provided for @gpxRangeWeek.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近 7 天'**
+  String get gpxRangeWeek;
+
+  /// No description provided for @gpxRangeMonth.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近 30 天'**
+  String get gpxRangeMonth;
+
+  /// No description provided for @gpxRangeYear.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近 1 年'**
+  String get gpxRangeYear;
+
+  /// No description provided for @gpxRangeCustom.
+  ///
+  /// In zh, this message translates to:
+  /// **'自定义时间'**
+  String get gpxRangeCustom;
+
+  /// No description provided for @gpxRangeEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'这个范围里没有轨迹点。'**
+  String get gpxRangeEmpty;
+
+  /// No description provided for @gpxExported.
+  ///
+  /// In zh, this message translates to:
+  /// **'已导出 {days} 天 · {points} 个轨迹点'**
+  String gpxExported(String days, String points);
+
+  /// No description provided for @gpxExportFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出失败，请检查存储权限或剩余空间'**
+  String get gpxExportFailed;
+
+  /// No description provided for @gpxSavedTo.
+  ///
+  /// In zh, this message translates to:
+  /// **'已保存到：{path}'**
+  String gpxSavedTo(String path);
+
 }
 
 class _AppLocalizationsDelegate

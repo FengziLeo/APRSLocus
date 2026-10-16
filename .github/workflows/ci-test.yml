@@ -316,6 +316,12 @@ jobs:
       - name: Test stations sort persistence
         run: flutter test test/stations_sort_persist_test.dart
 
+      # 历史轨迹导出 GPX（用户要求）：GPX 是**给别人读的文件**，时间少个 Z、
+      # 海拔补个 0、断档不断段，在这里都不会报错 —— 只有导进 Strava / Garmin /
+      # Google Earth 之后才看得见。所以把这几条意图逐字钉在 CI。
+      - name: Test GPX export
+        run: flutter test test/gpx_test.dart
+
       # 备份/恢复（含 v2.0.39 的历史轨迹拼入）：导出/导入错了不会编译失败、
       # analyze 也全绿，只会在用户换机那天才发现「少了东西」。轨迹载荷尤其
       # 不能落进偏好白名单，否则一份伪造 JSON 就能改任意偏好。

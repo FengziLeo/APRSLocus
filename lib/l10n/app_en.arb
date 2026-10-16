@@ -4145,5 +4145,18 @@
   "partners": "Partners",
   "partnerAprsnetCnDesc": "Beacons keep going, echoes keep answering",
   "serverMissing": "Not set",
-  "serverMissingWarning": "No server address set · APRS-IS cannot be reached, fill one in before connecting"
+  "serverMissingWarning": "No server address set · APRS-IS cannot be reached, fill one in before connecting",
+  "historyExportGpx": "Export GPX",
+  "gpxRangeTitle": "Choose a time range",
+  "gpxRangeToday": "Today",
+  "gpxRangeWeek": "Last 7 days",
+  "gpxRangeMonth": "Last 30 days",
+  "gpxRangeYear": "Last year",
+  "gpxRangeCustom": "Custom range",
+  "gpxRangeEmpty": "No track points in this range.",
+  "gpxExported": "Exported {days} day(s), {points} track point(s)",
+  "gpxExportFailed": "Export failed. Check storage permission or free space.",
+  "gpxSavedTo": "Saved to: {path}",
+  "@gpxExported": {"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}},
+  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}}
 }

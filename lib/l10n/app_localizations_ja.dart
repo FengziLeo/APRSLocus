@@ -9176,4 +9176,37 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get serverMissingWarning => "サーバーアドレスが未入力 · APRS-IS に接続できません。先に入力してから接続してください";
 
+  @override
+  String get historyExportGpx => "GPX を書き出す";
+
+  @override
+  String get gpxRangeTitle => "書き出す期間を選ぶ";
+
+  @override
+  String get gpxRangeToday => "今日";
+
+  @override
+  String get gpxRangeWeek => "過去 7 日間";
+
+  @override
+  String get gpxRangeMonth => "過去 30 日間";
+
+  @override
+  String get gpxRangeYear => "過去 1 年";
+
+  @override
+  String get gpxRangeCustom => "期間を指定";
+
+  @override
+  String get gpxRangeEmpty => "この期間に軌跡点がありません。";
+
+  @override
+  String gpxExported(String days, String points) => "$days 日分・$points 点を書き出しました";
+
+  @override
+  String get gpxExportFailed => "書き出しに失敗しました。ストレージの権限や空き容量を確認してください。";
+
+  @override
+  String gpxSavedTo(String path) => "保存先：$path";
+
 }

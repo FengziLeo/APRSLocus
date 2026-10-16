@@ -9465,4 +9465,37 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get serverMissingWarning => "Alamat server belum diisi · APRS-IS tidak bisa dihubungi, isi dulu sebelum menyambung";
 
+  @override
+  String get historyExportGpx => "Ekspor GPX";
+
+  @override
+  String get gpxRangeTitle => "Pilih rentang waktu";
+
+  @override
+  String get gpxRangeToday => "Hari ini";
+
+  @override
+  String get gpxRangeWeek => "7 hari terakhir";
+
+  @override
+  String get gpxRangeMonth => "30 hari terakhir";
+
+  @override
+  String get gpxRangeYear => "1 tahun terakhir";
+
+  @override
+  String get gpxRangeCustom => "Rentang khusus";
+
+  @override
+  String get gpxRangeEmpty => "Tidak ada titik jejak di rentang ini.";
+
+  @override
+  String gpxExported(String days, String points) => "Mengekspor $days hari, $points titik jejak";
+
+  @override
+  String get gpxExportFailed => "Ekspor gagal. Periksa izin penyimpanan atau ruang kosong.";
+
+  @override
+  String gpxSavedTo(String path) => "Disimpan ke: $path";
+
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'backup_io.dart' if (dart.library.html) 'backup_io_web.dart' as backup_io;
+import 'gpx.dart';
 import 'material.dart';
 import 'settings_widgets.dart';
 import 'state.dart';
@@ -91,6 +93,129 @@ class _TrackHistoryPageState extends State<TrackHistoryPage> {
     await _reload();
   }
 
+  // ── GPX 导出（用户要求：一天 / 1 周 / 1 个月 / 1 年 / 自定义时间）──
+  //
+  // 范围选的是**天**，所以直接按 `DayTrack.day`（`YYYY-MM-DD`）做字符串比较：
+  // 这种日期的字典序就是时间序，不用解析成 DateTime 再比。
+
+  /// 弹范围选择：今天 / 最近 7 天 / 最近 30 天 / 最近 1 年 / 自定义。
+  /// 回的是「往前多少天」（今天 = 1）或 `custom`。
+  Future<String?> _pickGpxRange() {
+    final s = S.of(context);
+    return showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) => MaterialSurface(
+        radius: 24,
+        topOnly: true,
+        child: Container(
+          decoration: BoxDecoration(
+            color: C.sheetFill,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 2),
+                child: Text(s.gpxRangeTitle, style: ts(16, w: FontWeight.w800)),
+              ),
+              _rangeRow(sheetCtx, '1', s.gpxRangeToday),
+              _rangeRow(sheetCtx, '7', s.gpxRangeWeek),
+              _rangeRow(sheetCtx, '30', s.gpxRangeMonth),
+              _rangeRow(sheetCtx, '365', s.gpxRangeYear),
+              _rangeRow(sheetCtx, 'custom', s.gpxRangeCustom),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _rangeRow(BuildContext ctx, String value, String label) =>
+      GestureDetector(
+        onTap: () => Navigator.pop(ctx, value),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          child: Row(
+            children: [
+              Expanded(child: Text(label, style: ts(14))),
+              Icon(Icons.chevron_right_rounded, size: 18, color: C.grey),
+            ],
+          ),
+        ),
+      );
+
+  Future<void> _exportGpx() async {
+    if (_days.isEmpty) return;
+    final picked = await _pickGpxRange();
+    if (picked == null || !mounted) return;
+
+    // 天数范围换算成首末两天（含首含末）。今天 = 只有今天这一天。
+    final today = DateTime.now();
+    var fromDay = TrackLogStore.dayKey(today);
+    var toDay = fromDay;
+    if (picked == 'custom') {
+      final first = DateTime(today.year - 5, today.month, today.day);
+      final range = await showDateRangePicker(
+        context: context,
+        firstDate: first,
+        lastDate: today,
+        initialDateRange: DateTimeRange(
+          start: today.subtract(const Duration(days: 6)),
+          end: today,
+        ),
+        helpText: S.of(context).gpxRangeTitle,
+      );
+      if (range == null || !mounted) return;
+      fromDay = TrackLogStore.dayKey(range.start);
+      toDay = TrackLogStore.dayKey(range.end);
+    } else {
+      final back = int.tryParse(picked) ?? 1;
+      fromDay = TrackLogStore.dayKey(
+        today.subtract(Duration(days: back - 1)),
+      );
+    }
+
+    final days = _days
+        .where(
+          (d) => d.day.compareTo(fromDay) >= 0 && d.day.compareTo(toDay) <= 0,
+        )
+        .toList();
+    var points = 0;
+    for (final d in days) {
+      points += d.count;
+    }
+    if (days.isEmpty || points == 0) {
+      final loc = S.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.gpxRangeEmpty)),
+      );
+      return;
+    }
+
+    final path = await backup_io.saveBackupFile(
+      Gpx.fileName(fromDay, toDay),
+      Gpx.encode(days),
+      mimeType: 'application/gpx+xml',
+    );
+    if (!mounted) return;
+    final loc = S.of(context);
+    final nDays = days.length.toString();
+    final nPoints = points.toString();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          path == null
+              ? loc.gpxExportFailed
+              : '${loc.gpxExported(nDays, nPoints)}\n${loc.gpxSavedTo(path)}',
+        ),
+      ),
+    );
+  }
+
   Future<void> _confirmClearAll() async {
     final s = S.of(context);
     final ok = await showDialog<bool>(
@@ -147,6 +272,20 @@ class _TrackHistoryPageState extends State<TrackHistoryPage> {
             _emptyCard()
           else ...[
             _summaryCard(),
+            const SizedBox(height: 10),
+            // 导出放在摘要卡下面、天列表上面：天一多就要滚很久才能到底，
+            // 把它和「清空全部」一起放在末尾的话，导出就变成「找不到的功能」。
+            OutlinedButton.icon(
+              onPressed: _exportGpx,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: C.green,
+                side: BorderSide(color: C.green.withValues(alpha: 0.4)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                textStyle: ts(13, w: FontWeight.w700),
+              ),
+              icon: const Icon(Icons.file_download_outlined, size: 17),
+              label: Text(S.of(context).historyExportGpx),
+            ),
             const SizedBox(height: 10),
             Row(
               children: [

@@ -9514,4 +9514,37 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get serverMissingWarning => "Falta la dirección del servidor · no se puede conectar a APRS-IS, escribe una antes de conectar";
 
+  @override
+  String get historyExportGpx => "Exportar GPX";
+
+  @override
+  String get gpxRangeTitle => "Elige el intervalo";
+
+  @override
+  String get gpxRangeToday => "Hoy";
+
+  @override
+  String get gpxRangeWeek => "Últimos 7 días";
+
+  @override
+  String get gpxRangeMonth => "Últimos 30 días";
+
+  @override
+  String get gpxRangeYear => "Último año";
+
+  @override
+  String get gpxRangeCustom => "Intervalo personalizado";
+
+  @override
+  String get gpxRangeEmpty => "No hay puntos de traza en este intervalo.";
+
+  @override
+  String gpxExported(String days, String points) => "Exportados $days día(s), $points punto(s)";
+
+  @override
+  String get gpxExportFailed => "Falló la exportación: revisa el permiso de almacenamiento o el espacio libre.";
+
+  @override
+  String gpxSavedTo(String path) => "Guardado en: $path";
+
 }

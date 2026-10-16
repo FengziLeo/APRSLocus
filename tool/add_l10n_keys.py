@@ -1020,10 +1020,57 @@ KEYS = {
         '(seluler / Wi-Fi) tidak punya satelit, dan sebagian perangkat atau ROM '
         'Android tidak melaporkan datanya.',
     ),
+    # ── 历史轨迹导出 GPX（用户要求：「历史轨迹页导出 GPX，一天 / 1 周 / 1 个月 /
+    # 1 年 / 自定义时间」）──
+    #
+    # 导出按钮自己一行文案，其余是范围选择弹层里的五个选项 + 结果提示。
+    'historyExportGpx': ('导出 GPX', '匯出 GPX', 'Export GPX',
+        'GPX を書き出す', 'Exportar GPX', 'Ekspor GPX'),
+    'gpxRangeTitle': (
+        '选择要导出的时间范围', '選擇要匯出的時間範圍', 'Choose a time range',
+        '書き出す期間を選ぶ', 'Elige el intervalo', 'Pilih rentang waktu'),
+    'gpxRangeToday': ('今天', '今天', 'Today', '今日', 'Hoy', 'Hari ini'),
+    'gpxRangeWeek': (
+        '最近 7 天', '最近 7 天', 'Last 7 days', '過去 7 日間', 'Últimos 7 días',
+        '7 hari terakhir'),
+    'gpxRangeMonth': (
+        '最近 30 天', '最近 30 天', 'Last 30 days', '過去 30 日間',
+        'Últimos 30 días', '30 hari terakhir'),
+    'gpxRangeYear': (
+        '最近 1 年', '最近 1 年', 'Last year', '過去 1 年', 'Último año',
+        '1 tahun terakhir'),
+    'gpxRangeCustom': (
+        '自定义时间', '自訂時間', 'Custom range', '期間を指定',
+        'Intervalo personalizado', 'Rentang khusus'),
+    # 空范围：不是「导出失败」—— 是这个范围里真没有点（例如刚从 2.1.5 装上）。
+    'gpxRangeEmpty': (
+        '这个范围里没有轨迹点。', '這個範圍裡沒有軌跡點。',
+        'No track points in this range.', 'この期間に軌跡点がありません。',
+        'No hay puntos de traza en este intervalo.',
+        'Tidak ada titik jejak di rentang ini.'),
+    'gpxExported': (
+        '已导出 {days} 天 · {points} 个轨迹点',
+        '已匯出 {days} 天 · {points} 個軌跡點',
+        'Exported {days} day(s), {points} track point(s)',
+        '{days} 日分・{points} 点を書き出しました',
+        'Exportados {days} día(s), {points} punto(s)',
+        'Mengekspor {days} hari, {points} titik jejak'),
+    'gpxExportFailed': (
+        '导出失败，请检查存储权限或剩余空间',
+        '匯出失敗，請檢查儲存權限或剩餘空間',
+        'Export failed. Check storage permission or free space.',
+        '書き出しに失敗しました。ストレージの権限や空き容量を確認してください。',
+        'Falló la exportación: revisa el permiso de almacenamiento o el espacio libre.',
+        'Ekspor gagal. Periksa izin penyimpanan atau ruang kosong.'),
+    'gpxSavedTo': (
+        '已保存到：{path}', '已儲存到：{path}', 'Saved to: {path}',
+        '保存先：{path}', 'Guardado en: {path}', 'Disimpan ke: {path}'),
 }
 
 # ── 占位符声明（可空）──
 META = {
+    'gpxExported': '{"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}}',
+    'gpxSavedTo': '{"placeholders": {"path": {"type": "String"}}}',
     'audioTxNotSourceWarn': '{"placeholders": {"src": {"type": "String"}}}',
     'prunePreview': '{"placeholders": {"n": {"type": "String"}}}',
     'pruneConfirm': '{"placeholders": {"n": {"type": "String"}, "m": {"type": "String"}}}',

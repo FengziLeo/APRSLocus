@@ -9075,6 +9075,39 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get serverMissingWarning => "服务器地址没填 · 连不上 APRS-IS，先填一个服务器地址再连接";
 
+  @override
+  String get historyExportGpx => "导出 GPX";
+
+  @override
+  String get gpxRangeTitle => "选择要导出的时间范围";
+
+  @override
+  String get gpxRangeToday => "今天";
+
+  @override
+  String get gpxRangeWeek => "最近 7 天";
+
+  @override
+  String get gpxRangeMonth => "最近 30 天";
+
+  @override
+  String get gpxRangeYear => "最近 1 年";
+
+  @override
+  String get gpxRangeCustom => "自定义时间";
+
+  @override
+  String get gpxRangeEmpty => "这个范围里没有轨迹点。";
+
+  @override
+  String gpxExported(String days, String points) => "已导出 $days 天 · $points 个轨迹点";
+
+  @override
+  String get gpxExportFailed => "导出失败，请检查存储权限或剩余空间";
+
+  @override
+  String gpxSavedTo(String path) => "已保存到：$path";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18146,5 +18179,38 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get serverMissingWarning => "伺服器位址沒填 · 連不上 APRS-IS，先填一個伺服器位址再連線";
+
+  @override
+  String get historyExportGpx => "匯出 GPX";
+
+  @override
+  String get gpxRangeTitle => "選擇要匯出的時間範圍";
+
+  @override
+  String get gpxRangeToday => "今天";
+
+  @override
+  String get gpxRangeWeek => "最近 7 天";
+
+  @override
+  String get gpxRangeMonth => "最近 30 天";
+
+  @override
+  String get gpxRangeYear => "最近 1 年";
+
+  @override
+  String get gpxRangeCustom => "自訂時間";
+
+  @override
+  String get gpxRangeEmpty => "這個範圍裡沒有軌跡點。";
+
+  @override
+  String gpxExported(String days, String points) => "已匯出 $days 天 · $points 個軌跡點";
+
+  @override
+  String get gpxExportFailed => "匯出失敗，請檢查儲存權限或剩餘空間";
+
+  @override
+  String gpxSavedTo(String path) => "已儲存到：$path";
 
 }

@@ -36,8 +36,6 @@ APRSLocus 已经陪 620+ 位用户走过一段路。下一步往哪儿走，我�
 
 ## 🎵 送你一首歌：启航的歌
 
-@video https://music.163.com/outchain/player?type=2&id=2162911948&auto=1&height=66
-
 @video https://player.bilibili.com/player.html?aid=1304817854&bvid=BV15M4m1k7YN&cid=1556315737&page=1
 
 ---

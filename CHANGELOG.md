@@ -1,5 +1,49 @@
 # 更新日志
 
+## [2.1.6] - 2026-10-16
+
+### 轨迹能导出，跟随有三态，横屏不再缺东西
+
+- **历史轨迹可以导出成 GPX**：今天、最近 7 天、30 天、1 年，或者自己挑一段起止时间。导出的
+  文件落在系统的「下载」目录里，导完可以直接分享出去，用别的软件打开就是一条条带时间的
+  轨迹点。挑的那段时间里没有轨迹的天会整条跳过，不写进文件。
+- **地图右侧的「跟随」改成三态**：关、锁定中心·正北朝上、锁定中心·航向朝上。要正北还是跟着
+  车头转，点一下就能换，不用进设置。
+- 台站页横屏下，**排序入口不再跟着统计行一起消失**。按哪个字段排也会记住，下次打开还是上次
+  选的那个，跟着备份一起走。
+- 自动上报那条横条开「详细档」时，**最左边会显示这一发真正要发出去的信标符号**。智能档按
+  速度换符号、纯网络定位单独指定的那一枚，都会跟着变，看到的就是地图上会出现的那个图标。
+- 启动时体检一次权限，**只说「本来有、现在被关掉」的那几项**，不去念一遍你从来没给过的权限。
+  定位权限被系统关掉时，前台服务声明失败也不会再把进程带走。
+- 横屏下地图画的那几层（轨迹、信标点、精度圈、热力图）**不再画到左侧卡片和底部横条底下**。
+  以前它们铺满整屏，卡片是磨砂的，蓝线就从卡片里透出来，看着像轨迹压住了卡片。
+
+---
+
+## [2.1.6] - 2026-10-16 (English)
+
+### Export the track, pick how the map follows, and landscape stops missing pieces
+
+- **History can be exported as GPX**: today, the last 7 days, 30 days, a year, or a range you
+  pick. The file lands in the system Downloads folder and can be shared straight away; any other
+  app that opens it gets the track as timestamped points. Days with no track inside the chosen
+  range are skipped whole.
+- **The map's follow button has three states**: off, locked centre with north up, and locked
+  centre with heading up. One tap switches between north and heading, no trip to settings.
+- On the stations page the sort entry no longer disappears with the statistics row in landscape,
+  and **the sort field is remembered** across launches, travelling with the backup.
+- With the reporting bar in detailed mode, **the leftmost item is the APRS symbol this beacon will
+  actually send**. Smart tiers change the symbol by speed and a network-only fix can have its own,
+  so what you see is the icon that shows up on the map.
+- **Permissions are checked once at startup**, naming only the ones that were there before and are
+  now off, never reciting permissions you never granted. A location permission switched off by the
+  system no longer takes the process down when the foreground service fails to start.
+- **In landscape the drawn layers** (track, beacon marks, accuracy ring, heat map) no longer paint
+  under the left card or the bottom bar. They used to fill the whole screen, and since the cards
+  are frosted the blue line showed through them, looking like the track was on top of the card.
+
+---
+
 ## [2.1.5] - 2026-10-15
 
 ### 地图跟着你走，连不上会告诉你为什么

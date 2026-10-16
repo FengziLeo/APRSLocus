@@ -419,6 +419,43 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.6', 'date': '2026-10-16',
+        'items': [
+            ('new',
+             T('**历史轨迹可以导出成 GPX**：今天、最近 7 天、30 天、1 年，或者自己挑一段起止'
+               '时间。导出的文件落在系统的「下载」目录里，导完可以直接分享出去，用别的软件'
+               '打开就是一条条带时间的轨迹点。',
+               '**歷史軌跡可以匯出成 GPX**：今天、最近 7 天、30 天、1 年，或者自己挑一段起止'
+               '時間。匯出的檔案落在系統的「下載」目錄裡，匯完可以直接分享出去，用別的軟體'
+               '打開就是一條條帶時間的軌跡點。',
+               '**History can be exported as GPX**: today, the last 7 days, 30 days, a year, or a '
+               'range you pick. The file lands in the system Downloads folder and can be shared '
+               'straight away; any other app that opens it gets the track as timestamped points.')),
+            ('new',
+             T('**地图右侧的「跟随」改成三态**：关、锁定中心·正北朝上、锁定中心·航向朝上，'
+               '点一下就能换。台站页横屏下的排序入口不再消失，按哪个字段排也会记住，跟着备份'
+               '一起走。',
+               '**地圖右側的「跟隨」改成三態**：關、鎖定中心·正北朝上、鎖定中心·航向朝上，'
+               '點一下就能換。臺站頁橫屏下的排序入口不再消失，按哪個欄位排也會記住，跟著備份'
+               '一起走。',
+               '**The follow button has three states**: off, locked centre with north up, and '
+               'locked centre with heading up, one tap apart. The stations page keeps its sort '
+               'entry in landscape, and the sort field is remembered with the backup.')),
+            ('fix',
+             T('横屏下地图画的轨迹、信标点、精度圈和热力图不再画到左侧卡片与底部横条底下（卡'
+               '片是磨砂的，以前蓝线就从卡片里透出来）；上报横条开详细档时，最左边会显示这一发'
+               '要发的信标符号；启动时体检一次权限，只说「本来有、现在被关掉」的那几项。',
+               '橫屏下地圖畫的軌跡、信標點、精度圈和熱力圖不再畫到左側卡片與底部橫條底下（卡'
+               '片是磨砂的，以前藍線就從卡片裡透出來）；上報橫條開詳細檔時，最左邊會顯示這一發'
+               '要發的信標符號；啟動時體檢一次權限，只說「本來有、現在被關掉」的那幾項。',
+               'In landscape the drawn track, beacon marks, accuracy ring and heat map no longer '
+               'paint under the left card or the bottom bar (the cards are frosted, so the blue '
+               'line used to show through them). The reporting bar now shows the symbol this '
+               'beacon will send, and permissions are checked once at startup, naming only the '
+               'ones that were there before and are now off.')),
+        ],
+    },
+    {
         'ver': 'v2.1.5', 'date': '2026-10-15',
         'items': [
             ('new',

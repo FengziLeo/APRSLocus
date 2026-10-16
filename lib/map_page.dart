@@ -94,14 +94,35 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   bool _showTracks = true;
   bool _heatEnabled = true; // 低缩放热力图开关
 
-  /// 锁定地图中心：开着时地图一直把**我的位置**摆在中心（用户要求
-  /// 「添加锁定地图中心按钮，我的位置自动居中」）。
+  /// 锁定地图中心的**三态**（用户要求把这一颗改成切换）：
+  /// 0 关（自由拖动）/ 1 锁定中心·正北朝上 / 2 锁定中心·航向朝上。
   ///
-  /// 与上面那颗「定位」的分工：定位是**跳一次**，锁定是**一直跟着** ——
+  /// 与上面那颗「定位」的分工不变：定位是**跳一次**，锁定是**一直跟着** ——
   /// 自己走动（或新定位点到达）时地图跟着走。两种动作会自动解锁：
   /// 拖地图（见下方 Listener）、点了某个台站要聚焦过去（见 [_handleViewFocus]）——
   /// 用户一动手就是要自己看，不该在下一帧被拽回中心。
-  bool _followMe = false;
+  int _followMode = 0;
+
+  /// 旧口径沿用：`> 0` 就是「锁定中心」。其余引用（拖一下解锁、矢量底图
+  /// 跟随）关心的只是「有没有锁」，不用跟着三态一起改。
+  bool get _followMe => _followMode > 0;
+
+  /// 航向朝上时的画布转角（弧度，顺时针为正 = -航向）。
+  ///
+  /// 由 [_rotCtrl] 平滑逼近目标角（定位每秒一帧，直接跳会抖）；同帧把
+  /// `cos/sin` 一并算好存着 —— `_toScreen` 每个台站每帧都要用，不能逐点算。
+  late final AnimationController _rotCtrl;
+  Tween<double> _rotTween = Tween<double>(begin: 0, end: 0);
+  double _rot = 0;
+  double _rotCos = 1;
+  double _rotSin = 0;
+
+  /// 这次已经安排给 [_rotCtrl] 的目标角。判断「目标变了没有」要用原始角，
+  /// 不能用 `_rotTween.end`：那是化到当前角附近的等价角，会差 2π。
+  double _rotWant = 0;
+
+  /// 旋转时底图的边长（屏幕对角线，见 [_mapCanvas]）。
+  double _diag = 0;
 
   /// 按下时的指针位置，只用于判断「这是拖还是点」（见 build 里的 Listener）。
   Offset? _dragStart;
@@ -178,6 +199,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 1600),
     );
+    _rotCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 320),
+    )..addListener(_onRotTick);
   }
 
   /// 脉冲动画按需启停：没有移动/选中台站时停转，省掉每帧重建开销
@@ -217,6 +242,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   void dispose() {
     _cancelAnim();
     _pulse.dispose();
+    _rotCtrl.dispose();
     _hover.dispose();
     super.dispose();
   }
@@ -255,14 +281,123 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   /// 当前渲染投影：百度不是 Web Mercator，标记必须与瓦片共用同一套投影
   MapProjection get _proj => projectionFor(_currentMapType);
 
+  /// 取与 [ref] 最接近的等价角（避免 359°→1° 反向绕一整圈）
+  static double _nearest(double target, double ref) {
+    var d = (target - ref) % (2 * math.pi);
+    if (d > math.pi) d -= 2 * math.pi;
+    if (d < -math.pi) d += 2 * math.pi;
+    return ref + d;
+  }
+
+  /// 绕 [c] 旋转（旋转量取当前 `_rot` 的 cos/sin）
+  Offset _spin(Offset p, Offset c) {
+    final d = p - c;
+    return Offset(
+      c.dx + d.dx * _rotCos - d.dy * _rotSin,
+      c.dy + d.dx * _rotSin + d.dy * _rotCos,
+    );
+  }
+
   Offset _toScreen(double lat, double lng, Size size) {
     final g = _toTileCoord(lat, lng);
     final b = _projBase;
     final c = _proj.latLngToPx(b.$1, b.$2, _zoom);
     final p = _proj.latLngToPx(g.$1, g.$2, _zoom);
-    return Offset(
+    final raw = Offset(
       p.dx - c.dx + size.width / 2 + _pan.dx,
       p.dy - c.dy + size.height / 2 + _pan.dy,
+    );
+    // 航向朝上：底图被 `Transform.rotate(_rot)` 转过（见 [_mapCanvas]，
+    // 旋转中心与页面中心重合），所以覆盖层（轨迹 / 信标点 / 标记）要跟着
+    // 绕页面中心转同一个角，否则会从底图上滑开。
+    return _rot == 0 ? raw : _spin(raw, size.center(Offset.zero));
+  }
+
+  /// 底图给的**局部坐标** → 页面坐标。
+  ///
+  /// 旋转时底图是「对角线画布」（边长 [_diag]，见 [_mapCanvas]），它的原点
+  /// 与页面不重合：先减画布中心、旋转、再加回页面中心。没转时两者本是一套。
+  Offset _canvasToPage(Offset local, Size size) {
+    if (_rot == 0 || _diag <= 0) return local;
+    final c = Offset(_diag / 2, _diag / 2);
+    return size.center(Offset.zero) + (_spin(local, c) - c);
+  }
+
+  /// 页面坐标 → 经纬度（鼠标悬停读数用）。
+  ///
+  /// 转过之后先绕页面中心反旋回去，再交给 [_screenToLatLng] —— 那套算法
+  /// 假定坐标系没转过。
+  (double, double) _pageToLatLng(Offset pagePoint, Size size) {
+    if (_rot == 0) return _screenToLatLng(pagePoint, size);
+    final c = size.center(Offset.zero);
+    final d = pagePoint - c;
+    return _screenToLatLng(
+      Offset(
+        c.dx + d.dx * _rotCos + d.dy * _rotSin,
+        c.dy - d.dx * _rotSin + d.dy * _rotCos,
+      ),
+      size,
+    );
+  }
+
+  /// 算这一帧的「航向朝上」目标角，目标一变就安排一段过渡。
+  ///
+  /// 目标角 = -航向（Flutter 正角为顺时针）。没有航向 / 没在动 / 底图是矢量
+  /// （相机在 flutter_map 手里，转不了）时回正北 —— 与沉浸页同一套口径。
+  ///
+  /// 不能在 build 里直接 `forward`（那会在 build 期间就通知监听者重建），
+  /// 所以只在这里定好 tween，启动交给 post-frame 回调。
+  void _syncRot() {
+    final st = widget.state;
+    final course = st.myCourse;
+    final moving = (st.mySpeed ?? 0) > 0.5;
+    final bool headingUp = _followMode == 2 &&
+        !_isVector &&
+        st.myHasFix &&
+        course != null &&
+        course >= 0 &&
+        moving;
+    final double want = headingUp ? -course * math.pi / 180 : 0.0;
+    if (want == _rotWant) return;
+    _rotWant = want;
+    // 从**当前角**出发取等价角，避免 359°→1° 时绕一整圈
+    _rotTween = Tween<double>(begin: _rot, end: _nearest(want, _rot));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _rotCtrl.forward(from: 0);
+    });
+  }
+
+  /// 每帧把展示角逼近目标角（同帧算好 cos/sin 供覆盖层逐点用）
+  void _onRotTick() {
+    final r = _rotTween.evaluate(_rotCtrl);
+    if (r == _rot) return;
+    setState(() {
+      _rot = r;
+      _rotCos = math.cos(r);
+      _rotSin = math.sin(r);
+    });
+  }
+
+  /// 航向朝上时把底图连画布一起转：画布取屏幕**对角线**长度并居中，
+  /// 这样任意角度四角都不会露白（与沉浸页同一套做法）。
+  ///
+  /// 转的时候底图自己的手势（拖动 / 双指缩放 / 滚轮 / 点击）都在**画布**
+  /// 坐标系里发生：`TileMapView` 的 pan 本来就是「相对画布中心」的量，所以
+  /// 拖动与缩放锚点都不用换算；只有点地图选点的落点要经 [_canvasToPage]。
+  Widget _mapCanvas(Size size, Widget child) {
+    if (_rot == 0 || _diag <= 0) return child;
+    return ClipRect(
+      child: Transform.rotate(
+        angle: _rot,
+        child: OverflowBox(
+          minWidth: _diag,
+          maxWidth: _diag,
+          minHeight: _diag,
+          maxHeight: _diag,
+          child: SizedBox(width: _diag, height: _diag, child: child),
+        ),
+      ),
     );
   }
 
@@ -459,6 +594,12 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           builder: (ctx, constraints) {
             final size = Size(constraints.maxWidth, constraints.maxHeight);
             _lastSize = size;
+            // 旋转时的底图边长（见 [_mapCanvas]）：先算好供 _canvasToPage 用
+            if (size.width > 0 && size.height > 0) {
+              _diag = math.sqrt(
+                size.width * size.width + size.height * size.height,
+              );
+            }
             // 锁定地图中心：每次状态刷新（多半是收到一条新的定位点）都把地图对回
             // 我的位置。这里**只改写 `_pan`、不 setState** —— 本帧的地图本来就会拿
             // 新的 `_pan` 去画，再 setState 只是白多一帧重建。
@@ -472,6 +613,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 st0.myLng != null) {
               _pan = _panFor(st0.myLat!, st0.myLng!, _zoom);
             }
+            // 航向朝上：算这一帧的目标转角（目标变了就安排一段过渡）
+            _syncRot();
             final vis = _visible;
             final searched = widget.searchQuery.trim().isNotEmpty;
             // 矮横屏（小屏手机横放，以及「窗口很宽但很矮」的桌面窗口）：
@@ -535,7 +678,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       // 用 0 阈值会把每一次点击都当成拖动。
                       if ((e.position - start).distance < 6) return;
                       _dragStart = null;
-                      setState(() => _followMe = false);
+                      // 自己拖地图：三态一起退回「关」，转角也随之回正北
+                      setState(() => _followMode = 0);
                     },
                     onPointerUp: (_) => _dragStart = null,
                     onPointerCancel: (_) => _dragStart = null,
@@ -579,20 +723,23 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                                 _syncPulse();
                               },
                             )
-                          : TileMapView(
-                              centerLat: _projBase.$1,
-                              centerLng: _projBase.$2,
-                              zoom: _zoom,
-                              pan: _pan,
-                              onPan: _panDelta,
-                              onViewChanged: _setView,
-                              // 滚轮：瞬时围绕焦点缩放，跟手不飘
-                              onZoomRequest: (z, p) => _animateTo(z, p),
-                              onTap: _handleMapTap,
-                              mapType: _currentMapType,
-                              // 离线地图：缓存开关与「仅离线」模式（设置页可改）
-                              cacheEnabled: widget.state.tileCacheOn,
-                              offlineOnly: widget.state.offlineOnly,
+                          : _mapCanvas(
+                              size,
+                              TileMapView(
+                                centerLat: _projBase.$1,
+                                centerLng: _projBase.$2,
+                                zoom: _zoom,
+                                pan: _pan,
+                                onPan: _panDelta,
+                                onViewChanged: _setView,
+                                // 滚轮：瞬时围绕焦点缩放，跟手不飘
+                                onZoomRequest: (z, p) => _animateTo(z, p),
+                                onTap: _handleMapTap,
+                                mapType: _currentMapType,
+                                // 离线地图：缓存开关与「仅离线」模式（设置页可改）
+                                cacheEnabled: widget.state.tileCacheOn,
+                                offlineOnly: widget.state.offlineOnly,
+                              ),
                             ),
                     ),
                   ),
@@ -608,6 +755,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         points: widget.state.myTrack,
                         color: C.blue,
                         toScreen: (lat, lng) => _toScreen(lat, lng, size),
+                        rot: _rot,
                       ),
                     ),
                   ),
@@ -623,6 +771,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         points: widget.state.beaconMarks,
                         color: C.orange,
                         toScreen: (lat, lng) => _toScreen(lat, lng, size),
+                        rot: _rot,
                       ),
                     ),
                   ),
@@ -637,6 +786,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         points: _selected!.track,
                         color: _selected!.color,
                         toScreen: (lat, lng) => _toScreen(lat, lng, size),
+                        rot: _rot,
                       ),
                     ),
                   ),
@@ -669,6 +819,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         stations: _visible,
                         toScreen: (lat, lng) => _toScreen(lat, lng, size),
                         level: widget.state.heatLevel,
+                        rot: _rot,
                       ),
                     ),
                   ),
@@ -891,7 +1042,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           _pan = _panFor(focus.lat, focus.lng, 14.0);
           // 跳到某个台站 = 用户要看那个点，锁定随之解除：留着的话下一帧就被
           // 「锁定地图中心」拽回我的位置，用户根本看不到刚聚焦的台站。
-          _followMe = false;
+          _followMode = 0;
         });
       });
       return true;
@@ -930,6 +1081,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         (_zoom * 64).round() * 1000003 +
         _pan.dx.round() * 1009 +
         _pan.dy.round() +
+        // 航向朝上时画布一直在转：转角和 pan/zoom 一样是**视图**的一部分，
+        // 不进缓存键的话标记会僵在旧角度上、从底图上滑开。
+        (_rot * 1000).round() * 4000037 +
         // 卫星与街道的标记外观不同（符号光晕/标签配色）→ 必须进缓存键，
         // 否则切底图后标记要等下一次拖拽才更新。
         (_isSat ? 1 : 0) * 2000003;
@@ -1179,8 +1333,13 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                   // **放在圆点之前（其下层）**：三角底边藏进圆点、被圆点盖住，
                   // 屏幕上只剩圆环外露出的尖角；与圆点同心叠放（放进圆点的 child
                   // 会被圆形裁剪）。
+                  //
+                  // 航向朝上时画布已经转过 -航向，箭头要再叠上同一个角，屏幕上
+                  // 它才仍指着行进方向（与沉浸页同一口径）。
                   HeadingCornerIndicator(
-                    course: widget.state.myCourse,
+                    course: widget.state.myCourse == null
+                        ? null
+                        : widget.state.myCourse! + _rot * 180 / math.pi,
                     accent: C.blue,
                   ),
                   Container(
@@ -1507,7 +1666,13 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   void _handleMapTap(Offset pos) {
     if (_pickMode) {
       // 选点模式：点击地图设为我的位置
-      final (lat, lng) = _screenToLatLng(pos, _lastSize);
+      //
+      // `pos` 是**底图局部坐标**：航向朝上时底图在「对角线画布」里，要先
+      // 换算回页面坐标（[_canvasToPage]），再反算经纬度。（没转时原样。）
+      final (lat, lng) = _screenToLatLng(
+        _canvasToPage(pos, _lastSize),
+        _lastSize,
+      );
       widget.state.setMyPosition(lat, lng);
       widget.state.finishPick();
       setState(() {
@@ -2109,26 +2274,35 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           },
         ),
         SizedBox(height: 6),
-        // ── 锁定地图中心 ──
+        // ── 锁定地图中心（三态）──
         //
         // 与上面那颗「定位」配成一对：定位是**跳一次**（还会把缩放拉到 15），
         // 锁定是**一直跟着** —— 开了之后自己走动时地图持续把我的位置摆在中心，
         // 缩放交给用户（锁定只管位置，不抢缩放）。
         //
+        // 用户要求把这一颗改成切换，于是三态循环：
+        //   关（自由拖动）→ 锁定中心·正北朝上 → 锁定中心·航向朝上 → 关
         // 图标用 gps_fixed / gps_not_fixed 这一对：它就是「定位是否锁在我身上」
-        // 的通用符号，比再画一颗准星更不容易被认成别的意思。
+        // 的通用符号，比再画一颗准星更不容易被认成别的意思；航向朝上那态
+        // 换成指南针（explore），与沉浸页切航向的按钮同一套图标。
         RoundIconBtn(
-          _followMe
+          _followMode == 1
               ? Icons.gps_fixed_rounded
-              : Icons.gps_not_fixed_rounded,
-          tooltip: _followMe
-              ? S.of(context).unlockMapCenter
-              : S.of(context).lockMapCenter,
+              : (_followMode == 2
+                    ? Icons.explore_rounded
+                    : Icons.gps_not_fixed_rounded),
+          // 提示语说的是**这一下按下去会切到哪**：
+          // 关 → 锁定中心 → 航向朝上 → 关（最后一态回到「取消锁定」）
+          tooltip: _followMode == 0
+              ? S.of(context).lockMapCenter
+              : (_followMode == 1
+                    ? S.of(context).headingUp
+                    : S.of(context).unlockMapCenter),
           color: _followMe ? C.blue : C.slate,
           onTap: () {
             final st = widget.state;
-            final turnOn = !_followMe;
-            if (turnOn &&
+            final next = (_followMode + 1) % 3;
+            if (next > 0 &&
                 st.myHasFix &&
                 st.myLat != null &&
                 st.myLng != null) {
@@ -2136,7 +2310,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
               // 按下去像没反应。
               _setView(_zoom, _panFor(st.myLat!, st.myLng!, _zoom));
             }
-            setState(() => _followMe = turnOn);
+            setState(() => _followMode = next);
           },
         ),
       ],
@@ -2794,7 +2968,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         ? S.of(context).datumWgs
         : S.of(context).datumGcj;
     if (hoverPos != null && hoverPos.dx > 0 && _lastSize.width > 0) {
-      final (lat, lng) = _screenToLatLng(hoverPos, _lastSize);
+      // 悬停点是**页面坐标**（MouseRegion 在旋转之外），转过之后要反旋回来
+      final (lat, lng) = _pageToLatLng(hoverPos, _lastSize);
       coord = '${lat.toStringAsFixed(4)}, ${lng.toStringAsFixed(4)}';
       grid = maidenhead(lat, lng);
     } else if (hasFix &&
@@ -2931,10 +3106,15 @@ class _BeaconMarkPainter extends CustomPainter {
   final Color color;
   final Offset Function(double lat, double lng) toScreen;
 
+  /// 画布转角（航向朝上时为 -航向）。`toScreen` 已经把它算进结果，这里只
+  /// 用来让 `shouldRepaint` 认得「只转了一下也是变了」。
+  final double rot;
+
   const _BeaconMarkPainter({
     required this.points,
     required this.color,
     required this.toScreen,
+    this.rot = 0,
   });
 
   @override
@@ -2964,17 +3144,22 @@ class _BeaconMarkPainter extends CustomPainter {
   /// 时间不参与比较：该层只在点位列表变化时重画（`beaconMarks` 增删即换实例）。
   @override
   bool shouldRepaint(covariant _BeaconMarkPainter old) =>
-      !identical(old.points, points) || old.color != color;
+      !identical(old.points, points) || old.color != color || old.rot != rot;
 }
 
 class _TrackOverlayPainter extends CustomPainter {
   final List<TrackPt> points;
   final Color color;
   final Offset Function(double lat, double lng) toScreen;
+
+  /// 画布转角（见 [_BeaconMarkPainter] 里的说明）
+  final double rot;
+
   _TrackOverlayPainter({
     required this.points,
     required this.color,
     required this.toScreen,
+    this.rot = 0,
   });
 
   @override
@@ -3021,7 +3206,7 @@ class _TrackOverlayPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _TrackOverlayPainter old) =>
-      old.points != points || old.color != color;
+      old.points != points || old.color != color || old.rot != rot;
 }
 
 /// 自己的定位精度圈：把 GPS **实测**精度如实画出来（`myAccuracy`）。
@@ -3088,7 +3273,15 @@ class _MyAccuracyPainter extends CustomPainter {
 class _HeatmapPainter extends CustomPainter {
   final List<Station> stations;
   final Offset Function(double lat, double lng) toScreen;
-  _HeatmapPainter({required this.stations, required this.toScreen, this.level = 1});
+  _HeatmapPainter({
+    required this.stations,
+    required this.toScreen,
+    this.level = 1,
+    this.rot = 0,
+  });
+
+  /// 画布转角（见 [_BeaconMarkPainter] 里的说明）
+  final double rot;
 
   /// 热力图档位 0/1/2（弱/中/强）：只缩放网格单元的半径，密度统计本身不变。
   final int level;
@@ -3160,5 +3353,5 @@ class _HeatmapPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _HeatmapPainter old) =>
-      old.stations != stations;
+      old.stations != stations || old.rot != rot;
 }

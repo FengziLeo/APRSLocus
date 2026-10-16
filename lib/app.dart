@@ -254,8 +254,10 @@ class _AppState extends State<App> {
   /// 只会在用到的那一刻失败（定位那条最坏：前台服务起不来，进程被系统带走）。
   /// 所以启动后查一次，缺哪一项就说哪一项，并给一个直达系统设置的入口。
   ///
-  /// 只做一次、只对**核心功能**的两项（定位 / 通知，见 [PermissionCheck.missing]）；
-  /// 不缺任何一项时全程静默，用户根本不会看到这一句话。
+  /// 只做一次、只对**核心功能**的两项（定位 / 通知，见 [PermissionCheck.watched]），
+  /// 而且只说「以前到手过、现在没了」的那几项（见 [PermissionCheck.revoked]）——
+  /// 第一次就拒绝是用户的选择，每次冷启都拿它拦人一道只会让人烦。
+  /// 一项不缺时全程静默。
   void _maybePromptPermissions(BuildContext context) {
     if (_permPromptScheduled) return;
     _permPromptScheduled = true;
@@ -267,7 +269,7 @@ class _AppState extends State<App> {
       // 用户正在看的页面会被换掉（与「有新版弹提醒」同一考虑）。
       await Future<void>.delayed(const Duration(milliseconds: 900));
       if (!mounted) return;
-      final missing = await PermissionCheck.missing();
+      final missing = await PermissionCheck.revoked();
       if (missing.isEmpty || !mounted) return;
       // 弹窗的 context 用根 Navigator 自己的：下面已经跨了好几次 await，
       // 首页那个 builder 的 context 可能已经不在了（换外壳 / 换主题会重建）。
@@ -310,7 +312,15 @@ class _AppState extends State<App> {
           ],
         ),
       );
-      if (go == true) await PermissionCheck.openSettings();
+      if (go == true) {
+        // 「去设置」：用户可能真的去把它打开，也可能只是想先看看 —— 所以
+        // 名单不动，下次启动查到还缺就再提一次（真打开了自然就不再提）。
+        await PermissionCheck.openSettings();
+      } else if (go == false) {
+        // 「知道了」：这次不说了。把这两项从名单里划掉（见 stopReminding）——
+        // 哪天它们重新到手又被关掉，还是会提。
+        await PermissionCheck.stopReminding(missing);
+      }
     });
   }
 

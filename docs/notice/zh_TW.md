@@ -22,7 +22,7 @@ Qingling（清零）管道上誤發的 2.2.0 已經下架，管道恢復正常�
 
 ## 📮 想聽聽你的聲音
 
-APRSLocus 已經陪 510+ 位使用者走過一段路。下一步往哪兒走，我們想聽你說：哪裡彆扭、還缺什麼、最該先修的是哪一個。
+APRSLocus 已經陪 620+ 位使用者走過一段路。下一步往哪兒走，我們想聽你說：哪裡彆扭、還缺什麼、最該先修的是哪一個。
 
 **[點擊進入調查問卷](https://ccncqe00x1e4.feishu.cn/share/base/form/shrcnWcCKNxzSMvlGP54DCrnAZg)**
 
@@ -31,6 +31,12 @@ APRSLocus 已經陪 510+ 位使用者走過一段路。下一步往哪兒走，�
 有問題、有想法，或者只是想說一句「收到了」，都歡迎進來坐坐。
 
 **[點擊加入 925025834](https://qun.qq.com/universal-share/share?ac=1&authKey=tqe%2BI6lZzakmEoIBwnSVV9%2BT8Zg36F4%2FejuSGAfEIYiDhj5sGyQUOx%2B3YCU68G05&busi_data=eyJncm91cENvZGUiOiI5MjUwMjU4MzQiLCJ0b2tlbiI6ImxiMTMrTm55MEoxU1o2aFV1V1hLUDRKQkZBR21nTEdNemJFOUM0aE1jOWJLU2lNZUtZaGpOa1dicnlYSk15V0YiLCJ1aW4iOiIzNDIxMDE2MTUwIn0%3D&data=nW_8Q1gX2ft-4C0n9p83Ukel3sHzCwlFOSMnOU0HZ8sCtWkwY3hmqlwVFAZm5ipk2W3hIDPxc6Rl0HoW-nMf8Q&svctype=4&tempid=h5_group_info)**
+
+---
+
+## 🎵 送你一首歌：啟航的歌
+
+@video https://music.163.com/outchain/player?type=2&id=2162911948&auto=1&height=66
 
 ---
 

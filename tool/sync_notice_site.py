@@ -27,7 +27,8 @@
     [文字](链接)       → <a target=_blank rel=noopener>
     - 列表项           → <ul><li>…
     > 引用             → 引用块（同一段连续引用合并为一行，<br> 连接）
-    @video <URL>      → 内嵌 B 站播放器 iframe
+    @video <URL>      → 内嵌播放器 iframe（视频给 16:9 大框；网易云 outchain
+                        那种音频小条给 330×86 的小框，不被放大成一块黑边）
 
 ## 幂等
 
@@ -94,6 +95,17 @@ VIDEO_TPL = (
     '</div>'
 )
 
+# 音频小条（网易云 outchain 播放器）：它自己就是一条 330×86 的横条，套进上面的
+# 16:9 大框会被放大成一块带黑边的空屏，所以单给一个小框。
+AUDIO_URL_RE = re.compile(r'^https?://music\.163\.com/outchain/player\b')
+
+AUDIO_TPL = (
+    '<div style="width:100%;max-width:330px;margin:6px auto">\n'
+    '<iframe src="{url}" scrolling="no" border="0" frameborder="no" '
+    'framespacing="0" style="width:100%;height:86px;display:block"></iframe>\n'
+    '</div>'
+)
+
 
 def read(rel):
     # 归一成 LF：Windows 下 git（core.autocrlf）会把工作区检出成 CRLF，而本脚本与
@@ -153,7 +165,8 @@ def render_body(md_text):
             continue
         if s.startswith('@video '):
             url = s[len('@video '):].strip()
-            out.append(VIDEO_TPL.format(url=esc(url)))
+            tpl = AUDIO_TPL if AUDIO_URL_RE.match(url) else VIDEO_TPL
+            out.append(tpl.format(url=esc(url)))
             i += 1
             continue
         if s.startswith('>'):

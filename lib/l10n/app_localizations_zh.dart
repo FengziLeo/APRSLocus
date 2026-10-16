@@ -9108,6 +9108,15 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String gpxSavedTo(String path) => "已保存到：$path";
 
+  @override
+  String get permCheckTitle => "权限被关掉了";
+
+  @override
+  String get permCheckLocation => "定位权限没开，地图标不出位置，也不能上报。";
+
+  @override
+  String get permCheckNotify => "通知权限没开，提醒和生命守护告警都看不到。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18212,5 +18221,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String gpxSavedTo(String path) => "已儲存到：$path";
+
+  @override
+  String get permCheckTitle => "權限被關掉了";
+
+  @override
+  String get permCheckLocation => "定位權限沒開，地圖標不出位置，也不能上報。";
+
+  @override
+  String get permCheckNotify => "通知權限沒開，提醒和生命守護告警都看不到。";
 
 }

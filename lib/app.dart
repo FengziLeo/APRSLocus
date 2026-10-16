@@ -20,6 +20,7 @@ import 'agent_auth_page.dart';
 import 'early_member.dart';
 import 'honor_celebration.dart';
 import 'l10n/app_localizations.dart';
+import 'permission_check.dart';
 import 'settings_pages.dart';
 import 'update_prompt.dart';
 import 'agent_ui.dart';
@@ -73,6 +74,12 @@ class _AppState extends State<App> {
 
   /// 「有新版弹提醒」只调一次（启动后第一次进入主页时挂一个 post-frame）
   bool _updatePromptScheduled = false;
+
+  /// 权限体检只做一次（同上，启动后第一次进入主页时查一次）。
+  ///
+  /// 摆在首页这一层、而不是某一页里：权限是**全局**的，用户在哪个页面上都
+  /// 可能需要那句话；而体检自己只在启动后跑一次，不会跟着页面切来切去。
+  bool _permPromptScheduled = false;
 
   /// 新荣誉庆祝：0=未开始 1=已排期/检测中 2=展示中
   int _honorCelebration = 0;
@@ -243,6 +250,70 @@ class _AppState extends State<App> {
     });
   }
 
+  /// 权限体检：用户可能在系统设置里把权限关掉，而关掉之后**应用里什么都看不出来**，
+  /// 只会在用到的那一刻失败（定位那条最坏：前台服务起不来，进程被系统带走）。
+  /// 所以启动后查一次，缺哪一项就说哪一项，并给一个直达系统设置的入口。
+  ///
+  /// 只做一次、只对**核心功能**的两项（定位 / 通知，见 [PermissionCheck.missing]）；
+  /// 不缺任何一项时全程静默，用户根本不会看到这一句话。
+  void _maybePromptPermissions(BuildContext context) {
+    if (_permPromptScheduled) return;
+    _permPromptScheduled = true;
+    // 语言要在 build 期间取好：下面已经跨了一次 await，不能再用那个 context 取
+    final l = AppLocalizations.of(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      // 稍等一下再查：启动瞬间还压在闪屏 / 首次引导上，这时候弹出来
+      // 用户正在看的页面会被换掉（与「有新版弹提醒」同一考虑）。
+      await Future<void>.delayed(const Duration(milliseconds: 900));
+      if (!mounted) return;
+      final missing = await PermissionCheck.missing();
+      if (missing.isEmpty || !mounted) return;
+      // 弹窗的 context 用根 Navigator 自己的：下面已经跨了好几次 await，
+      // 首页那个 builder 的 context 可能已经不在了（换外壳 / 换主题会重建）。
+      // `Navigator.of` 对「传进来的就是 Navigator 自己的 element」有专门处理，
+      // 所以拿它去 showDialog 能找到正确的 Navigator。
+      final nav = _navKey.currentState;
+      if (nav == null) return;
+      final lines = <String>[
+        if (missing.contains('location')) l.permCheckLocation,
+        if (missing.contains('notifications')) l.permCheckNotify,
+      ];
+      final go = await showDialog<bool>(
+        context: nav.context,
+        builder: (dctx) => AlertDialog(
+          backgroundColor: C.white,
+          title: Text(l.permCheckTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < lines.length; i++)
+                Padding(
+                  padding: EdgeInsets.only(
+                    bottom: i == lines.length - 1 ? 0 : 10,
+                  ),
+                  child: Text(lines[i], style: ts(13, h: 1.5)),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dctx, false),
+              child: Text(l.gotIt),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: C.blue),
+              onPressed: () => Navigator.pop(dctx, true),
+              child: Text(l.goSettings),
+            ),
+          ],
+        ),
+      );
+      if (go == true) await PermissionCheck.openSettings();
+    });
+  }
+
   /// 打开「连接设置」页（提示里那个「去设置」的动作）。
   void _openConnSettings() {
     final nav = _navKey.currentState;
@@ -381,7 +452,9 @@ class _AppState extends State<App> {
       // 「服务器地址没填」：点连接被拦下（见 AppState.connectBlockedNoServer）时
       // 弹一句说明 + 一键去设置（用户要求：同 Passcode 填 -1 的验证提示一样）。
       _maybePromptNoServer();
-          // 启动后检查一次新版本：有则弹提醒（同一版本只提醒一次）。
+          // 启动时体检一次权限（缺哪项就提示哪项，见 [_maybePromptPermissions]）。
+      _maybePromptPermissions(context);
+      // 启动后检查一次新版本：有则弹提醒（同一版本只提醒一次）。
           // 放在 home 的 builder 里是为了拿到 **Navigator 之下**的 context
           // （showDialog 需要它）。
           if (!_updatePromptScheduled) {

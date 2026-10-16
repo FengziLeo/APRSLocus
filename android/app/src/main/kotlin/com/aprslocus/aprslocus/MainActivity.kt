@@ -212,6 +212,16 @@ class MainActivity : FlutterActivity() {
                         requestPermissionsNow()
                     }
                 }
+                // 启动体检：只回答「现在哪些权限没在手上」，**不申请**。
+                // 申请是各功能自己的事（连接蓝牙时、开录音时、首次定位时）——
+                // 启动时再弹系统权限框，用户还没操作就先被拦一道。
+                "permissionReport" -> result.success(permissionReport())
+                // 体检提示里那个「去设置」：落到本应用的系统设置页，
+                // 用户在那儿把被关掉的权限打开，回来即生效。
+                "openAppSettings" -> {
+                    openAppSettings()
+                    result.success(true)
+                }
                 else -> result.notImplemented()
             }
         }
@@ -1274,6 +1284,47 @@ class MainActivity : FlutterActivity() {
         val fine = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         val coarse = checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         return fine || coarse
+    }
+
+    /**
+     * 当前权限授予情况：启动体检用（**只查、不申请**）。
+     *
+     * 为什么不复用各链路自己的 `checkPermissions`：那些只回答「够不够我这一条路
+     * 用」。权限有个很难自查的失败模式 —— 用户在系统设置里把它关掉之后，界面上
+     * 什么都看不出来，只会在用到的那一刻失败（定位那条最坏：前台服务声明拿不到
+     * 权限，服务直接结束）。启动时一次问清，界面才好如实说「缺哪一项、什么用不了」。
+     *
+     * 只报**核心功能**要用的两项：
+     *   * `location`：地图定位与信标上报；
+     *   * `notifications`：常驻通知、消息与生命守护强提醒（Android 13 起才是运行时权限，
+     *     之前一律算已授予）。
+     * 蓝牙 / 录音 / 计步这些是**按功能**要的，各自在用到的那一刻申请并提示
+     * （见 `TncManager`、`AudioManager`、`MotionManager`），放进启动体检只会在用户
+     * 根本没开那个功能时乱报「缺权限」。
+     */
+    private fun permissionReport(): Map<String, Boolean> {
+        fun granted(p: String) = checkSelfPermission(p) == PackageManager.PERMISSION_GRANTED
+        return mapOf(
+            "location" to hasPermissions(),
+            "notifications" to (
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                    granted("android.permission.POST_NOTIFICATIONS")
+                ),
+        )
+    }
+
+    /** 打开本应用的系统设置页（权限体检提示里的「去设置」）。 */
+    private fun openAppSettings() {
+        try {
+            startActivity(
+                Intent(
+                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:$packageName")
+                )
+            )
+        } catch (_: Exception) {
+            // 极少数 ROM 没有这个页面：静默失败，用户仍可从系统设置自己进去
+        }
     }
 
     private fun startLocationService(mode: String = LocationService.MODE_GPS_NETWORK) {

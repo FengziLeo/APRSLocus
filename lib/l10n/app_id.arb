@@ -4158,5 +4158,8 @@
   "gpxExportFailed": "Ekspor gagal. Periksa izin penyimpanan atau ruang kosong.",
   "gpxSavedTo": "Disimpan ke: {path}",
   "@gpxExported": {"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}},
-  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}}
+  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}},
+  "permCheckTitle": "Izin dimatikan",
+  "permCheckLocation": "Izin lokasi mati: peta tidak bisa menampilkan posisi dan tidak ada yang bisa dipancarkan.",
+  "permCheckNotify": "Izin notifikasi mati: pengingat dan alarm darurat tidak akan muncul."
 }

@@ -4746,5 +4746,8 @@
   "gpxExportFailed": "匯出失敗，請檢查儲存權限或剩餘空間",
   "gpxSavedTo": "已儲存到：{path}",
   "@gpxExported": {"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}},
-  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}}
+  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}},
+  "permCheckTitle": "權限被關掉了",
+  "permCheckLocation": "定位權限沒開，地圖標不出位置，也不能上報。",
+  "permCheckNotify": "通知權限沒開，提醒和生命守護告警都看不到。"
 }

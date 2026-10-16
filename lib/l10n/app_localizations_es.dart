@@ -9547,4 +9547,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String gpxSavedTo(String path) => "Guardado en: $path";
 
+  @override
+  String get permCheckTitle => "Hay permisos desactivados";
+
+  @override
+  String get permCheckLocation => "El permiso de ubicación está desactivado: el mapa no puede mostrar tu posición y no se puede balizar.";
+
+  @override
+  String get permCheckNotify => "El permiso de notificaciones está desactivado: no se verán los avisos ni la alarma de vida.";
+
 }

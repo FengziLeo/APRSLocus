@@ -4158,5 +4158,8 @@
   "gpxExportFailed": "書き出しに失敗しました。ストレージの権限や空き容量を確認してください。",
   "gpxSavedTo": "保存先：{path}",
   "@gpxExported": {"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}},
-  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}}
+  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}},
+  "permCheckTitle": "権限がオフになっています",
+  "permCheckLocation": "位置情報の権限がオフです。地図に自分の位置が出ず、送信もできません。",
+  "permCheckNotify": "通知の権限がオフです。リマインダーとライフアラームが表示されません。"
 }

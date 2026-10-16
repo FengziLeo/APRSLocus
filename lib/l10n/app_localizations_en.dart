@@ -9488,4 +9488,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String gpxSavedTo(String path) => "Saved to: $path";
 
+  @override
+  String get permCheckTitle => "Permissions are off";
+
+  @override
+  String get permCheckLocation => "Location is off. The map cannot show your position and nothing can be beaconed.";
+
+  @override
+  String get permCheckNotify => "Notifications are off. Reminders and the life-guard alarm will not show.";
+
 }

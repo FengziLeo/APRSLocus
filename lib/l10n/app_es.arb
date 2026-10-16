@@ -4158,5 +4158,8 @@
   "gpxExportFailed": "Falló la exportación: revisa el permiso de almacenamiento o el espacio libre.",
   "gpxSavedTo": "Guardado en: {path}",
   "@gpxExported": {"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}},
-  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}}
+  "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}},
+  "permCheckTitle": "Hay permisos desactivados",
+  "permCheckLocation": "El permiso de ubicación está desactivado: el mapa no puede mostrar tu posición y no se puede balizar.",
+  "permCheckNotify": "El permiso de notificaciones está desactivado: no se verán los avisos ni la alarma de vida."
 }

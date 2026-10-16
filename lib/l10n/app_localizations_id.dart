@@ -9498,4 +9498,13 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String gpxSavedTo(String path) => "Disimpan ke: $path";
 
+  @override
+  String get permCheckTitle => "Izin dimatikan";
+
+  @override
+  String get permCheckLocation => "Izin lokasi mati: peta tidak bisa menampilkan posisi dan tidak ada yang bisa dipancarkan.";
+
+  @override
+  String get permCheckNotify => "Izin notifikasi mati: pengingat dan alarm darurat tidak akan muncul.";
+
 }

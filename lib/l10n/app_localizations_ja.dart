@@ -9209,4 +9209,13 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String gpxSavedTo(String path) => "保存先：$path";
 
+  @override
+  String get permCheckTitle => "権限がオフになっています";
+
+  @override
+  String get permCheckLocation => "位置情報の権限がオフです。地図に自分の位置が出ず、送信もできません。";
+
+  @override
+  String get permCheckNotify => "通知の権限がオフです。リマインダーとライフアラームが表示されません。";
+
 }

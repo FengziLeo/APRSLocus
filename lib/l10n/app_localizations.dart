@@ -16572,6 +16572,24 @@ abstract class AppLocalizations {
   /// **'已保存到：{path}'**
   String gpxSavedTo(String path);
 
+  /// No description provided for @permCheckTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'权限被关掉了'**
+  String get permCheckTitle;
+
+  /// No description provided for @permCheckLocation.
+  ///
+  /// In zh, this message translates to:
+  /// **'定位权限没开，地图标不出位置，也不能上报。'**
+  String get permCheckLocation;
+
+  /// No description provided for @permCheckNotify.
+  ///
+  /// In zh, this message translates to:
+  /// **'通知权限没开，提醒和生命守护告警都看不到。'**
+  String get permCheckNotify;
+
 }
 
 class _AppLocalizationsDelegate

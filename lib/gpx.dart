@@ -1,3 +1,5 @@
+import 'track_log.dart';
+
 /// ─── 历史轨迹 → GPX ───
 ///
 /// 只做一件事：把 [DayTrack] 台账写成 GPX 1.1 文本。**不碰 IO** —— 写盘交给

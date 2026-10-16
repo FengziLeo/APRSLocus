@@ -133,6 +133,12 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   static const double _heatZoom = 9.0;
   Size _lastSize = Size.zero;
 
+  /// 地图**画出来的**那几层（轨迹 / 信标点 / 选中轨迹 / 精度圈 / 热力图）用的裁剪器。
+  ///
+  /// 每帧在 build 里按外壳传进来的让位量重建（为什么必须裁，见赋值处的说明）。
+  _OverlayInsetClipper _ovClip =
+      _OverlayInsetClipper(left: 0, top: 0, bottom: 0);
+
   MapType get _currentMapType => MapType.values.firstWhere(
     (t) => t.name == widget.state.mapType,
     orElse: () => MapType.gaode,
@@ -170,6 +176,15 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   /// ⚠ 缩放钮加了「锁定地图中心」这一颗之后，这个数必须跟着涨：
   /// `check_landscape_layout.py` 就是按它判断「矮横屏要不要分两列」的。
   static const double _kToolbarColH = 390;
+
+  /// 上报横杠（[_beaconBar]）自身的高度：一行 12 号字 + 上下各 8 内边距 + 描边。
+  ///
+  /// 只给「地图画出来的那几层」的裁剪线用（见 `_ovClip`），不参与任何布局 ——
+  /// 那个 `Positioned` 仍然是按内容撑开的，这里只是估一个「它大概有多高」。
+  static const double _kBeaconBarH = 38;
+
+  /// 底部坐标条（[_bottomControls]）自身的高度：13 号图标 + 上下各 7 内边距 + 描边。
+  static const double _kBottomCtrlH = 30;
 
   // 脉冲动画（移动/选中标记）
   late final AnimationController _pulse;
@@ -637,6 +652,29 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             // （阈值一直跟着 [_kToolbarColH] 涨：工具列长高了，贴底控件就得
             // 更晚才出现，不然两者会在矮屏上叠在一起）。
             final bool roomForBottom = availH > 484;
+            // ── 地图**画出来的**那几层也要让开外壳占用的区域 ──
+            //
+            // 与贴左控件同一个口径（见 [leftInset] 与 [bottomInset]）：2.0 外壳的
+            // 导航竖条、内容面板、顶栏与贴底浮层都是**磨砂半透明**地悬在整屏地图
+            // 之上（1.0 与地图并排，传进来的几个 inset 都是 0，这里等于不裁）。
+            // 控件早就会让开，画上去的那几层却照旧铺满整屏 —— 于是蓝线从卡片背后
+            // 透出来，看着像「轨迹压住了卡片」。裁到可见地图区之后，卡片底下不再有
+            // 这条线，磨砂里剩下的只有底图，观感与「卡片是实的」一致。
+            //
+            // 画笔坐标与各层位置都不变：`CustomPaint` 自己就是 `size` 大小，外面包
+            // 一层同尺寸的 `ClipRect` 只改「画到哪儿」，不改「画在哪儿」。
+            final double padBottom = MediaQuery.of(context).padding.bottom;
+            _ovClip = _OverlayInsetClipper(
+              left: widget.leftInset,
+              top: widget.topInset,
+              // 贴底浮层（上报横杠 / 底部坐标条）的底边距与自身高度必须与下面那两个
+              // `Positioned` 一致，否则裁剪线会落在横杠里面（线上还会剩一截露在杠下）。
+              bottom: !roomForBottom
+                  ? 0
+                  : (widget.state.connected && widget.state.myHasFix
+                      ? 62 + padBottom + widget.bottomInset + _kBeaconBarH
+                      : 14 + padBottom + widget.bottomInset + _kBottomCtrlH),
+            );
             if (widget.frozen) {
               // 冻结：停掉脉冲动画。它是地图这边**唯一的每帧**重绘来源
               // （`_pulse.repeat()` 会驱动所有移动台站的扩散圈逐帧重建），
@@ -749,13 +787,16 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     _showTracks &&
                     widget.state.myTrack.length > 1)
                   IgnorePointer(
-                    child: CustomPaint(
-                      size: size,
-                      painter: _TrackOverlayPainter(
-                        points: widget.state.myTrack,
-                        color: C.blue,
-                        toScreen: (lat, lng) => _toScreen(lat, lng, size),
-                        rot: _rot,
+                    child: ClipRect(
+                      clipper: _ovClip,
+                      child: CustomPaint(
+                        size: size,
+                        painter: _TrackOverlayPainter(
+                          points: widget.state.myTrack,
+                          color: C.blue,
+                          toScreen: (lat, lng) => _toScreen(lat, lng, size),
+                          rot: _rot,
+                        ),
                       ),
                     ),
                   ),
@@ -765,13 +806,16 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 // 间隔是否合预期），所以要画成独立符号而不是线上的节点。
                 if (!_usePluginMap && widget.state.beaconMarks.isNotEmpty)
                   IgnorePointer(
-                    child: CustomPaint(
-                      size: size,
-                      painter: _BeaconMarkPainter(
-                        points: widget.state.beaconMarks,
-                        color: C.orange,
-                        toScreen: (lat, lng) => _toScreen(lat, lng, size),
-                        rot: _rot,
+                    child: ClipRect(
+                      clipper: _ovClip,
+                      child: CustomPaint(
+                        size: size,
+                        painter: _BeaconMarkPainter(
+                          points: widget.state.beaconMarks,
+                          color: C.orange,
+                          toScreen: (lat, lng) => _toScreen(lat, lng, size),
+                          rot: _rot,
+                        ),
                       ),
                     ),
                   ),
@@ -780,13 +824,16 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     _selected != null &&
                     _selected!.track.length > 1)
                   IgnorePointer(
-                    child: CustomPaint(
-                      size: size,
-                      painter: _TrackOverlayPainter(
-                        points: _selected!.track,
-                        color: _selected!.color,
-                        toScreen: (lat, lng) => _toScreen(lat, lng, size),
-                        rot: _rot,
+                    child: ClipRect(
+                      clipper: _ovClip,
+                      child: CustomPaint(
+                        size: size,
+                        painter: _TrackOverlayPainter(
+                          points: _selected!.track,
+                          color: _selected!.color,
+                          toScreen: (lat, lng) => _toScreen(lat, lng, size),
+                          rot: _rot,
+                        ),
                       ),
                     ),
                   ),
@@ -800,26 +847,32 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     widget.state.myHasFix &&
                     widget.state.myAccuracy > 0)
                   IgnorePointer(
-                    child: CustomPaint(
-                      size: size,
-                      painter: _MyAccuracyPainter(
-                        lat: widget.state.myLat!,
-                        lng: widget.state.myLng!,
-                        accuracyM: widget.state.myAccuracy,
-                        toScreen: (lat, lng) => _toScreen(lat, lng, size),
+                    child: ClipRect(
+                      clipper: _ovClip,
+                      child: CustomPaint(
+                        size: size,
+                        painter: _MyAccuracyPainter(
+                          lat: widget.state.myLat!,
+                          lng: widget.state.myLng!,
+                          accuracyM: widget.state.myAccuracy,
+                          toScreen: (lat, lng) => _toScreen(lat, lng, size),
+                        ),
                       ),
                     ),
                   ),
                 // 低缩放热力图（按网格统计台站密度，不改变标记本身）
                 if (_showHeatmap)
                   IgnorePointer(
-                    child: CustomPaint(
-                      size: size,
-                      painter: _HeatmapPainter(
-                        stations: _visible,
-                        toScreen: (lat, lng) => _toScreen(lat, lng, size),
-                        level: widget.state.heatLevel,
-                        rot: _rot,
+                    child: ClipRect(
+                      clipper: _ovClip,
+                      child: CustomPaint(
+                        size: size,
+                        painter: _HeatmapPainter(
+                          stations: _visible,
+                          toScreen: (lat, lng) => _toScreen(lat, lng, size),
+                          level: widget.state.heatLevel,
+                          rot: _rot,
+                        ),
                       ),
                     ),
                   ),
@@ -3384,4 +3437,47 @@ class _HeatmapPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _HeatmapPainter old) =>
       old.stations != stations || old.rot != rot;
+}
+
+/// 把地图**画出来的**那几层裁到「可见地图区」的裁剪器。
+///
+/// 为什么需要（用户反馈）：「横屏地图界面上，蓝色历史轨迹线图层覆盖在了左侧定位
+/// 信息卡片和底部上报状态横条（『距下次上报 47s』那一块）之上，轨迹线穿透并压住了
+/// 这些 UI 浮层。」
+///
+/// 图层顺序本身是对的：轨迹层排在主 Stack 里所有浮层**之前**（见那里的注释），
+/// 画不到卡片上面。真正的原因是那些卡片**本身是磨砂半透明的** —— 2.0 外壳的
+/// 竖条 / 内容面板 / 顶栏 / 贴底浮层都悬在整屏铺满的地图之上，背后那张地图（连同
+/// 这条线）会从卡片里透出来。贴左控件早就按 [MapPage.leftInset] 让开了，画上去的
+/// 层却没让，表现就是「线穿过了卡片」。
+///
+/// 1.0 布局下地图与侧栏是并排的（传进来的几个 inset 都是 0），这个框就等于整屏，
+/// 什么都不裁，与旧版逐像素一致。
+class _OverlayInsetClipper extends CustomClipper<Rect> {
+  /// 左侧被外壳占用的宽度（竖条 + 展开时的内容面板）。
+  final double left;
+
+  /// 顶栏高度。
+  final double top;
+
+  /// 底部贴底浮层占用的高度（上报横杠或底部坐标条）。
+  final double bottom;
+
+  _OverlayInsetClipper({
+    required this.left,
+    required this.top,
+    required this.bottom,
+  });
+
+  @override
+  Rect getClip(Size size) => Rect.fromLTRB(
+        left.clamp(0.0, size.width),
+        top.clamp(0.0, size.height),
+        size.width,
+        (size.height - bottom).clamp(0.0, size.height),
+      );
+
+  @override
+  bool shouldReclip(covariant _OverlayInsetClipper old) =>
+      old.left != left || old.top != top || old.bottom != bottom;
 }

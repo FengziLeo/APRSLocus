@@ -186,6 +186,16 @@ class _SponsorPageState extends State<SponsorPage> {
       },
     ),
     (
+      kind: 'jade',
+      name: 'BH4HGA',
+      names: const {},
+      desc: '赠我以琼琚 · 琼琚在手，回响不息',
+      descs: const {
+        'zh-TW': '贈我以瓊琚 · 瓊琚在手，回響不息',
+        'en': 'Gifted with jade — jade in hand, the echo goes on.',
+      },
+    ),
+    (
       kind: 'api',
       name: 'BH7NOR',
       names: const {},

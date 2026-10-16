@@ -2833,6 +2833,36 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
               children: [
                 Row(
                   children: [
+                    // 详细档在**最左侧**摆当前真要发出去的那一枚信标符号。
+                    //
+                    // 为什么要摆：符号不总是「我的符号」—— 智能档按速度档给不同
+                    // 符号（`activeSmartTier.symbol`），纯网络定位还能单独指定一枚
+                    // （`networkSymbol`，见 `beaconSymbolNow`）。只看倒计时与档位，
+                    // 用户不知道这一发在地图上会长成什么样。
+                    //
+                    // 表字符固定 `/`：本应用的报文永远是主表
+                    // （`AprsFmt.position` 写的是 `!lat/lng$symbol`）。
+                    if (st.beaconBarDetailed)
+                      Container(
+                        width: 26,
+                        height: 26,
+                        alignment: Alignment.center,
+                        margin: const EdgeInsets.only(right: 8),
+                        decoration: BoxDecoration(
+                          color: c.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: c.withValues(alpha: 0.22)),
+                        ),
+                        // 官方符号表 PNG（与地图标记同一套资源），缺席时自己回退
+                        // Material 图标；`halo` 让彩色符号在这个半透明横杠上也
+                        // 分辨得出（与地图标记同一个理由）。
+                        child: AprsSymbolImage(
+                          st.beaconSymbolNow,
+                          '/',
+                          size: 18,
+                          halo: true,
+                        ),
+                      ),
                     Icon(
                       on ? Icons.send_rounded : Icons.notifications_off_rounded,
                       size: st.beaconBarDetailed ? 16 : 14,

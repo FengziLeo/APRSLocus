@@ -290,19 +290,13 @@ class LocationService : Service() {
             if (it == MODE_GPS || it == MODE_GPS_NETWORK || it == MODE_NETWORK || it == MODE_KEEPALIVE) mode = it
         }
         val notification = buildNotification("APRSlocus 运行中")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // 把当前已激活的能力一并声明：服务可能在蓝牙/音频已经在用之后才启动，
-            // 只声明 location 会让系统立刻限制蓝牙/麦克风访问。
-            var t = ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
-            if (audioActive) t = t or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-            // connectedDevice 是 API 34 才引入的类型：旧系统不认识这个位，
-            // 不能无条件传（有些 ROM 会直接抛异常导致服务起不来）。
-            if (btActive && Build.VERSION.SDK_INT >= 34) {
-                t = t or ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
-            }
-            startForeground(NOTIFICATION_ID, notification, t)
-        } else {
-            startForeground(NOTIFICATION_ID, notification)
+        if (!declareForeground(notification)) {
+            // 权限被收回（用户在系统设置里把定位关掉）：带 location 类型的
+            // 前台服务声明拿不到权限，服务无论如何也撑不起来。不崩溃、不装死：
+            // 结束自己并把原因报给 Dart，由界面去提示「缺哪项权限」。
+            LocationBus.emit(mapOf("status" to "定位权限已关闭，后台定位无法启动"))
+            stopSelf()
+            return START_NOT_STICKY
         }
         // 持锁防止 Doze 冻结 Dart 隔离区（保证保活/重连定时器运行）
         try {
@@ -363,6 +357,47 @@ class LocationService : Service() {
         } catch (_: Exception) {
             // 个别 ROM 不允许运行中重复声明类型；失败时保持原类型即可 ——
             // 前台服务与 APRS 连接不受影响，最坏情况是后台录音被系统限制。
+        }
+    }
+
+    /**
+     * 声明前台服务：**失败不能把进程带走**。
+     *
+     * Android 9 及以上在这里要连「服务类型」一起声明；而带
+     * `FOREGROUND_SERVICE_TYPE_LOCATION` 的声明要求定位权限**此刻还在手上**
+     * （Android 14 起系统会真的来查）。用户在系统设置里把定位关掉之后，
+     * 这个调用会抛 `SecurityException` —— 它在 `onStartCommand` 里没有人接，
+     * 于是整个进程被系统干掉：用户看到的是「一打开应用就闪退」。
+     *
+     * 所以逐级退让：先按当前能力声明类型，失败再退回不带类型的旧写法
+     * （旧写法在部分 ROM 上仍能起服务，只是拿不到后台定位/录音的豁免）。
+     * 两级都失败才返回 false，由调用方停掉自己并如实上报。
+     *
+     * @return 服务是否已经进入前台
+     */
+    private fun declareForeground(notification: Notification): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // 把当前已激活的能力一并声明：服务可能在蓝牙/音频已经在用之后才启动，
+            // 只声明 location 会让系统立刻限制蓝牙/麦克风访问。
+            var t = ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+            if (audioActive) t = t or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+            // connectedDevice 是 API 34 才引入的类型：旧系统不认识这个位，
+            // 不能无条件传（有些 ROM 会直接抛异常导致服务起不来）。
+            if (btActive && Build.VERSION.SDK_INT >= 34) {
+                t = t or ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+            }
+            try {
+                startForeground(NOTIFICATION_ID, notification, t)
+                return true
+            } catch (_: Exception) {
+                // 落到下面用不带类型的老写法再试一次
+            }
+        }
+        return try {
+            startForeground(NOTIFICATION_ID, notification)
+            true
+        } catch (_: Exception) {
+            false
         }
     }
 

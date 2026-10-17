@@ -30,7 +30,8 @@
     @video <URL>      → 内嵌一块外部页面（iframe）。模板按 URL 选，写法只有这一种：
                         视频给 16:9 的大框；网易云 outchain 那种音频小条给 330×86
                         的小框，不被放大成一块黑边；OA 小件（aprsnet.cn/oa/embed.html）
-                        给一条 168 高的横条 —— 套进 16:9 会变成一块带黑边的空屏。
+                        给一条 148 高的横条 —— 套进 16:9 会变成一块带黑边的空屏。
+                        小件自己穿活动页的白天那套（纸白底、墨字、赤红状态），不吃主题参数。
 
 ## 幂等
 
@@ -110,26 +111,15 @@ AUDIO_TPL = (
 
 # OA 小件（APRSNET.CN 的倒计时条）：自己就是一条矮横条，和音频小条同理，
 # 套进 16:9 只会得到一块空屏。宽也跟正文那一列对齐（满宽、不居中，小件里不留
-# 左右内边距），左边就和段落同一根线；底色跟卡片一样，看不出框。
-# 跨域读不到父页的 CSS 变量，所以站点切深浅色时把主题当参数再交给它一次。
+# 左右内边距），左边就和段落同一根线；底色用它的纸白，切深浅色时都不跳。
 EMBED_URL_RE = re.compile(r'^https?://aprsnet\.cn/oa/(?:en/)?embed\.html\b')
 
-# 注意：模板里的花括号不少（有一段 JS），所以下面一律用 replace 填 URL，
-# 不用 str.format —— 否则 JS 的每个括号都得写成两个。
 EMBED_TPL = (
     '<div style="width:100%;margin:6px 0">\n'
     '<iframe class="oa-embed" src="{url}" title="APRSNETCN OA" scrolling="no" '
     'border="0" frameborder="no" framespacing="0" loading="lazy" '
     'style="display:block;width:100%;height:148px;border:0;border-radius:14px;'
-    'background:#1c2228"></iframe>\n'
-    '<script>(function(){var f=document.currentScript.previousElementSibling;'
-    'if(!f)return;var base=f.getAttribute("src").split("?")[0];'
-    'function set(){var light=document.documentElement.getAttribute("data-theme")==="light";'
-    'var u=base+"?theme="+(light?"light":"dark");'
-    'if(f.getAttribute("src")!==u)f.src=u;'
-    'f.style.background=light?"#ffffff":"#1c2228";}'
-    'set();if(window.MutationObserver){new MutationObserver(set).observe('
-    'document.documentElement,{attributes:true,attributeFilter:["data-theme"]});}})();</script>\n'
+    'background:#f2f0ea"></iframe>\n'
     '</div>'
 )
 

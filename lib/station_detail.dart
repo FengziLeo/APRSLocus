@@ -750,6 +750,16 @@ class _StationDetailState extends State<StationDetail> {
                                 '${s.symbol}  ${localizedAprsSymbolName(context, s.symbol)}',
                                 icon: Icons.tag_rounded,
                               ),
+                              // 来源：只有「本地没收到、由 APRSNETCN 的 24 小时
+                              // 接口并进来的」台站才多这一行，否则整行不占位置。
+                              if (s.remote) ...[
+                                SizedBox(height: 8),
+                                KV(
+                                  S.of(context).stationSource,
+                                  'APRSNETCN',
+                                  icon: Icons.cloud_download_rounded,
+                                ),
+                              ],
                             ],
                           ),
                         ),

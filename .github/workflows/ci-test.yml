@@ -298,6 +298,12 @@ jobs:
       - name: Test beacon packet format (third-party compatibility)
         run: flutter test test/beacon_format_test.dart
 
+      # APRSNETCN 24 小时台站接口的解析层：时间是不带偏移的北京时间，坐标或
+      # 时间缺一条就该整台丢掉。这两条写错了编译能过、analyze 也全绿，只会让
+      # 「多久前听到」差几个小时、地图上多出一片 0,0 的假台站。
+      - name: Test APRSNETCN station parsing
+        run: flutter test test/aprsnetcn_test.dart
+
       # 百度瓦片投影/编号数学：官方参考向量锁定（BD-09 坐标 + 多项式平面投影 +
       # 瓦片 y 朝北 + 每级瓦片数不是 2^z）。这些**编译能过、analyze 也全绿**，
       # 只有把标记画到与瓦片错开的位置才看得出来，所以钉在 CI。

@@ -9239,4 +9239,19 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get serverAccountNote => "APRSNETCN のようなサーバーだけが必要です。標準の APRS-IS では空のままで構いません。";
 
+  @override
+  String get acnSyncTitle => "24 時間の局を同期";
+
+  @override
+  String get acnSyncLast => "前回の同期";
+
+  @override
+  String acnSyncDone(String total, String added) => "サーバーに $total 局、新しく $added 局";
+
+  @override
+  String get acnSyncNoAccount => "アカウントとパスワードを入れると同期できます。";
+
+  @override
+  String get stationSource => "ソース";
+
 }

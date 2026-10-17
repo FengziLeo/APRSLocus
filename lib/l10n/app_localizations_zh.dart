@@ -9138,6 +9138,21 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get serverAccountNote => "只有 APRSNETCN 这类服务器要账号和口令，标准 APRS-IS 留空就行。";
 
+  @override
+  String get acnSyncTitle => "同步 24 小时台站";
+
+  @override
+  String get acnSyncLast => "上次同步";
+
+  @override
+  String acnSyncDone(String total, String added) => "服务器上有 $total 台，新并入 $added 台";
+
+  @override
+  String get acnSyncNoAccount => "填了账号和口令才能同步。";
+
+  @override
+  String get stationSource => "来源";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18272,5 +18287,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get serverAccountNote => "只有 APRSNETCN 這類伺服器要帳號和口令，標準 APRS-IS 留空就行。";
+
+  @override
+  String get acnSyncTitle => "同步 24 小時臺站";
+
+  @override
+  String get acnSyncLast => "上次同步";
+
+  @override
+  String acnSyncDone(String total, String added) => "伺服器上有 $total 臺，新併入 $added 臺";
+
+  @override
+  String get acnSyncNoAccount => "填了帳號和口令才能同步。";
+
+  @override
+  String get stationSource => "來源";
 
 }

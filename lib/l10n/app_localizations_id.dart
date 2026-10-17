@@ -9528,4 +9528,19 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get serverAccountNote => "Hanya server seperti APRSNETCN yang memerlukannya. Di APRS-IS biasa biarkan kosong.";
 
+  @override
+  String get acnSyncTitle => "Sinkronkan stasiun 24 jam";
+
+  @override
+  String get acnSyncLast => "Sinkronisasi terakhir";
+
+  @override
+  String acnSyncDone(String total, String added) => "Server punya $total stasiun, $added di antaranya baru di sini";
+
+  @override
+  String get acnSyncNoAccount => "Isi akun dan kata sandi untuk menyinkronkan.";
+
+  @override
+  String get stationSource => "Sumber";
+
 }

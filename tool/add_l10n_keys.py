@@ -36,33 +36,16 @@ CLASSES = {
 
 # ── 要加的键：key → (zh, zh_TW, en, ja, es, id) ──
 KEYS = {
-    # ── 连接设置：名单账号 + 口令（APRSNETCN 这类服务器才用得上）──
+    # ── 台站来源（详情页位置卡片里那一个 KV 行）──
     #
-    # 两格与 passcode 并列但有区别：passcode 是呼号算出来的数字，账号口令是
-    # 服务器发给人的一对字符串。留空就完全按标准 APRS-IS 登录，所以提示句
-    # 先说要哪个服务器才填，再说留空没关系。
-    'serverAccountTitle': (
-        '账号', '帳號', 'Account', 'アカウント', 'Cuenta', 'Akun'),
-    'serverAccountHint': (
-        '服务器给的账号', '伺服器給的帳號', 'The account the server gave you',
-        'サーバーが発行したアカウント', 'La cuenta que te dio el servidor',
-        'Akun dari server'),
-    'serverPasswordTitle': (
-        '口令', '口令', 'Password', 'パスワード', 'Contraseña', 'Kata sandi'),
-    'serverPasswordHint': (
-        '服务器给的口令', '伺服器給的口令', 'The password the server gave you',
-        'サーバーが発行したパスワード', 'La contraseña que te dio el servidor',
-        'Kata sandi dari server'),
-    'serverAccountNote': (
-        '只有 APRSNETCN 这类服务器要账号和口令，标准 APRS-IS 留空就行。',
-        '只有 APRSNETCN 這類伺服器要帳號和口令，標準 APRS-IS 留空就行。',
-        'Only servers like APRSNETCN need these. Leave both empty on a standard APRS-IS server.',
-        'APRSNETCN のようなサーバーだけが必要です。標準の APRS-IS では空のままで構いません。',
-        'Solo servidores como APRSNETCN los necesitan. En un APRS-IS normal déjalos vacíos.',
-        'Hanya server seperti APRSNETCN yang memerlukannya. Di APRS-IS biasa biarkan kosong.'),
+    # 只有 APRSNETCN 的 24 小时接口并进来的台站才有这一行；值是服务器名，
+    # 不翻译，所以这里只需要一个标签。
+    'stationSource': (
+        '来源', '來源', 'Source', 'ソース', 'Origen', 'Sumber'),
 }
 
 META = {
+    'acnSyncDone': '{"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}}',
     'gpxExported': '{"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}}',
     'gpxSavedTo': '{"placeholders": {"path": {"type": "String"}}}',
     'audioTxNotSourceWarn': '{"placeholders": {"src": {"type": "String"}}}',

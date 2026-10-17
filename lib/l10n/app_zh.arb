@@ -4847,5 +4847,11 @@
   "serverAccountHint": "服务器给的账号",
   "serverPasswordTitle": "口令",
   "serverPasswordHint": "服务器给的口令",
-  "serverAccountNote": "只有 APRSNETCN 这类服务器要账号和口令，标准 APRS-IS 留空就行。"
+  "serverAccountNote": "只有 APRSNETCN 这类服务器要账号和口令，标准 APRS-IS 留空就行。",
+  "acnSyncTitle": "同步 24 小时台站",
+  "acnSyncLast": "上次同步",
+  "acnSyncDone": "服务器上有 {total} 台，新并入 {added} 台",
+  "acnSyncNoAccount": "填了账号和口令才能同步。",
+  "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
+  "stationSource": "来源"
 }

@@ -2348,6 +2348,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
         }),
         _passcodeInput(),
         if (st.aprs.supportsAccountLogin) _accountInputs(),
+        _acnSyncRow(),
         SettingsInput(S.of(context).wsUrlOptional, _ws,
             onChanged: (v) {
           st.aprs.wsUrl = v.trim().isEmpty ? null : v.trim();
@@ -2554,7 +2555,8 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     setState(() {});
   }
 
-  /// 名单账号 + 口令。只在连接器支持账号登录时出现（见 [AprsConnector]）。
+  /// 名单账号 + 口令。只在连接器支持账号登录时出现
+  /// （`AprsConnector.supportsAccountLogin`，TCP 直连为真、WebSocket 网关为假）。
   ///
   /// 为什么不归到 passcode 那一行：passcode 是呼号算出来的六位数字，账号
   /// 口令是服务器发给人的一对字符串。两者都要随登录行发出，但不是一回事。
@@ -2625,6 +2627,39 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
         const SizedBox(height: 4),
         Text(S.of(context).serverAccountNote, style: ts(10, c: C.grey)),
       ]),
+    );
+  }
+
+  /// 「同步 24 小时台站」开关，只在地址确实是 APRSNETCN 时出现。
+  ///
+  /// 挂在服务器输入框上：对着 rotate.aprs2.net 摆一个「同步台站」开关，
+  /// 用户不知道它做什么，也会以为是全站行为。
+  Widget _acnSyncRow() {
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: _server,
+      builder: (_, v, _) {
+        if (v.text.trim() != kAcnServerHost) return const SizedBox.shrink();
+        final last = st.acnLast;
+        return Column(children: [
+          SettingsSwitch(
+            S.of(context).acnSyncTitle,
+            value: st.acnSync,
+            color: C.purple,
+            onChanged: (x) => st.setAcnSync(x),
+          ),
+          if (last != null)
+            SettingsRow2(
+              S.of(context).acnSyncLast,
+              last.ok
+                  ? S.of(context).acnSyncDone(
+                      '${last.total}', '${last.added}')
+                  : (last.error == 'no-account'
+                      ? S.of(context).acnSyncNoAccount
+                      : last.error!),
+              valueColor: last.ok ? C.slate : C.orange,
+            ),
+        ]);
+      },
     );
   }
 

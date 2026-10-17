@@ -16632,6 +16632,36 @@ abstract class AppLocalizations {
   /// **'只有 APRSNETCN 这类服务器要账号和口令，标准 APRS-IS 留空就行。'**
   String get serverAccountNote;
 
+  /// No description provided for @acnSyncTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'同步 24 小时台站'**
+  String get acnSyncTitle;
+
+  /// No description provided for @acnSyncLast.
+  ///
+  /// In zh, this message translates to:
+  /// **'上次同步'**
+  String get acnSyncLast;
+
+  /// No description provided for @acnSyncDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务器上有 {total} 台，新并入 {added} 台'**
+  String acnSyncDone(String total, String added);
+
+  /// No description provided for @acnSyncNoAccount.
+  ///
+  /// In zh, this message translates to:
+  /// **'填了账号和口令才能同步。'**
+  String get acnSyncNoAccount;
+
+  /// No description provided for @stationSource.
+  ///
+  /// In zh, this message translates to:
+  /// **'来源'**
+  String get stationSource;
+
 }
 
 class _AppLocalizationsDelegate

@@ -4756,5 +4756,11 @@
   "serverAccountHint": "伺服器給的帳號",
   "serverPasswordTitle": "口令",
   "serverPasswordHint": "伺服器給的口令",
-  "serverAccountNote": "只有 APRSNETCN 這類伺服器要帳號和口令，標準 APRS-IS 留空就行。"
+  "serverAccountNote": "只有 APRSNETCN 這類伺服器要帳號和口令，標準 APRS-IS 留空就行。",
+  "acnSyncTitle": "同步 24 小時臺站",
+  "acnSyncLast": "上次同步",
+  "acnSyncDone": "伺服器上有 {total} 臺，新併入 {added} 臺",
+  "acnSyncNoAccount": "填了帳號和口令才能同步。",
+  "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
+  "stationSource": "來源"
 }

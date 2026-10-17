@@ -4168,5 +4168,11 @@
   "serverAccountHint": "サーバーが発行したアカウント",
   "serverPasswordTitle": "パスワード",
   "serverPasswordHint": "サーバーが発行したパスワード",
-  "serverAccountNote": "APRSNETCN のようなサーバーだけが必要です。標準の APRS-IS では空のままで構いません。"
+  "serverAccountNote": "APRSNETCN のようなサーバーだけが必要です。標準の APRS-IS では空のままで構いません。",
+  "acnSyncTitle": "24 時間の局を同期",
+  "acnSyncLast": "前回の同期",
+  "acnSyncDone": "サーバーに {total} 局、新しく {added} 局",
+  "acnSyncNoAccount": "アカウントとパスワードを入れると同期できます。",
+  "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
+  "stationSource": "ソース"
 }

@@ -9518,4 +9518,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get serverAccountNote => "Only servers like APRSNETCN need these. Leave both empty on a standard APRS-IS server.";
 
+  @override
+  String get acnSyncTitle => "Sync 24h stations";
+
+  @override
+  String get acnSyncLast => "Last sync";
+
+  @override
+  String acnSyncDone(String total, String added) => "The server had $total stations, $added of them new here";
+
+  @override
+  String get acnSyncNoAccount => "Fill in the account and password to sync.";
+
+  @override
+  String get stationSource => "Source";
+
 }

@@ -9577,4 +9577,19 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get serverAccountNote => "Solo servidores como APRSNETCN los necesitan. En un APRS-IS normal déjalos vacíos.";
 
+  @override
+  String get acnSyncTitle => "Sincronizar estaciones 24 h";
+
+  @override
+  String get acnSyncLast => "Última sincronización";
+
+  @override
+  String acnSyncDone(String total, String added) => "El servidor tenía $total estaciones, $added nuevas aquí";
+
+  @override
+  String get acnSyncNoAccount => "Rellena la cuenta y la contraseña para sincronizar.";
+
+  @override
+  String get stationSource => "Origen";
+
 }

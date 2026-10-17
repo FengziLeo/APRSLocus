@@ -1,4 +1,4 @@
-/// APRSNETCN SERVER（国内的一台 APRS-IS 兼容服务器）在客户端这侧要知道的那几个值。
+/// APRSNETCN SERVER（国内的一台 APRS-IS 兼容服务器）在客户端这侧要知道的那些值。
 ///
 /// 服务器是另一个项目（github.com/dariondong/APRSNETCN-SERVER），协议上是
 /// APRS-IS 的超集：标准登录行照旧可用，另外多认一对「名单账号 + 口令」
@@ -7,6 +7,10 @@
 /// 地址写死在这里是因为它现在只有一个公网入口，没有域名；将来上了域名，
 /// 改这三个常量就行，界面里引用的是 `kAcnServerHost` 而不是字面量。
 library;
+
+import 'dart:convert';
+
+import 'net/http_send.dart';
 
 /// 接入点地址（APRS-IS 兼容的 TCP 端口）
 const String kAcnServerHost = '8.138.199.11';
@@ -19,3 +23,183 @@ const String kAcnHttpBase = 'http://8.138.199.11:8899';
 
 /// 预置按钮上显示的名字（服务器自己的名字，不翻译）
 const String kAcnPresetLabel = 'APRSNETCN SERVER';
+
+/// 一台台站在服务器那侧的 24 小时概况（= 该呼号最后一次位置 + 收到几帧）。
+///
+/// 字段与 `/api/v1/stations` 的响应一一对应，但这里**全部容错**：缺一个字段
+/// 就让那台站整台丢掉，比带一个 0,0 的坐标进地图好得多 —— 后者会在地图原点
+/// （几内亚湾）堆出一片假台站。
+class AcnStation {
+  final String call;
+  final double lat;
+  final double lng;
+  final String symbolTable;
+  final String symbol;
+  final double? speed;
+  final double? course;
+  final double? alt;
+  final String comment;
+  final DateTime lastSeen;
+  final int packets;
+
+  const AcnStation({
+    required this.call,
+    required this.lat,
+    required this.lng,
+    required this.symbolTable,
+    required this.symbol,
+    required this.speed,
+    required this.course,
+    required this.alt,
+    required this.comment,
+    required this.lastSeen,
+    required this.packets,
+  });
+
+  /// 解析一条；坐标/时间是必需项，缺了返回 null。
+  static AcnStation? fromJson(Object? raw) {
+    if (raw is! Map) return null;
+    final call = (raw['call'] as String?)?.trim().toUpperCase() ?? '';
+    if (call.isEmpty) return null;
+    final lat = _num(raw['lat']);
+    final lng = _num(raw['lon']);
+    final at = _parseBeijing((raw['last_seen'] as String?) ?? '');
+    if (lat == null || lng == null || at == null) return null;
+    final sym = raw['symbol'];
+    var table = '/';
+    var code = '/';
+    if (sym is Map) {
+      table = (sym['table'] as String?) ?? '/';
+      code = (sym['code'] as String?) ?? '/';
+    }
+    return AcnStation(
+      call: call,
+      lat: lat,
+      lng: lng,
+      symbolTable: table,
+      symbol: code,
+      speed: _num(raw['speed']),
+      course: _num(raw['course']),
+      alt: _num(raw['alt']),
+      comment: (raw['comment'] as String?) ?? '',
+      lastSeen: at,
+      packets: (raw['packets'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  static double? _num(Object? v) {
+    if (v is num) return v.toDouble();
+    if (v is String) return double.tryParse(v);
+    return null;
+  }
+
+  static final RegExp _zoneTail = RegExp(r'(Z|[+-]\d{2}:?\d{2})$');
+
+  /// 服务器写的是北京时间（形如 `2026-10-17T23:44:01`），字符串里没有偏移。
+  ///
+  /// 直接交给 `DateTime.tryParse` 会按**本机时区**解释：出了国门，「多久前听到」
+  /// 就差几个小时，在线与离线会判反。缺偏移就按 +08:00 补上，再转成本机时间。
+  static DateTime? _parseBeijing(String text) {
+    final s = text.trim();
+    if (s.isEmpty) return null;
+    final filled = _zoneTail.hasMatch(s) ? s : '$s+08:00';
+    return DateTime.tryParse(filled)?.toLocal();
+  }
+}
+
+/// 一次同步的结果（给界面/日志用，不抛异常）
+class AcnSyncResult {
+  final int added;
+  final int total;
+  final String? error;
+
+  const AcnSyncResult({required this.added, required this.total, this.error});
+
+  bool get ok => error == null;
+
+  @override
+  String toString() =>
+      ok ? '同步 $total 台，新增 $added' : '同步失败：$error';
+}
+
+/// 24 小时台站接口的客户端。
+///
+/// token 只放在内存里：换一台机器、重启一次就要重新用账号口令换一个，这本来
+/// 就是一两百毫秒的事，落盘一份 token 反而要在备份里处理它。
+class AcnClient {
+  AcnClient({String base = kAcnHttpBase}) : _base = base;
+
+  final String _base;
+  String _token = '';
+  String _tokenFor = '';
+  DateTime _expires = DateTime.fromMillisecondsSinceEpoch(0);
+
+  /// token 剩下的有效期（服务器发 12 小时，这里按下限保守算 11 小时，
+  /// 免得正好卡在过期那一刻发请求）
+  static const Duration _ttl = Duration(hours: 11);
+
+  bool _tokenOk(String account) =>
+      _token.isNotEmpty &&
+      _tokenFor == account.trim().toLowerCase() &&
+      DateTime.now().isBefore(_expires);
+
+  /// 用名单账号口令换一个 token。账号或口令错会抛 HttpStatusError。
+  Future<void> login(String account, String password) async {
+    final body = await httpSend(
+      'POST',
+      Uri.parse('$_base/api/v1/login'),
+      headers: const {'Content-Type': 'application/json'},
+      body: jsonEncode({'account': account.trim(), 'password': password}),
+      timeout: const Duration(seconds: 15),
+    );
+    final map = jsonDecode(body);
+    final token = (map is Map) ? (map['token'] as String?) ?? '' : '';
+    if (token.isEmpty) throw StateError('no-token');
+    _token = token;
+    _tokenFor = account.trim().toLowerCase();
+    _expires = DateTime.now().add(_ttl);
+  }
+
+  /// 拉 24 小时台站。没 token 就先换一个；401 时换一次再重试。
+  Future<List<AcnStation>> stations({
+    required String account,
+    required String password,
+    int hours = 24,
+  }) async {
+    if (!_tokenOk(account)) await login(account, password);
+    final rows = await _get(account, password, hours);
+    final out = <AcnStation>[];
+    for (final row in rows) {
+      final s = AcnStation.fromJson(row);
+      if (s != null) out.add(s);
+    }
+    return out;
+  }
+
+  Future<List<Object?>> _get(
+    String account,
+    String password,
+    int hours,
+  ) async {
+    final uri = Uri.parse('$_base/api/v1/stations').replace(
+      queryParameters: {'window': '${hours}h', 'limit': '2000'},
+    );
+    Future<String> call() => httpSend(
+          'GET',
+          uri,
+          headers: {'Authorization': 'Bearer $_token'},
+          timeout: const Duration(seconds: 20),
+        );
+    String body;
+    try {
+      body = await call();
+    } on HttpStatusError catch (e) {
+      if (e.status != 401) rethrow;
+      await login(account, password);
+      body = await call();
+    }
+    final map = jsonDecode(body);
+    final rows = (map is Map) ? map['stations'] : null;
+    return rows is List ? rows : const <Object?>[];
+  }
+}

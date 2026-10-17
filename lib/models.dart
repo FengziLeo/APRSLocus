@@ -62,6 +62,13 @@ class Station {
   }
   bool favorite;
   bool manual; // 手动添加的联系人
+
+  /// 这条记录是**别的服务器替我们听到的**（目前只有 APRSNETCN 的 24 小时
+  /// 台站接口）。不是本地链路的收包结果，所以：
+  ///   * 不参与收包速率/过滤器的统计；
+  ///   * 详情页标出来源，用户才知道「这个我没收到过」；
+  ///   * 本地一旦真的收到同呼号报文，仍由 [_upsertStation] 正常更新它。
+  bool remote;
   /// 速度/高度遥测历史（内存态，与 track 一致不持久化）
   List<TelemetryPt> telemetry;
 
@@ -88,6 +95,7 @@ class Station {
     this.statusText,
     this.favorite = false,
     this.manual = false,
+    this.remote = false,
   });
 
   String get lastSeen {

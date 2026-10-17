@@ -4168,5 +4168,11 @@
   "serverAccountHint": "La cuenta que te dio el servidor",
   "serverPasswordTitle": "Contraseña",
   "serverPasswordHint": "La contraseña que te dio el servidor",
-  "serverAccountNote": "Solo servidores como APRSNETCN los necesitan. En un APRS-IS normal déjalos vacíos."
+  "serverAccountNote": "Solo servidores como APRSNETCN los necesitan. En un APRS-IS normal déjalos vacíos.",
+  "acnSyncTitle": "Sincronizar estaciones 24 h",
+  "acnSyncLast": "Última sincronización",
+  "acnSyncDone": "El servidor tenía {total} estaciones, {added} nuevas aquí",
+  "acnSyncNoAccount": "Rellena la cuenta y la contraseña para sincronizar.",
+  "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
+  "stationSource": "Origen"
 }

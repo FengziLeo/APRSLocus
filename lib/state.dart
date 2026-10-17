@@ -28,6 +28,8 @@ import 'l10n/app_localizations_id.dart';
 import 'l10n/app_localizations_ja.dart';
 import 'l10n/app_localizations_zh.dart';
 import 'net/aprs.dart';
+import 'net/http_send.dart';
+import 'aprsnetcn.dart';
 import 'audio.dart';
 import 'box.dart';
 import 'pkwdwpl.dart';
@@ -163,6 +165,16 @@ class AppState extends ChangeNotifier {
     _applyOnlineWindow();
     persist();
     _notify();
+  }
+
+  /// 打开/关掉 APRSNETCN 的 24 小时台站同步。刚打开时马上拉一次，
+  /// 不用等下一次重连 —— 否则用户会以为开关没效果。
+  void setAcnSync(bool v) {
+    if (acnSync == v) return;
+    acnSync = v;
+    persist();
+    _notify();
+    if (v) unawaited(syncAcnStations());
   }
 
   /// 完整呼号（含 SSID 后缀）
@@ -4046,6 +4058,8 @@ class AppState extends ChangeNotifier {
     aprs.passcode = '-1';
     aprs.account = '';
     aprs.password = '';
+    acnSync = true;
+    acnLast = null;
     dataSource = srcAprsIs;
     enabledSources
       ..clear()
@@ -4255,6 +4269,20 @@ class AppState extends ChangeNotifier {
   final LocService loc = LocService();
   final AprsConnector aprs = createAprs();
 
+  /// APRSNETCN 的 24 小时台站接口（见 lib/aprsnetcn.dart）。
+  /// token 只在内存里，不用烤进备份。
+  final AcnClient acn = AcnClient();
+
+  /// 连上 APRSNETCN 后是否顺带拉一份 24 小时台站。
+  ///
+  /// 默认打开：用户特意填了这台服务器的地址，要的就是它那 600 多台站；
+  /// 但它确实会多发一次 HTTP 请求与一对账号口令，所以给个开关。
+  bool acnSync = true;
+
+  /// 上一次同步的结果（设置页/日志用），未同步过为 null。
+  AcnSyncResult? acnLast;
+  bool _acnSyncing = false;
+
   Timer? _simTimer;
   Timer? _tickTimer;
 
@@ -4450,6 +4478,7 @@ class AppState extends ChangeNotifier {
       aprs.passcode = p.getString('passcode') ?? aprs.passcode;
       aprs.account = p.getString('aprsAccount') ?? aprs.account;
       aprs.password = p.getString('aprsPassword') ?? aprs.password;
+      acnSync = p.getBool('acnSync') ?? acnSync;
       dataSource = p.getString('dataSource') ?? dataSource;
       // 容错：非法/旧值一律回落 APRS-IS，避免多来源判断失配。
       // pkwdwpl 是**只读**来源，即使旧配置里存了它也不能当发射来源。
@@ -4738,6 +4767,7 @@ class AppState extends ChangeNotifier {
     await p.setString('passcode', aprs.passcode);
     await p.setString('aprsAccount', aprs.account);
     await p.setString('aprsPassword', aprs.password);
+    await p.setBool('acnSync', acnSync);
     await p.setString('dataSource', dataSource);
     await p.setStringList('enabledSources', enabledSources.toList());
     await p.setBool('igateEnabled', igateEnabled);
@@ -5842,6 +5872,12 @@ class AppState extends ChangeNotifier {
       // 但射频也不发 CONNECT 帧，不存在这个覆盖问题）。
       final customFrame = _customStatusFrame();
       if (customFrame != null) _customStatusLost = !aprs.send(customFrame);
+      // 连的是 APRSNETCN 就顺带拉一份它 24 小时内的台站：服务器替我们听到了
+      // 过滤器之外的一大片（六百多台站），这一份只在本地列表里**补空**，
+      // 已经收到的呼号一律不动（见 mergeAcnStations）。失败只记日志。
+      if (acnSync && aprs.server.trim() == kAcnServerHost) {
+        unawaited(syncAcnStations());
+      }
       // 连接成功：**不再**自动弹「是否自动上报」询问。
       // 用户要求：连上后不自动上报，界面给一个正式的「开始上报」按钮，由用户
       // 手动确认（见 [beginReporting] / [BeaconPhase.needConfirm]）。
@@ -8301,6 +8337,97 @@ class AppState extends ChangeNotifier {
     return true;
   }
 
+  /// 把 APRSNETCN 的 24 小时台站并进列表。返回新增台数。
+  ///
+  /// 只补**本地没听到的**：同呼号已在列表里就完全不动 —— 本地链路收到的是这一秒
+  /// 的事实，服务器那份是它替别人听到的副本，拿一份旧坐标去盖新坐标没有道理。
+  /// 已屏蔽的台站不并入；国家接收筛选照旧生效。
+  int mergeAcnStations(List<AcnStation> rows) {
+    final mine = myFullCall.toUpperCase();
+    var added = 0;
+    for (final r in rows) {
+      if (isStationIgnored(r.call)) continue;
+      if (!_matchReceiveFilter(r.call)) continue;
+      if (mine.isNotEmpty && r.call == mine) continue;
+      if (stations.any((s) => s.call == r.call)) continue;
+      if (stations.length >= maxStations) break;
+      final speed = r.speed;
+      stations.add(
+        Station(
+          call: r.call,
+          symbol: r.symbol.isEmpty ? '/' : r.symbol,
+          symbolTable: r.symbolTable.isEmpty ? '/' : r.symbolTable,
+          lat: r.lat,
+          lng: r.lng,
+          alt: r.alt,
+          speed: speed,
+          course: r.course,
+          comment: r.comment.isEmpty ? null : r.comment,
+          // 服务器给的「最后一次听到」：直接当 lastHeard，于是一个 12 小时前
+          // 听到的台站会显示成离线，不需要另存一个时间字段。
+          lastHeard: r.lastSeen,
+          status: speed == null
+              ? St.online
+              : (speed > 1.0 ? St.moving : St.stopped),
+          track: [TrackPt(r.lat, r.lng, r.lastSeen)],
+          remote: true,
+        ),
+      );
+      added++;
+    }
+    if (added > 0) {
+      _bumpStationsVersion();
+      _notify();
+      _saveStations();
+    }
+    return added;
+  }
+
+  /// 拉一份 APRSNETCN 的 24 小时台站并合并（设置页可关）。
+  ///
+  /// 失败只记一条日志与一个结果，**不改链路状态**：这是搭头，链路本身好不好
+  /// 由连接那一层说。
+  Future<AcnSyncResult> syncAcnStations() async {
+    if (_acnSyncing) return acnLast ?? const AcnSyncResult(added: 0, total: 0);
+    final account = aprs.account.trim();
+    final password = aprs.password;
+    if (account.isEmpty || password.isEmpty) {
+      final r = const AcnSyncResult(added: 0, total: 0, error: 'no-account');
+      acnLast = r;
+      return r;
+    }
+    _acnSyncing = true;
+    try {
+      final rows = await acn.stations(account: account, password: password);
+      final added = mergeAcnStations(rows);
+      final r = AcnSyncResult(added: added, total: rows.length);
+      acnLast = r;
+      _log(LogLevel.info, 'APRSNETCN', '台站同步：${rows.length} 台，新增 $added');
+      _notify();
+      return r;
+    } catch (e) {
+      final r = AcnSyncResult(added: 0, total: 0, error: _acnError(e));
+      acnLast = r;
+      _log(LogLevel.error, 'APRSNETCN', '台站同步失败：${r.error}');
+      _notify();
+      return r;
+    } finally {
+      _acnSyncing = false;
+    }
+  }
+
+  /// 把同步异常翻成一句人话（设置页直接显示）
+  String _acnError(Object e) {
+    if (e is HttpStatusError) {
+      if (e.status == 401) return '账号或口令不对';
+      if (e.status == 403) return '这个账号没有权限';
+      if (e.status == 429) return '请求太频繁';
+      return '服务器返回 ${e.status}';
+    }
+    if (e is TimeoutException) return '服务器没响应';
+    return '同步出错';
+  }
+
   /// 保存台站列表到本地
   void _saveStations() {
     unawaited(_saveStationsNow());
@@ -8322,6 +8449,7 @@ class AppState extends ChangeNotifier {
               'comment': s.comment,
               'favorite': s.favorite,
               'manual': s.manual,
+              if (s.remote) 'remote': true,
               if (s.path != null) 'path': s.path,
               if (s.toCall != null && s.toCall!.isNotEmpty) 'toCall': s.toCall,
               if (s.fmo != null) 'fmo': s.fmo,
@@ -8347,6 +8475,7 @@ class AppState extends ChangeNotifier {
         if (idx >= 0) {
           stations[idx].favorite = m['favorite'] as bool? ?? false;
           stations[idx].manual = m['manual'] as bool? ?? false;
+          stations[idx].remote = m['remote'] as bool? ?? false;
           stations[idx].path = m['path'] as String?;
           final savedToCall = m['toCall'] as String?;
           if (savedToCall != null && savedToCall.isNotEmpty) {
@@ -8387,6 +8516,7 @@ class AppState extends ChangeNotifier {
               comment: m['comment'] as String?,
               favorite: favorite,
               manual: manual,
+              remote: m['remote'] as bool? ?? false,
               path: m['path'] as String?,
               toCall: (m['toCall'] as String?)?.isNotEmpty == true
                   ? m['toCall'] as String?

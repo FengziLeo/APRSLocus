@@ -4168,5 +4168,11 @@
   "serverAccountHint": "Akun dari server",
   "serverPasswordTitle": "Kata sandi",
   "serverPasswordHint": "Kata sandi dari server",
-  "serverAccountNote": "Hanya server seperti APRSNETCN yang memerlukannya. Di APRS-IS biasa biarkan kosong."
+  "serverAccountNote": "Hanya server seperti APRSNETCN yang memerlukannya. Di APRS-IS biasa biarkan kosong.",
+  "acnSyncTitle": "Sinkronkan stasiun 24 jam",
+  "acnSyncLast": "Sinkronisasi terakhir",
+  "acnSyncDone": "Server punya {total} stasiun, {added} di antaranya baru di sini",
+  "acnSyncNoAccount": "Isi akun dan kata sandi untuk menyinkronkan.",
+  "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
+  "stationSource": "Sumber"
 }

@@ -1,5 +1,34 @@
 # 更新日志
 
+## [2.1.8] - 2026-10-17
+
+### 外接 GPS 走了之后，定位和上报都能自己回来
+
+- **模块供位时，手机定位只是待机**。以前它会把后台服务一起停掉，应用退到后台就被系统冻住：
+  连接悄悄断掉、信标定时器停摆，界面上却还写着已连接。现在后台服务一直在，只是不开 GPS。
+- **模块断流或被拔掉，手机定位会自己接回来**。接回失败隔十秒再试一次，不会一次失败就再也
+  没有位置。
+- **模块只是开着、其实没在供位时，网络定位不再被它挡住**。室内或者只用网络定位的时候也能
+  重新拿到位置，上报闸跟着打开，手动发送不再只剩一帧状态报文。
+
+---
+
+## [2.1.8] - 2026-10-17 (English)
+
+### Position and reporting recover on their own once the external GPS is gone
+
+- **While the module supplies fixes, the phone GPS only stands by.** It used to stop the
+  background service as well, so once the app was sent to the background the system froze it:
+  the connection died silently, the beacon timer stopped, and the screen still said connected.
+  The service now stays up, only the GPS sampling is off.
+- **When the module goes quiet or is unplugged, the phone GPS comes back by itself.** If that
+  hand-over fails, it retries ten seconds later instead of leaving the app without a position.
+- **A module that is only switched on no longer blocks network fixes.** Indoors, or in a
+  network-only setup, the app can pick a position again, which reopens the reporting gate, and a
+  manual send no longer carries just a status frame.
+
+---
+
 ## [2.1.7] - 2026-10-17
 
 ### 选过的东西留到下次

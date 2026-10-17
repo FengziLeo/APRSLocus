@@ -633,6 +633,15 @@ html{overflow-x:hidden}
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.1.8</span>
+        <span class="cl-date">2026-10-17</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot fix"></span>While an external GPS module supplies fixes, the phone GPS only stands by instead of stopping the background service. When the module goes quiet or is unplugged, the phone GPS returns by itself and retries after ten seconds if the hand-over fails. A module that is switched on but not supplying no longer blocks network fixes, so a position comes back indoors too.</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.1.7</span>
         <span class="cl-date">2026-10-17</span>
       </div>

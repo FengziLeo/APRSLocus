@@ -419,6 +419,23 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.8', 'date': '2026-10-17',
+        'items': [
+            ('fix',
+             T('外接 GPS 模块供位时手机定位只待机，不再把后台服务一起停掉；模块断流或被拔掉，'
+               '手机定位会自己接回来，接回失败隔十秒再试。模块只是开着、没在供位时，网络定位'
+               '也不再被它挡住，室内也能重新拿到位置。',
+               '外接 GPS 模組供位時手機定位只待機，不再把後台服務一起停掉；模組斷流或被拔掉，'
+               '手機定位會自己接回來，接回失敗隔十秒再試。模組只是開著、沒在供位時，網路定位'
+               '也不再被它擋住，室內也能重新拿到位置。',
+               'While an external GPS module supplies fixes, the phone GPS only stands by instead '
+               'of stopping the background service. When the module goes quiet or is unplugged, '
+               'the phone GPS returns by itself and retries after ten seconds if the hand-over '
+               'fails. A module that is switched on but not supplying no longer blocks network '
+               'fixes, so a position comes back indoors too.')),
+        ],
+    },
+    {
         'ver': 'v2.1.7', 'date': '2026-10-17',
         'items': [
             ('fix',

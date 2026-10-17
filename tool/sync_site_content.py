@@ -419,6 +419,22 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.9', 'date': '2026-10-17',
+        'items': [
+            ('new',
+             T('数据包页搜索框与连接设置里的服务器地址多了「最近用过的」：点开挑一条就填回去，'
+               '选错的也能当场删掉，最多留八条。公告里的内嵌视频按屏幕宽度铺开，竖屏不再有'
+               '黑边，横条也不会留下一大片空白。',
+               '資料包頁搜尋框與連線設定裡的伺服器位址多了「最近用過的」：點開挑一條就填回去，'
+               '選錯的也能當場刪掉，最多留八條。公告裡的內嵌影片按螢幕寬度鋪開，豎屏不再有'
+               '黑邊，橫條也不會留下一大片空白。',
+               'The packet page search box and the server address in the connection settings '
+               'now keep a short history: tap to fill one back in, delete the ones you got wrong, '
+               'eight entries at most. Inline videos in the announcement fill the width, so a '
+               'portrait phone has no black bar and an audio strip leaves no empty gap.')),
+        ],
+    },
+    {
         'ver': 'v2.1.8', 'date': '2026-10-17',
         'items': [
             ('fix',

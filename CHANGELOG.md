@@ -1,5 +1,36 @@
 # 更新日志
 
+## [2.1.9] - 2026-10-17
+
+### 常用的输入留下来，公告里的视频铺满了
+
+- **数据包页的搜索框有了「最近搜过的」**。搜过几次之后，搜索框右边会多一个小历史按钮，
+  点开挑一条就填回去，挑错的也能当场删掉。最多留八条，刚用过的排最前。
+- **连接设置里的服务器地址也记**。`rotate.aprs2.net` 这种地址敲起来不轻松，连过的几台
+  都留在面板里，点一下换回来。
+- **公告里的内嵌视频按屏幕宽度铺开**。以前高度写死，手机竖着看时 16:9 的画面被撑出一道
+  黑边；网易云那种横条又会在公告里留下一大片空白。现在它跟着宽度等比缩放，横屏和平板上
+  也不会变成一块巨幕。
+
+---
+
+## [2.1.9] - 2026-10-17 (English)
+
+### The values you reuse are kept, and embeds fill the width
+
+- **The packet page's search box now remembers recent searches.** After a few searches a small
+  history button appears on the right of the field: pick an entry to fill it back in, or delete
+  the ones you got wrong. Eight entries at most, most recent first.
+- **The server address in the connection settings is remembered the same way.**
+  `rotate.aprs2.net` is not pleasant to type; the servers you have used stay in a small panel and
+  come back with one tap.
+- **Inline videos in the announcement fill the screen width.** The height used to be fixed, so a
+  16:9 player carried a black bar on a portrait phone, while a 330×86 audio strip left a large
+  empty gap. Both now scale with the width, and on a tablet or in landscape they stop growing at
+  a sensible size.
+
+---
+
 ## [2.1.8] - 2026-10-17
 
 ### 外接 GPS 走了之后，定位和上报都能自己回来

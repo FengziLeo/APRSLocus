@@ -4313,6 +4313,27 @@ class AppState extends ChangeNotifier {
   String acnAccount = '';
   String acnPassword = '';
 
+  /// 主链路最近收到的原始报文行（副链路镜像去重用，见 [_isMainMirror]）。
+  final Map<String, DateTime> _mainLines = {};
+
+  /// 这一行是不是刚在主链路上收到过（60 秒内、逐字相同）。
+  ///
+  /// APRSNETCN 那边是拿 rotate.aprs2.net 的报文再转给我们的，两边常常是同一帧。
+  /// 台站是 upsert，重复无害；数据包列表、收包计数与成就会各记两遍。
+  bool _isMainMirror(String line) {
+    final at = _mainLines[line];
+    return at != null && DateTime.now().difference(at).inSeconds < 60;
+  }
+
+  void _noteMainLine(String line) {
+    final now = DateTime.now();
+    _mainLines[line] = now;
+    // 只在超长时清一次过期的：多数报文 60 秒后自动失效，不必每帧遍历。
+    if (_mainLines.length > 400) {
+      _mainLines.removeWhere((_, t) => now.difference(t).inSeconds >= 60);
+    }
+  }
+
   Timer? _simTimer;
   Timer? _tickTimer;
 
@@ -7337,6 +7358,8 @@ class AppState extends ChangeNotifier {
   void _onAprsLine(String line,
       {required bool rf, String source = 'local', bool fromAcn = false}) {
     _rxSource = source;
+    if (fromAcn && _isMainMirror(line)) return;
+    if (!fromAcn) _noteMainLine(line);
     // 网关转递必须在**解析之前**做：无论这条报文能否解析成台站/消息，
     // 只要它该被转递就得转递（很多报文类型本应用并不解析，但网关该转发）。
     // 副链路（APRSNETCN）只收不发，也不做网关转递：同一条报文可能从两条链路
@@ -7757,6 +7780,19 @@ class AppState extends ChangeNotifier {
       DateTime.now(),
       groupId: groupId,
     );
+    // 两条链路同时在线时，同一句话会各来一份。只在这种情况下按
+    // 「谁说的 + 说了什么」在 20 秒内去一次重：单链路时（含射频+网关回环）
+    // 这个判断不该改人原来的行为。
+    if (acnOn && acnConnected) {
+      final mk = 'MSG|${src.toUpperCase()}|${text.toUpperCase()}';
+      final mn = DateTime.now();
+      final ms = _seenProtoMsgs[mk];
+      if (ms != null && mn.difference(ms).inSeconds < 20) return null;
+      _seenProtoMsgs[mk] = mn;
+      if (_seenProtoMsgs.length > 400) {
+        _seenProtoMsgs.remove(_seenProtoMsgs.keys.first);
+      }
+    }
     messages.insert(0, msg);
     if (messages.length > 500) messages.removeLast();
     // 群聊：记录活跃成员

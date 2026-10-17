@@ -326,6 +326,11 @@ jobs:
       - name: Test map filter persistence
         run: flutter test test/map_filter_persist_test.dart
 
+      # 地图「锁定地图中心」三态的记忆（用户要求）：它原来只活在地图页的 State 里，
+      # 冷启动就回到「关」。三档之外的值必须夹回 0..2，不能造出第三态。
+      - name: Test map follow mode persistence
+        run: flutter test test/map_follow_mode_persist_test.dart
+
       # 历史轨迹导出 GPX（用户要求）：GPX 是**给别人读的文件**，时间少个 Z、
       # 海拔补个 0、断档不断段，在这里都不会报错 —— 只有导进 Strava / Garmin /
       # Google Earth 之后才看得见。所以把这几条意图逐字钉在 CI。

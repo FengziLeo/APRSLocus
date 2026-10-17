@@ -97,11 +97,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   /// 锁定地图中心的**三态**（用户要求把这一颗改成切换）：
   /// 0 关（自由拖动）/ 1 锁定中心·正北朝上 / 2 锁定中心·航向朝上。
   ///
+  /// 值与落盘都在 [AppState.mapFollowMode]：用户要求「上次选的航向锁定要能保持」，
+  /// 它原来是本页的 State 字段，冷启动就回到 0。
+  ///
   /// 与上面那颗「定位」的分工不变：定位是**跳一次**，锁定是**一直跟着** ——
   /// 自己走动（或新定位点到达）时地图跟着走。两种动作会自动解锁：
   /// 拖地图（见下方 Listener）、点了某个台站要聚焦过去（见 [_handleViewFocus]）——
   /// 用户一动手就是要自己看，不该在下一帧被拽回中心。
-  int _followMode = 0;
+  int get _followMode => widget.state.mapFollowMode;
 
   /// 旧口径沿用：`> 0` 就是「锁定中心」。其余引用（拖一下解锁、矢量底图
   /// 跟随）关心的只是「有没有锁」，不用跟着三态一起改。
@@ -719,8 +722,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       // 用 0 阈值会把每一次点击都当成拖动。
                       if ((e.position - start).distance < 6) return;
                       _dragStart = null;
-                      // 自己拖地图：三态一起退回「关」，转角也随之回正北
-                      setState(() => _followMode = 0);
+                      // 自己拖地图：三态一起退回「关」，转角也随之回正北（也落盘）
+                      setState(() => widget.state.setMapFollowMode(0));
                     },
                     onPointerUp: (_) => _dragStart = null,
                     onPointerCancel: (_) => _dragStart = null,
@@ -1098,7 +1101,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           _pan = _panFor(focus.lat, focus.lng, 14.0);
           // 跳到某个台站 = 用户要看那个点，锁定随之解除：留着的话下一帧就被
           // 「锁定地图中心」拽回我的位置，用户根本看不到刚聚焦的台站。
-          _followMode = 0;
+          widget.state.setMapFollowMode(0);
         });
       });
       return true;
@@ -2366,7 +2369,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
               // 按下去像没反应。
               _setView(_zoom, _panFor(st.myLat!, st.myLng!, _zoom));
             }
-            setState(() => _followMode = next);
+            setState(() => st.setMapFollowMode(next));
           },
         ),
       ],

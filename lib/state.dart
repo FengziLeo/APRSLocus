@@ -3355,6 +3355,18 @@ class AppState extends ChangeNotifier {
     _notify();
   }
 
+  /// 地图「锁定地图中心」的三态：0 关 / 1 锁定中心·正北朝上 / 2 锁定中心·航向朝上。
+  ///
+  /// 用户要求「航向锁定选择每次启动后都要保持」：它原来是地图页的 State 字段
+  /// `_followMode`，冷启动就回到 0，于是每次重新打开地图都要再点两下。落盘
+  /// 之后只认三档，其它值一律夹回合法范围（不写脏值）。
+  void setMapFollowMode(int v) {
+    final n = v.clamp(0, 2);
+    if (n == mapFollowMode) return;
+    mapFollowMode = n;
+    persist();
+  }
+
   /// 设置台站列表的排序方式（见 [stationSort]）。
   ///
   /// 非法值直接忽略：这颗入口只有四个选项，谁传进来的脏值都不该把列表排序弄成
@@ -3638,6 +3650,10 @@ class AppState extends ChangeNotifier {
   /// 打开后忽略该阈值、**始终**绘制 —— 栅格与矢量两套地图共用。
   bool mapLabelsAlways = false;
 
+  /// 地图「锁定地图中心」三态（见 [setMapFollowMode]）：0 关 / 1 正北朝上 / 2 航向朝上。
+  /// 默认关 —— 与原来一致，不锁就不跟着跑。
+  int mapFollowMode = 0;
+
   /// 台站列表的排序方式（台站面板统计行右端那颗排序入口）。
   ///
   /// 取值 [stationSorts] 之一，认不出的值（改坏 / 将来改名字）一律回到 `call`。
@@ -3920,6 +3936,7 @@ class AppState extends ChangeNotifier {
     filterRadius = 300;
     heatLevel = 1;
     mapLabelsAlways = false;
+    mapFollowMode = 0;
     stationFilter = const StationFilter();
     applyFilterToMap = false;
     mapHiddenTypes.clear();
@@ -4279,6 +4296,8 @@ class AppState extends ChangeNotifier {
       filterRadius = p.getInt('filterRadius') ?? filterRadius;
       heatLevel = (p.getInt('heatLevel') ?? heatLevel).clamp(0, 2);
       mapLabelsAlways = p.getBool('mapLabelsAlways') ?? mapLabelsAlways;
+      // 地图锁定中心的三态：认不出的值夹回 0..2（改坏 / 旧版不写这一项）
+      mapFollowMode = (p.getInt('mapFollowMode') ?? mapFollowMode).clamp(0, 2);
       // 台站筛选：启动后保持上次那一套（含脏值回落，见 StationFilter.fromJson）
       try {
         final sf = p.getString('stationFilterJson');
@@ -4593,6 +4612,7 @@ class AppState extends ChangeNotifier {
     await p.setInt('filterRadius', filterRadius);
     await p.setInt('heatLevel', heatLevel);
     await p.setBool('mapLabelsAlways', mapLabelsAlways);
+    await p.setInt('mapFollowMode', mapFollowMode);
     await p.setString('stationFilterJson', jsonEncode(stationFilter.toJson()));
     await p.setBool('applyFilterToMap', applyFilterToMap);
     await p.setStringList(

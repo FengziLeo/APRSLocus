@@ -16590,6 +16590,18 @@ abstract class AppLocalizations {
   /// **'通知权限没开，提醒和生命守护告警都看不到。'**
   String get permCheckNotify;
 
+  /// No description provided for @searchHistoryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近搜过的'**
+  String get searchHistoryTitle;
+
+  /// No description provided for @serverHistoryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近连过的服务器'**
+  String get serverHistoryTitle;
+
 }
 
 class _AppLocalizationsDelegate

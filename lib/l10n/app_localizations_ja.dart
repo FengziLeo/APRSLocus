@@ -9218,4 +9218,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get permCheckNotify => "通知の権限がオフです。リマインダーとライフアラームが表示されません。";
 
+  @override
+  String get searchHistoryTitle => "最近の検索";
+
+  @override
+  String get serverHistoryTitle => "最近接続したサーバー";
+
 }

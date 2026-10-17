@@ -224,6 +224,12 @@ class SettingsInput extends StatelessWidget {
   ///   3. 聚焦时描边变主题蓝，进一步确认「点这里就是在编辑」。
   final String? hint;
 
+  /// 输入框右端的小控件（例：「最近用过的」历史按钮，见 lib/input_history.dart）。
+  ///
+  /// 做成一个 Widget 而不是几个回调参数：这一行只负责**摆**它，点开、删除、
+  /// 历史从哪来都归调用方。设置里将来别的输入框要用同一个按钮，换一个实例即可。
+  final Widget? trailing;
+
   const SettingsInput(this.label, this.controller,
       {super.key,
       this.onChanged,
@@ -231,7 +237,8 @@ class SettingsInput extends StatelessWidget {
       this.focusNode,
       this.tip,
       this.hint,
-      this.badge});
+      this.badge,
+      this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -303,6 +310,14 @@ class SettingsInput extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: C.blue, width: 1.4),
               ),
+              suffixIconConstraints:
+                  const BoxConstraints(minWidth: 0, minHeight: 0),
+              suffixIcon: trailing == null
+                  ? null
+                  : Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: trailing,
+                    ),
             ),
           ),
         ),

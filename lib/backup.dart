@@ -165,6 +165,9 @@ const List<BackupGroupSpec> kBackupGroups = [
     // 功能引导的「已看过」集合：与 oobeDone 同类（都是「新手引导走没走过」）。
     // 换机后不该把用户已经看过的提示卡再弹一遍 —— 那正是引导最烦人的地方。
     'guideSeen',
+    // 输入框历史（搜索词 / 服务器地址）：与上一条同类 —— 是用户自己攒下来的，
+    // 换机后清零表现为「最近用过的怎么全没了」，而它本来就是用来省重敲的。
+    'packetSearchHistory', 'serverHistory',
     'sensorAssist',
     'server', 'port', 'passcode', 'dataSource', 'enabledSources',
     'igateEnabled', 'igateTwoWay',

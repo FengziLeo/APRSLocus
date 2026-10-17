@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'theme.dart';
 import 'guide.dart';
+import 'input_history.dart';
 import 'models.dart';
 import 'state.dart';
 import 'widgets.dart';
@@ -22,6 +23,23 @@ class _PacketsPageState extends State<PacketsPage> {
   bool _raw = false;
   final _tx = TextEditingController();
   final _search = TextEditingController();
+
+  /// 搜索框的焦点：**离开时**把这次搜的词记进历史。
+  ///
+  /// 不在 onChanged 里记：那就成了逐字母记录（「B」「BG」「BG7」…）。
+  /// 也不在打开面板时才记 —— 用户真正想重用的往往是上一次搜完就删掉的那个。
+  final _searchFocus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _searchFocus.addListener(_onSearchFocus);
+  }
+
+  void _onSearchFocus() {
+    if (_searchFocus.hasFocus) return;
+    widget.state.rememberInput(InputHistory.packetSearch, _search.text);
+  }
 
   List<Packet> _list(AppState st) {
     var p = st.packets;
@@ -106,6 +124,8 @@ class _PacketsPageState extends State<PacketsPage> {
 
   @override
   void dispose() {
+    _searchFocus.removeListener(_onSearchFocus);
+    _searchFocus.dispose();
     _tx.dispose();
     _search.dispose();
     super.dispose();
@@ -275,7 +295,12 @@ class _PacketsPageState extends State<PacketsPage> {
               // 搜索
               TextField(
                 controller: _search,
+                focusNode: _searchFocus,
                 onChanged: (_) => setState(() {}),
+                onSubmitted: (v) {
+                  widget.state.rememberInput(InputHistory.packetSearch, v);
+                },
+                textInputAction: TextInputAction.search,
                 style: ts(13),
                 decoration: InputDecoration(
                   hintText: S.of(context).searchPacket,
@@ -285,19 +310,42 @@ class _PacketsPageState extends State<PacketsPage> {
                     size: 18,
                     color: C.grey,
                   ),
-                  suffixIcon: _search.text.isNotEmpty
-                      ? GestureDetector(
-                          onTap: () {
-                            _search.clear();
-                            setState(() {});
-                          },
-                          child: Icon(
-                            Icons.close_rounded,
-                            size: 16,
-                            color: C.grey,
-                          ),
-                        )
-                      : null,
+                  // 右侧两个小按钮：历史（没历史时不显示）+ 清空
+                  suffixIconConstraints:
+                      const BoxConstraints(minWidth: 0, minHeight: 0),
+                  suffixIcon: (widget.state.packetSearchHistory.isEmpty &&
+                          _search.text.isEmpty)
+                      ? null
+                      : Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child:
+                              Row(mainAxisSize: MainAxisSize.min, children: [
+                            HistoryButton(
+                              entries: widget.state.packetSearchHistory,
+                              title: S.of(context).searchHistoryTitle,
+                              onPick: (v) => setState(() => _search.text = v),
+                              onDelete: (v) => widget.state
+                                  .forgetInput(InputHistory.packetSearch, v),
+                              onClear: () => widget.state
+                                  .clearInputHistory(InputHistory.packetSearch),
+                            ),
+                            if (_search.text.isNotEmpty)
+                              GestureDetector(
+                                onTap: () {
+                                  _search.clear();
+                                  setState(() {});
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 6),
+                                  child: Icon(
+                                    Icons.close_rounded,
+                                    size: 16,
+                                    color: C.grey,
+                                  ),
+                                ),
+                              ),
+                          ]),
+                        ),
                   filled: true,
                   fillColor: C.white,
                   isDense: true,

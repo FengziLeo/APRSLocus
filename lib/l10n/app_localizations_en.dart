@@ -9497,4 +9497,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get permCheckNotify => "Notifications are off. Reminders and the life-guard alarm will not show.";
 
+  @override
+  String get searchHistoryTitle => "Recent searches";
+
+  @override
+  String get serverHistoryTitle => "Recent servers";
+
 }

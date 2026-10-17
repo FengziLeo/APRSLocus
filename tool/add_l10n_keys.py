@@ -64,6 +64,15 @@ KEYS = {
         'El permiso de notificaciones está desactivado: no se verán los avisos ni '
         'la alarma de vida.',
         'Izin notifikasi mati: pengingat dan alarm darurat tidak akan muncul.'),
+    # ── 输入框历史（搜索框 / 服务器地址的「最近用过的」面板，见 lib/input_history.dart）──
+    # 两个标题分开写：面板标题同时当按钮的长按提示，说「最近搜过的」比说
+    # 「历史记录」更能说明点开是什么。
+    'searchHistoryTitle': (
+        '最近搜过的', '最近搜過的', 'Recent searches',
+        '最近の検索', 'Búsquedas recientes', 'Pencarian terakhir'),
+    'serverHistoryTitle': (
+        '最近连过的服务器', '最近連過的伺服器', 'Recent servers',
+        '最近接続したサーバー', 'Servidores recientes', 'Server terakhir'),
 }
 
 META = {

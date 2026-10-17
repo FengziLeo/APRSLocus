@@ -9556,4 +9556,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get permCheckNotify => "El permiso de notificaciones está desactivado: no se verán los avisos ni la alarma de vida.";
 
+  @override
+  String get searchHistoryTitle => "Búsquedas recientes";
+
+  @override
+  String get serverHistoryTitle => "Servidores recientes";
+
 }

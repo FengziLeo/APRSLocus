@@ -9507,4 +9507,10 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get permCheckNotify => "Izin notifikasi mati: pengingat dan alarm darurat tidak akan muncul.";
 
+  @override
+  String get searchHistoryTitle => "Pencarian terakhir";
+
+  @override
+  String get serverHistoryTitle => "Server terakhir";
+
 }

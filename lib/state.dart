@@ -1917,6 +1917,55 @@ class AppState extends ChangeNotifier {
     persist();
   }
 
+  /// 输入框历史最多留几条。
+  ///
+  /// 8 条的理由：面板是一屏能看全的高度，再多就只能滚动 —— 而这里存的是
+  /// 「刚才用过的那几个」，翻到第 9 条的场景基本不存在。
+  static const int historyLimit = 8;
+
+  /// 数据包页搜索框最近搜过的词，新的在前。
+  ///
+  /// 这两个列表（搜索词 / 服务器地址）是同一套东西：输入框右侧的「最近用过的」
+  /// 按钮读它们，见 lib/input_history.dart。存成 List 而不是 Set，因为顺序本身
+  /// 就是信息（最近用过的排最前）。
+  final List<String> packetSearchHistory = [];
+
+  /// 最近连过的服务器地址，新的在前。
+  final List<String> serverHistory = [];
+
+  /// 取某个输入框的历史列表。
+  List<String> historyOf(InputHistory which) =>
+      which == InputHistory.server ? serverHistory : packetSearchHistory;
+
+  /// 记一条输入历史（去两端空白，重复的提到最前，最多 [historyLimit] 条）。
+  void rememberInput(InputHistory which, String value) {
+    final v = value.trim();
+    if (v.isEmpty) return;
+    final list = historyOf(which);
+    if (list.isNotEmpty && list.first == v) return;
+    list.remove(v);
+    list.insert(0, v);
+    if (list.length > historyLimit) list.removeRange(historyLimit, list.length);
+    persist();
+    _notify();
+  }
+
+  /// 从历史里删掉一条。
+  void forgetInput(InputHistory which, String value) {
+    if (!historyOf(which).remove(value)) return;
+    persist();
+    _notify();
+  }
+
+  /// 清空某个输入框的全部历史。
+  void clearInputHistory(InputHistory which) {
+    final list = historyOf(which);
+    if (list.isEmpty) return;
+    list.clear();
+    persist();
+    _notify();
+  }
+
   /// 按国家接收列表（国家代码）
   final List<String> receiveCountries = [];
 
@@ -3988,6 +4037,8 @@ class AppState extends ChangeNotifier {
     receiveCountries.clear();
     receiveOthers = false;
     guideSeen.clear();
+    packetSearchHistory.clear();
+    serverHistory.clear();
     labLandscape = false;
     sensorAssist = true;
     aprs.server = 'rotate.aprs2.net';
@@ -4380,6 +4431,15 @@ class AppState extends ChangeNotifier {
         final gseen = p.getStringList('guideSeen');
         if (gseen != null) guideSeen..clear()..addAll(gseen);
       } catch (_) {}
+      // 输入框历史（搜索词 / 服务器地址，见 lib/input_history.dart）
+      try {
+        final ps = p.getStringList('packetSearchHistory');
+        if (ps != null) packetSearchHistory..clear()..addAll(ps);
+      } catch (_) {}
+      try {
+        final sh = p.getStringList('serverHistory');
+        if (sh != null) serverHistory..clear()..addAll(sh);
+      } catch (_) {}
       labLandscape = p.getBool('labLandscape') ?? labLandscape;
       sensorAssist = p.getBool('sensorAssist') ?? sensorAssist;
       oobeDone = p.getBool('oobeDone') ?? oobeDone;
@@ -4663,6 +4723,8 @@ class AppState extends ChangeNotifier {
     await p.setBool('filterFollow', filterFollow);
     await p.setStringList('receiveCountries', receiveCountries);
     await p.setStringList('guideSeen', guideSeen.toList());
+    await p.setStringList('packetSearchHistory', packetSearchHistory);
+    await p.setStringList('serverHistory', serverHistory);
     await p.setBool('receiveOthers', receiveOthers);
     await p.setBool('labLandscape', labLandscape);
     await p.setBool('sensorAssist', sensorAssist);
@@ -9958,6 +10020,18 @@ class AppState extends ChangeNotifier {
 /// 抽成枚举而不是字符串：界面要按它选文案/颜色，用中文串比较必然漂
 /// （本仓库在 [BeaconPhase] 上已经踩过一次）。
 enum PositionSourceNow { sim, spp, garmin, phone, none }
+
+/// **哪个输入框的历史**（见 [AppState.rememberInput]）。
+///
+/// 抽成枚举的理由与 [PositionSourceNow] 一样：用裸字符串当键，早晚会在两个
+/// 调用点之间写歪一个字母，而错的那一处只表现为「历史没记住」。
+enum InputHistory {
+  /// 数据包页的搜索框
+  packetSearch,
+
+  /// 连接设置里的服务器地址
+  server,
+}
 
 /// 步数在界面上的四种状态（issue #23）。
 ///

@@ -4161,5 +4161,7 @@
   "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}},
   "permCheckTitle": "Permissions are off",
   "permCheckLocation": "Location is off. The map cannot show your position and nothing can be beaconed.",
-  "permCheckNotify": "Notifications are off. Reminders and the life-guard alarm will not show."
+  "permCheckNotify": "Notifications are off. Reminders and the life-guard alarm will not show.",
+  "searchHistoryTitle": "Recent searches",
+  "serverHistoryTitle": "Recent servers"
 }

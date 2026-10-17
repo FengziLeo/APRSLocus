@@ -7,6 +7,7 @@ import 'state.dart';
 import 'models.dart';
 import 'widgets.dart';
 import 'settings_widgets.dart';
+import 'input_history.dart';
 import 'garmin_page.dart';
 import 'hr_card.dart';
 import 'log_page.dart';
@@ -2187,6 +2188,9 @@ class ConnectionSettingsPage extends StatefulWidget {
 
 class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
   late final TextEditingController _server;
+
+  /// 服务器输入框的焦点：**离开时**把这次连的地址记进历史（见 lib/input_history.dart）。
+  final _serverFocus = FocusNode();
   late final TextEditingController _port;
   late final TextEditingController _ws;
   late final TextEditingController _pass;
@@ -2215,6 +2219,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
   void initState() {
     super.initState();
     _server = TextEditingController(text: st.aprs.server);
+    _serverFocus.addListener(_onServerFocus);
     _port = TextEditingController(text: '${st.aprs.port}');
     _ws = TextEditingController(text: st.aprs.wsUrl ?? '');
     _pass = TextEditingController(text: st.aprs.passcode);
@@ -2237,6 +2242,8 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
 
   @override
   void dispose() {
+    _serverFocus.removeListener(_onServerFocus);
+    _serverFocus.dispose();
     _server.dispose();
     _port.dispose();
     _ws.dispose();
@@ -2377,6 +2384,23 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     );
   }
 
+  /// 输入框失焦时把这次填的地址记进历史（`onChanged` 里记就会变成逐字母的记录）。
+  void _onServerFocus() {
+    if (_serverFocus.hasFocus) return;
+    st.rememberInput(InputHistory.server, _server.text);
+  }
+
+  /// 从历史里挑一台：写回输入框与配置。
+  ///
+  /// 程序赋值不会触发 `onChanged`，所以配置与「配置已改」提示要在这里补上一遍，
+  /// 否则挑完历史后页面还以为什么都没改。
+  void _pickServer(String v) {
+    _server.text = v;
+    st.aprs.server = v.trim();
+    _checkConfigDirty();
+    setState(() {});
+  }
+
   /// 服务器地址输入（没填时给「未配置」徽标 + 一句原因）。
   ///
   /// 用户要求：没有配置服务器时要点出**连不上的原因**并提示去配置，与 Passcode
@@ -2395,11 +2419,22 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           SettingsInput(
             S.of(context).server,
             _server,
+            focusNode: _serverFocus,
             badge: missing ? S.of(context).serverMissing : null,
             onChanged: (x) {
               st.aprs.server = x.trim();
               _checkConfigDirty();
             },
+            // 「最近连过的服务器」：地址是一串不短的域名，重敲一遍最容易出错
+            trailing: st.serverHistory.isEmpty
+                ? null
+                : HistoryButton(
+                    entries: st.serverHistory,
+                    title: S.of(context).serverHistoryTitle,
+                    onPick: _pickServer,
+                    onDelete: (v) => st.forgetInput(InputHistory.server, v),
+                    onClear: () => st.clearInputHistory(InputHistory.server),
+                  ),
           ),
           if (missing)
             Padding(

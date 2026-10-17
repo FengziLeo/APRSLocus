@@ -9117,6 +9117,12 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get permCheckNotify => "通知权限没开，提醒和生命守护告警都看不到。";
 
+  @override
+  String get searchHistoryTitle => "最近搜过的";
+
+  @override
+  String get serverHistoryTitle => "最近连过的服务器";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18230,5 +18236,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get permCheckNotify => "通知權限沒開，提醒和生命守護告警都看不到。";
+
+  @override
+  String get searchHistoryTitle => "最近搜過的";
+
+  @override
+  String get serverHistoryTitle => "最近連過的伺服器";
 
 }

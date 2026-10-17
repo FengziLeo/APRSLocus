@@ -322,6 +322,12 @@ jobs:
       - name: Test stations sort persistence
         run: flutter test test/stations_sort_persist_test.dart
 
+      # 输入框历史（用户要求）：数据包页搜索词与服务器地址要有「最近用过的」。
+      # 上限失效、两个框串了历史、清空没落盘，这些都编译能过、analyze 全绿，
+      # 只表现成「历史怎么空了」或「服务器里怎么出现搜索词」。
+      - name: Test input history
+        run: flutter test test/input_history_test.dart
+
       # 台站筛选「能记忆」（用户要求）：它原来只活在台站面板的 State 里，关掉
       # 应用就回到「全部」。任一条错都不会编译报错，只表现成「筛选怎么又没了」。
       - name: Test station filter persistence

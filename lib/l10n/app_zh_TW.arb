@@ -4749,5 +4749,7 @@
   "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}},
   "permCheckTitle": "權限被關掉了",
   "permCheckLocation": "定位權限沒開，地圖標不出位置，也不能上報。",
-  "permCheckNotify": "通知權限沒開，提醒和生命守護告警都看不到。"
+  "permCheckNotify": "通知權限沒開，提醒和生命守護告警都看不到。",
+  "searchHistoryTitle": "最近搜過的",
+  "serverHistoryTitle": "最近連過的伺服器"
 }

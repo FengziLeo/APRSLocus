@@ -4161,5 +4161,7 @@
   "@gpxSavedTo": {"placeholders": {"path": {"type": "String"}}},
   "permCheckTitle": "Izin dimatikan",
   "permCheckLocation": "Izin lokasi mati: peta tidak bisa menampilkan posisi dan tidak ada yang bisa dipancarkan.",
-  "permCheckNotify": "Izin notifikasi mati: pengingat dan alarm darurat tidak akan muncul."
+  "permCheckNotify": "Izin notifikasi mati: pengingat dan alarm darurat tidak akan muncul.",
+  "searchHistoryTitle": "Pencarian terakhir",
+  "serverHistoryTitle": "Server terakhir"
 }

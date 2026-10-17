@@ -1,4 +1,4 @@
-# 本週六，向 BG7LZQ-3 發一條報文
+# APRSNETCN OA · 本週六，向 BG7LZQ-3 發一條報文
 
 APRSNETCN OA 是 APRSNET.CN 發起的 APRS 報文簽到活動。按北京時間的週六算，一整天都能簽到。OA 是 On Air 的縮寫。
 

@@ -9183,6 +9183,12 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get acnLoginRejected => "账号或口令不对";
 
+  @override
+  String get acnSyncNow => "立即同步";
+
+  @override
+  String get acnSyncing => "同步中…";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18362,5 +18368,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get acnLoginRejected => "帳號或密碼不對";
+
+  @override
+  String get acnSyncNow => "立即同步";
+
+  @override
+  String get acnSyncing => "同步中…";
 
 }

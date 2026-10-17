@@ -4184,5 +4184,7 @@
   "packetSrcAcn": "APRSNETCN",
   "acnLoginTitle": "ログイン",
   "acnLoginOk": "検証済み",
-  "acnLoginRejected": "アカウントかパスワードが違います"
+  "acnLoginRejected": "アカウントかパスワードが違います",
+  "acnSyncNow": "今すぐ同期",
+  "acnSyncing": "同期中…"
 }

@@ -167,16 +167,6 @@ class AppState extends ChangeNotifier {
     _notify();
   }
 
-  /// 打开/关掉 APRSNETCN 的 24 小时台站同步。刚打开时马上拉一次，
-  /// 不用等下一次重连 —— 否则用户会以为开关没效果。
-  void setAcnSync(bool v) {
-    if (acnSync == v) return;
-    acnSync = v;
-    persist();
-    _notify();
-    if (v) unawaited(syncAcnStations());
-  }
-
   /// 完整呼号（含 SSID 后缀）
   String get myFullCall => mySsid == 0 ? myCall : '$myCall-$mySsid';
 
@@ -4067,7 +4057,6 @@ class AppState extends ChangeNotifier {
     aprs.passcode = '-1';
     aprs.account = '';
     aprs.password = '';
-    acnSync = true;
     acnOn = false;
     acnAccount = '';
     acnPassword = '';
@@ -4289,15 +4278,12 @@ class AppState extends ChangeNotifier {
   /// token 只在内存里，不用烤进备份。
   final AcnClient acn = AcnClient();
 
-  /// 连上 APRSNETCN 后是否顺带拉一份 24 小时台站。
-  ///
-  /// 默认打开：用户特意填了这台服务器的地址，要的就是它那 600 多台站；
-  /// 但它确实会多发一次 HTTP 请求与一对账号口令，所以给个开关。
-  bool acnSync = true;
-
   /// 上一次同步的结果（设置页/日志用），未同步过为 null。
   AcnSyncResult? acnLast;
   bool _acnSyncing = false;
+
+  /// 正在拉 24 小时台站。设置页的按钮据此置灰，不会连点两次。
+  bool get acnSyncing => _acnSyncing;
 
   /// APRSNETCN 的第二条链路：**只收不发**。
   ///
@@ -4572,7 +4558,6 @@ class AppState extends ChangeNotifier {
       aprs.passcode = p.getString('passcode') ?? aprs.passcode;
       aprs.account = p.getString('aprsAccount') ?? aprs.account;
       aprs.password = p.getString('aprsPassword') ?? aprs.password;
-      acnSync = p.getBool('acnSync') ?? acnSync;
       // 副链路的账号口令与开关。老版本把这几格放在主连接卡里、存在
       // aprsAccount/aprsPassword 下：那时只有在主连接就是 APRSNETCN 时才会显示，
       // 所以那两个值可以无歧义地当作副链路的账号口令搬过来（只搬一次，之后
@@ -4870,7 +4855,6 @@ class AppState extends ChangeNotifier {
     await p.setString('passcode', aprs.passcode);
     await p.setString('aprsAccount', aprs.account);
     await p.setString('aprsPassword', aprs.password);
-    await p.setBool('acnSync', acnSync);
     await p.setBool('acnOn', acnOn);
     await p.setString('acnAccount', acnAccount);
     await p.setString('acnPassword', acnPassword);
@@ -5996,9 +5980,8 @@ class AppState extends ChangeNotifier {
       _acnAttempt = 0;
       _acnRetryAt = null;
       _log(LogLevel.info, 'APRSNETCN', '副链路已连接（只收不发）');
-      // 连接成功顺带拉一次 24 小时台站：一个能立刻看到全国台站，不用等下一条
-      // 报文过来。失败只记日志，不影响这条链路。
-      if (acnSync) unawaited(syncAcnStations());
+      // 24 小时台站不在连上时拉：那要再发一次 HTTP 请求，还要把账号口令再发
+      // 一遍，等用户点了设置页的「立即同步」才做这件事。
     } else {
       _log(LogLevel.error, 'APRSNETCN', '副链路连接失败，稍后重试');
       _scheduleAcnRetry();
@@ -6096,12 +6079,10 @@ class AppState extends ChangeNotifier {
       // 但射频也不发 CONNECT 帧，不存在这个覆盖问题）。
       final customFrame = _customStatusFrame();
       if (customFrame != null) _customStatusLost = !aprs.send(customFrame);
-      // 连的是 APRSNETCN 就顺带拉一份它 24 小时内的台站：服务器替我们听到了
-      // 过滤器之外的一大片（六百多台站），这一份只在本地列表里**补空**，
-      // 已经收到的呼号一律不动（见 mergeAcnStations）。失败只记日志。
-      // 副链路自己连上时会拉一次（见 [_connectAcn]）；主链路是不是 APRSNETCN
-      // 与它无关 —— 两条链路可以同时在线，各收各的。
-      if (acnSync && acnOn && acnConnected) unawaited(syncAcnStations());
+      // 24 小时台站是用户点了设置页的「立即同步」才会去拉的（见
+      // [syncAcnStations]）：连上就发一次 HTTP 请求、带上账号口令，那种
+      // 副作用得由用户自己按下去。拉回来的那份只在本地列表里**补空**，
+      // 已经收到的呼号一律不动（见 [mergeAcnStations]）。
       // 连接成功：**不再**自动弹「是否自动上报」询问。
       // 用户要求：连上后不自动上报，界面给一个正式的「开始上报」按钮，由用户
       // 手动确认（见 [beginReporting] / [BeaconPhase.needConfirm]）。
@@ -8676,7 +8657,10 @@ class AppState extends ChangeNotifier {
     return added;
   }
 
-  /// 拉一份 APRSNETCN 的 24 小时台站并合并（设置页可关）。
+  /// 拉一份 APRSNETCN 的 24 小时台站并合并。
+  ///
+  /// 只有用户点设置页的「立即同步」才会走到这里：连上链路、切回前台都不自动
+  /// 拉，那个请求会带上账号口令，得用户自己按。
   ///
   /// 失败只记一条日志与一个结果，**不改链路状态**：这是搭头，链路本身好不好
   /// 由连接那一层说。
@@ -8687,26 +8671,27 @@ class AppState extends ChangeNotifier {
     if (account.isEmpty || password.isEmpty) {
       final r = const AcnSyncResult(added: 0, total: 0, error: 'no-account');
       acnLast = r;
+      _notify();
       return r;
     }
     _acnSyncing = true;
+    // 先通知一次：按钮当场变成「同步中…」，否则这一两秒里还能再点一次。
+    _notify();
+    AcnSyncResult result;
     try {
       final rows = await acn.stations(account: account, password: password);
       final added = mergeAcnStations(rows);
-      final r = AcnSyncResult(added: added, total: rows.length);
-      acnLast = r;
+      result = AcnSyncResult(added: added, total: rows.length);
       _log(LogLevel.info, 'APRSNETCN', '台站同步：${rows.length} 台，新增 $added');
-      _notify();
-      return r;
     } catch (e) {
-      final r = AcnSyncResult(added: 0, total: 0, error: _acnError(e));
-      acnLast = r;
-      _log(LogLevel.error, 'APRSNETCN', '台站同步失败：${r.error}');
-      _notify();
-      return r;
+      result = AcnSyncResult(added: 0, total: 0, error: _acnError(e));
+      _log(LogLevel.error, 'APRSNETCN', '台站同步失败：${result.error}');
     } finally {
       _acnSyncing = false;
     }
+    acnLast = result;
+    _notify();
+    return result;
   }
 
   /// 把同步异常翻成一句人话（设置页直接显示）

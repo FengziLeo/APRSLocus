@@ -9621,4 +9621,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get acnLoginRejected => "Cuenta o contraseña incorrectos";
 
+  @override
+  String get acnSyncNow => "Sincronizar ahora";
+
+  @override
+  String get acnSyncing => "Sincronizando…";
+
 }

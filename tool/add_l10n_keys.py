@@ -94,6 +94,13 @@ KEYS = {
             'recibe solo con el passcode.',
         'Akun dan kata sandi dari server. Kosongkan keduanya untuk menerima '
             'dengan passcode saja.'),
+    # 24 小时台站只在用户点按钮时拉，所以按钮只有这两句
+    'acnSyncNow': (
+        '立即同步', '立即同步', 'Sync now', '今すぐ同期', 'Sincronizar ahora',
+        'Sinkron sekarang'),
+    'acnSyncing': (
+        '同步中…', '同步中…', 'Syncing…', '同期中…', 'Sincronizando…',
+        'Menyinkronkan…'),
 }
 
 META = {

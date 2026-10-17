@@ -4184,5 +4184,7 @@
   "packetSrcAcn": "APRSNETCN",
   "acnLoginTitle": "Acceso",
   "acnLoginOk": "Verificado",
-  "acnLoginRejected": "Cuenta o contraseña incorrectos"
+  "acnLoginRejected": "Cuenta o contraseña incorrectos",
+  "acnSyncNow": "Sincronizar ahora",
+  "acnSyncing": "Sincronizando…"
 }

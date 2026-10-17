@@ -9283,4 +9283,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get acnLoginRejected => "アカウントかパスワードが違います";
 
+  @override
+  String get acnSyncNow => "今すぐ同期";
+
+  @override
+  String get acnSyncing => "同期中…";
+
 }

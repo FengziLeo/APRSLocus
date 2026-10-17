@@ -176,9 +176,6 @@ const List<BackupGroupSpec> kBackupGroups = [
     // 副链路（APRSNETCN）自己的账号口令与开关：它和主链路是两条连接，
     // 换机后两个服务器都得重新填，所以一起进备份。
     'acnAccount', 'acnPassword', 'acnOn',
-    // 连上 APRSNETCN 后要不要拉它 24 小时的台站：跟服务器走，不是跟设备走，
-    // 换机后用户不该再找一遍这个开关。
-    'acnSync',
     'igateEnabled', 'igateTwoWay',
     'myLat', 'myLng',
     // 链路配置（TNC / 声卡 TNC / PKWDWPL / 小盒子 / 外接 GPS）与各自上次选的设备。

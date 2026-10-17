@@ -4863,5 +4863,7 @@
   "packetSrcAcn": "APRSNETCN",
   "acnLoginTitle": "登录",
   "acnLoginOk": "已验证",
-  "acnLoginRejected": "账号或口令不对"
+  "acnLoginRejected": "账号或口令不对",
+  "acnSyncNow": "立即同步",
+  "acnSyncing": "同步中…"
 }

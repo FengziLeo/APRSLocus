@@ -16722,6 +16722,18 @@ abstract class AppLocalizations {
   /// **'账号或口令不对'**
   String get acnLoginRejected;
 
+  /// No description provided for @acnSyncNow.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即同步'**
+  String get acnSyncNow;
+
+  /// No description provided for @acnSyncing.
+  ///
+  /// In zh, this message translates to:
+  /// **'同步中…'**
+  String get acnSyncing;
+
 }
 
 class _AppLocalizationsDelegate

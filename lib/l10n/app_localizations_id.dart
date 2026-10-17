@@ -9572,4 +9572,10 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get acnLoginRejected => "Akun atau kata sandi salah";
 
+  @override
+  String get acnSyncNow => "Sinkron sekarang";
+
+  @override
+  String get acnSyncing => "Menyinkronkan…";
+
 }

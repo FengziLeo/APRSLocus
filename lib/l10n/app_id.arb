@@ -4184,5 +4184,7 @@
   "packetSrcAcn": "APRSNETCN",
   "acnLoginTitle": "Masuk",
   "acnLoginOk": "Terverifikasi",
-  "acnLoginRejected": "Akun atau kata sandi salah"
+  "acnLoginRejected": "Akun atau kata sandi salah",
+  "acnSyncNow": "Sinkron sekarang",
+  "acnSyncing": "Menyinkronkan…"
 }

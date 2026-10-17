@@ -4772,5 +4772,7 @@
   "packetSrcAcn": "APRSNETCN",
   "acnLoginTitle": "登入",
   "acnLoginOk": "已驗證",
-  "acnLoginRejected": "帳號或密碼不對"
+  "acnLoginRejected": "帳號或密碼不對",
+  "acnSyncNow": "立即同步",
+  "acnSyncing": "同步中…"
 }

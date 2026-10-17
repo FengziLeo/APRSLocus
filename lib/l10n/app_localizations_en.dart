@@ -9562,4 +9562,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get acnLoginRejected => "Account or password wrong";
 
+  @override
+  String get acnSyncNow => "Sync now";
+
+  @override
+  String get acnSyncing => "Syncing…";
+
 }

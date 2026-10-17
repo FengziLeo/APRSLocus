@@ -2567,10 +2567,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
               valueColor: st.acnLogin == '' ? C.slate : C.orange,
             ),
           _acnAccountInputs(),
-          SettingsSwitch(s.acnSyncTitle,
-              value: st.acnSync,
-              color: C.purple,
-              onChanged: (x) => st.setAcnSync(x)),
+          _acnSyncRow(),
           if (last != null)
             SettingsRow2(
               s.acnSyncLast,
@@ -2588,6 +2585,39 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           child: Text(s.acnLinkNote, style: ts(10, c: C.grey)),
         ),
       ],
+    );
+  }
+
+  /// 24 小时台站那一行：只有一个按钮。
+  ///
+  /// 这件事只有用户按下去才做 —— 连上链路、切回前台都不自动拉。那个请求会把
+  /// 账号口令再发给服务器一次，属于用户自己该决定的事。
+  Widget _acnSyncRow() {
+    final s = S.of(context);
+    final busy = st.acnSyncing;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 4, 10, 4),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: C.border, width: 0.4)),
+      ),
+      child: Row(children: [
+        Expanded(
+          child: Text(s.acnSyncTitle, style: ts(12, c: C.slate)),
+        ),
+        TextButton.icon(
+          onPressed: busy ? null : () => unawaited(st.syncAcnStations()),
+          icon: Icon(Icons.sync_rounded,
+              size: 15, color: busy ? C.greyLight : C.purple),
+          label: Text(busy ? s.acnSyncing : s.acnSyncNow,
+              style: ts(11, w: FontWeight.w700,
+                  c: busy ? C.greyLight : C.purple)),
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+      ]),
     );
   }
 

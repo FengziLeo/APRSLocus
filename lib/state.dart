@@ -8014,6 +8014,9 @@ class AppState extends ChangeNotifier {
       final s = stations[idx];
       final moved =
           (s.lat - p.lat).abs() > 1e-6 || (s.lng - p.lng).abs() > 1e-6;
+      // 本地真的收到了它的报文：这一行的事实不再来自服务器，详情页那句
+      // 「来源 APRSNETCN」该收起来。
+      s.remote = false;
       // 记录修改前的“地图相关”字段，用于判断是否推进台站版本
       final oldStatus = s.status;
       final oldSym = s.symbol;
@@ -8339,9 +8342,12 @@ class AppState extends ChangeNotifier {
 
   /// 把 APRSNETCN 的 24 小时台站并进列表。返回新增台数。
   ///
-  /// 只补**本地没听到的**：同呼号已在列表里就完全不动 —— 本地链路收到的是这一秒
-  /// 的事实，服务器那份是它替别人听到的副本，拿一份旧坐标去盖新坐标没有道理。
-  /// 已屏蔽的台站不并入；国家接收筛选照旧生效。
+  /// 两条规则，缺一条都会坏：
+  ///   * 本地没这个呼号 → 补一台，标记 remote；
+  ///   * 已有 → 只在服务器那边的 last_seen 比本地 lastHeard 新时才刷新。
+  /// 只补空的话，上一轮补进来的台站会永远停在那一次的坐标上；无条件覆盖的话，
+  /// 服务器那份旧坐标会把刚收到的位置顶掉。已屏蔽的台站不并入，国家接收筛选
+  /// 照旧生效。
   int mergeAcnStations(List<AcnStation> rows) {
     final mine = myFullCall.toUpperCase();
     var added = 0;
@@ -8349,7 +8355,34 @@ class AppState extends ChangeNotifier {
       if (isStationIgnored(r.call)) continue;
       if (!_matchReceiveFilter(r.call)) continue;
       if (mine.isNotEmpty && r.call == mine) continue;
-      if (stations.any((s) => s.call == r.call)) continue;
+      final idx = stations.indexWhere((s) => s.call == r.call);
+      if (idx >= 0) {
+        final s = stations[idx];
+        if (!r.lastSeen.isAfter(s.lastHeard)) continue;
+        final moved =
+            (s.lat - r.lat).abs() > 1e-6 || (s.lng - r.lng).abs() > 1e-6;
+        s.lat = r.lat;
+        s.lng = r.lng;
+        s.alt = r.alt ?? s.alt;
+        s.speed = r.speed ?? s.speed;
+        s.course = r.course ?? s.course;
+        if (r.comment.isNotEmpty) s.comment = r.comment;
+        s.lastHeard = r.lastSeen;
+        // 这一行的事实现在来自服务器；下一次真的收到它的报文时，
+        // _upsertStation 会把标记抹掉。
+        s.remote = true;
+        if (moved &&
+            (s.track.isEmpty ||
+                haversine(s.track.last.lat, s.track.last.lng, r.lat, r.lng) >
+                    0.02)) {
+          s.track = [...s.track, TrackPt(r.lat, r.lng, r.lastSeen)];
+          if (s.track.length > maxTrackPts) {
+            s.track = s.track.sublist(s.track.length - maxTrackPts);
+          }
+        }
+        if (moved) _bumpStationsVersion();
+        continue;
+      }
       if (stations.length >= maxStations) break;
       final speed = r.speed;
       stations.add(
@@ -8363,8 +8396,8 @@ class AppState extends ChangeNotifier {
           speed: speed,
           course: r.course,
           comment: r.comment.isEmpty ? null : r.comment,
-          // 服务器给的「最后一次听到」：直接当 lastHeard，于是一个 12 小时前
-          // 听到的台站会显示成离线，不需要另存一个时间字段。
+          // 服务器给的「最后一次听到」直接当 lastHeard：一个 12 小时前听到的
+          // 台站于是显示成离线，不需要另存一个时间字段。
           lastHeard: r.lastSeen,
           status: speed == null
               ? St.online

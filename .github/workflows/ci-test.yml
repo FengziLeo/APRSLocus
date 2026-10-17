@@ -269,6 +269,12 @@ jobs:
       - name: Test foreground notification dedupe
         run: flutter test test/notification_dedupe_test.dart
 
+      # 外置 GPS 供位时，手机定位只能「待机」不能停服务（用户报的「断开外置 GPS
+      # 后自动上报停了、手动上报只有报文没有位置」）：停了前台服务就丢掉后台生存
+      # 能力，连接静默断、定时器停摆。这属于「编译能过、analyze 也全绿」的那类。
+      - name: Test external GPS standby handoff
+        run: flutter test test/ext_gps_standby_test.dart
+
       # 地形/等高线图层（v2.0.37）：Esri 地形瓦片是 z/y/x 坐标顺序、且必须判成
       # WGS-84。这两点写错了**编译能过、analyze 也全绿**，只会表现成「取到别的
       # 一张图」或「整图偏出 500m」，所以钉在 CI。

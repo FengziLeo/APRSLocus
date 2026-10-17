@@ -91,6 +91,56 @@ class LocService {
     }
   }
 
+  /// 手机侧采样是否正被外置 GPS「待机」（见 [pauseForExternal]）。
+  bool _pausedForExternal = false;
+  bool get pausedForExternal => _pausedForExternal;
+
+  /// 外置 GPS 供位期间把**手机侧采样**停掉，但保留前台服务。
+  ///
+  /// ⚠ 这里必须是「切模式」而不是 [stop]：`stop()` 会把前台服务、WakeLock 与
+  /// 定位事件订阅一起拆掉，应用退到后台随即被系统冻结 —— APRS-IS 连接静默死掉、
+  /// 信标定时器停摆，而界面上的「已连接」还亮着。用户报的「断开外置 GPS 后
+  /// 自动上报停了、手动上报只有报文没有位置」就是这条路径（`state.dart` 的
+  /// `_syncPhoneGps` 原来在这里调的是 `loc.stop()`）。
+  ///
+  /// 原生侧 `LocationService.setModeStatic` 收到 `keepalive` 会注销 provider
+  /// 监听与「最后已知位置」轮询，前台服务与 WakeLock 原样保留。
+  ///
+  /// 返回值：采样真的停下来了吗（false = 手机定位本来就没在跑）。
+  Future<bool> pauseForExternal() async {
+    if (!_running) return false;
+    try {
+      await _channel.invokeMethod('setLocationMode', {'mode': 'keepalive'});
+      _pausedForExternal = true;
+      return true;
+    } catch (e) {
+      onStatus?.call('手机定位待机失败: $e');
+      return false;
+    }
+  }
+
+  /// 外置 GPS 失效：把手机侧采样接回来（服务一直在，不用重启）。
+  ///
+  /// 返回 false 有两种情况：本来就没停过，或者服务已经不在了 ——
+  /// 后者调用方必须改用 [start]（`state.dart` 的 `_resumePhoneGps` 就这么分）。
+  Future<bool> resumeFromExternal() async {
+    if (!_pausedForExternal) return false;
+    _pausedForExternal = false;
+    if (!_running) return false;
+    try {
+      await _channel.invokeMethod('setLocationMode', {'mode': mode});
+      return true;
+    } catch (e) {
+      onStatus?.call('恢复手机定位失败: $e');
+      return false;
+    }
+  }
+
+  /// 测试用：把服务标记成「已在跑」，省掉在主机上真的启动一套定位。
+  void debugMarkRunning() {
+    _running = true;
+  }
+
   /// 订阅原生事件通道（保活/定位共用）
   void _listenEvents() {
     _sub ??= _eventChannel.receiveBroadcastStream().listen((event) {
@@ -275,6 +325,7 @@ class LocService {
   void stop() {
     _running = false;
     _keepAliveMode = false;
+    _pausedForExternal = false;
     _notifDirty = true; // 服务停了，通知也没了：下次重发不能被去重挡住
     _sub?.cancel();
     _sub = null;

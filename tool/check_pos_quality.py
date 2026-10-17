@@ -79,6 +79,28 @@ def main() -> int:
          '      parts.add(\'SAT=$mySats\');',
          '信标里没有把卫星数带上 —— 或者写成了「发 SAT=0」（收端会读成「一颗星都没有」）')
 
+    # 外置 GPS 接管手机定位：只能「待机」（切原生模式），**不能停服务**。
+    #
+    # 用户报的「断开外置 GPS 后自动上报停了、手动上报只有报文没有位置」：
+    # `LocService.stop()` 会把前台服务、WakeLock 与定位事件订阅一起拆掉，退到后台
+    # 之后系统随即冻结 Dart 隔离区 —— APRS-IS 连接静默死掉、信标定时器停摆，
+    # 而界面上的「已连接」还亮着。这几条断言编译与 analyze 都过得去，错了只会
+    # 表现成「后台悄悄不发了」，只能靠 CI 钉住。
+    need('lib/state.dart', 'unawaited(loc.pauseForExternal());',
+         '外置 GPS 接管时没有用「待机」—— 停了前台服务就会丢掉后台生存能力')
+    need('lib/state.dart', '? await loc.resumeFromExternal()',
+         '外置 GPS 失效后没有把手机采样接回来（服务一直在，不用重启）')
+    need('lib/state.dart', 'await startTracking();',
+         '外置 GPS 失效后没有兵分两路：服务已经不在了必须真的起一遍')
+    need('lib/services.dart', "'setLocationMode', {'mode': 'keepalive'}",
+         'pauseForExternal 没把原生模式切成 keepalive（就停不了采样）')
+    forbid('lib/state.dart', '_phoneGpsPaused = true;\n      loc.stop();',
+           '外置 GPS 接管时还在停前台服务 —— 后台连接与信标定时器会静默失效')
+    # 外接 GPS 模块**启用着但早已断流**时，不准再拿它当挡粗点的理由：
+    # 室内/纯网络模式下那等于永远没有位置（同一个用户报告的另一半）。
+    forbid('lib/state.dart', 'if (coarse && nmeaGpsOn) return;',
+           '模块只要启用就挡掉所有网络定位 —— 断流之后位置再也回不来')
+
     # 粗定位（网络/基站）的两道闸：缺任何一道，标记都会在 GPS 一闪一断时横跳。
     #
     # 闸的阈值在**策略层**（这两个常量），而原生 LocationService.kt 里的

@@ -915,6 +915,9 @@ class AppState extends ChangeNotifier {
   /// 是否正因为外置 GPS 而停着手机定位（内部状态，不持久化）
   bool _phoneGpsPaused = false;
 
+  /// 上次尝试「把手机定位接回来」失败后的重试时刻（null = 不欠重试）。
+  DateTime? _phoneGpsResumeAt;
+
   void setExtGpsStandby(bool v) {
     extGpsStandby = v;
     persist();
@@ -924,26 +927,60 @@ class AppState extends ChangeNotifier {
   /// 每秒 tick 调一次：把手机定位的启停与外置源的鲜度对齐。
   ///
   /// 很便宜：只在**状态翻转**时才做事（不翻转时就是两次判断）。
+  ///
+  /// ⚠ 待机用的是 `loc.pauseForExternal()`（只切原生定位模式），**不是**
+  /// `loc.stop()`。`stop()` 会把前台服务、WakeLock 与定位事件订阅一起拆掉，
+  /// 退到后台后系统随即冻结 Dart 隔离区：APRS-IS 连接静默失效、信标定时器停摆，
+  /// 而界面上的「已连接」还亮着 —— 用户报的「断开外置 GPS 后自动上报停了、
+  /// 手动上报只有报文没有位置」正是这条路径（之前这里就是 `loc.stop()`）。
   void _syncPhoneGps() {
     if (useSimLocation) return;
     final ext = externalFixFresh;
     if (extGpsStandby && ext && !_phoneGpsPaused) {
       _phoneGpsPaused = true;
-      loc.stop();
+      _phoneGpsResumeAt = null;
+      unawaited(loc.pauseForExternal());
       locStatus = '外置 GPS 供位 · 手机 GPS 已待机';
       _log(LogLevel.info, '定位',
           '外置 GPS（${nmeaGpsSupplying ? '外接模块' : '佳明'}）接管，手机 GPS 已待机');
+      _notify();
       return;
     }
     if (_phoneGpsPaused && (!ext || !extGpsStandby)) {
+      // 上一轮接回失败时先退避，别每秒重试一次（平台通道/系统会被打爆）
+      final due = _phoneGpsResumeAt;
+      if (due != null && DateTime.now().isBefore(due)) return;
       _phoneGpsPaused = false;
       // 外置失效（或用户关掉了这个开关）：把手机 GPS 接回来，并**明确告诉用户**
       // —— 否则「位置突然换了一批点」会被当成漂移故障。
       locStatus = ext ? '手机 GPS 已接管' : '外置 GPS 已失效 · 改用手机 GPS';
       _log(LogLevel.info, '定位',
           ext ? '手机 GPS 已接管' : '外置 GPS 已失效，改用手机 GPS');
-      unawaited(startTracking());
+      _notify();
+      unawaited(_resumePhoneGps());
     }
+  }
+
+  /// 把手机定位接回来；失败就退避 10 秒再试。
+  ///
+  /// 为什么要重试：外置源断供的那一刻往往只有一次机会 —— 前台服务刚被 ROM 掐过、
+  /// 定位权限刚被系统回收、平台通道瞬时异常都会让这一次失败。没有第二次尝试，
+  /// 位置就再也回不来（界面停在「外置 GPS 已失效」，自动上报一直没位置可发）。
+  Future<void> _resumePhoneGps() async {
+    if (_disposed) return;
+    final ok = loc.pausedForExternal
+        ? await loc.resumeFromExternal()
+        // 服务本来就不在跑（模块供位期间它没起过 / 被系统停掉）：老实地起一遍
+        : await startTracking();
+    if (_disposed) return;
+    if (ok) {
+      _phoneGpsResumeAt = null;
+      return;
+    }
+    if (useSimLocation) return; // 其间切到了模拟位置：位置由手动坐标供，不再纠缠
+    _phoneGpsPaused = true; // 没接回来：下一轮继续（退避 10 秒）
+    _phoneGpsResumeAt = DateTime.now().add(const Duration(seconds: 10));
+    _log(LogLevel.warn, '定位', '手机定位没接回来，10 秒后重试');
   }
 
   // ─── 碰撞 / 摔倒检测（issue #26）───
@@ -6407,10 +6444,14 @@ class AppState extends ChangeNotifier {
     // 上报横杠多半显示着正常的倒计时（beaconPhase = counting），
     // 用户完全看不出「正在发一个错坐标」。宁可保持上一个（手表的）位置，等真 GPS 接回来。
     if (coarse && garmin.on) return;
-    // 外接 GPS 模块同理：它是**更准的位置源**（常常架在车顶/窗外），
-    // 而粗定位点干的就是「拿一个偏几百米的基站质心去替换真实位置」。
-    // 它不新鲜（拔了 / 断流）时手机 GPS 会自然接回来，但不能让粗点抢。
-    if (coarse && nmeaGpsOn) return;
+    // ── 外接 GPS 模块：**不再单独挡粗点** ──
+    //
+    // 这里原来有一行「只要是粗点、且模块启用着就 return」。它比上面那道「模块
+    // 新鲜就让位」更狠：只要模块**启用着**（哪怕早已断流、早已拔掉），手机侧的
+    // 网络定位就永远进不来。室内或纯网络模式下这等于没有位置 —— 用户报的
+    // 「断开外置 GPS 后一直没有位置，手动上报只剩一帧状态报文」就是它。
+    // 模块真在供位时上面那道 return 已经把手机点全挡了；断流之后交给下面通用
+    // 那两关（GPS 刚更新过 300 秒内 / 粗点自己跳太远）判断，与其它来源一致。
     if (coarse) {
       final gapSec = _lastFixTime == null
           ? 1 << 30

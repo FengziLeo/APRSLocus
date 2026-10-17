@@ -7192,7 +7192,7 @@ class AppState extends ChangeNotifier {
           final status = lm.group(2)!.toLowerCase();
           if (status == 'unverified') {
             passcodeInvalid = true;
-            _log(LogLevel.warn, '连接', '登录未验证：passcode 可能错误（unverified）');
+            _log(LogLevel.warn, '连接', '登录未验证：passcode 或账号口令可能不对（unverified）');
             if (connected) {
               setConnStatus(ConnPhase.unverified);
               _notify();

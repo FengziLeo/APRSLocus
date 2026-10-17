@@ -4317,10 +4317,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get packetsReceived => '收包';
 
   @override
-  String get passcodeUnverified => 'Passcode 未验证';
+  String get passcodeUnverified => '登录未验证';
 
   @override
-  String get passcodeWarning => '登录密码可能错误，无法正常收发消息';
+  String get passcodeWarning => 'Passcode 或账号口令可能不对，无法正常收发消息';
 
   @override
   String get goSettings => '去设置';
@@ -13467,10 +13467,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get packetsReceived => '收包';
 
   @override
-  String get passcodeUnverified => 'Passcode 未驗證';
+  String get passcodeUnverified => '登入未驗證';
 
   @override
-  String get passcodeWarning => '登入密碼可能錯誤，無法正常收發訊息';
+  String get passcodeWarning => 'Passcode 或帳號口令可能不對，無法正常收發訊息';
 
   @override
   String get goSettings => '去設定';

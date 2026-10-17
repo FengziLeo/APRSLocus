@@ -4532,11 +4532,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get packetsReceived => 'RX';
 
   @override
-  String get passcodeUnverified => 'Passcode sin verificar';
+  String get passcodeUnverified => 'Acceso sin verificar';
 
   @override
-  String get passcodeWarning =>
-      'Es posible que el passcode de acceso sea incorrecto; los mensajes podrían no funcionar';
+  String get passcodeWarning => 'Es posible que el passcode o la contraseña de la cuenta sean incorrectos; los mensajes podrían no funcionar';
 
   @override
   String get goSettings => 'Ajustes';

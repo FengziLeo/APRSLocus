@@ -4499,11 +4499,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get packetsReceived => 'RX';
 
   @override
-  String get passcodeUnverified => 'Passcode not verified';
+  String get passcodeUnverified => 'Login not verified';
 
   @override
-  String get passcodeWarning =>
-      'The login passcode may be incorrect; messages may not work';
+  String get passcodeWarning => 'The passcode or the account password may be wrong; messages may not work';
 
   @override
   String get goSettings => 'Settings';

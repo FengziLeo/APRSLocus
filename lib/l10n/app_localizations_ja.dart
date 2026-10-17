@@ -4354,11 +4354,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get packetsReceived => '受信';
 
   @override
-  String get passcodeUnverified => 'Passcode 未検証';
+  String get passcodeUnverified => 'ログイン未検証';
 
   @override
-  String get passcodeWarning =>
-      'ログイン用 Passcode が誤っている可能性があり、メッセージの送受信が正常に行えない場合があります';
+  String get passcodeWarning => 'Passcode かアカウントのパスワードが違う可能性があり、メッセージの送受信が正常に行えない場合があります';
 
   @override
   String get goSettings => '設定へ';

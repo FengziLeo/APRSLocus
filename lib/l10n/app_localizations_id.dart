@@ -4498,11 +4498,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get packetsReceived => 'RX';
 
   @override
-  String get passcodeUnverified => 'Passcode belum diverifikasi';
+  String get passcodeUnverified => 'Login belum diverifikasi';
 
   @override
-  String get passcodeWarning =>
-      'Passcode login mungkin salah; pesan mungkin tidak berfungsi';
+  String get passcodeWarning => 'Passcode atau kata sandi akun mungkin salah; pesan mungkin tidak berfungsi';
 
   @override
   String get goSettings => 'Pengaturan';

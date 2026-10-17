@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:url_launcher/url_launcher.dart';
@@ -68,7 +70,7 @@ class MarkdownView extends StatelessWidget {
       final m = _videoLine.firstMatch(line.trim());
       if (m != null) {
         flush();
-        children.add(WebEmbed(url: m.group(1)!, height: 240));
+        children.add(_Embed(m.group(1)!));
         children.add(const SizedBox(height: 12));
       } else {
         buf.writeln(line);
@@ -472,5 +474,51 @@ Future<void> openExternal(BuildContext context, String url) async {
         SnackBar(content: Text(url), behavior: SnackBarBehavior.floating),
       );
     }
+  }
+}
+
+/// 公告里的内嵌媒体块：**按可用宽度**算高度，而不是写死 240。
+///
+/// 写死 240 的两处毛病（都来自实际观感）：
+/// * B 站播放器是 16:9，公告卡在手机上宽约 320，16:9 只剩 180 高 —— 240 的框
+///   把播放器撑出一道黑边，看起来像「没加载全」；
+/// * 网易云外链播放器本身是一条 330×86 的横条，按 240 留位置等于在公告里挖出
+///   一大片空白（网站那边也是 86 高，见 sync_notice_site.py 的 AUDIO_TPL）。
+///
+/// 所以这里先认「它是什么形状」，再按真实宽度等比缩。宽度有上限、高度有上下限：
+/// 手机竖屏拿到的是贴着屏宽的一块，平板 / 横屏不会被拉成巨幕，也不会缩成一条缝。
+class _Embed extends StatelessWidget {
+  final String url;
+  const _Embed(this.url);
+
+  /// 视频（B 站等）：16:9
+  static const double _videoW = 16, _videoH = 9;
+
+  /// 网易云外链播放器：330×86
+  static const double _audioW = 330, _audioH = 86;
+
+  /// 最宽铺到多少。超过就是一块巨幕了（横屏 / 平板）
+  static const double _maxW = 560;
+
+  @override
+  Widget build(BuildContext context) {
+    final u = url.toLowerCase();
+    final audio = u.contains('music.163.com/outchain/player');
+    final rw = audio ? _audioW : _videoW;
+    final rh = audio ? _audioH : _videoH;
+    return LayoutBuilder(builder: (context, c) {
+      // 宽度拿不到（无约束的 Column 里）时按手机常见的屏宽先算
+      final avail = c.maxWidth.isFinite && c.maxWidth > 0 ? c.maxWidth : 320.0;
+      final width = math.min(avail, _maxW);
+      // 下限 72：横条在窄屏上不会被压成两条线
+      final height = (width * rh / rw).clamp(72.0, 420.0);
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: SizedBox(
+          width: width,
+          child: WebEmbed(url: url, height: height),
+        ),
+      );
+    });
   }
 }

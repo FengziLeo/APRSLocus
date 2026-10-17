@@ -69,6 +69,16 @@ KEYS = {
             'aquí se marcan como del servidor y no se reenvían.',
         'Pengiriman tetap di tautan utama. Stasiun yang diterima di sini '
             'ditandai berasal dari server dan tidak diteruskan.'),
+    # 副链路的登录结果（服务器回的 logresp / not authorized）
+    'acnLoginTitle': (
+        '登录', '登入', 'Login', 'ログイン', 'Acceso', 'Masuk'),
+    'acnLoginOk': (
+        '已验证', '已驗證', 'Verified', '検証済み', 'Verificado',
+        'Terverifikasi'),
+    'acnLoginRejected': (
+        '账号或口令不对', '帳號或密碼不對', 'Account or password wrong',
+        'アカウントかパスワードが違います',
+        'Cuenta o contraseña incorrectos', 'Akun atau kata sandi salah'),
     # 数据包页的来源标签：服务器名，不翻译（六语言同一个词）。
     'packetSrcAcn': (
         'APRSNETCN', 'APRSNETCN', 'APRSNETCN', 'APRSNETCN', 'APRSNETCN',

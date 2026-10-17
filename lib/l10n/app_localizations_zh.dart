@@ -9174,6 +9174,15 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get packetSrcAcn => "APRSNETCN";
 
+  @override
+  String get acnLoginTitle => "登录";
+
+  @override
+  String get acnLoginOk => "已验证";
+
+  @override
+  String get acnLoginRejected => "账号或口令不对";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18344,5 +18353,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get packetSrcAcn => "APRSNETCN";
+
+  @override
+  String get acnLoginTitle => "登入";
+
+  @override
+  String get acnLoginOk => "已驗證";
+
+  @override
+  String get acnLoginRejected => "帳號或密碼不對";
 
 }

@@ -9563,4 +9563,13 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get packetSrcAcn => "APRSNETCN";
 
+  @override
+  String get acnLoginTitle => "Masuk";
+
+  @override
+  String get acnLoginOk => "Terverifikasi";
+
+  @override
+  String get acnLoginRejected => "Akun atau kata sandi salah";
+
 }

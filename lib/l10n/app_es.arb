@@ -4181,5 +4181,8 @@
   "acnLinkStatus": "Enlace secundario",
   "acnLinkNote": "El envío va solo por el enlace principal. Las estaciones recibidas aquí se marcan como del servidor y no se reenvían.",
   "acnAccountNote": "Cuenta y contraseña que emite el servidor. Si se dejan vacías, se recibe solo con el passcode.",
-  "packetSrcAcn": "APRSNETCN"
+  "packetSrcAcn": "APRSNETCN",
+  "acnLoginTitle": "Acceso",
+  "acnLoginOk": "Verificado",
+  "acnLoginRejected": "Cuenta o contraseña incorrectos"
 }

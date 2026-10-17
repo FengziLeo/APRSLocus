@@ -2554,6 +2554,18 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
             st.acnConnected ? s.connected : s.disconnected,
             valueColor: st.acnConnected ? C.green : C.grey,
           ),
+          // 服务器认不认这个登录：口令填错时链路照样「已连接」，只有这一行
+          // 说得出原因（服务器回 `not authorized (auth-failed)`）。
+          if (st.acnLogin != null)
+            SettingsRow2(
+              s.acnLoginTitle,
+              st.acnLogin == ''
+                  ? s.acnLoginOk
+                  : (st.acnLogin == 'unverified'
+                      ? s.unverified
+                      : s.acnLoginRejected),
+              valueColor: st.acnLogin == '' ? C.slate : C.orange,
+            ),
           _acnAccountInputs(),
           SettingsSwitch(s.acnSyncTitle,
               value: st.acnSync,

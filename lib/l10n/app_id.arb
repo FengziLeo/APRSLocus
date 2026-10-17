@@ -4181,5 +4181,8 @@
   "acnLinkStatus": "Tautan kedua",
   "acnLinkNote": "Pengiriman tetap di tautan utama. Stasiun yang diterima di sini ditandai berasal dari server dan tidak diteruskan.",
   "acnAccountNote": "Akun dan kata sandi dari server. Kosongkan keduanya untuk menerima dengan passcode saja.",
-  "packetSrcAcn": "APRSNETCN"
+  "packetSrcAcn": "APRSNETCN",
+  "acnLoginTitle": "Masuk",
+  "acnLoginOk": "Terverifikasi",
+  "acnLoginRejected": "Akun atau kata sandi salah"
 }

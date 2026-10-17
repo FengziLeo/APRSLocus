@@ -4072,6 +4072,7 @@ class AppState extends ChangeNotifier {
     acnAccount = '';
     acnPassword = '';
     acnConnected = false;
+    acnLogin = null;
     _acnRetryAt = null;
     _acnAttempt = 0;
     acnLast = null;
@@ -4319,6 +4320,13 @@ class AppState extends ChangeNotifier {
   String acnAccount = '';
   String acnPassword = '';
 
+  /// 副链路的登录结果：null = 还没收到服务器的 logresp；'' = 已验证；
+  /// 其他 = 服务器自己说的原因（`unverified` / `auth-failed` / `auth-required`）。
+  ///
+  /// 它与主链路的 `passcodeInvalid` 是两件事：副链路有自己的 passcode 与账号，
+  /// 拿它的未验证去把主横幅变黄是错的（见 [_noteAcnServerLine]）。
+  String? acnLogin;
+
   /// 主链路最近收到的原始报文行（副链路镜像去重用，见 [_isMainMirror]）。
   final Map<String, DateTime> _mainLines = {};
 
@@ -4329,6 +4337,35 @@ class AppState extends ChangeNotifier {
   bool _isMainMirror(String line) {
     final at = _mainLines[line];
     return at != null && DateTime.now().difference(at).inSeconds < 60;
+  }
+
+  static final RegExp _acnReject = RegExp(r'not authorized \(([^)]*)\)');
+  static final RegExp _acnLogresp =
+      RegExp(r'logresp\s+(\S+)\s+(unverified|verified)');
+
+  /// 副链路服务器的说明行（`# logresp …` / `# aprsnetcn: not authorized (…)`）。
+  ///
+  /// 只写 [acnLogin]：passcode 是 -1 时服务器也会回 `unverified`，那是正常的
+  /// 只收状态；账号口令错了才会再来一句 `not authorized (auth-failed)`。
+  void _noteAcnServerLine(String line) {
+    final rejected = _acnReject.firstMatch(line);
+    if (rejected != null) {
+      final why = rejected.group(1) ?? 'rejected';
+      if (acnLogin == why) return;
+      acnLogin = why;
+      _log(LogLevel.warn, 'APRSNETCN', '副链路被服务器拒绝：$why');
+      _notify();
+      return;
+    }
+    final m = _acnLogresp.firstMatch(line);
+    if (m == null) return;
+    final unverified = m.group(2)!.toLowerCase() == 'unverified';
+    final value = unverified ? 'unverified' : '';
+    if (acnLogin == value) return;
+    acnLogin = value;
+    _log(LogLevel.info, 'APRSNETCN',
+        unverified ? '副链路登录未验证（只按 passcode 收报文）' : '副链路登录已验证');
+    _notify();
   }
 
   void _noteMainLine(String line) {
@@ -5925,6 +5962,7 @@ class AppState extends ChangeNotifier {
     acnLink.onDisconnected = () {
       if (_disposed) return;
       acnConnected = false;
+      acnLogin = null;
       _log(LogLevel.warn, 'APRSNETCN', '副链路断开，稍后自动重连');
       _scheduleAcnRetry();
       _notify();
@@ -5941,6 +5979,7 @@ class AppState extends ChangeNotifier {
     if (kIsWeb) return;
     if (!acnOn || acnConnected || _acnConnecting || _disposed) return;
     _acnConnecting = true;
+    acnLogin = null;
     _log(LogLevel.info, 'APRSNETCN', '正在连接 $kAcnServerHost:$kAcnServerPort…');
     _notify();
     acnLink.server = kAcnServerHost;
@@ -5985,6 +6024,7 @@ class AppState extends ChangeNotifier {
     persist();
     if (!v) {
       acnConnected = false;
+      acnLogin = null;
       _acnRetryAt = null;
       _acnAttempt = 0;
       acnLink.disconnect();
@@ -7323,6 +7363,7 @@ class AppState extends ChangeNotifier {
       if (aprsIsOn) aprs.disconnect();
       if (acnOn || acnConnected) {
         acnConnected = false;
+        acnLogin = null;
         _acnRetryAt = null;
         _acnAttempt = 0;
         acnLink.disconnect();
@@ -7380,8 +7421,12 @@ class AppState extends ChangeNotifier {
     // 简单解析收到的 APRS 帧
     try {
       if (line.startsWith('#')) {
-        // 副链路有它自己的 passcode，它的 logresp 不能去动主链路的横幅
-        if (fromAcn) return;
+        // 副链路有它自己的 passcode，它的 logresp 不能去动主链路的横幅，
+        // 但要记进自己那一行，否则口令填错时卡里永远显示「已连接」。
+        if (fromAcn) {
+          _noteAcnServerLine(line);
+          return;
+        }
         // 服务器握手响应：# logresp {call} verified / unverified
         final lm = RegExp(
           r'#\s*logresp[:\s]*(\S+)\s+(unverified|verified)',

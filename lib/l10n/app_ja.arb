@@ -4181,5 +4181,8 @@
   "acnLinkStatus": "副リンク",
   "acnLinkNote": "送信はメイン回線のみです。ここで受信した局はサーバー由来として表示され、ゲートウェイ転送は行いません。",
   "acnAccountNote": "サーバーがホワイトリストの局に発行するアカウントとパスワードです。空欄なら passcode のみで受信します。",
-  "packetSrcAcn": "APRSNETCN"
+  "packetSrcAcn": "APRSNETCN",
+  "acnLoginTitle": "ログイン",
+  "acnLoginOk": "検証済み",
+  "acnLoginRejected": "アカウントかパスワードが違います"
 }

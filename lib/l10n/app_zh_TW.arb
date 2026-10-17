@@ -4769,5 +4769,8 @@
   "acnLinkStatus": "副鏈路",
   "acnLinkNote": "發報文只走主鏈路。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。",
   "acnAccountNote": "伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。",
-  "packetSrcAcn": "APRSNETCN"
+  "packetSrcAcn": "APRSNETCN",
+  "acnLoginTitle": "登入",
+  "acnLoginOk": "已驗證",
+  "acnLoginRejected": "帳號或密碼不對"
 }

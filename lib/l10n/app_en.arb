@@ -4181,5 +4181,8 @@
   "acnLinkStatus": "Second link",
   "acnLinkNote": "Sending stays on the main link. Stations heard here are marked as coming from the server and are never gatewayed.",
   "acnAccountNote": "Account and password issued by the server. Leave both empty to receive on the passcode alone.",
-  "packetSrcAcn": "APRSNETCN"
+  "packetSrcAcn": "APRSNETCN",
+  "acnLoginTitle": "Login",
+  "acnLoginOk": "Verified",
+  "acnLoginRejected": "Account or password wrong"
 }

@@ -9274,4 +9274,13 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get packetSrcAcn => "APRSNETCN";
 
+  @override
+  String get acnLoginTitle => "ログイン";
+
+  @override
+  String get acnLoginOk => "検証済み";
+
+  @override
+  String get acnLoginRejected => "アカウントかパスワードが違います";
+
 }

@@ -16704,6 +16704,24 @@ abstract class AppLocalizations {
   /// **'APRSNETCN'**
   String get packetSrcAcn;
 
+  /// No description provided for @acnLoginTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'登录'**
+  String get acnLoginTitle;
+
+  /// No description provided for @acnLoginOk.
+  ///
+  /// In zh, this message translates to:
+  /// **'已验证'**
+  String get acnLoginOk;
+
+  /// No description provided for @acnLoginRejected.
+  ///
+  /// In zh, this message translates to:
+  /// **'账号或口令不对'**
+  String get acnLoginRejected;
+
 }
 
 class _AppLocalizationsDelegate

@@ -9612,4 +9612,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get packetSrcAcn => "APRSNETCN";
 
+  @override
+  String get acnLoginTitle => "Acceso";
+
+  @override
+  String get acnLoginOk => "Verificado";
+
+  @override
+  String get acnLoginRejected => "Cuenta o contraseña incorrectos";
+
 }

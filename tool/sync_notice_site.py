@@ -109,7 +109,8 @@ AUDIO_TPL = (
 )
 
 # OA 小件（APRSNET.CN 的倒计时条）：自己就是一条矮横条，和音频小条同理，
-# 套进 16:9 只会得到一块空屏。给了圆角与底色，和视频框摆在一起像同一家。
+# 套进 16:9 只会得到一块空屏。#1c2228 是本站深色皮肤下公告卡的底色，
+# 小件自己也画这个色，两边对上就没有“框”，只剩卡片里的一段读数。
 EMBED_URL_RE = re.compile(r'^https?://aprsnet\.cn/oa/(?:en/)?embed\.html\b')
 
 EMBED_TPL = (
@@ -117,7 +118,7 @@ EMBED_TPL = (
     '<iframe src="{url}" title="APRSNETCN OA" scrolling="no" border="0" '
     'frameborder="no" framespacing="0" loading="lazy" '
     'style="width:100%;height:168px;display:block;border-radius:14px;'
-    'border:1px solid rgba(255,255,255,.10);background:#0b0e11"></iframe>\n'
+    'background:#1c2228"></iframe>\n'
     '</div>'
 )
 

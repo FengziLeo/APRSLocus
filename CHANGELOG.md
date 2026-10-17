@@ -1,5 +1,36 @@
 # 更新日志
 
+## [2.1.7] - 2026-10-17
+
+### 选过的东西留到下次
+
+- **台站页的筛选会记住**：状态、类型、同款软件、设备、只看收藏，退出应用再打开还是上次那一套。
+  以前每次进来都得在几个筛选按钮之间重新点一遍。
+- **地图的图层筛选也会记住**：图层面板里关掉的台站类型，以及那颗「套用台站面板筛选」开关，
+  重启后照样生效。
+- **锁定地图中心记住上次选的那一档**：关、锁定中心·正北朝上、锁定中心·航向朝上，启动就按
+  上次那一档。拖地图或者点台站聚焦过去，锁定仍会自动解开。
+- 这三项都跟着备份走，换机导入后照旧。
+
+---
+
+## [2.1.7] - 2026-10-17 (English)
+
+### What you picked stays picked
+
+- **The stations page remembers its filter**: status, type, same app, device and favourites-only
+  are still in place the next time the app opens. Before, every visit meant tapping the filter
+  chips again.
+- **The map's layer filter is remembered too**: the station types switched off in the layer panel,
+  and the "apply the station filter to the map" switch, both come back the same way after a
+  restart.
+- **The map centre lock remembers its last state**: off, locked with north up, or locked with
+  heading up starts where you left it. Dragging the map or focusing a station still releases the
+  lock.
+- All three travel with the backup, so a restore on a new phone keeps them.
+
+---
+
 ## [2.1.6] - 2026-10-16
 
 ### 轨迹能导出，跟随有三态，横屏不再缺东西

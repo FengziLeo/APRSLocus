@@ -419,6 +419,19 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.7', 'date': '2026-10-17',
+        'items': [
+            ('fix',
+             T('台站页的筛选、地图的图层筛选、锁定地图中心的三态都会记住上次的选择，重启后照旧，'
+               '也跟备份走。以前每次打开地图都要把航向锁定重新点两下。',
+               '臺站頁的篩選、地圖的圖層篩選、鎖定地圖中心的三態都會記住上次的選擇，重啟後照舊，'
+               '也跟備份走。以前每次打開地圖都要把航向鎖定重新點兩下。',
+               'The station filter, the map layer filter and the map centre lock all keep their '
+               'last setting across launches, and travel with the backup. The heading lock used '
+               'to need two taps on every launch.')),
+        ],
+    },
+    {
         'ver': 'v2.1.6', 'date': '2026-10-16',
         'items': [
             ('new',

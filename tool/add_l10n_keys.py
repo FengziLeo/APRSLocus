@@ -36,43 +36,30 @@ CLASSES = {
 
 # ── 要加的键：key → (zh, zh_TW, en, ja, es, id) ──
 KEYS = {
-    # ── 启动权限体检（用户要求：「每次 APP 启动前检查权限，要不然用户关掉权限后
-    # 可能会闪退。你做个提示」）──
+    # ── 连接设置：名单账号 + 口令（APRSNETCN 这类服务器才用得上）──
     #
-    # 只在**缺哪一项**时出现，一项不缺时全程静默。文案要说清「缺的是哪一项、
-    # 什么功能用不了」，而不是光说「请授权」——用户刚在系统设置里关掉它，
-    # 不说清是哪一项，他回去也找不到。
-    'permCheckTitle': (
-        '权限被关掉了', '權限被關掉了', 'Permissions are off',
-        '権限がオフになっています', 'Hay permisos desactivados',
-        'Izin dimatikan'),
-    # 定位：地图与上报都靠它；也是「后台服务起不来」的那一项
-    'permCheckLocation': (
-        '定位权限没开，地图标不出位置，也不能上报。',
-        '定位權限沒開，地圖標不出位置，也不能上報。',
-        'Location is off. The map cannot show your position and nothing can be beaconed.',
-        '位置情報の権限がオフです。地図に自分の位置が出ず、送信もできません。',
-        'El permiso de ubicación está desactivado: el mapa no puede mostrar tu posición '
-        'y no se puede balizar.',
-        'Izin lokasi mati: peta tidak bisa menampilkan posisi dan tidak ada yang bisa dipancarkan.'),
-    # 通知：常驻通知、消息与生命守护强提醒都靠它（Android 13 起才是运行时权限）
-    'permCheckNotify': (
-        '通知权限没开，提醒和生命守护告警都看不到。',
-        '通知權限沒開，提醒和生命守護告警都看不到。',
-        'Notifications are off. Reminders and the life-guard alarm will not show.',
-        '通知の権限がオフです。リマインダーとライフアラームが表示されません。',
-        'El permiso de notificaciones está desactivado: no se verán los avisos ni '
-        'la alarma de vida.',
-        'Izin notifikasi mati: pengingat dan alarm darurat tidak akan muncul.'),
-    # ── 输入框历史（搜索框 / 服务器地址的「最近用过的」面板，见 lib/input_history.dart）──
-    # 两个标题分开写：面板标题同时当按钮的长按提示，说「最近搜过的」比说
-    # 「历史记录」更能说明点开是什么。
-    'searchHistoryTitle': (
-        '最近搜过的', '最近搜過的', 'Recent searches',
-        '最近の検索', 'Búsquedas recientes', 'Pencarian terakhir'),
-    'serverHistoryTitle': (
-        '最近连过的服务器', '最近連過的伺服器', 'Recent servers',
-        '最近接続したサーバー', 'Servidores recientes', 'Server terakhir'),
+    # 两格与 passcode 并列但有区别：passcode 是呼号算出来的数字，账号口令是
+    # 服务器发给人的一对字符串。留空就完全按标准 APRS-IS 登录，所以提示句
+    # 先说要哪个服务器才填，再说留空没关系。
+    'serverAccountTitle': (
+        '账号', '帳號', 'Account', 'アカウント', 'Cuenta', 'Akun'),
+    'serverAccountHint': (
+        '服务器给的账号', '伺服器給的帳號', 'The account the server gave you',
+        'サーバーが発行したアカウント', 'La cuenta que te dio el servidor',
+        'Akun dari server'),
+    'serverPasswordTitle': (
+        '口令', '口令', 'Password', 'パスワード', 'Contraseña', 'Kata sandi'),
+    'serverPasswordHint': (
+        '服务器给的口令', '伺服器給的口令', 'The password the server gave you',
+        'サーバーが発行したパスワード', 'La contraseña que te dio el servidor',
+        'Kata sandi dari server'),
+    'serverAccountNote': (
+        '只有 APRSNETCN 这类服务器要账号和口令，标准 APRS-IS 留空就行。',
+        '只有 APRSNETCN 這類伺服器要帳號和口令，標準 APRS-IS 留空就行。',
+        'Only servers like APRSNETCN need these. Leave both empty on a standard APRS-IS server.',
+        'APRSNETCN のようなサーバーだけが必要です。標準の APRS-IS では空のままで構いません。',
+        'Solo servidores como APRSNETCN los necesitan. En un APRS-IS normal déjalos vacíos.',
+        'Hanya server seperti APRSNETCN yang memerlukannya. Di APRS-IS biasa biarkan kosong.'),
 }
 
 META = {

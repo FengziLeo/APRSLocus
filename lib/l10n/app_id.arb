@@ -4163,5 +4163,10 @@
   "permCheckLocation": "Izin lokasi mati: peta tidak bisa menampilkan posisi dan tidak ada yang bisa dipancarkan.",
   "permCheckNotify": "Izin notifikasi mati: pengingat dan alarm darurat tidak akan muncul.",
   "searchHistoryTitle": "Pencarian terakhir",
-  "serverHistoryTitle": "Server terakhir"
+  "serverHistoryTitle": "Server terakhir",
+  "serverAccountTitle": "Akun",
+  "serverAccountHint": "Akun dari server",
+  "serverPasswordTitle": "Kata sandi",
+  "serverPasswordHint": "Kata sandi dari server",
+  "serverAccountNote": "Hanya server seperti APRSNETCN yang memerlukannya. Di APRS-IS biasa biarkan kosong."
 }

@@ -16602,6 +16602,36 @@ abstract class AppLocalizations {
   /// **'最近连过的服务器'**
   String get serverHistoryTitle;
 
+  /// No description provided for @serverAccountTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'账号'**
+  String get serverAccountTitle;
+
+  /// No description provided for @serverAccountHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务器给的账号'**
+  String get serverAccountHint;
+
+  /// No description provided for @serverPasswordTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'口令'**
+  String get serverPasswordTitle;
+
+  /// No description provided for @serverPasswordHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务器给的口令'**
+  String get serverPasswordHint;
+
+  /// No description provided for @serverAccountNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'只有 APRSNETCN 这类服务器要账号和口令，标准 APRS-IS 留空就行。'**
+  String get serverAccountNote;
+
 }
 
 class _AppLocalizationsDelegate

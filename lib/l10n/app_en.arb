@@ -4163,5 +4163,10 @@
   "permCheckLocation": "Location is off. The map cannot show your position and nothing can be beaconed.",
   "permCheckNotify": "Notifications are off. Reminders and the life-guard alarm will not show.",
   "searchHistoryTitle": "Recent searches",
-  "serverHistoryTitle": "Recent servers"
+  "serverHistoryTitle": "Recent servers",
+  "serverAccountTitle": "Account",
+  "serverAccountHint": "The account the server gave you",
+  "serverPasswordTitle": "Password",
+  "serverPasswordHint": "The password the server gave you",
+  "serverAccountNote": "Only servers like APRSNETCN need these. Leave both empty on a standard APRS-IS server."
 }

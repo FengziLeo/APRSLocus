@@ -9513,4 +9513,19 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get serverHistoryTitle => "Server terakhir";
 
+  @override
+  String get serverAccountTitle => "Akun";
+
+  @override
+  String get serverAccountHint => "Akun dari server";
+
+  @override
+  String get serverPasswordTitle => "Kata sandi";
+
+  @override
+  String get serverPasswordHint => "Kata sandi dari server";
+
+  @override
+  String get serverAccountNote => "Hanya server seperti APRSNETCN yang memerlukannya. Di APRS-IS biasa biarkan kosong.";
+
 }

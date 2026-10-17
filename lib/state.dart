@@ -4044,6 +4044,8 @@ class AppState extends ChangeNotifier {
     aprs.server = 'rotate.aprs2.net';
     aprs.port = 14580;
     aprs.passcode = '-1';
+    aprs.account = '';
+    aprs.password = '';
     dataSource = srcAprsIs;
     enabledSources
       ..clear()
@@ -4446,6 +4448,8 @@ class AppState extends ChangeNotifier {
       aprs.server = p.getString('server') ?? aprs.server;
       aprs.port = p.getInt('port') ?? aprs.port;
       aprs.passcode = p.getString('passcode') ?? aprs.passcode;
+      aprs.account = p.getString('aprsAccount') ?? aprs.account;
+      aprs.password = p.getString('aprsPassword') ?? aprs.password;
       dataSource = p.getString('dataSource') ?? dataSource;
       // 容错：非法/旧值一律回落 APRS-IS，避免多来源判断失配。
       // pkwdwpl 是**只读**来源，即使旧配置里存了它也不能当发射来源。
@@ -4732,6 +4736,8 @@ class AppState extends ChangeNotifier {
     await p.setString('server', aprs.server);
     await p.setInt('port', aprs.port);
     await p.setString('passcode', aprs.passcode);
+    await p.setString('aprsAccount', aprs.account);
+    await p.setString('aprsPassword', aprs.password);
     await p.setString('dataSource', dataSource);
     await p.setStringList('enabledSources', enabledSources.toList());
     await p.setBool('igateEnabled', igateEnabled);

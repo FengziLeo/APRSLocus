@@ -9224,4 +9224,19 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get serverHistoryTitle => "最近接続したサーバー";
 
+  @override
+  String get serverAccountTitle => "アカウント";
+
+  @override
+  String get serverAccountHint => "サーバーが発行したアカウント";
+
+  @override
+  String get serverPasswordTitle => "パスワード";
+
+  @override
+  String get serverPasswordHint => "サーバーが発行したパスワード";
+
+  @override
+  String get serverAccountNote => "APRSNETCN のようなサーバーだけが必要です。標準の APRS-IS では空のままで構いません。";
+
 }

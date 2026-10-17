@@ -9123,6 +9123,21 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get serverHistoryTitle => "最近连过的服务器";
 
+  @override
+  String get serverAccountTitle => "账号";
+
+  @override
+  String get serverAccountHint => "服务器给的账号";
+
+  @override
+  String get serverPasswordTitle => "口令";
+
+  @override
+  String get serverPasswordHint => "服务器给的口令";
+
+  @override
+  String get serverAccountNote => "只有 APRSNETCN 这类服务器要账号和口令，标准 APRS-IS 留空就行。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18242,5 +18257,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get serverHistoryTitle => "最近連過的伺服器";
+
+  @override
+  String get serverAccountTitle => "帳號";
+
+  @override
+  String get serverAccountHint => "伺服器給的帳號";
+
+  @override
+  String get serverPasswordTitle => "口令";
+
+  @override
+  String get serverPasswordHint => "伺服器給的口令";
+
+  @override
+  String get serverAccountNote => "只有 APRSNETCN 這類伺服器要帳號和口令，標準 APRS-IS 留空就行。";
 
 }

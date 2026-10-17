@@ -4163,5 +4163,10 @@
   "permCheckLocation": "El permiso de ubicación está desactivado: el mapa no puede mostrar tu posición y no se puede balizar.",
   "permCheckNotify": "El permiso de notificaciones está desactivado: no se verán los avisos ni la alarma de vida.",
   "searchHistoryTitle": "Búsquedas recientes",
-  "serverHistoryTitle": "Servidores recientes"
+  "serverHistoryTitle": "Servidores recientes",
+  "serverAccountTitle": "Cuenta",
+  "serverAccountHint": "La cuenta que te dio el servidor",
+  "serverPasswordTitle": "Contraseña",
+  "serverPasswordHint": "La contraseña que te dio el servidor",
+  "serverAccountNote": "Solo servidores como APRSNETCN los necesitan. En un APRS-IS normal déjalos vacíos."
 }

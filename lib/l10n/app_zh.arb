@@ -4842,5 +4842,10 @@
   "permCheckLocation": "定位权限没开，地图标不出位置，也不能上报。",
   "permCheckNotify": "通知权限没开，提醒和生命守护告警都看不到。",
   "searchHistoryTitle": "最近搜过的",
-  "serverHistoryTitle": "最近连过的服务器"
+  "serverHistoryTitle": "最近连过的服务器",
+  "serverAccountTitle": "账号",
+  "serverAccountHint": "服务器给的账号",
+  "serverPasswordTitle": "口令",
+  "serverPasswordHint": "服务器给的口令",
+  "serverAccountNote": "只有 APRSNETCN 这类服务器要账号和口令，标准 APRS-IS 留空就行。"
 }

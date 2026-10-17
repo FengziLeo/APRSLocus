@@ -7,6 +7,10 @@ import '../state.dart';
 
 /// 桌面平台：dart:io Socket 直连 APRS-IS TCP 14580（标准协议）
 class AprsIo extends AprsConnector {
+  /// TCP 直连能自己拼登录行，所以支持 `auth <账号> <口令>`。
+  @override
+  bool get supportsAccountLogin => true;
+
   Socket? _sock;
   StreamSubscription<List<int>>? _sub;
   final List<int> _buf = [];
@@ -49,7 +53,7 @@ class AprsIo extends AprsConnector {
       _sock = sock;
       sock.setOption(SocketOption.tcpNoDelay, true);
       sock.write('user $callsign pass $passcode vers APRSlocus ${AppState.appVersion}'
-          ' filter $filter\r\n');
+          '${authSegment} filter $filter\r\n');
       _sub = sock.listen(
         (data) {
           _buf.addAll(data);

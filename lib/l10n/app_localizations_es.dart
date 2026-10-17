@@ -9562,4 +9562,19 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get serverHistoryTitle => "Servidores recientes";
 
+  @override
+  String get serverAccountTitle => "Cuenta";
+
+  @override
+  String get serverAccountHint => "La cuenta que te dio el servidor";
+
+  @override
+  String get serverPasswordTitle => "Contraseña";
+
+  @override
+  String get serverPasswordHint => "La contraseña que te dio el servidor";
+
+  @override
+  String get serverAccountNote => "Solo servidores como APRSNETCN los necesitan. En un APRS-IS normal déjalos vacíos.";
+
 }

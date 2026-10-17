@@ -8,6 +8,7 @@ import 'models.dart';
 import 'widgets.dart';
 import 'settings_widgets.dart';
 import 'input_history.dart';
+import 'aprsnetcn.dart';
 import 'garmin_page.dart';
 import 'hr_card.dart';
 import 'log_page.dart';
@@ -2194,6 +2195,10 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
   late final TextEditingController _port;
   late final TextEditingController _ws;
   late final TextEditingController _pass;
+  /// 名单账号口令（只有支持账号登录的服务器才用得上，见 `AprsConnector.supportsAccountLogin`）
+  late final TextEditingController _account;
+  late final TextEditingController _accountPass;
+  bool _accountPassHidden = true;
   late final TextEditingController _filterLat;
   late final TextEditingController _filterLng;
   late final TextEditingController _filterRadius;
@@ -2207,6 +2212,8 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
   String _origServer = '';
   int _origPort = 14580;
   String _origPass = '';
+  String _origAccount = '';
+  String _origAccountPass = '';
   String? _origWs;
   int _origFilterRadius = 300;
   bool _origFilterFollow = false;
@@ -2223,6 +2230,8 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     _port = TextEditingController(text: '${st.aprs.port}');
     _ws = TextEditingController(text: st.aprs.wsUrl ?? '');
     _pass = TextEditingController(text: st.aprs.passcode);
+    _account = TextEditingController(text: st.aprs.account);
+    _accountPass = TextEditingController(text: st.aprs.password);
     _filterLat = TextEditingController(text: st.filterLat.toStringAsFixed(2));
     _filterLng = TextEditingController(text: st.filterLng.toStringAsFixed(2));
     _filterRadius = TextEditingController(text: '${st.filterRadius}');
@@ -2233,6 +2242,8 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     _origServer = st.aprs.server;
     _origPort = st.aprs.port;
     _origPass = st.aprs.passcode;
+    _origAccount = st.aprs.account;
+    _origAccountPass = st.aprs.password;
     _origWs = st.aprs.wsUrl;
     _origFilterRadius = st.filterRadius;
     _origFilterFollow = st.filterFollow;
@@ -2248,6 +2259,8 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     _port.dispose();
     _ws.dispose();
     _pass.dispose();
+    _account.dispose();
+    _accountPass.dispose();
     _filterLat.dispose();
     _filterLng.dispose();
     _filterRadius.dispose();
@@ -2326,6 +2339,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
             localizedConnectionInfo(context, st.connInfo)),
         Divider(height: 1, color: C.border),
         _serverInput(),
+        _presetRow(),
         SettingsInput(S.of(context).port, _port,
             onChanged: (v) {
           final n = int.tryParse(v);
@@ -2333,6 +2347,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           _checkConfigDirty();
         }),
         _passcodeInput(),
+        if (st.aprs.supportsAccountLogin) _accountInputs(),
         SettingsInput(S.of(context).wsUrlOptional, _ws,
             onChanged: (v) {
           st.aprs.wsUrl = v.trim().isEmpty ? null : v.trim();
@@ -2502,6 +2517,113 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
         const SizedBox(height: 4),
         Text(S.of(context).passcodeMessageWarning,
             style: ts(10, c: C.grey)),
+      ]),
+    );
+  }
+
+  /// 预置服务器：一键把地址与端口写好（账号口令还是用户自己的）
+  Widget _presetRow() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: OutlinedButton(
+          onPressed: _fillPreset,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: C.purple,
+            side: BorderSide(color: C.purple.withValues(alpha: 0.35)),
+            minimumSize: const Size(0, 30),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            textStyle: ts(11, w: FontWeight.w700),
+          ),
+          child: Text(kAcnPresetLabel),
+        ),
+      ),
+    );
+  }
+
+  /// 填入预置地址；程序赋值不触发 `onChanged`，所以配置要在这里补一遍
+  void _fillPreset() {
+    _server.text = kAcnServerHost;
+    _port.text = '$kAcnServerPort';
+    st.aprs.server = kAcnServerHost;
+    st.aprs.port = kAcnServerPort;
+    _checkConfigDirty();
+    setState(() {});
+  }
+
+  /// 名单账号 + 口令。只在连接器支持账号登录时出现（见 [AprsConnector]）。
+  ///
+  /// 为什么不归到 passcode 那一行：passcode 是呼号算出来的六位数字，账号
+  /// 口令是服务器发给人的一对字符串。两者都要随登录行发出，但不是一回事。
+  Widget _accountInputs() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: C.border, width: 0.4)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(S.of(context).serverAccountTitle, style: ts(12, c: C.slate)),
+        const SizedBox(height: 6),
+        TextField(
+          controller: _account,
+          autocorrect: false,
+          style: ts(13, w: FontWeight.w600),
+          onChanged: (v) {
+            st.aprs.account = v.trim();
+            _checkConfigDirty();
+          },
+          decoration: InputDecoration(
+            hintText: S.of(context).serverAccountHint,
+            hintStyle: ts(13, c: C.greyLight),
+            isDense: true,
+            filled: true,
+            fillColor: C.bgSoft,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _accountPass,
+          obscureText: _accountPassHidden,
+          autocorrect: false,
+          enableSuggestions: false,
+          style: ts(13, w: FontWeight.w600),
+          onChanged: (v) {
+            st.aprs.password = v;
+            _checkConfigDirty();
+          },
+          decoration: InputDecoration(
+            hintText: S.of(context).serverPasswordHint,
+            hintStyle: ts(13, c: C.greyLight),
+            isDense: true,
+            filled: true,
+            fillColor: C.bgSoft,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _accountPassHidden
+                    ? Icons.visibility_off_rounded
+                    : Icons.visibility_rounded,
+                size: 18,
+                color: C.grey,
+              ),
+              tooltip: S.of(context).serverPasswordTitle,
+              onPressed: () =>
+                  setState(() => _accountPassHidden = !_accountPassHidden),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(S.of(context).serverAccountNote, style: ts(10, c: C.grey)),
       ]),
     );
   }
@@ -3277,6 +3399,8 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     final dirty = st.aprs.server != _origServer ||
         st.aprs.port != _origPort ||
         st.aprs.passcode != _origPass ||
+        st.aprs.account != _origAccount ||
+        st.aprs.password != _origAccountPass ||
         st.aprs.wsUrl != _origWs;
     if (dirty != _configDirty) {
       setState(() => _configDirty = dirty);

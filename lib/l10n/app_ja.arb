@@ -4163,5 +4163,10 @@
   "permCheckLocation": "位置情報の権限がオフです。地図に自分の位置が出ず、送信もできません。",
   "permCheckNotify": "通知の権限がオフです。リマインダーとライフアラームが表示されません。",
   "searchHistoryTitle": "最近の検索",
-  "serverHistoryTitle": "最近接続したサーバー"
+  "serverHistoryTitle": "最近接続したサーバー",
+  "serverAccountTitle": "アカウント",
+  "serverAccountHint": "サーバーが発行したアカウント",
+  "serverPasswordTitle": "パスワード",
+  "serverPasswordHint": "サーバーが発行したパスワード",
+  "serverAccountNote": "APRSNETCN のようなサーバーだけが必要です。標準の APRS-IS では空のままで構いません。"
 }

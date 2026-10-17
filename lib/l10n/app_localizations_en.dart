@@ -9580,4 +9580,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get acnPageLead => "A link designed by APRSNET.CN. It runs alongside the main link and only receives.";
 
+  @override
+  String get acnServerProto => "Server proto";
+
+  @override
+  String acnServerRetention(String hours) => "Positions kept $hours h";
+
+  @override
+  String get acnDefaultFilter => "Default feed";
+
+  @override
+  String get acnAllPackets => "All packets";
+
+  @override
+  String get acnOpenMap => "Station map";
+
 }

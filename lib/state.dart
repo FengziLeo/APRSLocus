@@ -4278,8 +4278,31 @@ class AppState extends ChangeNotifier {
   final AprsConnector aprs = createAprs();
 
   /// APRSNETCN 的 24 小时台站接口（见 lib/aprsnetcn.dart）。
-  /// token 只在内存里，不用烤进备份。
-  final AcnClient acn = AcnClient();
+  ///
+  /// 入口跟着界面里填的服务器地址走：换一台机器、自己搭一台试，拉的就是
+  /// 那一台的接口。token 只在内存里，不进备份。
+  AcnClient? _acnHttp;
+  AcnClient get acn {
+    final base = acnHttpBaseHost(acnServer);
+    final client = _acnHttp;
+    if (client != null && client.base == base) return client;
+    final fresh = AcnClient(base: base);
+    _acnHttp = fresh;
+    return fresh;
+  }
+
+  /// 服务器公布的能力与策略（`/api/v1/version`），页面打开时拉一次。
+  AcnInfo? acnInfo;
+
+  Future<void> fetchAcnInfo() async {
+    try {
+      final info = await acn.info();
+      acnInfo = info;
+      _notify();
+    } catch (e) {
+      _log(LogLevel.warn, 'APRSNETCN', '服务器信息没取到：$e');
+    }
+  }
 
   /// 上一次同步的结果（设置页/日志用），未同步过为 null。
   AcnSyncResult? acnLast;

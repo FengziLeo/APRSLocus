@@ -9590,4 +9590,19 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get acnPageLead => "Tautan yang dirancang APRSNET.CN. Berjalan bersama tautan utama dan hanya menerima.";
 
+  @override
+  String get acnServerProto => "Protokol server";
+
+  @override
+  String acnServerRetention(String hours) => "Posisi disimpan $hours jam";
+
+  @override
+  String get acnDefaultFilter => "Langganan bawaan";
+
+  @override
+  String get acnAllPackets => "Semua paket";
+
+  @override
+  String get acnOpenMap => "Peta stasiun";
+
 }

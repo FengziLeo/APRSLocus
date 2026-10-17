@@ -9201,6 +9201,21 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get acnPageLead => "APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。";
 
+  @override
+  String get acnServerProto => "服务器协议";
+
+  @override
+  String acnServerRetention(String hours) => "位置保留 $hours 小时";
+
+  @override
+  String get acnDefaultFilter => "默认订阅";
+
+  @override
+  String get acnAllPackets => "全部报文";
+
+  @override
+  String get acnOpenMap => "台站地图";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18398,5 +18413,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get acnPageLead => "APRSNET.CN 設計的一條鏈路。與主鏈路同時在線，只收不發。";
+
+  @override
+  String get acnServerProto => "伺服器協定";
+
+  @override
+  String acnServerRetention(String hours) => "位置保留 $hours 小時";
+
+  @override
+  String get acnDefaultFilter => "預設訂閱";
+
+  @override
+  String get acnAllPackets => "全部報文";
+
+  @override
+  String get acnOpenMap => "臺站地圖";
 
 }

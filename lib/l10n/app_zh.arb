@@ -4869,5 +4869,11 @@
   "acnSyncHint": "按下按钮才拉，连上链路不会自己拉。",
   "sourceGroupInternet": "互联网链接",
   "sourceGroupRadio": "电台链路",
-  "acnPageLead": "APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。"
+  "acnPageLead": "APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。",
+  "acnServerProto": "服务器协议",
+  "acnServerRetention": "位置保留 {hours} 小时",
+  "acnDefaultFilter": "默认订阅",
+  "acnAllPackets": "全部报文",
+  "acnOpenMap": "台站地图",
+  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}}
 }

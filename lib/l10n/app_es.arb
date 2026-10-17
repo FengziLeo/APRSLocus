@@ -4190,5 +4190,11 @@
   "acnSyncHint": "Solo se descarga al pulsar el botón. Conectar no descarga nada.",
   "sourceGroupInternet": "Enlaces de internet",
   "sourceGroupRadio": "Enlaces de radio",
-  "acnPageLead": "Un enlace diseñado por APRSNET.CN. Funciona junto al enlace principal y solo recibe."
+  "acnPageLead": "Un enlace diseñado por APRSNET.CN. Funciona junto al enlace principal y solo recibe.",
+  "acnServerProto": "Protocolo del servidor",
+  "acnServerRetention": "Posiciones {hours} h",
+  "acnDefaultFilter": "Suscripción por defecto",
+  "acnAllPackets": "Todos los paquetes",
+  "acnOpenMap": "Mapa de estaciones",
+  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}}
 }

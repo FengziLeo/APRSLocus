@@ -4778,5 +4778,11 @@
   "acnSyncHint": "按下按鈕才拉，連上鏈路不會自己拉。",
   "sourceGroupInternet": "網際網路連結",
   "sourceGroupRadio": "電台鏈路",
-  "acnPageLead": "APRSNET.CN 設計的一條鏈路。與主鏈路同時在線，只收不發。"
+  "acnPageLead": "APRSNET.CN 設計的一條鏈路。與主鏈路同時在線，只收不發。",
+  "acnServerProto": "伺服器協定",
+  "acnServerRetention": "位置保留 {hours} 小時",
+  "acnDefaultFilter": "預設訂閱",
+  "acnAllPackets": "全部報文",
+  "acnOpenMap": "臺站地圖",
+  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}}
 }

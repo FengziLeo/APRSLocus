@@ -9301,4 +9301,19 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get acnPageLead => "APRSNET.CN が設計した回線です。メイン回線と同時に接続し、受信のみ行います。";
 
+  @override
+  String get acnServerProto => "サーバー協定";
+
+  @override
+  String acnServerRetention(String hours) => "位置は $hours 時間保持";
+
+  @override
+  String get acnDefaultFilter => "既定の購読";
+
+  @override
+  String get acnAllPackets => "すべてのパケット";
+
+  @override
+  String get acnOpenMap => "局の地図";
+
 }

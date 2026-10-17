@@ -21,6 +21,15 @@ const int kAcnServerPort = 14580;
 /// HTTP 接口入口（`/api/v1/...`，见服务器仓库的 docs/API.md）
 const String kAcnHttpBase = 'http://8.138.199.11:8899';
 
+/// 界面里填的 APRS 地址 → HTTP 接口入口。
+///
+/// 那台机器上 APRS 端口（14580）与 HTTP 端口（8899）是分开的两个设置，界面
+/// 只让人填 APRS 那一个，所以这里补上 8899。地址空着就退回默认入口。
+String acnHttpBaseHost(String host) {
+  final h = host.trim();
+  return h.isEmpty ? kAcnHttpBase : 'http://$h:8899';
+}
+
 /// 一台台站在服务器那侧的 24 小时概况（= 该呼号最后一次位置 + 收到几帧）。
 ///
 /// 字段与 `/api/v1/stations` 的响应一一对应，但这里**全部容错**：缺一个字段
@@ -104,6 +113,50 @@ class AcnStation {
   }
 }
 
+/// 服务器自己公布的那几条策略（`/api/v1/version`，不用 token）。
+///
+/// 草案要求服务器明确写出自己实际采用的策略：passcode 怎么验、位置留多久、
+/// 没带过滤器的连接收到什么。客户端照实显示，不自己猜。
+class AcnInfo {
+  final String proto;
+  final int retentionHours;
+  final String passcodeMode;
+  final int whitelistMaxAgeHours;
+  final String defaultFilter;
+  final List<String> filters;
+
+  const AcnInfo({
+    required this.proto,
+    required this.retentionHours,
+    required this.passcodeMode,
+    required this.whitelistMaxAgeHours,
+    required this.defaultFilter,
+    required this.filters,
+  });
+
+  /// 没带过滤器的连接收到什么。`all` = 全收。
+  bool get feedAll => defaultFilter == 'all';
+
+  static AcnInfo? fromJson(Object? raw) {
+    if (raw is! Map) return null;
+    final proto = (raw['proto'] as String?)?.trim() ?? '';
+    if (proto.isEmpty) return null;
+    final list = raw['filters'];
+    return AcnInfo(
+      proto: proto,
+      retentionHours: (raw['retention_hours'] as num?)?.toInt() ?? 24,
+      passcodeMode: (raw['passcode_mode'] as String?) ?? '',
+      whitelistMaxAgeHours:
+          (raw['whitelist_max_age_hours'] as num?)?.toInt() ?? 0,
+      defaultFilter: (raw['default_filter'] as String?) ?? '',
+      filters: [
+        if (list is List)
+          for (final item in list) '$item',
+      ],
+    );
+  }
+}
+
 /// 一次同步的结果（给界面/日志用，不抛异常）
 class AcnSyncResult {
   final int added;
@@ -124,9 +177,10 @@ class AcnSyncResult {
 /// token 只放在内存里：换一台机器、重启一次就要重新用账号口令换一个，这本来
 /// 就是一两百毫秒的事，落盘一份 token 反而要在备份里处理它。
 class AcnClient {
-  AcnClient({String base = kAcnHttpBase}) : _base = base;
+  AcnClient({this.base = kAcnHttpBase});
 
-  final String _base;
+  /// 接口入口。换一台服务器就是换这个值。
+  final String base;
   String _token = '';
   String _tokenFor = '';
   DateTime _expires = DateTime.fromMillisecondsSinceEpoch(0);
@@ -144,7 +198,7 @@ class AcnClient {
   Future<void> login(String account, String password) async {
     final body = await httpSend(
       'POST',
-      Uri.parse('$_base/api/v1/login'),
+      Uri.parse('$base/api/v1/login'),
       headers: const {'Content-Type': 'application/json'},
       body: jsonEncode({'account': account.trim(), 'password': password}),
       timeout: const Duration(seconds: 15),
@@ -155,6 +209,18 @@ class AcnClient {
     _token = token;
     _tokenFor = account.trim().toLowerCase();
     _expires = DateTime.now().add(_ttl);
+  }
+
+  /// 服务器公布的能力与策略。不用 token，地址写错只是这一条失败。
+  Future<AcnInfo> info() async {
+    final body = await httpSend(
+      'GET',
+      Uri.parse('$base/api/v1/version'),
+      timeout: const Duration(seconds: 10),
+    );
+    final parsed = AcnInfo.fromJson(jsonDecode(body));
+    if (parsed == null) throw StateError('no-info');
+    return parsed;
   }
 
   /// 拉 24 小时台站。没 token 就先换一个；401 时换一次再重试。
@@ -178,7 +244,7 @@ class AcnClient {
     String password,
     int hours,
   ) async {
-    final uri = Uri.parse('$_base/api/v1/stations').replace(
+    final uri = Uri.parse('$base/api/v1/stations').replace(
       queryParameters: {'window': '${hours}h', 'limit': '2000'},
     );
     Future<String> call() => httpSend(

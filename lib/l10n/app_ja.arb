@@ -4190,5 +4190,11 @@
   "acnSyncHint": "ボタンを押したときだけ取得します。接続しても取得しません。",
   "sourceGroupInternet": "インターネット回線",
   "sourceGroupRadio": "無線回線",
-  "acnPageLead": "APRSNET.CN が設計した回線です。メイン回線と同時に接続し、受信のみ行います。"
+  "acnPageLead": "APRSNET.CN が設計した回線です。メイン回線と同時に接続し、受信のみ行います。",
+  "acnServerProto": "サーバー協定",
+  "acnServerRetention": "位置は {hours} 時間保持",
+  "acnDefaultFilter": "既定の購読",
+  "acnAllPackets": "すべてのパケット",
+  "acnOpenMap": "局の地図",
+  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}}
 }

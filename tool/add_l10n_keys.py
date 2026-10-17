@@ -126,9 +126,30 @@ KEYS = {
             'y solo recibe.',
         'Tautan yang dirancang APRSNET.CN. Berjalan bersama tautan utama dan '
             'hanya menerima.'),
+
+    # ── 服务器自己公布的那几条（副链路页面的「服务器」卡）──
+    #
+    # 草案要求服务器写明自己实际采用的策略。客户端照它报的原样显示，不猜。
+    'acnServerProto': (
+        '服务器协议', '伺服器協定', 'Server proto',
+        'サーバー協定', 'Protocolo del servidor', 'Protokol server'),
+    'acnServerRetention': (
+        '位置保留 {hours} 小时', '位置保留 {hours} 小時',
+        'Positions kept {hours} h', '位置は {hours} 時間保持',
+        'Posiciones {hours} h', 'Posisi disimpan {hours} jam'),
+    'acnDefaultFilter': (
+        '默认订阅', '預設訂閱', 'Default feed', '既定の購読',
+        'Suscripción por defecto', 'Langganan bawaan'),
+    'acnAllPackets': (
+        '全部报文', '全部報文', 'All packets', 'すべてのパケット',
+        'Todos los paquetes', 'Semua paket'),
+    'acnOpenMap': (
+        '台站地图', '臺站地圖', 'Station map', '局の地図',
+        'Mapa de estaciones', 'Peta stasiun'),
 }
 
 META = {
+    'acnServerRetention': '{"placeholders": {"hours": {"type": "String"}}}',
     'acnSyncDone': '{"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}}',
     'gpxExported': '{"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}}',
     'gpxSavedTo': '{"placeholders": {"path": {"type": "String"}}}',

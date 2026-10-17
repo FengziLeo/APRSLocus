@@ -4190,5 +4190,11 @@
   "acnSyncHint": "Hanya diambil saat tombol ditekan, tidak saat terhubung.",
   "sourceGroupInternet": "Tautan internet",
   "sourceGroupRadio": "Tautan radio",
-  "acnPageLead": "Tautan yang dirancang APRSNET.CN. Berjalan bersama tautan utama dan hanya menerima."
+  "acnPageLead": "Tautan yang dirancang APRSNET.CN. Berjalan bersama tautan utama dan hanya menerima.",
+  "acnServerProto": "Protokol server",
+  "acnServerRetention": "Posisi disimpan {hours} jam",
+  "acnDefaultFilter": "Langganan bawaan",
+  "acnAllPackets": "Semua paket",
+  "acnOpenMap": "Peta stasiun",
+  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}}
 }

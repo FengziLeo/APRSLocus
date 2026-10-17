@@ -16758,6 +16758,36 @@ abstract class AppLocalizations {
   /// **'APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。'**
   String get acnPageLead;
 
+  /// No description provided for @acnServerProto.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务器协议'**
+  String get acnServerProto;
+
+  /// No description provided for @acnServerRetention.
+  ///
+  /// In zh, this message translates to:
+  /// **'位置保留 {hours} 小时'**
+  String acnServerRetention(String hours);
+
+  /// No description provided for @acnDefaultFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认订阅'**
+  String get acnDefaultFilter;
+
+  /// No description provided for @acnAllPackets.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部报文'**
+  String get acnAllPackets;
+
+  /// No description provided for @acnOpenMap.
+  ///
+  /// In zh, this message translates to:
+  /// **'台站地图'**
+  String get acnOpenMap;
+
 }
 
 class _AppLocalizationsDelegate

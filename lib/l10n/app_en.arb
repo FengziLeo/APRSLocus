@@ -4190,5 +4190,11 @@
   "acnSyncHint": "Pulled only when you press the button, never on connect.",
   "sourceGroupInternet": "Internet links",
   "sourceGroupRadio": "Radio links",
-  "acnPageLead": "A link designed by APRSNET.CN. It runs alongside the main link and only receives."
+  "acnPageLead": "A link designed by APRSNET.CN. It runs alongside the main link and only receives.",
+  "acnServerProto": "Server proto",
+  "acnServerRetention": "Positions kept {hours} h",
+  "acnDefaultFilter": "Default feed",
+  "acnAllPackets": "All packets",
+  "acnOpenMap": "Station map",
+  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}}
 }

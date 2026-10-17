@@ -145,6 +145,9 @@ const List<BackupGroupSpec> kBackupGroups = [
     // 台站面板的筛选条件（状态 / 类型 / 同款软件 / 设备 / 只看收藏）：同样是
     // 用户自己调出来的显示偏好，换机后回到「全部」会让人以为筛选没记住。
     'stationFilterJson',
+    // 地图的图层筛选（隐藏了哪些台站类型、是否套用台站面板的筛选）：同属
+    // 显示偏好，换机后回到「全部显示」会让人以为「筛选怎么又自己开了」。
+    'mapHiddenTypes', 'applyFilterToMap',
     // 离线地图：缓存开关、仅离线模式，以及**区域记录**（只有范围与进度，
     // 瓦片本体是文件不随备份走 —— 换机后区域记录还在，重新点「继续」即可）
     'tileCacheOn', 'offlineOnly', 'offlineRegions',

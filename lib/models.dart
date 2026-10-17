@@ -231,6 +231,18 @@ class Station {
 
 enum TypeGroup { mobile, fixed, infra, wx, fmo, other }
 
+/// 名字 → 类型分组（偏好里的 `mapHiddenTypes` 存的是名字，认不出的旧名 / 脏值
+/// 返回 null）。
+///
+/// 存名字而不是下标：下标会随枚举顺序变化而错位，改坏之后会静静地把
+/// 「隐藏天气」变成「隐藏固定台站」。
+TypeGroup? typeGroupByName(String name) {
+  for (final g in TypeGroup.values) {
+    if (g.name == name) return g;
+  }
+  return null;
+}
+
 /// 台站筛选条件（台站面板的 chips + 设备筛选）。
 /// 由台站面板编辑；开启 [AppState.applyFilterToMap] 后同样作用于地图显示，
 /// 两处共用 [matches] 同一套判定，避免行为不一致。

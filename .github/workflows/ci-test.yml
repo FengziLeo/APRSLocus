@@ -321,6 +321,11 @@ jobs:
       - name: Test station filter persistence
         run: flutter test test/station_filter_persist_test.dart
 
+      # 地图图层筛选「能记忆」（用户要求）：关掉的台站类型与「套用台站面板筛选」
+      # 原来都不落盘，重启就全显示出来。存的是类型名字，脏名字必须被丢掉。
+      - name: Test map filter persistence
+        run: flutter test test/map_filter_persist_test.dart
+
       # 历史轨迹导出 GPX（用户要求）：GPX 是**给别人读的文件**，时间少个 Z、
       # 海拔补个 0、断档不断段，在这里都不会报错 —— 只有导进 Strava / Garmin /
       # Google Earth 之后才看得见。所以把这几条意图逐字钉在 CI。

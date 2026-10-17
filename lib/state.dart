@@ -2025,6 +2025,25 @@ class AppState extends ChangeNotifier {
   /// 是否把台站面板的筛选同时应用到地图（默认关闭，避免误隐藏台站）
   bool applyFilterToMap = false;
 
+  /// 地图「图层筛选」里被关掉的台站类型（只作用于地图）。
+  ///
+  /// 用户要求「地图筛选也要记住」：它原来只活在地图页的 State 里（页面重建就回
+  /// 到「全部显示」），而那颗按钮所在的图层面板每点一下都在提醒他改过什么。
+  final Set<TypeGroup> mapHiddenTypes = <TypeGroup>{};
+
+  /// 切换某个类型在地图上的显隐（[mapHiddenTypes] 的反向操作），并落盘。
+  void toggleMapHiddenType(TypeGroup g) {
+    if (!mapHiddenTypes.remove(g)) mapHiddenTypes.add(g);
+    persist();
+  }
+
+  /// 把地图图层筛选一次恢复成「全部显示」，并落盘。
+  void clearMapHiddenTypes() {
+    if (mapHiddenTypes.isEmpty) return;
+    mapHiddenTypes.clear();
+    persist();
+  }
+
   /// 更新台站筛选；推进台站版本让台站页与地图（共用同一条台站流）同步刷新。
   ///
   /// 落盘（用户要求「记住台站筛选」）：它原来只活在台站面板的 State 里，关掉应用
@@ -2037,8 +2056,10 @@ class AppState extends ChangeNotifier {
   }
 
   void setApplyFilterToMap(bool v) {
+    if (v == applyFilterToMap) return;
     applyFilterToMap = v;
     _bumpStationsVersion();
+    persist();
   }
 
   /// 数据包列表上限（下限 100，防止设成 0 把历史全清掉）
@@ -3900,6 +3921,8 @@ class AppState extends ChangeNotifier {
     heatLevel = 1;
     mapLabelsAlways = false;
     stationFilter = const StationFilter();
+    applyFilterToMap = false;
+    mapHiddenTypes.clear();
     stationSort = 'call';
     maxStations = 100000;
     maxPackets = 2000;
@@ -4263,6 +4286,16 @@ class AppState extends ChangeNotifier {
           stationFilter = StationFilter.fromJson(jsonDecode(sf));
         }
       } catch (_) {}
+      applyFilterToMap = p.getBool('applyFilterToMap') ?? applyFilterToMap;
+      // 地图图层筛选：认不出的类型名直接丢掉（改坏 / 将来改名都不该崩）
+      try {
+        final hid = p.getStringList('mapHiddenTypes');
+        if (hid != null) {
+          mapHiddenTypes
+            ..clear()
+            ..addAll(hid.map(typeGroupByName).whereType<TypeGroup>());
+        }
+      } catch (_) {}
       // 台站排序：认不出的值（改坏 / 旧版本号）回到默认的按呼号排
       final savedSort = p.getString('stationSort');
       if (savedSort != null && stationSorts.contains(savedSort)) {
@@ -4561,6 +4594,9 @@ class AppState extends ChangeNotifier {
     await p.setInt('heatLevel', heatLevel);
     await p.setBool('mapLabelsAlways', mapLabelsAlways);
     await p.setString('stationFilterJson', jsonEncode(stationFilter.toJson()));
+    await p.setBool('applyFilterToMap', applyFilterToMap);
+    await p.setStringList(
+        'mapHiddenTypes', mapHiddenTypes.map((g) => g.name).toList());
     await p.setString('stationSort', stationSort);
     await p.setInt('maxStations', maxStations);
     await p.setInt('maxPackets', maxPackets);

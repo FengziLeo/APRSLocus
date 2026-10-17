@@ -531,7 +531,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   }
 
   // 图层筛选：隐藏的类型
-  final Set<TypeGroup> _hiddenTypes = {};
+  //
+  // 不另存一份：直接读写 [AppState.mapHiddenTypes]（用户要求「地图筛选要记住」）。
+  // 存两份的话，面板里的勾与落盘那份迟早会不同步 —— 那种错只有在重启后才看得见。
+  Set<TypeGroup> get _hiddenTypes => widget.state.mapHiddenTypes;
 
   // 可见台站缓存：台站版本 + 筛选条件未变时复用，
   // 避免每秒 tick 重建时对几百个台站反复全量过滤
@@ -2649,7 +2652,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 if (_hiddenTypes.isNotEmpty)
                   GestureDetector(
                     onTap: () {
-                      setMenuState(() => _hiddenTypes.clear());
+                      widget.state.clearMapHiddenTypes();
+                      setMenuState(() {});
                       setState(() {});
                     },
                     child: Container(
@@ -2747,13 +2751,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 padding: const EdgeInsets.symmetric(vertical: 3),
                 child: GestureDetector(
                   onTap: () {
-                    setMenuState(() {
-                      if (_hiddenTypes.contains(t.$1)) {
-                        _hiddenTypes.remove(t.$1);
-                      } else {
-                        _hiddenTypes.add(t.$1);
-                      }
-                    });
+                    widget.state.toggleMapHiddenType(t.$1);
+                    setMenuState(() {});
                     setState(() {});
                   },
                   behavior: HitTestBehavior.opaque,

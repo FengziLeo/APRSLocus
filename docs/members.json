@@ -1,6 +1,6 @@
 {
-  "version": 66,
-  "updated": "2026-10-16",
+  "version": 67,
+  "updated": "2026-10-17",
   "developers": [
     {
       "call": "BG7LZQ",
@@ -1961,6 +1961,54 @@
         "jadeGift"
       ],
       "primary": "jadeGift"
+    },
+    {
+      "call": "BA7JKT",
+      "who": {
+        "zh": "BA7JKT",
+        "zh-TW": "BA7JKT",
+        "en": "BA7JKT"
+      },
+      "role": {
+        "zh": "分享传播",
+        "zh-TW": "分享傳播",
+        "en": "Community sharing"
+      },
+      "brief": {
+        "zh": "把电波里的新鲜事讲出去，让路过的人也抬头听一会儿。",
+        "zh-TW": "把電波裡的新鮮事講出去，讓路過的人也抬頭聽一會兒。",
+        "en": "Took the fresh stories off the airwaves and told them out loud, so passers-by stopped to listen."
+      },
+      "contrib": {
+        "zh": "在社交媒体上分享 APRSlocus 的截图与用法，把门推开一条缝，让还没听说过的人自己走进来。",
+        "zh-TW": "在社群媒體上分享 APRSlocus 的截圖與用法，把門推開一條縫，讓還沒聽說過的人自己走進來。",
+        "en": "Shared screenshots and how-tos of APRSlocus on social media, leaving the door ajar for people who had never heard of it."
+      },
+      "quote": {
+        "zh": "种子不问落在哪块地，只管先落下去。",
+        "zh-TW": "種子不問落在哪塊地，只管先落下去。",
+        "en": "A seed does not ask which field it lands in; it simply falls."
+      },
+      "tags": {
+        "zh": [
+          "社交分享",
+          "社区传播"
+        ],
+        "zh-TW": [
+          "社群分享",
+          "社群傳播"
+        ],
+        "en": [
+          "Social sharing",
+          "Community reach"
+        ]
+      },
+      "c": "#2E9E5B",
+      "grp": "support",
+      "honors": [
+        "sower"
+      ],
+      "primary": "sower"
     }
   ],
   "groups": [

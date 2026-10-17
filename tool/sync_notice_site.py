@@ -109,16 +109,27 @@ AUDIO_TPL = (
 )
 
 # OA 小件（APRSNET.CN 的倒计时条）：自己就是一条矮横条，和音频小条同理，
-# 套进 16:9 只会得到一块空屏。#1c2228 是本站深色皮肤下公告卡的底色，
-# 小件自己也画这个色，两边对上就没有“框”，只剩卡片里的一段读数。
+# 套进 16:9 只会得到一块空屏。宽也跟正文那一列对齐（满宽、不居中，小件里不留
+# 左右内边距），左边就和段落同一根线；底色跟卡片一样，看不出框。
+# 跨域读不到父页的 CSS 变量，所以站点切深浅色时把主题当参数再交给它一次。
 EMBED_URL_RE = re.compile(r'^https?://aprsnet\.cn/oa/(?:en/)?embed\.html\b')
 
+# 注意：模板里的花括号不少（有一段 JS），所以下面一律用 replace 填 URL，
+# 不用 str.format —— 否则 JS 的每个括号都得写成两个。
 EMBED_TPL = (
-    '<div style="width:100%;max-width:760px;margin:6px auto">\n'
-    '<iframe src="{url}" title="APRSNETCN OA" scrolling="no" border="0" '
-    'frameborder="no" framespacing="0" loading="lazy" '
-    'style="width:100%;height:168px;display:block;border-radius:14px;'
+    '<div style="width:100%;margin:6px 0">\n'
+    '<iframe class="oa-embed" src="{url}" title="APRSNETCN OA" scrolling="no" '
+    'border="0" frameborder="no" framespacing="0" loading="lazy" '
+    'style="display:block;width:100%;height:148px;border:0;border-radius:14px;'
     'background:#1c2228"></iframe>\n'
+    '<script>(function(){var f=document.currentScript.previousElementSibling;'
+    'if(!f)return;var base=f.getAttribute("src").split("?")[0];'
+    'function set(){var light=document.documentElement.getAttribute("data-theme")==="light";'
+    'var u=base+"?theme="+(light?"light":"dark");'
+    'if(f.getAttribute("src")!==u)f.src=u;'
+    'f.style.background=light?"#ffffff":"#1c2228";}'
+    'set();if(window.MutationObserver){new MutationObserver(set).observe('
+    'document.documentElement,{attributes:true,attributeFilter:["data-theme"]});}})();</script>\n'
     '</div>'
 )
 
@@ -187,7 +198,7 @@ def render_body(md_text):
                 tpl = EMBED_TPL
             else:
                 tpl = VIDEO_TPL
-            out.append(tpl.format(url=esc(url)))
+            out.append(tpl.replace('{url}', esc(url)))
             i += 1
             continue
         if s.startswith('>'):

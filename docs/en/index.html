@@ -633,6 +633,15 @@ html{overflow-x:hidden}
 <!-- site-sync:changelog -->
     <div class="cl-version reveal">
       <div class="cl-head">
+        <span class="cl-tag">v2.1.10</span>
+        <span class="cl-date">2026-10-17</span>
+      </div>
+      <div class="cl-body">
+        <div class="cl-item"><span class="cl-dot new"></span>The connection settings gained an APRSNETCN secondary link: it runs alongside the main link, receive only, while everything you send still leaves through the main server. The whitelist account and password have their own field, and a wrong password gets a line that says why. The stations the server heard in the last 24 hours can be pulled in with "Sync now"; it only fills the gaps and never overwrites a callsign you already have, and nothing is requested on connect. A frame arriving on both links is recorded once.</div>
+      </div>
+    </div>
+    <div class="cl-version reveal">
+      <div class="cl-head">
         <span class="cl-tag">v2.1.9</span>
         <span class="cl-date">2026-10-17</span>
       </div>

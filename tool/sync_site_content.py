@@ -419,6 +419,27 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.10', 'date': '2026-10-17',
+        'items': [
+            ('new',
+             T('连接设置多了「APRSNETCN 副链路」：它和主链路同时在线、只收不发，发报文仍走'
+               '主链路那台服务器。名单账号与口令填在副链路自己那一格，口令错了卡片里会说明'
+               '原因。服务器 24 小时里的台站可以点「立即同步」拉进来，只补空，已有的呼号'
+               '不动；连上链路不会自己去请求。两条链路收到同一帧只记一次。',
+               '連線設定多了「APRSNETCN 副鏈路」：它和主鏈路同時在線、只收不發，發報文仍走'
+               '主鏈路那臺伺服器。名單帳號與口令填在副鏈路自己那一格，口令錯了卡片裡會說明'
+               '原因。伺服器 24 小時裡的臺站可以點「立即同步」拉進來，只補空，已有的呼號'
+               '不動；連上鏈路不會自己去請求。兩條鏈路收到同一幀只記一次。',
+               'The connection settings gained an APRSNETCN secondary link: it runs alongside the '
+               'main link, receive only, while everything you send still leaves through the main '
+               'server. The whitelist account and password have their own field, and a wrong '
+               'password gets a line that says why. The stations the server heard in the last 24 '
+               'hours can be pulled in with "Sync now"; it only fills the gaps and never overwrites '
+               'a callsign you already have, and nothing is requested on connect. A frame arriving '
+               'on both links is recorded once.')),
+        ],
+    },
+    {
         'ver': 'v2.1.9', 'date': '2026-10-17',
         'items': [
             ('new',

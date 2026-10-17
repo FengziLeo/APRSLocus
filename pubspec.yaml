@@ -1,7 +1,7 @@
 name: aprslocus
 description: "APRSlocus - a local APRS client (no server address bundled)"
 publish_to: 'none'
-version: 2.1.9+20109
+version: 2.1.10+20110
 
 environment:
   sdk: ^3.13.1

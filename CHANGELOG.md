@@ -1,5 +1,42 @@
 # 更新日志
 
+## [2.1.10] - 2026-10-17
+
+### 多开一条只听的链路，网络那头也能跟着收
+
+- **连接设置里多了「APRSNETCN 副链路」**。打开之后它和主链路同时在线，只收不发：
+  发出去的报文永远还是走主链路那一台服务器，两条链路各收各的台站，互不顶替。
+- **名单账号和口令填在副链路自己那一格里**。有些服务器给白名单呼号发了账号，
+  登录时带上才认；这两个值只写进副链路的登录行，主链路的登录一个词都不多。
+  口令填错时链路照样显示已连接，卡片里会多一行说清原因。
+- **服务器那 24 小时里的台站可以拉一份进来**。点「立即同步」，服务器替我们听到的
+  那一大片就并进列表，只补空，已经收到的呼号一个都不动。来源会标成服务器。
+  这件事只有你按下按钮才做，连上链路不会自己去请求。
+- **两条链路收到同一帧只记一次**。同一句报文从两边都进来时，列表里不会出现两个
+  一样的行。
+
+---
+
+## [2.1.10] - 2026-10-17 (English)
+
+### A second link that only listens
+
+- **The connection settings have their own APRSNETCN section now.** Switch it on and it runs
+  alongside the main link, receive only: every packet you send still goes out through the main
+  server, and the two links collect their stations independently.
+- **The account and password live in that section.** Some servers issue an account to whitelisted
+  callsigns and only accept a login that carries it. Those two values go into the secondary
+  link's login line only; the main link's login gains no extra word. A wrong password still
+  leaves the link looking connected, so the card adds a line that says why.
+- **The stations the server heard in the last 24 hours can be pulled in.** Tap "Sync now" and its
+  wide list is merged into yours: it only fills the gaps, a callsign you already have is left
+  alone, and the rows are marked as coming from the server. This happens only when you tap the
+  button, never on connect.
+- **The same frame arriving on both links is recorded once.** A packet that comes in twice no
+  longer shows up as two identical rows.
+
+---
+
 ## [2.1.9] - 2026-10-17
 
 ### 常用的输入留下来，公告里的视频铺满了

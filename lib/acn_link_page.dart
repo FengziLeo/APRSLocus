@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'aprsnetcn.dart';
 import 'settings_widgets.dart';
 import 'state.dart';
 import 'theme.dart';
@@ -51,6 +53,8 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
     _origPort = st.acnPort;
     _origAccount = st.acnAccount;
     _origPassword = st.acnPassword;
+    // 服务器自己公布的那几条，不用账号也能取：地址写错只是这张卡空着。
+    unawaited(st.fetchAcnInfo());
   }
 
   @override
@@ -77,6 +81,20 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
   Future<void> _reconnect() async {
     setState(() => _dirty = false);
     await st.reconnectAcn();
+    unawaited(st.fetchAcnInfo());
+  }
+
+  /// 服务器上的 24 小时台站地图。它是那台机器的公共页面，不用账号，
+  /// 地址就是界面上填的那一台，所以交给浏览器打开，不在 App 里再画一遍。
+  Future<void> _openMap() async {
+    final s = S.of(context);
+    final url = Uri.parse('${acnHttpBaseHost(st.acnServer)}/stations');
+    final opened = await launchUrl(url, mode: LaunchMode.externalApplication);
+    if (!opened && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(s.openLinkFailed)),
+      );
+    }
   }
 
   @override
@@ -91,6 +109,10 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
         color: C.purple,
         body: Column(children: [
           _linkCard(s),
+          if (st.acnInfo != null) ...[
+            const SizedBox(height: 16),
+            _serverCard(s, st.acnInfo!),
+          ],
           const SizedBox(height: 16),
           _syncCard(s),
           const SizedBox(height: 24),
@@ -261,7 +283,37 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
     );
   }
 
-  /// ② 24 小时台站：只有用户按下去才拉
+  /// ② 服务器自己公布的策略：`/api/v1/version` 上那几条，不带账号也能看。
+  /// 取不到就整张卡不出现（地址写错时链路卡已经说了原因）。
+  Widget _serverCard(S s, AcnInfo info) {
+    return SettingsSectionCard(
+      title: s.server,
+      icon: Icons.dns_rounded,
+      color: C.cyan,
+      children: [
+        SettingsRow2(s.acnServerProto, info.proto),
+        SettingsRow2(
+          s.acnDefaultFilter,
+          info.feedAll ? s.acnAllPackets : info.defaultFilter,
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+          child: Text(
+            s.acnServerRetention('${info.retentionHours}'),
+            style: ts(10, c: C.grey),
+          ),
+        ),
+        SettingsNavRow(
+          title: s.acnOpenMap,
+          icon: Icons.map_rounded,
+          color: C.cyan,
+          onTap: () => unawaited(_openMap()),
+        ),
+      ],
+    );
+  }
+
+  /// ③ 24 小时台站：只有用户按下去才拉
   Widget _syncCard(S s) {
     final last = st.acnLast;
     final busy = st.acnSyncing;

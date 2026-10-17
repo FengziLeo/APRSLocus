@@ -27,8 +27,10 @@
     [文字](链接)       → <a target=_blank rel=noopener>
     - 列表项           → <ul><li>…
     > 引用             → 引用块（同一段连续引用合并为一行，<br> 连接）
-    @video <URL>      → 内嵌播放器 iframe（视频给 16:9 大框；网易云 outchain
-                        那种音频小条给 330×86 的小框，不被放大成一块黑边）
+    @video <URL>      → 内嵌一块外部页面（iframe）。模板按 URL 选，写法只有这一种：
+                        视频给 16:9 的大框；网易云 outchain 那种音频小条给 330×86
+                        的小框，不被放大成一块黑边；OA 小件（aprsnet.cn/oa/embed.html）
+                        给一条 168 高的横条 —— 套进 16:9 会变成一块带黑边的空屏。
 
 ## 幂等
 
@@ -106,6 +108,19 @@ AUDIO_TPL = (
     '</div>'
 )
 
+# OA 小件（APRSNET.CN 的倒计时条）：自己就是一条矮横条，和音频小条同理，
+# 套进 16:9 只会得到一块空屏。给了圆角与底色，和视频框摆在一起像同一家。
+EMBED_URL_RE = re.compile(r'^https?://aprsnet\.cn/oa/(?:en/)?embed\.html\b')
+
+EMBED_TPL = (
+    '<div style="width:100%;max-width:760px;margin:6px auto">\n'
+    '<iframe src="{url}" title="APRSNETCN OA" scrolling="no" border="0" '
+    'frameborder="no" framespacing="0" loading="lazy" '
+    'style="width:100%;height:168px;display:block;border-radius:14px;'
+    'border:1px solid rgba(255,255,255,.10);background:#0b0e11"></iframe>\n'
+    '</div>'
+)
+
 
 def read(rel):
     # 归一成 LF：Windows 下 git（core.autocrlf）会把工作区检出成 CRLF，而本脚本与
@@ -165,7 +180,12 @@ def render_body(md_text):
             continue
         if s.startswith('@video '):
             url = s[len('@video '):].strip()
-            tpl = AUDIO_TPL if AUDIO_URL_RE.match(url) else VIDEO_TPL
+            if AUDIO_URL_RE.match(url):
+                tpl = AUDIO_TPL
+            elif EMBED_URL_RE.match(url):
+                tpl = EMBED_TPL
+            else:
+                tpl = VIDEO_TPL
             out.append(tpl.format(url=esc(url)))
             i += 1
             continue

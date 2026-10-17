@@ -8,6 +8,8 @@ The first round of APRSNETCN OA is this Saturday. Stay on for the day, send one 
 - In UTC that is 16:00 on 16 October to 15:59 on 17 October
 - The duty callsign this week is **BG7LZQ-3**
 
+@video https://aprsnet.cn/oa/en/embed.html?theme=dark
+
 ## 📮 How to join
 
 Address the message to **BG7LZQ-3**.

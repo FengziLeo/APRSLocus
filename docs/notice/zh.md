@@ -8,6 +8,8 @@ APRSNETCN OA 的第一轮放在本周六。一整天，把一条报文发到当�
 - 同一段时间的 UTC：10 月 16 日 16:00 到 10 月 17 日 15:59
 - 本周轮值呼号是 **BG7LZQ-3**
 
+@video https://aprsnet.cn/oa/embed.html?theme=dark
+
 ## 📮 怎么参加
 
 报文的收件人填 **BG7LZQ-3**。

@@ -42,8 +42,54 @@ APRSNETCN OA 的第一轮放在本周六。一整天，把一条报文发到当�
 
 在 APRSLocus 里打开「消息」页，把收件人填成轮值呼号就能发。
 
-有问题在 QQ 群 **925025834** 说一声。
+当天的名单在活动页上。**[打开活动页](https://oa.aprsnet.cn)**
 
 ---
 
-当天的名单在活动页上。**[打开活动页](https://oa.aprsnet.cn)**
+## ✅ 清零通道已恢复
+
+Qingling（清零）渠道上误发的 2.2.0 已经下架，通道恢复正常。
+
+现在检查更新会拿到最新正式版 2.1.6。之前装过 2.2.0 的话，请先卸载 2.2.0，再安装 2.1.6。
+
+**[下载 2.1.6](https://github.com/dariondong/APRSLocus/releases/download/v2.1.6/APRSLocus_2.1.6.apk)**
+
+---
+
+## 🥚 2.1.0 的一份彩蛋：点一下，那颗星球会转过身来
+
+彩蛋就藏在「关于」页 —— 那个你大概每天都会路过一次的地方。
+
+封面那颗一直在转的星，不是一张画。**轻轻点它一下**：它会抖一抖，转过身去，然后带你落进一页故事里。那里也有一颗星球在转，有一个数字一直在往上走；有守着电波的人，也有把这件事一起做出来的人。
+
+那一页里有声音，记得开着音响听。不用长按，也不用等五秒 —— 点一下，故事就来了。想反悔也来得及：再点一下，它翻回正面，故事也就不打开了。
+
+剩下的，请你自己去看。
+
+---
+
+## 📮 想听听你的声音
+
+APRSLocus 已经陪 620+ 位用户走过一段路。下一步往哪儿走，我们想听你说：哪里别扭、还缺什么、最该先修的是哪一个。
+
+**[点击进入调查问卷](https://ccncqe00x1e4.feishu.cn/share/base/form/shrcnWcCKNxzSMvlGP54DCrnAZg)**
+
+## 💬 官方 QQ 群 925025834
+
+有问题、有想法，或者只是想说一句「收到了」，都欢迎进来坐坐。
+
+**[点击加入 925025834](https://qun.qq.com/universal-share/share?ac=1&authKey=tqe%2BI6lZzakmEoIBwnSVV9%2BT8Zg36F4%2FejuSGAfEIYiDhj5sGyQUOx%2B3YCU68G05&busi_data=eyJncm91cENvZGUiOiI5MjUwMjU4MzQiLCJ0b2tlbiI6ImxiMTMrTm55MEoxU1o2aFV1V1hLUDRKQkZBR21nTEdNemJFOUM0aE1jOWJLU2lNZUtZaGpOa1dicnlYSk15V0YiLCJ1aW4iOiIzNDIxMDE2MTUwIn0%3D&data=nW_8Q1gX2ft-4C0n9p83Ukel3sHzCwlFOSMnOU0HZ8sCtWkwY3hmqlwVFAZm5ipk2W3hIDPxc6Rl0HoW-nMf8Q&svctype=4&tempid=h5_group_info)**
+
+---
+
+## 🎵 送你一首歌：启航的歌
+
+@video https://player.bilibili.com/player.html?aid=1304817854&bvid=BV15M4m1k7YN&cid=1556315737&page=1
+
+---
+
+> 那颗星球还在转，那个数字还在往上走。
+> 谢谢每一个还在守听的人。
+
+**APRSLocus 开发团队**
+2026 年 10 月

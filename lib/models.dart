@@ -265,6 +265,58 @@ class StationFilter {
   String get key =>
       '$status|$type|$app|$dev|$model|fav${favoriteOnly ? 1 : 0}';
 
+  /// 落盘用的键值（[fromJson] 读回）。字段名与构造参数同名，改名要两处一起改。
+  Map<String, dynamic> toJson() => {
+        'status': status,
+        'type': type,
+        'app': app,
+        'dev': dev,
+        'model': model,
+        'favoriteOnly': favoriteOnly,
+      };
+
+  /// 各档的合法取值（读回时逐项校验，认不出的一律回落 `all`）。
+  static const List<String> statusValues = [
+    'all',
+    'online',
+    'moving',
+    'stopped',
+    'iss',
+  ];
+  static const List<String> typeValues = [
+    'all',
+    'mobile',
+    'fixed',
+    'infra',
+    'wx',
+  ];
+  static const List<String> appValues = ['all', 'aprslocus'];
+
+  /// 从偏好里读回筛选条件：任何解析失败 / 脏值都回落成「无筛选」。
+  ///
+  /// 用户要求台站面板的筛选「记住」—— 它原来只活在面板的 State 里，关掉应用就
+  /// 回到「全部」。脏值（手改偏好文件 / 旧版本写进去的东西）只回落一次，不抛异常，
+  /// 也不能把面板做成第三种状态。
+  static StationFilter fromJson(Object? raw) {
+    if (raw is! Map) return const StationFilter();
+    String pick(String k, List<String> allowed) {
+      final v = raw[k];
+      return v is String && allowed.contains(v) ? v : 'all';
+    }
+
+    final fav = raw['favoriteOnly'];
+    final dev = raw['dev'];
+    final model = raw['model'];
+    return StationFilter(
+      status: pick('status', statusValues),
+      type: pick('type', typeValues),
+      app: pick('app', appValues),
+      dev: dev is String ? dev : 'all',
+      model: model is String ? model : 'all',
+      favoriteOnly: fav is bool ? fav : false,
+    );
+  }
+
   StationFilter copyWith({
     String? status,
     String? type,

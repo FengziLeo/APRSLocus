@@ -2025,10 +2025,15 @@ class AppState extends ChangeNotifier {
   /// 是否把台站面板的筛选同时应用到地图（默认关闭，避免误隐藏台站）
   bool applyFilterToMap = false;
 
-  /// 更新台站筛选；推进台站版本让台站页与地图（共用同一条台站流）同步刷新
+  /// 更新台站筛选；推进台站版本让台站页与地图（共用同一条台站流）同步刷新。
+  ///
+  /// 落盘（用户要求「记住台站筛选」）：它原来只活在台站面板的 State 里，关掉应用
+  /// 就回到「全部」，下次打开要在几个 chips 之间重新点一遍。没有变化时不写盘。
   void setStationFilter(StationFilter f) {
+    if (f.key == stationFilter.key) return;
     stationFilter = f;
     _bumpStationsVersion();
+    persist();
   }
 
   void setApplyFilterToMap(bool v) {
@@ -3894,6 +3899,7 @@ class AppState extends ChangeNotifier {
     filterRadius = 300;
     heatLevel = 1;
     mapLabelsAlways = false;
+    stationFilter = const StationFilter();
     stationSort = 'call';
     maxStations = 100000;
     maxPackets = 2000;
@@ -4250,6 +4256,13 @@ class AppState extends ChangeNotifier {
       filterRadius = p.getInt('filterRadius') ?? filterRadius;
       heatLevel = (p.getInt('heatLevel') ?? heatLevel).clamp(0, 2);
       mapLabelsAlways = p.getBool('mapLabelsAlways') ?? mapLabelsAlways;
+      // 台站筛选：启动后保持上次那一套（含脏值回落，见 StationFilter.fromJson）
+      try {
+        final sf = p.getString('stationFilterJson');
+        if (sf != null && sf.isNotEmpty) {
+          stationFilter = StationFilter.fromJson(jsonDecode(sf));
+        }
+      } catch (_) {}
       // 台站排序：认不出的值（改坏 / 旧版本号）回到默认的按呼号排
       final savedSort = p.getString('stationSort');
       if (savedSort != null && stationSorts.contains(savedSort)) {
@@ -4547,6 +4560,7 @@ class AppState extends ChangeNotifier {
     await p.setInt('filterRadius', filterRadius);
     await p.setInt('heatLevel', heatLevel);
     await p.setBool('mapLabelsAlways', mapLabelsAlways);
+    await p.setString('stationFilterJson', jsonEncode(stationFilter.toJson()));
     await p.setString('stationSort', stationSort);
     await p.setInt('maxStations', maxStations);
     await p.setInt('maxPackets', maxPackets);

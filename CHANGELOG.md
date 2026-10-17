@@ -1,5 +1,38 @@
 # 更新日志
 
+## [2.1.11] - 2026-10-17
+
+### 副链路自己一页，服务器地址可以自己填
+
+- **APRSNETCN SERVER 从连接设置里搬出来，单独一页**。地址、端口、账号口令、登录结果、
+  重新连接，排法与 APRS-IS 那一页一致。原来它挤在主连接卡下面，两件事混成一件看。
+- **服务器地址和端口不再写死在代码里**。默认还是预置的那一台，换机器、走反代、
+  自己搭一台试，都只改这两格，填完给一个「重新连接」。地址留空就不连。
+- **数据来源卡分了两组**。「互联网链接」里 APRS-IS 与 APRSNETCN SERVER 并排，
+  TNC、WLAN 电台、声卡归到「电台链路」。
+- **24 小时台站改成只有按下「立即同步」才拉**。连上链路不再自己发那次 HTTP 请求，
+  也就不会再悄悄送一遍账号口令。说明写在按钮左边，上次结果在按钮下面。
+
+---
+
+## [2.1.11] - 2026-10-17 (English)
+
+### The secondary link gets its own page, and its address is yours to fill
+
+- **APRSNETCN SERVER moved out of the connection settings into a page of its own.**
+  Address, port, account and password, login result, reconnect: the same arrangement the
+  APRS-IS page uses. It used to sit under the main connection card and read as one thing.
+- **The server address and port are no longer hard-coded.** The preset machine is still the
+  default; swapping machines, going through a proxy or trying one you run yourself is a matter
+  of editing those two fields and tapping reconnect. An empty address does not connect.
+- **The data source card is split into groups.** APRS-IS and APRSNETCN SERVER sit side by side
+  under "Internet links"; TNC, WLAN radio and the sound card fall under "Radio links".
+- **The 24-hour station list is pulled only when you tap "Sync now".** Connecting no longer
+  fires that HTTP request, so the account and password are not sent behind your back either.
+  The hint sits left of the button, the last result below it.
+
+---
+
 ## [2.1.10] - 2026-10-17
 
 ### 多开一条只听的链路，网络那头也能跟着收

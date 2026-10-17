@@ -419,6 +419,29 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.11', 'date': '2026-10-17',
+        'items': [
+            ('up',
+             T('APRSNETCN SERVER 从连接设置里搬出来单独一页：地址、端口、账号口令、'
+               '登录结果、重新连接，排法与 APRS-IS 那一页一致。服务器地址和端口不再'
+               '写死，填哪台就连哪台，留空就不连。数据来源卡分两组：互联网链接里它和 '
+               'APRS-IS 并排，TNC、WLAN 电台、声卡归到电台链路。24 小时台站现在只在'
+               '按下「立即同步」时拉，连上链路不再自己去请求。',
+               'APRSNETCN SERVER 從連線設定裡搬出來單獨一頁：位址、連接埠、帳號密碼、'
+               '登入結果、重新連線，排法與 APRS-IS 那一頁一致。伺服器位址和連接埠不再'
+               '寫死，填哪臺就連哪臺，留空就不連。資料來源卡分兩組：網際網路連結裡它和 '
+               'APRS-IS 並排，TNC、WLAN 電臺、音效卡歸到電臺鏈路。24 小時臺站現在只在'
+               '按下「立即同步」時拉，連上鏈路不再自己去請求。',
+               'APRSNETCN SERVER has a page of its own now: address, port, account and '
+               'password, login result and reconnect, arranged like the APRS-IS page. The '
+               'address and port are no longer hard-coded, so any machine can be filled in, '
+               'and an empty address does not connect. The data source card is split into '
+               'Internet links, where it sits beside APRS-IS, and Radio links for TNC, WLAN '
+               'radio and the sound card. The 24-hour station list is pulled only when you '
+               'tap "Sync now".')),
+        ],
+    },
+    {
         'ver': 'v2.1.10', 'date': '2026-10-17',
         'items': [
             ('new',

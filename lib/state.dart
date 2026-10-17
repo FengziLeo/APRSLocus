@@ -3928,6 +3928,9 @@ class AppState extends ChangeNotifier {
       aprs.disconnect();
     } catch (_) {}
     try {
+      acnLink.disconnect();
+    } catch (_) {}
+    try {
       await tnc.disconnect(manual: false);
     } catch (_) {}
     try {
@@ -4059,6 +4062,12 @@ class AppState extends ChangeNotifier {
     aprs.account = '';
     aprs.password = '';
     acnSync = true;
+    acnOn = false;
+    acnAccount = '';
+    acnPassword = '';
+    acnConnected = false;
+    _acnRetryAt = null;
+    _acnAttempt = 0;
     acnLast = null;
     dataSource = srcAprsIs;
     enabledSources
@@ -4283,6 +4292,27 @@ class AppState extends ChangeNotifier {
   AcnSyncResult? acnLast;
   bool _acnSyncing = false;
 
+  /// APRSNETCN 的第二条链路：**只收不发**。
+  ///
+  /// 它与主链路（`aprs`）是两个独立连接、各收各的：主链路发报文，副链路只把
+  /// netcn 那边的台站并进列表。发送永远走 `aprs` —— 一句话不能同时从两个服务
+  /// 器发出去，否则对端会收到两帧一样的。
+  final AprsConnector acnLink = createAprs();
+
+  /// 是否同时连 APRSNETCN（设置页的开关）。默认关：不是所有人都用这台服务器。
+  bool acnOn = false;
+  bool acnConnected = false;
+  bool _acnConnecting = false;
+  int _acnAttempt = 0;
+
+  /// 下一次允许重连的时刻（1 秒 tick 里判断，不另起 Timer）
+  DateTime? _acnRetryAt;
+
+  /// 名单账号口令：只给副链路的登录行（`auth <账号> <口令>`）与 24 小时台站接口
+  /// 用。主链路永远不带 —— 发到 rotate.aprs2.net 有可能被当成非法登录词。
+  String acnAccount = '';
+  String acnPassword = '';
+
   Timer? _simTimer;
   Timer? _tickTimer;
 
@@ -4479,6 +4509,15 @@ class AppState extends ChangeNotifier {
       aprs.account = p.getString('aprsAccount') ?? aprs.account;
       aprs.password = p.getString('aprsPassword') ?? aprs.password;
       acnSync = p.getBool('acnSync') ?? acnSync;
+      // 副链路的账号口令与开关。老版本把这几格放在主连接卡里、存在
+      // aprsAccount/aprsPassword 下：那时只有在主连接就是 APRSNETCN 时才会显示，
+      // 所以那两个值可以无歧义地当作副链路的账号口令搬过来（只搬一次，之后
+      // 以 acn* 为准）。
+      acnOn = p.getBool('acnOn') ?? acnOn;
+      acnAccount = p.getString('acnAccount') ??
+          (aprs.server.trim() == kAcnServerHost ? aprs.account : '');
+      acnPassword = p.getString('acnPassword') ??
+          (aprs.server.trim() == kAcnServerHost ? aprs.password : '');
       dataSource = p.getString('dataSource') ?? dataSource;
       // 容错：非法/旧值一律回落 APRS-IS，避免多来源判断失配。
       // pkwdwpl 是**只读**来源，即使旧配置里存了它也不能当发射来源。
@@ -4768,6 +4807,9 @@ class AppState extends ChangeNotifier {
     await p.setString('aprsAccount', aprs.account);
     await p.setString('aprsPassword', aprs.password);
     await p.setBool('acnSync', acnSync);
+    await p.setBool('acnOn', acnOn);
+    await p.setString('acnAccount', acnAccount);
+    await p.setString('acnPassword', acnPassword);
     await p.setString('dataSource', dataSource);
     await p.setStringList('enabledSources', enabledSources.toList());
     await p.setBool('igateEnabled', igateEnabled);
@@ -4875,6 +4917,7 @@ class AppState extends ChangeNotifier {
     _wirePkwdwpl();
     _wireBox();
     _wireNmeaGps();
+    _wireAcnLink();
     // 蓝牙心率带：状态变化只影响 UI 与信标备注，通知一次即可。
     bleHr.onChanged = () {
       if (_disposed) return;
@@ -5029,6 +5072,16 @@ class AppState extends ChangeNotifier {
             speedMps: (mySpeed ?? 0) / 3.6,    // app 是 km/h，盒子要 m/s
             courseDeg: myCourse,
           );
+        }
+      }
+      // APRSNETCN 副链路掉线后的重连：到点了就重连一次。
+      // 走这条 1 秒 tick 而不是自己的 Timer —— 应用在后台时不该多一个定时器，
+      // 副链路也不该抢主链路的 8/16/32/60 秒重连节奏。
+      if (acnOn && !acnConnected && !_acnConnecting) {
+        final due = _acnRetryAt;
+        if (due != null && DateTime.now().isAfter(due)) {
+          _acnRetryAt = null;
+          unawaited(_connectAcn());
         }
       }
       // 每秒刷新：只通知“秒级 UI”（信标倒计时/收包速率），
@@ -5195,6 +5248,7 @@ class AppState extends ChangeNotifier {
     // 把内存里攒着、还没到节流时间的台账落盘（退出后不丢最后几个点）
     unawaited(TrackLogStore.instance.flush());
     aprs.disconnect();
+    acnLink.disconnect();
     // 射频链路也要收尾（原先只释放了 APRS-IS）：
     // pkwdwpl 的传输层持有一个 EventChannel 订阅，不释放会一直挂在平台通道上；
     // TNC 同样有 reader/writer 线程与 socket。
@@ -5817,6 +5871,7 @@ class AppState extends ChangeNotifier {
       // 到不了，用户点连接会没任何反馈。它的代价只是几个提前 return，
       // 不会造成空转。
       if (aprsIsOn && !isUp(srcAprsIs)) await _connectAprsIs();
+      if (acnOn && !acnConnected) await _connectAcn();
       if (tncOn && !isUp(srcTnc)) await _connectTnc();
       if (audioOn && !isUp(srcAudio)) await _connectAudio();
       if (pkwdwplOn && !isUp(srcPkwdwpl)) await _connectPkwdwpl();
@@ -5828,6 +5883,108 @@ class AppState extends ChangeNotifier {
   }
 
   bool _connectingAll = false;
+
+  /// 把 APRSNETCN 副链路的报文接进同一条解析管线。
+  ///
+  /// 与 TNC 的做法一样：不另写一套解析，只多传一个 `fromAcn`，让台站标记成
+  /// 「来源 APRSNETCN」、并且**不做网关转递**（两条链路可能收到同一条报文，
+  /// 都转一遍就是重复占用射频时隙）。
+  ///
+  /// 副链路上的 `logresp` 不能进主链路那套状态：两条链路各有自己的 passcode，
+  /// 拿副链路的 unverified 去把主横幅变黄是错的。
+  void _wireAcnLink() {
+    acnLink.onLine =
+        (l) => _onAprsLine(l, rf: false, source: 'acn', fromAcn: true);
+    acnLink.onDisconnected = () {
+      if (_disposed) return;
+      acnConnected = false;
+      _log(LogLevel.warn, 'APRSNETCN', '副链路断开，稍后自动重连');
+      _scheduleAcnRetry();
+      _notify();
+    };
+  }
+
+  /// 连 APRSNETCN 副链路（只收不发）。
+  ///
+  /// 副链路不需要账号口令：服务器在 compat 模式下只按 passcode 判定能否发，
+  /// 收报文不需要验证。填了账号口令就随登录行发 `auth`，换一个 verified。
+  Future<void> _connectAcn() async {
+    // Web 上没有 TCP，副链路连的是一台只有明文 14580 的服务器，重试也只是
+    // 每 8 秒刷一条失败日志（设置页在 Web 上不显示这个开关）。
+    if (kIsWeb) return;
+    if (!acnOn || acnConnected || _acnConnecting || _disposed) return;
+    _acnConnecting = true;
+    _log(LogLevel.info, 'APRSNETCN', '正在连接 $kAcnServerHost:$kAcnServerPort…');
+    _notify();
+    acnLink.server = kAcnServerHost;
+    acnLink.port = kAcnServerPort;
+    acnLink.callsign = myFullCall;
+    acnLink.passcode = aprs.passcode;
+    acnLink.account = acnAccount.trim();
+    acnLink.password = acnPassword;
+    acnLink.filter = filterString;
+    final ok = await acnLink.connect();
+    _acnConnecting = false;
+    acnConnected = ok;
+    if (ok) {
+      _acnAttempt = 0;
+      _acnRetryAt = null;
+      _log(LogLevel.info, 'APRSNETCN', '副链路已连接（只收不发）');
+      // 连接成功顺带拉一次 24 小时台站：一个能立刻看到全国台站，不用等下一条
+      // 报文过来。失败只记日志，不影响这条链路。
+      if (acnSync) unawaited(syncAcnStations());
+    } else {
+      _log(LogLevel.error, 'APRSNETCN', '副链路连接失败，稍后重试');
+      _scheduleAcnRetry();
+    }
+    _notify();
+  }
+
+  /// 排一次副链路重连（渐进：8s → 16s → 32s → 60s 封顶）。
+  ///
+  /// 用 1 秒 tick 里的 [DateTime] 判断，不另起 Timer：副链路掉了不该抢主链路的
+  /// 重连节奏，也不该在应用进后台时多一个定时器。
+  void _scheduleAcnRetry() {
+    if (!acnOn || _disposed) return;
+    final backoff = [8, 16, 32, 60][_acnAttempt.clamp(0, 3)];
+    _acnAttempt++;
+    _acnRetryAt = DateTime.now().add(Duration(seconds: backoff));
+  }
+
+  /// 开/关副链路。关的时候立刻断开，不等下一次 tick。
+  void setAcnOn(bool v) {
+    if (acnOn == v) return;
+    acnOn = v;
+    persist();
+    if (!v) {
+      acnConnected = false;
+      _acnRetryAt = null;
+      _acnAttempt = 0;
+      acnLink.disconnect();
+      _notify();
+      return;
+    }
+    _notify();
+    unawaited(_connectAcn());
+  }
+
+  /// 立刻把副链路重连一次（账号口令改过之后用）。
+  ///
+  /// 先断开再连，不走 [_scheduleAcnRetry] 的 8 秒等待：用户刚刚点的是
+  /// 「重新连接」，等 8 秒他会以为按钮没反应。
+  Future<void> reconnectAcn() async {
+    if (!acnOn || _disposed) return;
+    acnConnected = false;
+    _acnAttempt = 0;
+    _acnRetryAt = null;
+    await persistNow();
+    acnLink.disconnect();
+    // 给 socket 一点时间真的关掉：同一台服务器上两个连接同时挂着，服务器
+    // 那边会把同一个呼号当成重连（旧连接先被踢），偶尔把新连接也一起断掉。
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    if (_disposed || !acnOn) return;
+    await _connectAcn();
+  }
 
   /// APRS-IS 连接（原来的 `_connect` 主体）
   Future<void> _connectAprsIs() async {
@@ -5875,9 +6032,9 @@ class AppState extends ChangeNotifier {
       // 连的是 APRSNETCN 就顺带拉一份它 24 小时内的台站：服务器替我们听到了
       // 过滤器之外的一大片（六百多台站），这一份只在本地列表里**补空**，
       // 已经收到的呼号一律不动（见 mergeAcnStations）。失败只记日志。
-      if (acnSync && aprs.server.trim() == kAcnServerHost) {
-        unawaited(syncAcnStations());
-      }
+      // 副链路自己连上时会拉一次（见 [_connectAcn]）；主链路是不是 APRSNETCN
+      // 与它无关 —— 两条链路可以同时在线，各收各的。
+      if (acnSync && acnOn && acnConnected) unawaited(syncAcnStations());
       // 连接成功：**不再**自动弹「是否自动上报」询问。
       // 用户要求：连上后不自动上报，界面给一个正式的「开始上报」按钮，由用户
       // 手动确认（见 [beginReporting] / [BeaconPhase.needConfirm]）。
@@ -7137,6 +7294,12 @@ class AppState extends ChangeNotifier {
       _reconnectAttempt = 0; // 手动断开，重置重试计数
       _reconnectTimer?.cancel();
       if (aprsIsOn) aprs.disconnect();
+      if (acnOn || acnConnected) {
+        acnConnected = false;
+        _acnRetryAt = null;
+        _acnAttempt = 0;
+        acnLink.disconnect();
+      }
       if (tncOn || isUp(srcTnc)) await tnc.disconnect();
       if (audioOn || isUp(srcAudio)) await audio.disconnect();
       if (pkwdwplOn || isUp(srcPkwdwpl)) await pkwdwpl.disconnect();
@@ -7171,18 +7334,25 @@ class AppState extends ChangeNotifier {
     await _connect();
   }
 
-  void _onAprsLine(String line, {required bool rf, String source = 'local'}) {
+  void _onAprsLine(String line,
+      {required bool rf, String source = 'local', bool fromAcn = false}) {
     _rxSource = source;
     // 网关转递必须在**解析之前**做：无论这条报文能否解析成台站/消息，
     // 只要它该被转递就得转递（很多报文类型本应用并不解析，但网关该转发）。
-    if (rf) {
-      _gateRfToIs(line);
-    } else {
-      _gateIsToRf(line);
+    // 副链路（APRSNETCN）只收不发，也不做网关转递：同一条报文可能从两条链路
+    // 都收到，转两遍就是白占一次射频时隙。
+    if (!fromAcn) {
+      if (rf) {
+        _gateRfToIs(line);
+      } else {
+        _gateIsToRf(line);
+      }
     }
     // 简单解析收到的 APRS 帧
     try {
       if (line.startsWith('#')) {
+        // 副链路有它自己的 passcode，它的 logresp 不能去动主链路的横幅
+        if (fromAcn) return;
         // 服务器握手响应：# logresp {call} verified / unverified
         final lm = RegExp(
           r'#\s*logresp[:\s]*(\S+)\s+(unverified|verified)',
@@ -7325,6 +7495,7 @@ class AppState extends ChangeNotifier {
             raw: line,
             path: path.isEmpty ? null : path,
             toCall: toCall,
+            fromServer: fromAcn,
           );
           info =
               '${p.lat.toStringAsFixed(4)}, ${p.lng.toStringAsFixed(4)}'
@@ -7908,7 +8079,7 @@ class AppState extends ChangeNotifier {
   /// **自己**的位置防抖（`SelfFixFilter`）与精度显示仍保留 —— 那才是每天看得见的东西。
   /// 若将来想重做这一层，请先回答“它能省下多少帧”再动手。
   void _upsertStation(String call, ParsedPos p,
-      {String? raw, String? path, String? toCall}) {
+      {String? raw, String? path, String? toCall, bool fromServer = false}) {
     // 本地屏蔽：被屏蔽的台站不上图、不进台站列表（原始数据包仍落在 packets 里，
     // 数据包页照常可见）。这是**展示层**过滤，不是接收闸门。
     if (isStationIgnored(call)) return;
@@ -8016,7 +8187,8 @@ class AppState extends ChangeNotifier {
           (s.lat - p.lat).abs() > 1e-6 || (s.lng - p.lng).abs() > 1e-6;
       // 本地真的收到了它的报文：这一行的事实不再来自服务器，详情页那句
       // 「来源 APRSNETCN」该收起来。
-      s.remote = false;
+      // fromServer 为真时这一行的事实仍来自服务器（副链路），标记要留着。
+      s.remote = fromServer;
       // 记录修改前的“地图相关”字段，用于判断是否推进台站版本
       final oldStatus = s.status;
       final oldSym = s.symbol;
@@ -8106,6 +8278,7 @@ class AppState extends ChangeNotifier {
           aprslocus: apInfo,
           path: path,
           toCall: toCall,
+          remote: fromServer,
         ),
       );
       _stationsDirty = true;
@@ -8422,8 +8595,8 @@ class AppState extends ChangeNotifier {
   /// 由连接那一层说。
   Future<AcnSyncResult> syncAcnStations() async {
     if (_acnSyncing) return acnLast ?? const AcnSyncResult(added: 0, total: 0);
-    final account = aprs.account.trim();
-    final password = aprs.password;
+    final account = acnAccount.trim();
+    final password = acnPassword;
     if (account.isEmpty || password.isEmpty) {
       final r = const AcnSyncResult(added: 0, total: 0, error: 'no-account');
       acnLast = r;

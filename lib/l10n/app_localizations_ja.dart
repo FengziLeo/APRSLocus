@@ -9271,4 +9271,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get acnAccountNote => "サーバーがホワイトリストの局に発行するアカウントとパスワードです。空欄なら passcode のみで受信します。";
 
+  @override
+  String get packetSrcAcn => "APRSNETCN";
+
 }

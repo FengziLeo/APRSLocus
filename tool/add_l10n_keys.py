@@ -69,6 +69,10 @@ KEYS = {
             'aquí se marcan como del servidor y no se reenvían.',
         'Pengiriman tetap di tautan utama. Stasiun yang diterima di sini '
             'ditandai berasal dari server dan tidak diteruskan.'),
+    # 数据包页的来源标签：服务器名，不翻译（六语言同一个词）。
+    'packetSrcAcn': (
+        'APRSNETCN', 'APRSNETCN', 'APRSNETCN', 'APRSNETCN', 'APRSNETCN',
+        'APRSNETCN'),
     'acnAccountNote': (
         '服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。',
         '伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。',

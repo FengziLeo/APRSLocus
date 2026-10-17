@@ -9560,4 +9560,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get acnAccountNote => "Akun dan kata sandi dari server. Kosongkan keduanya untuk menerima dengan passcode saja.";
 
+  @override
+  String get packetSrcAcn => "APRSNETCN";
+
 }

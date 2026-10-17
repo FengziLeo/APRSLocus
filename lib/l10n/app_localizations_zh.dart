@@ -9171,6 +9171,9 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get acnAccountNote => "服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。";
 
+  @override
+  String get packetSrcAcn => "APRSNETCN";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18338,5 +18341,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get acnAccountNote => "伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。";
+
+  @override
+  String get packetSrcAcn => "APRSNETCN";
 
 }

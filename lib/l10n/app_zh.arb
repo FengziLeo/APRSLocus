@@ -4859,5 +4859,6 @@
   "acnLinkSwitch": "同时连接 APRSNETCN",
   "acnLinkStatus": "副链路",
   "acnLinkNote": "发报文只走主链路。这条链路收来的台站会标成来自服务器，也不做网关转递。",
-  "acnAccountNote": "服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。"
+  "acnAccountNote": "服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。",
+  "packetSrcAcn": "APRSNETCN"
 }

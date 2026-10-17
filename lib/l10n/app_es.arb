@@ -4180,5 +4180,6 @@
   "acnLinkSwitch": "Conectar también a APRSNETCN",
   "acnLinkStatus": "Enlace secundario",
   "acnLinkNote": "El envío va solo por el enlace principal. Las estaciones recibidas aquí se marcan como del servidor y no se reenvían.",
-  "acnAccountNote": "Cuenta y contraseña que emite el servidor. Si se dejan vacías, se recibe solo con el passcode."
+  "acnAccountNote": "Cuenta y contraseña que emite el servidor. Si se dejan vacías, se recibe solo con el passcode.",
+  "packetSrcAcn": "APRSNETCN"
 }

@@ -101,6 +101,8 @@ class _PacketsPageState extends State<PacketsPage> {
         return l.packetSrcAudio;
       case AppState.srcPkwdwpl:
         return l.packetSrcPkwdwpl;
+      case AppState.srcAcn:
+        return l.packetSrcAcn;
       default:
         return l.packetSrcLocal;
     }
@@ -117,6 +119,8 @@ class _PacketsPageState extends State<PacketsPage> {
         return C.orange;
       case AppState.srcPkwdwpl:
         return C.purple;
+      case AppState.srcAcn:
+        return C.cyan;
       default:
         return C.slate;
     }

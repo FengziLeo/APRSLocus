@@ -16698,6 +16698,12 @@ abstract class AppLocalizations {
   /// **'服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。'**
   String get acnAccountNote;
 
+  /// No description provided for @packetSrcAcn.
+  ///
+  /// In zh, this message translates to:
+  /// **'APRSNETCN'**
+  String get packetSrcAcn;
+
 }
 
 class _AppLocalizationsDelegate

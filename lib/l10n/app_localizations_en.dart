@@ -9550,4 +9550,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get acnAccountNote => "Account and password issued by the server. Leave both empty to receive on the passcode alone.";
 
+  @override
+  String get packetSrcAcn => "APRSNETCN";
+
 }

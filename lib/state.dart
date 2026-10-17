@@ -2834,6 +2834,12 @@ class AppState extends ChangeNotifier {
   /// 「重连时要照顾到它」这两件事上出现（见 [box] 的注释）。
   static const String srcBox = 'box';
 
+  /// APRSNETCN 副链路：只收不收发的第二条连接（见 [acnLink]）。
+  ///
+  /// 它**不是**一个可以选的数据来源（发报文永远走 `aprs`），只是让数据包页能
+  /// 标出「这一帧是从副链路上来的」。
+  static const String srcAcn = 'acn';
+
   /// 可发射的来源（用于「至少要保留一条能发射的链路」与各种发射守卫）。
   ///
   /// 写成集合而不是各处硬写三个比较，是因为以后再加只读来源时
@@ -5915,7 +5921,7 @@ class AppState extends ChangeNotifier {
   /// 拿副链路的 unverified 去把主横幅变黄是错的。
   void _wireAcnLink() {
     acnLink.onLine =
-        (l) => _onAprsLine(l, rf: false, source: 'acn', fromAcn: true);
+        (l) => _onAprsLine(l, rf: false, source: srcAcn, fromAcn: true);
     acnLink.onDisconnected = () {
       if (_disposed) return;
       acnConnected = false;

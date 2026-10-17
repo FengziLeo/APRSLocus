@@ -9609,4 +9609,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get acnAccountNote => "Cuenta y contraseña que emite el servidor. Si se dejan vacías, se recibe solo con el passcode.";
 
+  @override
+  String get packetSrcAcn => "APRSNETCN";
+
 }

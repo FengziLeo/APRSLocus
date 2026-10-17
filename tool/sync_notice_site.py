@@ -60,22 +60,22 @@ PAGES = [
 # ⚠ 换一期公告时这里必须一起改，否则会出现「正文是新的、标题还是上一期」。
 HEAD = {
     'zh': {
-        'kicker': '✅ 通道已恢复',
-        'title': '清零通道已恢复，误发的 2.2.0 已下架',
-        'en': 'Qingling channel restored',
-        'sub': 'Qingling（清零）渠道上误发的 2.2.0 已经下架，通道恢复正常。现在检查更新会拿到最新正式版 2.1.6。之前装过 2.2.0 的话，请先卸载 2.2.0，再安装 2.1.6。',
+        'kicker': '📡 APRSNETCN OA 测试轮次',
+        'title': '本周六，向轮值呼号发一条报文',
+        'en': 'APRSNETCN OA · test round',
+        'sub': '北京时间 10 月 17 日（周六）00:00 到 23:59，网络和射频都能进，射频优先。报文的收件人填 BG7LZQ-3，正文按 CQ CNNET 的写法发。',
     },
     'zh_TW': {
-        'kicker': '✅ 管道已恢復',
-        'title': '清零通道已恢復，誤發的 2.2.0 已下架',
-        'en': 'Qingling channel restored',
-        'sub': 'Qingling（清零）管道上誤發的 2.2.0 已經下架，管道恢復正常。現在檢查更新會拿到最新正式版 2.1.6。之前裝過 2.2.0 的話，請先卸載 2.2.0，再安裝 2.1.6。',
+        'kicker': '📡 APRSNETCN OA 測試輪次',
+        'title': '本週六，向輪值呼號發一條報文',
+        'en': 'APRSNETCN OA · test round',
+        'sub': '北京時間 10 月 17 日（週六）00:00 到 23:59，網路和射頻都能進，射頻優先。報文的收件人填 BG7LZQ-3，正文照 CQ CNNET 的寫法發。',
     },
     'en': {
-        'kicker': '✅ Channel restored',
-        'title': 'The Qingling channel is back, the mistaken 2.2.0 is gone',
-        'en': 'Qingling channel restored',
-        'sub': 'The 2.2.0 build published on the Qingling channel by mistake has been taken down, and the channel works normally again. Checking for updates now returns the latest stable version, 2.1.6. If you installed 2.2.0, uninstall it first, then install 2.1.6.',
+        'kicker': '📡 APRSNETCN OA · test round',
+        'title': 'This Saturday, send a packet to the duty station',
+        'en': 'APRSNETCN OA · test round',
+        'sub': 'Saturday 17 October, 00:00 to 23:59 Beijing time. Network and RF both count, RF first. Address the message to BG7LZQ-3 and send it the CQ CNNET way.',
     },
 }
 

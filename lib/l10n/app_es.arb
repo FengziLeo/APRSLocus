@@ -4175,7 +4175,7 @@
   "acnSyncNoAccount": "Rellena la cuenta y la contraseña para sincronizar.",
   "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
   "stationSource": "Origen",
-  "acnCardTitle": "Enlace secundario APRSNETCN",
+  "acnCardTitle": "APRSNETCN SERVER",
   "acnCardSubtitle": "Funciona junto al enlace principal. Solo recibe.",
   "acnLinkSwitch": "Conectar también a APRSNETCN",
   "acnLinkStatus": "Enlace secundario",
@@ -4186,5 +4186,9 @@
   "acnLoginOk": "Verificado",
   "acnLoginRejected": "Cuenta o contraseña incorrectos",
   "acnSyncNow": "Sincronizar ahora",
-  "acnSyncing": "Sincronizando…"
+  "acnSyncing": "Sincronizando…",
+  "acnSyncHint": "Solo se descarga al pulsar el botón. Conectar no descarga nada.",
+  "sourceGroupInternet": "Enlaces de internet",
+  "sourceGroupRadio": "Enlaces de radio",
+  "acnPageLead": "Un enlace diseñado por APRSNET.CN. Funciona junto al enlace principal y solo recibe."
 }

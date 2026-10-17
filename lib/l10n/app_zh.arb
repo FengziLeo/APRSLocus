@@ -4854,7 +4854,7 @@
   "acnSyncNoAccount": "填了账号和口令才能同步。",
   "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
   "stationSource": "来源",
-  "acnCardTitle": "APRSNETCN 副链路",
+  "acnCardTitle": "APRSNETCN SERVER",
   "acnCardSubtitle": "与主链路同时在线，只收不发。",
   "acnLinkSwitch": "同时连接 APRSNETCN",
   "acnLinkStatus": "副链路",
@@ -4865,5 +4865,9 @@
   "acnLoginOk": "已验证",
   "acnLoginRejected": "账号或口令不对",
   "acnSyncNow": "立即同步",
-  "acnSyncing": "同步中…"
+  "acnSyncing": "同步中…",
+  "acnSyncHint": "按下按钮才拉，连上链路不会自己拉。",
+  "sourceGroupInternet": "互联网链接",
+  "sourceGroupRadio": "电台链路",
+  "acnPageLead": "APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。"
 }

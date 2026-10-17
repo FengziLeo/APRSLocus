@@ -41,9 +41,8 @@ KEYS = {
     # 独立于主连接卡：这条连接只收不发，与主链路同时在线。三个标签各自说清
     # 一件事（这条链路是什么 / 开关 / 当前状态），说明文字放在卡片底部。
     'acnCardTitle': (
-        'APRSNETCN 副链路', 'APRSNETCN 副鏈路', 'APRSNETCN second link',
-        'APRSNETCN 副リンク', 'Enlace secundario APRSNETCN',
-        'Tautan kedua APRSNETCN'),
+        'APRSNETCN SERVER', 'APRSNETCN SERVER', 'APRSNETCN SERVER',
+        'APRSNETCN SERVER', 'APRSNETCN SERVER', 'APRSNETCN SERVER'),
     'acnCardSubtitle': (
         '与主链路同时在线，只收不发。',
         '與主鏈路同時在線，只收不發。',
@@ -101,6 +100,32 @@ KEYS = {
     'acnSyncing': (
         '同步中…', '同步中…', 'Syncing…', '同期中…', 'Sincronizando…',
         'Menyinkronkan…'),
+    # 24 小时台站为什么要点按钮：说明放在按钮左边那一行
+    'acnSyncHint': (
+        '按下按钮才拉，连上链路不会自己拉。',
+        '按下按鈕才拉，連上鏈路不會自己拉。',
+        'Pulled only when you press the button, never on connect.',
+        'ボタンを押したときだけ取得します。接続しても取得しません。',
+        'Solo se descarga al pulsar el botón. Conectar no descarga nada.',
+        'Hanya diambil saat tombol ditekan, tidak saat terhubung.'),
+    # 数据来源的分组标题：互联网链路（APRS-IS / APRSNETCN SERVER）/ 电台链路
+    'sourceGroupInternet': (
+        '互联网链接', '網際網路連結', 'Internet links', 'インターネット回線',
+        'Enlaces de internet', 'Tautan internet'),
+    'sourceGroupRadio': (
+        '电台链路', '電台鏈路', 'Radio links', '無線回線',
+        'Enlaces de radio', 'Tautan radio'),
+    # 副链路设置页的导语：这条链路是谁设计的
+    'acnPageLead': (
+        'APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。',
+        'APRSNET.CN 設計的一條鏈路。與主鏈路同時在線，只收不發。',
+        'A link designed by APRSNET.CN. It runs alongside the main link and '
+            'only receives.',
+        'APRSNET.CN が設計した回線です。メイン回線と同時に接続し、受信のみ行います。',
+        'Un enlace diseñado por APRSNET.CN. Funciona junto al enlace principal '
+            'y solo recibe.',
+        'Tautan yang dirancang APRSNET.CN. Berjalan bersama tautan utama dan '
+            'hanya menerima.'),
 }
 
 META = {

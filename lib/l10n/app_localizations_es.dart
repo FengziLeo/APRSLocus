@@ -9592,7 +9592,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get stationSource => "Origen";
 
   @override
-  String get acnCardTitle => "Enlace secundario APRSNETCN";
+  String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
   String get acnCardSubtitle => "Funciona junto al enlace principal. Solo recibe.";
@@ -9626,5 +9626,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get acnSyncing => "Sincronizando…";
+
+  @override
+  String get acnSyncHint => "Solo se descarga al pulsar el botón. Conectar no descarga nada.";
+
+  @override
+  String get sourceGroupInternet => "Enlaces de internet";
+
+  @override
+  String get sourceGroupRadio => "Enlaces de radio";
+
+  @override
+  String get acnPageLead => "Un enlace diseñado por APRSNET.CN. Funciona junto al enlace principal y solo recibe.";
 
 }

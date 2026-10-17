@@ -24,6 +24,12 @@ bool get isIOSPlatform =>
 /// 其余平台（Android / Windows / Linux / macOS）沿用原有实现。
 bool get tncPlatformSupported => !isIOSPlatform;
 
+/// 直连 TCP 的报文链路（APRS-IS / APRSNETCN SERVER）在本平台是否可用。
+///
+/// Web 没有裸 TCP：主链路在 Web 上走的是 WebSocket 网关（另一回事），副链路
+/// 只有 14580 明文端口，摆一个永远连不上的开关不如不摆。
+bool get tcpLinkPlatformSupported => !kIsWeb;
+
 /// 蓝牙心率带（BLE 标准心率服务）在本平台是否可用：Android / iOS 有原生实现。
 bool get bleHrPlatformSupported =>
     !kIsWeb &&

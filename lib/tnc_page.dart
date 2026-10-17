@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'settings_widgets.dart';
+import 'acn_link_page.dart';
 import 'audio_page.dart';
 import 'ext_gps_device_page.dart';
 import 'garmin_page.dart';
@@ -108,6 +109,10 @@ class DataSourceCard extends StatelessWidget {
       icon: Icons.swap_horiz_rounded,
       color: C.blue,
       children: [
+        // 两条「互联网链路」并排：APRS-IS 与 APRSNETCN SERVER。它们都是
+        // 一条 TCP 登录（地址 + 端口 + passcode），都与电台无关，所以归在同一组；
+        // 往下的 TNC / WLAN 电台 / 音频走的是自己的硬件，另起一组。
+        _ownLabel(context, s.sourceGroupInternet),
         _tile(
           context,
           key: AppState.srcAprsIs,
@@ -115,6 +120,23 @@ class DataSourceCard extends StatelessWidget {
           desc: s.dataSourceAprsIsDesc,
           icon: Icons.cloud_rounded,
         ),
+        // 副链路只有裸 TCP，Web 上没有（与原来的连接设置卡同一个口径）
+        if (tcpLinkPlatformSupported)
+          _tile(
+            context,
+            key: 'acn',
+            title: s.acnCardTitle,
+            desc: s.acnCardSubtitle,
+            icon: Icons.hub_rounded,
+            enabled: state.acnOn,
+            up: state.acnConnected,
+            canTx: false,
+            onToggle: (on) => state.setAcnOn(on),
+            onConfigure: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => AcnLinkPage(state: state)),
+            ),
+          ),
+        _ownLabel(context, s.sourceGroupRadio),
         _tile(
           context,
           key: AppState.srcTnc,
@@ -344,7 +366,7 @@ class DataSourceCard extends StatelessWidget {
     );
   }
 
-  /// 小组标题（位置来源 / 心率来源）
+  /// 小组标题（互联网链路 / 电台链路 / 位置来源 / 心率来源）
   Widget _ownLabel(BuildContext context, String text) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),

@@ -9543,7 +9543,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get stationSource => "Sumber";
 
   @override
-  String get acnCardTitle => "Tautan kedua APRSNETCN";
+  String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
   String get acnCardSubtitle => "Berjalan bersama tautan utama. Hanya menerima.";
@@ -9577,5 +9577,17 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get acnSyncing => "Menyinkronkan…";
+
+  @override
+  String get acnSyncHint => "Hanya diambil saat tombol ditekan, tidak saat terhubung.";
+
+  @override
+  String get sourceGroupInternet => "Tautan internet";
+
+  @override
+  String get sourceGroupRadio => "Tautan radio";
+
+  @override
+  String get acnPageLead => "Tautan yang dirancang APRSNET.CN. Berjalan bersama tautan utama dan hanya menerima.";
 
 }

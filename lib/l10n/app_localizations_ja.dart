@@ -9254,7 +9254,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get stationSource => "ソース";
 
   @override
-  String get acnCardTitle => "APRSNETCN 副リンク";
+  String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
   String get acnCardSubtitle => "メイン回線と同時に接続します。受信のみです。";
@@ -9288,5 +9288,17 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get acnSyncing => "同期中…";
+
+  @override
+  String get acnSyncHint => "ボタンを押したときだけ取得します。接続しても取得しません。";
+
+  @override
+  String get sourceGroupInternet => "インターネット回線";
+
+  @override
+  String get sourceGroupRadio => "無線回線";
+
+  @override
+  String get acnPageLead => "APRSNET.CN が設計した回線です。メイン回線と同時に接続し、受信のみ行います。";
 
 }

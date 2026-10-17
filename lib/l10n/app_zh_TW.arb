@@ -4763,7 +4763,7 @@
   "acnSyncNoAccount": "填了帳號和口令才能同步。",
   "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
   "stationSource": "來源",
-  "acnCardTitle": "APRSNETCN 副鏈路",
+  "acnCardTitle": "APRSNETCN SERVER",
   "acnCardSubtitle": "與主鏈路同時在線，只收不發。",
   "acnLinkSwitch": "同時連線 APRSNETCN",
   "acnLinkStatus": "副鏈路",
@@ -4774,5 +4774,9 @@
   "acnLoginOk": "已驗證",
   "acnLoginRejected": "帳號或密碼不對",
   "acnSyncNow": "立即同步",
-  "acnSyncing": "同步中…"
+  "acnSyncing": "同步中…",
+  "acnSyncHint": "按下按鈕才拉，連上鏈路不會自己拉。",
+  "sourceGroupInternet": "網際網路連結",
+  "sourceGroupRadio": "電台鏈路",
+  "acnPageLead": "APRSNET.CN 設計的一條鏈路。與主鏈路同時在線，只收不發。"
 }

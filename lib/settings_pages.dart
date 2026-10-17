@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'theme.dart';
 import 'state.dart';
@@ -2195,10 +2194,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
   late final TextEditingController _port;
   late final TextEditingController _ws;
   late final TextEditingController _pass;
-  /// 名单账号口令（只有支持账号登录的服务器才用得上，见 `AprsConnector.supportsAccountLogin`）
-  late final TextEditingController _account;
-  late final TextEditingController _accountPass;
-  bool _accountPassHidden = true;
   late final TextEditingController _filterLat;
   late final TextEditingController _filterLng;
   late final TextEditingController _filterRadius;
@@ -2210,13 +2205,9 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
 
   bool _configDirty = false;
 
-  /// 副链路的账号口令改过没有（它有自己的「重新连接」，与主链路那张卡无关）
-  bool _acnDirty = false;
   String _origServer = '';
   int _origPort = 14580;
   String _origPass = '';
-  String _origAccount = '';
-  String _origAccountPass = '';
   String? _origWs;
   int _origFilterRadius = 300;
   bool _origFilterFollow = false;
@@ -2233,8 +2224,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     _port = TextEditingController(text: '${st.aprs.port}');
     _ws = TextEditingController(text: st.aprs.wsUrl ?? '');
     _pass = TextEditingController(text: st.aprs.passcode);
-    _account = TextEditingController(text: st.acnAccount);
-    _accountPass = TextEditingController(text: st.acnPassword);
     _filterLat = TextEditingController(text: st.filterLat.toStringAsFixed(2));
     _filterLng = TextEditingController(text: st.filterLng.toStringAsFixed(2));
     _filterRadius = TextEditingController(text: '${st.filterRadius}');
@@ -2245,8 +2234,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     _origServer = st.aprs.server;
     _origPort = st.aprs.port;
     _origPass = st.aprs.passcode;
-    _origAccount = st.acnAccount;
-    _origAccountPass = st.acnPassword;
     _origWs = st.aprs.wsUrl;
     _origFilterRadius = st.filterRadius;
     _origFilterFollow = st.filterFollow;
@@ -2262,8 +2249,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     _port.dispose();
     _ws.dispose();
     _pass.dispose();
-    _account.dispose();
-    _accountPass.dispose();
     _filterLat.dispose();
     _filterLng.dispose();
     _filterRadius.dispose();
@@ -2304,10 +2289,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
               _storageCard(),
               const SizedBox(height: 16),
             ],
-            // 副链路与主链路分开摆：它不依赖 APRS-IS 是否启用（自己的连接、
-            // 自己的账号口令），所以不在 `if (st.aprsIsOn)` 里面。
-            _acnCard(),
-            const SizedBox(height: 16),
             if (st.tncOn) ...[
               _tncCard(),
               const SizedBox(height: 16),
@@ -2522,203 +2503,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
         const SizedBox(height: 4),
         Text(S.of(context).passcodeMessageWarning,
             style: ts(10, c: C.grey)),
-      ]),
-    );
-  }
-
-  /// 副链路（APRSNETCN）卡片。
-  ///
-  /// 与 [_connectionCard] 分开摆：副链路有自己的服务器、账号口令和同步开关。
-  /// 混进主连接卡会让人以为它是主链路的另一种填法 —— 实际是两条连接同时在跑，
-  /// 主链路照旧收发，这条只收。
-  Widget _acnCard() {
-    // Web 上没有 TCP：副链路只有 14580 的明文端口，摆一个永远连不上的开关
-    // 不如不摆。（主线在 Web 上走的是 WebSocket 网关，那是另一回事。）
-    if (kIsWeb) return const SizedBox.shrink();
-    final s = S.of(context);
-    final last = st.acnLast;
-    return SettingsSectionCard(
-      title: s.acnCardTitle,
-      subtitle: s.acnCardSubtitle,
-      icon: Icons.hub_rounded,
-      color: C.purple,
-      children: [
-        SettingsSwitch(s.acnLinkSwitch,
-            value: st.acnOn,
-            color: C.purple,
-            onChanged: (v) => st.setAcnOn(v)),
-        // 开关关着时只留那一行：不看这个服务器的人不用滚过两格账号口令。
-        if (st.acnOn) ...[
-          SettingsRow2(
-            s.acnLinkStatus,
-            st.acnConnected ? s.connected : s.disconnected,
-            valueColor: st.acnConnected ? C.green : C.grey,
-          ),
-          // 服务器认不认这个登录：口令填错时链路照样「已连接」，只有这一行
-          // 说得出原因（服务器回 `not authorized (auth-failed)`）。
-          if (st.acnLogin != null)
-            SettingsRow2(
-              s.acnLoginTitle,
-              st.acnLogin == ''
-                  ? s.acnLoginOk
-                  : (st.acnLogin == 'unverified'
-                      ? s.unverified
-                      : s.acnLoginRejected),
-              valueColor: st.acnLogin == '' ? C.slate : C.orange,
-            ),
-          _acnAccountInputs(),
-          _acnSyncRow(),
-          if (last != null)
-            SettingsRow2(
-              s.acnSyncLast,
-              last.ok
-                  ? s.acnSyncDone('${last.total}', '${last.added}')
-                  : (last.error == 'no-account'
-                      ? s.acnSyncNoAccount
-                      : last.error!),
-              valueColor: last.ok ? C.slate : C.orange,
-            ),
-          if (_acnDirty) _acnReconnectRow(),
-        ],
-        Padding(
-          padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
-          child: Text(s.acnLinkNote, style: ts(10, c: C.grey)),
-        ),
-      ],
-    );
-  }
-
-  /// 24 小时台站那一行：只有一个按钮。
-  ///
-  /// 这件事只有用户按下去才做 —— 连上链路、切回前台都不自动拉。那个请求会把
-  /// 账号口令再发给服务器一次，属于用户自己该决定的事。
-  Widget _acnSyncRow() {
-    final s = S.of(context);
-    final busy = st.acnSyncing;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 4, 10, 4),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: C.border, width: 0.4)),
-      ),
-      child: Row(children: [
-        Expanded(
-          child: Text(s.acnSyncTitle, style: ts(12, c: C.slate)),
-        ),
-        TextButton.icon(
-          onPressed: busy ? null : () => unawaited(st.syncAcnStations()),
-          icon: Icon(Icons.sync_rounded,
-              size: 15, color: busy ? C.greyLight : C.purple),
-          label: Text(busy ? s.acnSyncing : s.acnSyncNow,
-              style: ts(11, w: FontWeight.w700,
-                  c: busy ? C.greyLight : C.purple)),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-            minimumSize: Size.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-        ),
-      ]),
-    );
-  }
-
-  /// 副链路的账号 + 口令。只写进副链路的登录行。
-  ///
-  /// 主链路永远不带 `auth`：那几个词发给 rotate.aprs2.net 有可能被当成非法
-  /// 登录词。两项都非空才发，留空就按 passcode 只收。
-  Widget _acnAccountInputs() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: C.border, width: 0.4)),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(S.of(context).serverAccountTitle, style: ts(12, c: C.slate)),
-        const SizedBox(height: 6),
-        TextField(
-          controller: _account,
-          autocorrect: false,
-          style: ts(13, w: FontWeight.w600),
-          onChanged: (v) {
-            st.acnAccount = v.trim();
-            _checkAcnDirty();
-          },
-          decoration: InputDecoration(
-            hintText: S.of(context).serverAccountHint,
-            hintStyle: ts(13, c: C.greyLight),
-            isDense: true,
-            filled: true,
-            fillColor: C.bgSoft,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _accountPass,
-          obscureText: _accountPassHidden,
-          autocorrect: false,
-          enableSuggestions: false,
-          style: ts(13, w: FontWeight.w600),
-          onChanged: (v) {
-            st.acnPassword = v;
-            _checkAcnDirty();
-          },
-          decoration: InputDecoration(
-            hintText: S.of(context).serverPasswordHint,
-            hintStyle: ts(13, c: C.greyLight),
-            isDense: true,
-            filled: true,
-            fillColor: C.bgSoft,
-            suffixIcon: IconButton(
-              icon: Icon(
-                _accountPassHidden
-                    ? Icons.visibility_off_rounded
-                    : Icons.visibility_rounded,
-                size: 18,
-                color: C.grey,
-              ),
-              tooltip: S.of(context).serverPasswordTitle,
-              onPressed: () =>
-                  setState(() => _accountPassHidden = !_accountPassHidden),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(S.of(context).acnAccountNote, style: ts(10, c: C.grey)),
-      ]),
-    );
-  }
-
-  /// 账号口令改过、副链路还连着：给一个「重新连接」，别让旧口令继续生效。
-  Widget _acnReconnectRow() {
-    return Padding(
-      padding: const EdgeInsets.all(14),
-      child: Row(children: [
-        Icon(Icons.info_outline_rounded, color: C.orange, size: 20),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(S.of(context).configChanged,
-                style: ts(13, c: C.orange, w: FontWeight.w700)),
-            Text(S.of(context).reconnectToApply,
-                style: ts(11, c: C.orange.withValues(alpha: 0.8))),
-          ]),
-        ),
-        const SizedBox(width: 8),
-        IconButton(
-          icon: Icon(Icons.refresh_rounded, color: C.orange, size: 22),
-          tooltip: S.of(context).reconnect,
-          onPressed: () async {
-            setState(() => _acnDirty = false);
-            await st.reconnectAcn();
-          },
-        ),
       ]),
     );
   }
@@ -3498,16 +3282,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     if (dirty != _configDirty) {
       setState(() => _configDirty = dirty);
     }
-  }
-
-  /// 副链路的账号口令是否改过。与 [_checkConfigDirty] 一样只在翻转时 setState；
-  /// 顺带落一次盘 —— 这两格没有「保存」按钮，离开这页就该记住。
-  void _checkAcnDirty() {
-    final dirty =
-        st.acnAccount != _origAccount || st.acnPassword != _origAccountPass;
-    if (dirty == _acnDirty) return;
-    if (dirty) st.persist();
-    setState(() => _acnDirty = dirty);
   }
 }
 

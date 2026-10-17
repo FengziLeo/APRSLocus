@@ -16734,6 +16734,30 @@ abstract class AppLocalizations {
   /// **'同步中…'**
   String get acnSyncing;
 
+  /// No description provided for @acnSyncHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'按下按钮才拉，连上链路不会自己拉。'**
+  String get acnSyncHint;
+
+  /// No description provided for @sourceGroupInternet.
+  ///
+  /// In zh, this message translates to:
+  /// **'互联网链接'**
+  String get sourceGroupInternet;
+
+  /// No description provided for @sourceGroupRadio.
+  ///
+  /// In zh, this message translates to:
+  /// **'电台链路'**
+  String get sourceGroupRadio;
+
+  /// No description provided for @acnPageLead.
+  ///
+  /// In zh, this message translates to:
+  /// **'APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。'**
+  String get acnPageLead;
+
 }
 
 class _AppLocalizationsDelegate

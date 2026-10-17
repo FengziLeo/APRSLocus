@@ -4175,7 +4175,7 @@
   "acnSyncNoAccount": "Isi akun dan kata sandi untuk menyinkronkan.",
   "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
   "stationSource": "Sumber",
-  "acnCardTitle": "Tautan kedua APRSNETCN",
+  "acnCardTitle": "APRSNETCN SERVER",
   "acnCardSubtitle": "Berjalan bersama tautan utama. Hanya menerima.",
   "acnLinkSwitch": "Hubungkan juga ke APRSNETCN",
   "acnLinkStatus": "Tautan kedua",
@@ -4186,5 +4186,9 @@
   "acnLoginOk": "Terverifikasi",
   "acnLoginRejected": "Akun atau kata sandi salah",
   "acnSyncNow": "Sinkron sekarang",
-  "acnSyncing": "Menyinkronkan…"
+  "acnSyncing": "Menyinkronkan…",
+  "acnSyncHint": "Hanya diambil saat tombol ditekan, tidak saat terhubung.",
+  "sourceGroupInternet": "Tautan internet",
+  "sourceGroupRadio": "Tautan radio",
+  "acnPageLead": "Tautan yang dirancang APRSNET.CN. Berjalan bersama tautan utama dan hanya menerima."
 }

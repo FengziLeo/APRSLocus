@@ -4058,6 +4058,9 @@ class AppState extends ChangeNotifier {
     aprs.account = '';
     aprs.password = '';
     acnOn = false;
+    acnServer = kAcnServerHost;
+    acnPort = kAcnServerPort;
+    _acnConfWarned = false;
     acnAccount = '';
     acnPassword = '';
     acnConnected = false;
@@ -4294,9 +4297,20 @@ class AppState extends ChangeNotifier {
 
   /// 是否同时连 APRSNETCN（设置页的开关）。默认关：不是所有人都用这台服务器。
   bool acnOn = false;
+
+  /// 副链路的服务器地址与端口。
+  ///
+  /// 默认值是预置的那一台，用户可以改成别的。协议是同一套，地址不该写死在
+  /// 连接里：服务器换机器、走反代、或者自己搭一台试用，都只改这两格。
+  String acnServer = kAcnServerHost;
+  int acnPort = kAcnServerPort;
+
   bool acnConnected = false;
   bool _acnConnecting = false;
   int _acnAttempt = 0;
+  /// 地址没填的提示只报一次：重连循环会把 `_connectAcn` 反复叫起来，
+  /// 每叫一次就刷一行错误日志只会把真正的错盖掉。
+  bool _acnConfWarned = false;
 
   /// 下一次允许重连的时刻（1 秒 tick 里判断，不另起 Timer）
   DateTime? _acnRetryAt;
@@ -4563,6 +4577,8 @@ class AppState extends ChangeNotifier {
       // 所以那两个值可以无歧义地当作副链路的账号口令搬过来（只搬一次，之后
       // 以 acn* 为准）。
       acnOn = p.getBool('acnOn') ?? acnOn;
+      acnServer = p.getString('acnServer') ?? acnServer;
+      acnPort = p.getInt('acnPort') ?? acnPort;
       acnAccount = p.getString('acnAccount') ??
           (aprs.server.trim() == kAcnServerHost ? aprs.account : '');
       acnPassword = p.getString('acnPassword') ??
@@ -4856,6 +4872,8 @@ class AppState extends ChangeNotifier {
     await p.setString('aprsAccount', aprs.account);
     await p.setString('aprsPassword', aprs.password);
     await p.setBool('acnOn', acnOn);
+    await p.setString('acnServer', acnServer);
+    await p.setInt('acnPort', acnPort);
     await p.setString('acnAccount', acnAccount);
     await p.setString('acnPassword', acnPassword);
     await p.setString('dataSource', dataSource);
@@ -5962,12 +5980,22 @@ class AppState extends ChangeNotifier {
     // 每 8 秒刷一条失败日志（设置页在 Web 上不显示这个开关）。
     if (kIsWeb) return;
     if (!acnOn || acnConnected || _acnConnecting || _disposed) return;
+    final host = acnServer.trim();
+    if (host.isEmpty || acnPort <= 0) {
+      if (!_acnConfWarned) {
+        _acnConfWarned = true;
+        _log(LogLevel.error, 'APRSNETCN', '副链路没有填服务器地址，先填好再连');
+        _notify();
+      }
+      return;
+    }
+    _acnConfWarned = false;
     _acnConnecting = true;
     acnLogin = null;
-    _log(LogLevel.info, 'APRSNETCN', '正在连接 $kAcnServerHost:$kAcnServerPort…');
+    _log(LogLevel.info, 'APRSNETCN', '正在连接 $host:$acnPort…');
     _notify();
-    acnLink.server = kAcnServerHost;
-    acnLink.port = kAcnServerPort;
+    acnLink.server = host;
+    acnLink.port = acnPort;
     acnLink.callsign = myFullCall;
     acnLink.passcode = aprs.passcode;
     acnLink.account = acnAccount.trim();

@@ -9154,7 +9154,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get stationSource => "来源";
 
   @override
-  String get acnCardTitle => "APRSNETCN 副链路";
+  String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
   String get acnCardSubtitle => "与主链路同时在线，只收不发。";
@@ -9188,6 +9188,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get acnSyncing => "同步中…";
+
+  @override
+  String get acnSyncHint => "按下按钮才拉，连上链路不会自己拉。";
+
+  @override
+  String get sourceGroupInternet => "互联网链接";
+
+  @override
+  String get sourceGroupRadio => "电台链路";
+
+  @override
+  String get acnPageLead => "APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。";
 
 }
 
@@ -18340,7 +18352,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get stationSource => "來源";
 
   @override
-  String get acnCardTitle => "APRSNETCN 副鏈路";
+  String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
   String get acnCardSubtitle => "與主鏈路同時在線，只收不發。";
@@ -18374,5 +18386,17 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get acnSyncing => "同步中…";
+
+  @override
+  String get acnSyncHint => "按下按鈕才拉，連上鏈路不會自己拉。";
+
+  @override
+  String get sourceGroupInternet => "網際網路連結";
+
+  @override
+  String get sourceGroupRadio => "電台鏈路";
+
+  @override
+  String get acnPageLead => "APRSNET.CN 設計的一條鏈路。與主鏈路同時在線，只收不發。";
 
 }

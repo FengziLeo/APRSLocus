@@ -4175,7 +4175,7 @@
   "acnSyncNoAccount": "Fill in the account and password to sync.",
   "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
   "stationSource": "Source",
-  "acnCardTitle": "APRSNETCN second link",
+  "acnCardTitle": "APRSNETCN SERVER",
   "acnCardSubtitle": "Runs alongside the main link. Receive only.",
   "acnLinkSwitch": "Also connect to APRSNETCN",
   "acnLinkStatus": "Second link",
@@ -4186,5 +4186,9 @@
   "acnLoginOk": "Verified",
   "acnLoginRejected": "Account or password wrong",
   "acnSyncNow": "Sync now",
-  "acnSyncing": "Syncing…"
+  "acnSyncing": "Syncing…",
+  "acnSyncHint": "Pulled only when you press the button, never on connect.",
+  "sourceGroupInternet": "Internet links",
+  "sourceGroupRadio": "Radio links",
+  "acnPageLead": "A link designed by APRSNET.CN. It runs alongside the main link and only receives."
 }

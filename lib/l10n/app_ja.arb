@@ -4175,7 +4175,7 @@
   "acnSyncNoAccount": "アカウントとパスワードを入れると同期できます。",
   "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
   "stationSource": "ソース",
-  "acnCardTitle": "APRSNETCN 副リンク",
+  "acnCardTitle": "APRSNETCN SERVER",
   "acnCardSubtitle": "メイン回線と同時に接続します。受信のみです。",
   "acnLinkSwitch": "APRSNETCN にも同時接続",
   "acnLinkStatus": "副リンク",
@@ -4186,5 +4186,9 @@
   "acnLoginOk": "検証済み",
   "acnLoginRejected": "アカウントかパスワードが違います",
   "acnSyncNow": "今すぐ同期",
-  "acnSyncing": "同期中…"
+  "acnSyncing": "同期中…",
+  "acnSyncHint": "ボタンを押したときだけ取得します。接続しても取得しません。",
+  "sourceGroupInternet": "インターネット回線",
+  "sourceGroupRadio": "無線回線",
+  "acnPageLead": "APRSNET.CN が設計した回線です。メイン回線と同時に接続し、受信のみ行います。"
 }

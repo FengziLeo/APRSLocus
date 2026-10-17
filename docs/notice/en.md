@@ -1,6 +1,10 @@
 # This Saturday, send a packet to BG7LZQ-3
 
-The first round of APRSNETCN OA is this Saturday. Stay on for the day, send one packet to the week's duty callsign, and you are on the list.
+APRSNETCN OA is an APRS message check-in run by APRSNET.CN. It lasts a whole Saturday, Beijing time. OA stands for On Air.
+
+One station is on duty each week. Send it a message, it answers with an ACK, and you are on that day's roster. The duty callsign changes every week.
+
+No sign-up, and nothing to be present for.
 
 ## 📡 When, and who is on duty
 
@@ -14,9 +18,9 @@ The first round of APRSNETCN OA is this Saturday. Stay on for the day, send one 
 
 Address the message to **BG7LZQ-3**.
 
-Send **CQ CNNET BG7XXX from OL62** with your own call and your own grid. When the duty station answers with an ACK, send **U CNNET**.
+Send **CQ CNNET BG7XXX OL62** with your own call and your own grid. When the duty station answers with an ACK, send **U CNNET**.
 
-You can also send **CNNET BG7XXX from OL62** and skip the CQ step.
+You can also send **CNNET BG7XXX OL62** and skip the CQ step.
 
 A grid of 4 or 6 characters both work, for example OL62 or OL62AA. If a packet arrives without a grid, the duty station answers with a hint; send it once more with the grid in.
 

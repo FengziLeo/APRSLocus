@@ -63,22 +63,22 @@ PAGES = [
 # ⚠ 换一期公告时这里必须一起改，否则会出现「正文是新的、标题还是上一期」。
 HEAD = {
     'zh': {
-        'kicker': '📡 APRSNETCN OA 测试轮次',
+        'kicker': '📡 APRSNETCN OA · 周六空中签到',
         'title': '本周六，向轮值呼号发一条报文',
         'en': 'APRSNETCN OA · test round',
-        'sub': '北京时间 10 月 17 日（周六）00:00 到 23:59，网络和射频都能进，射频优先。报文的收件人填 BG7LZQ-3，正文按 CQ CNNET 的写法发。',
+        'sub': 'APRSNET.CN 每周六办一次空中签到。北京时间 10 月 17 日 00:00 到 23:59，把报文发给当周的轮值呼号 BG7LZQ-3，收到 ACK 就算签到，网络和射频都算。',
     },
     'zh_TW': {
-        'kicker': '📡 APRSNETCN OA 測試輪次',
+        'kicker': '📡 APRSNETCN OA · 週六空中簽到',
         'title': '本週六，向輪值呼號發一條報文',
         'en': 'APRSNETCN OA · test round',
-        'sub': '北京時間 10 月 17 日（週六）00:00 到 23:59，網路和射頻都能進，射頻優先。報文的收件人填 BG7LZQ-3，正文照 CQ CNNET 的寫法發。',
+        'sub': 'APRSNET.CN 每週六辦一次空中簽到。北京時間 10 月 17 日 00:00 到 23:59，把報文發給當週的輪值呼號 BG7LZQ-3，收到 ACK 就算簽到，網路和射頻都算。',
     },
     'en': {
-        'kicker': '📡 APRSNETCN OA · test round',
+        'kicker': '📡 APRSNETCN OA · Saturday check-in',
         'title': 'This Saturday, send a packet to the duty station',
         'en': 'APRSNETCN OA · test round',
-        'sub': 'Saturday 17 October, 00:00 to 23:59 Beijing time. Network and RF both count, RF first. Address the message to BG7LZQ-3 and send it the CQ CNNET way.',
+        'sub': 'APRSNET.CN runs an on-air check-in every Saturday. On 17 October, 00:00 to 23:59 Beijing time, send a message to the duty callsign BG7LZQ-3; an ACK puts you on the roster. Network and RF both count.',
     },
 }
 

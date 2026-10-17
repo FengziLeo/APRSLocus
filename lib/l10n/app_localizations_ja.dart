@@ -9253,4 +9253,22 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get stationSource => "ソース";
 
+  @override
+  String get acnCardTitle => "APRSNETCN 副リンク";
+
+  @override
+  String get acnCardSubtitle => "メイン回線と同時に接続します。受信のみです。";
+
+  @override
+  String get acnLinkSwitch => "APRSNETCN にも同時接続";
+
+  @override
+  String get acnLinkStatus => "副リンク";
+
+  @override
+  String get acnLinkNote => "送信はメイン回線のみです。ここで受信した局はサーバー由来として表示され、ゲートウェイ転送は行いません。";
+
+  @override
+  String get acnAccountNote => "サーバーがホワイトリストの局に発行するアカウントとパスワードです。空欄なら passcode のみで受信します。";
+
 }

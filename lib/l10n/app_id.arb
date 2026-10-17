@@ -4174,5 +4174,11 @@
   "acnSyncDone": "Server punya {total} stasiun, {added} di antaranya baru di sini",
   "acnSyncNoAccount": "Isi akun dan kata sandi untuk menyinkronkan.",
   "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
-  "stationSource": "Sumber"
+  "stationSource": "Sumber",
+  "acnCardTitle": "Tautan kedua APRSNETCN",
+  "acnCardSubtitle": "Berjalan bersama tautan utama. Hanya menerima.",
+  "acnLinkSwitch": "Hubungkan juga ke APRSNETCN",
+  "acnLinkStatus": "Tautan kedua",
+  "acnLinkNote": "Pengiriman tetap di tautan utama. Stasiun yang diterima di sini ditandai berasal dari server dan tidak diteruskan.",
+  "acnAccountNote": "Akun dan kata sandi dari server. Kosongkan keduanya untuk menerima dengan passcode saja."
 }

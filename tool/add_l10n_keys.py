@@ -36,12 +36,50 @@ CLASSES = {
 
 # ── 要加的键：key → (zh, zh_TW, en, ja, es, id) ──
 KEYS = {
-    # ── 台站来源（详情页位置卡片里那一个 KV 行）──
+    # ── 副链路（APRSNETCN）卡片 ──
     #
-    # 只有 APRSNETCN 的 24 小时接口并进来的台站才有这一行；值是服务器名，
-    # 不翻译，所以这里只需要一个标签。
-    'stationSource': (
-        '来源', '來源', 'Source', 'ソース', 'Origen', 'Sumber'),
+    # 独立于主连接卡：这条连接只收不发，与主链路同时在线。三个标签各自说清
+    # 一件事（这条链路是什么 / 开关 / 当前状态），说明文字放在卡片底部。
+    'acnCardTitle': (
+        'APRSNETCN 副链路', 'APRSNETCN 副鏈路', 'APRSNETCN second link',
+        'APRSNETCN 副リンク', 'Enlace secundario APRSNETCN',
+        'Tautan kedua APRSNETCN'),
+    'acnCardSubtitle': (
+        '与主链路同时在线，只收不发。',
+        '與主鏈路同時在線，只收不發。',
+        'Runs alongside the main link. Receive only.',
+        'メイン回線と同時に接続します。受信のみです。',
+        'Funciona junto al enlace principal. Solo recibe.',
+        'Berjalan bersama tautan utama. Hanya menerima.'),
+    'acnLinkSwitch': (
+        '同时连接 APRSNETCN', '同時連線 APRSNETCN',
+        'Also connect to APRSNETCN', 'APRSNETCN にも同時接続',
+        'Conectar también a APRSNETCN', 'Hubungkan juga ke APRSNETCN'),
+    'acnLinkStatus': (
+        '副链路', '副鏈路', 'Second link', '副リンク',
+        'Enlace secundario', 'Tautan kedua'),
+    'acnLinkNote': (
+        '发报文只走主链路。这条链路收来的台站会标成来自服务器，也不做网关转递。',
+        '發報文只走主鏈路。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。',
+        'Sending stays on the main link. Stations heard here are marked as '
+            'coming from the server and are never gatewayed.',
+        '送信はメイン回線のみです。ここで受信した局はサーバー由来として表示され、'
+            'ゲートウェイ転送は行いません。',
+        'El envío va solo por el enlace principal. Las estaciones recibidas '
+            'aquí se marcan como del servidor y no se reenvían.',
+        'Pengiriman tetap di tautan utama. Stasiun yang diterima di sini '
+            'ditandai berasal dari server dan tidak diteruskan.'),
+    'acnAccountNote': (
+        '服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。',
+        '伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。',
+        'Account and password issued by the server. Leave both empty to '
+            'receive on the passcode alone.',
+        'サーバーがホワイトリストの局に発行するアカウントとパスワードです。'
+            '空欄なら passcode のみで受信します。',
+        'Cuenta y contraseña que emite el servidor. Si se dejan vacías, se '
+            'recibe solo con el passcode.',
+        'Akun dan kata sandi dari server. Kosongkan keduanya untuk menerima '
+            'dengan passcode saja.'),
 }
 
 META = {

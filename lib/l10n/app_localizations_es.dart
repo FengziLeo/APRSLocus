@@ -9591,4 +9591,22 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get stationSource => "Origen";
 
+  @override
+  String get acnCardTitle => "Enlace secundario APRSNETCN";
+
+  @override
+  String get acnCardSubtitle => "Funciona junto al enlace principal. Solo recibe.";
+
+  @override
+  String get acnLinkSwitch => "Conectar también a APRSNETCN";
+
+  @override
+  String get acnLinkStatus => "Enlace secundario";
+
+  @override
+  String get acnLinkNote => "El envío va solo por el enlace principal. Las estaciones recibidas aquí se marcan como del servidor y no se reenvían.";
+
+  @override
+  String get acnAccountNote => "Cuenta y contraseña que emite el servidor. Si se dejan vacías, se recibe solo con el passcode.";
+
 }

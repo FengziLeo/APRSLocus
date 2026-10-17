@@ -9532,4 +9532,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get stationSource => "Source";
 
+  @override
+  String get acnCardTitle => "APRSNETCN second link";
+
+  @override
+  String get acnCardSubtitle => "Runs alongside the main link. Receive only.";
+
+  @override
+  String get acnLinkSwitch => "Also connect to APRSNETCN";
+
+  @override
+  String get acnLinkStatus => "Second link";
+
+  @override
+  String get acnLinkNote => "Sending stays on the main link. Stations heard here are marked as coming from the server and are never gatewayed.";
+
+  @override
+  String get acnAccountNote => "Account and password issued by the server. Leave both empty to receive on the passcode alone.";
+
 }

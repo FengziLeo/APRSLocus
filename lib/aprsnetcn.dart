@@ -21,9 +21,6 @@ const int kAcnServerPort = 14580;
 /// HTTP 接口入口（`/api/v1/...`，见服务器仓库的 docs/API.md）
 const String kAcnHttpBase = 'http://8.138.199.11:8899';
 
-/// 预置按钮上显示的名字（服务器自己的名字，不翻译）
-const String kAcnPresetLabel = 'APRSNETCN SERVER';
-
 /// 一台台站在服务器那侧的 24 小时概况（= 该呼号最后一次位置 + 收到几帧）。
 ///
 /// 字段与 `/api/v1/stations` 的响应一一对应，但这里**全部容错**：缺一个字段

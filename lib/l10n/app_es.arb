@@ -4174,5 +4174,11 @@
   "acnSyncDone": "El servidor tenía {total} estaciones, {added} nuevas aquí",
   "acnSyncNoAccount": "Rellena la cuenta y la contraseña para sincronizar.",
   "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
-  "stationSource": "Origen"
+  "stationSource": "Origen",
+  "acnCardTitle": "Enlace secundario APRSNETCN",
+  "acnCardSubtitle": "Funciona junto al enlace principal. Solo recibe.",
+  "acnLinkSwitch": "Conectar también a APRSNETCN",
+  "acnLinkStatus": "Enlace secundario",
+  "acnLinkNote": "El envío va solo por el enlace principal. Las estaciones recibidas aquí se marcan como del servidor y no se reenvían.",
+  "acnAccountNote": "Cuenta y contraseña que emite el servidor. Si se dejan vacías, se recibe solo con el passcode."
 }

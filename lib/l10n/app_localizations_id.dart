@@ -9542,4 +9542,22 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get stationSource => "Sumber";
 
+  @override
+  String get acnCardTitle => "Tautan kedua APRSNETCN";
+
+  @override
+  String get acnCardSubtitle => "Berjalan bersama tautan utama. Hanya menerima.";
+
+  @override
+  String get acnLinkSwitch => "Hubungkan juga ke APRSNETCN";
+
+  @override
+  String get acnLinkStatus => "Tautan kedua";
+
+  @override
+  String get acnLinkNote => "Pengiriman tetap di tautan utama. Stasiun yang diterima di sini ditandai berasal dari server dan tidak diteruskan.";
+
+  @override
+  String get acnAccountNote => "Akun dan kata sandi dari server. Kosongkan keduanya untuk menerima dengan passcode saja.";
+
 }

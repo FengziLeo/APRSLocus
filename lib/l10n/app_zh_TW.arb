@@ -4762,5 +4762,11 @@
   "acnSyncDone": "伺服器上有 {total} 臺，新併入 {added} 臺",
   "acnSyncNoAccount": "填了帳號和口令才能同步。",
   "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
-  "stationSource": "來源"
+  "stationSource": "來源",
+  "acnCardTitle": "APRSNETCN 副鏈路",
+  "acnCardSubtitle": "與主鏈路同時在線，只收不發。",
+  "acnLinkSwitch": "同時連線 APRSNETCN",
+  "acnLinkStatus": "副鏈路",
+  "acnLinkNote": "發報文只走主鏈路。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。",
+  "acnAccountNote": "伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。"
 }

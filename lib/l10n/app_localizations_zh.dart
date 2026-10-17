@@ -9153,6 +9153,24 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get stationSource => "来源";
 
+  @override
+  String get acnCardTitle => "APRSNETCN 副链路";
+
+  @override
+  String get acnCardSubtitle => "与主链路同时在线，只收不发。";
+
+  @override
+  String get acnLinkSwitch => "同时连接 APRSNETCN";
+
+  @override
+  String get acnLinkStatus => "副链路";
+
+  @override
+  String get acnLinkNote => "发报文只走主链路。这条链路收来的台站会标成来自服务器，也不做网关转递。";
+
+  @override
+  String get acnAccountNote => "服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18302,5 +18320,23 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get stationSource => "來源";
+
+  @override
+  String get acnCardTitle => "APRSNETCN 副鏈路";
+
+  @override
+  String get acnCardSubtitle => "與主鏈路同時在線，只收不發。";
+
+  @override
+  String get acnLinkSwitch => "同時連線 APRSNETCN";
+
+  @override
+  String get acnLinkStatus => "副鏈路";
+
+  @override
+  String get acnLinkNote => "發報文只走主鏈路。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。";
+
+  @override
+  String get acnAccountNote => "伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。";
 
 }

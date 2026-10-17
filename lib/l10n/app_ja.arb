@@ -4174,5 +4174,11 @@
   "acnSyncDone": "サーバーに {total} 局、新しく {added} 局",
   "acnSyncNoAccount": "アカウントとパスワードを入れると同期できます。",
   "@acnSyncDone": {"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}},
-  "stationSource": "ソース"
+  "stationSource": "ソース",
+  "acnCardTitle": "APRSNETCN 副リンク",
+  "acnCardSubtitle": "メイン回線と同時に接続します。受信のみです。",
+  "acnLinkSwitch": "APRSNETCN にも同時接続",
+  "acnLinkStatus": "副リンク",
+  "acnLinkNote": "送信はメイン回線のみです。ここで受信した局はサーバー由来として表示され、ゲートウェイ転送は行いません。",
+  "acnAccountNote": "サーバーがホワイトリストの局に発行するアカウントとパスワードです。空欄なら passcode のみで受信します。"
 }

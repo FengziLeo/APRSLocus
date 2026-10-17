@@ -16662,6 +16662,42 @@ abstract class AppLocalizations {
   /// **'来源'**
   String get stationSource;
 
+  /// No description provided for @acnCardTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'APRSNETCN 副链路'**
+  String get acnCardTitle;
+
+  /// No description provided for @acnCardSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'与主链路同时在线，只收不发。'**
+  String get acnCardSubtitle;
+
+  /// No description provided for @acnLinkSwitch.
+  ///
+  /// In zh, this message translates to:
+  /// **'同时连接 APRSNETCN'**
+  String get acnLinkSwitch;
+
+  /// No description provided for @acnLinkStatus.
+  ///
+  /// In zh, this message translates to:
+  /// **'副链路'**
+  String get acnLinkStatus;
+
+  /// No description provided for @acnLinkNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'发报文只走主链路。这条链路收来的台站会标成来自服务器，也不做网关转递。'**
+  String get acnLinkNote;
+
+  /// No description provided for @acnAccountNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。'**
+  String get acnAccountNote;
+
 }
 
 class _AppLocalizationsDelegate

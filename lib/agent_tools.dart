@@ -1090,6 +1090,10 @@ Future<AgentToolOutcome> executeAgentTool(
           'user_disconnected': st.userDisconnected,
           'server': st.aprs.server,
           'port': st.aprs.port,
+          // 副链路不是可选的数据来源（发报文永远走主链路），所以不进下面的
+          // sources，只报它开没开、连没连上。
+          'acn_on': st.acnOn,
+          'acn_connected': st.acnConnected,
           'sources': {
             'aprsis': st.aprsIsOn,
             'tnc': st.tncOn,

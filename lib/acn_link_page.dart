@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'aprsnetcn.dart';
 import 'settings_widgets.dart';
@@ -82,19 +81,6 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
     setState(() => _dirty = false);
     await st.reconnectAcn();
     unawaited(st.fetchAcnInfo());
-  }
-
-  /// 服务器上的 24 小时台站地图。它是那台机器的公共页面，不用账号，
-  /// 地址就是界面上填的那一台，所以交给浏览器打开，不在 App 里再画一遍。
-  Future<void> _openMap() async {
-    final s = S.of(context);
-    final url = Uri.parse('${acnHttpBaseHost(st.acnServer)}/stations');
-    final opened = await launchUrl(url, mode: LaunchMode.externalApplication);
-    if (!opened && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(s.openLinkFailed)),
-      );
-    }
   }
 
   @override
@@ -302,12 +288,6 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
             s.acnServerRetention('${info.retentionHours}'),
             style: ts(10, c: C.grey),
           ),
-        ),
-        SettingsNavRow(
-          title: s.acnOpenMap,
-          icon: Icons.map_rounded,
-          color: C.cyan,
-          onTap: () => unawaited(_openMap()),
         ),
       ],
     );

@@ -56,9 +56,9 @@ APRSNETCN OA 是 APRSNET.CN 发起的 APRS 报文签到活动。按北京时间�
 
 Qingling（清零）渠道上误发的 2.2.0 已经下架，通道恢复正常。
 
-现在检查更新会拿到最新正式版 2.1.8。之前装过 2.2.0 的话，请先卸载 2.2.0，再安装 2.1.8。
+现在检查更新会拿到最新正式版 2.1.9。之前装过 2.2.0 的话，请先卸载 2.2.0，再安装 2.1.9。
 
-**[下载 2.1.8](https://github.com/dariondong/APRSLocus/releases/download/v2.1.8/APRSLocus_2.1.8.apk)**
+**[下载 2.1.9](https://github.com/dariondong/APRSLocus/releases/download/v2.1.9/APRSLocus_2.1.9.apk)**
 
 ---
 

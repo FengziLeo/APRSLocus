@@ -1772,27 +1772,42 @@ class AppState extends ChangeNotifier {
     _refreshFilter();
   }
 
-  /// 应用过滤变更：重连以使 APRS-IS 服务器使用新过滤器
+  /// 应用过滤变更：两条链路共用一套规则，改完各自用新过滤器重连。
   void _refreshFilter() {
-    if (!connected) return;
     final newFilter = filterString;
-    if (_lastFilter != newFilter) {
+    if (connected && _lastFilter != newFilter) {
       aprs.filter = newFilter;
       _log(LogLevel.info, '连接', '过滤规则变更，重连: $newFilter');
       reconnect();
+    }
+    // 第二条链路也按这一套规则收：它在线时同样要用新过滤器重连，
+    // 否则得等用户自己去点那张卡上的「重新连接」才生效。
+    if (acnConnected && acnLink.filter != newFilter) {
+      _log(LogLevel.info, 'APRSNETCN', '过滤规则变更，重连: $newFilter');
+      unawaited(reconnectAcn());
     }
   }
 
   /// 公开：手动触发 APRS 过滤器刷新（设置面板调用）
   void refreshAprsFilter() => _refreshFilter();
 
-  /// 生成 APRS-IS 过滤字符串（服务器只收范围 + 群呼号，国家过滤在本地做）
+  /// 两条互联网链路共用的过滤字符串（范围 + 群呼号，国家过滤在本地做）。
+  ///
+  /// APRS-IS 与 APRSNETCN SERVER 用同一套规则：同一个中心点、同一个半径、
+  /// 同一份群呼号，在「服务器」页上只填一次。群呼号走 `b/`（呼号列表），
+  /// 那是两边服务器都认的前缀 —— 认不出来的一条会让整条过滤器作废。
   String get filterString {
     var f =
         'r/${filterLat.toStringAsFixed(2)}/${filterLng.toStringAsFixed(2)}/$filterRadius';
-    // 追加所有群呼号（~ 前缀精确匹配）
-    for (final g in chatGroups) {
-      f += ' ~${g.groupCall}';
+    // 群呼号：b/call1/call2…，一条过滤器带 5 个，多的另起一条。
+    final calls = chatGroups
+        .map((g) => g.groupCall.trim().toUpperCase())
+        .where((c) => c.isNotEmpty)
+        .toSet()
+        .toList();
+    for (var i = 0; i < calls.length; i += 5) {
+      final end = i + 5 < calls.length ? i + 5 : calls.length;
+      f += ' b/${calls.sublist(i, end).join('/')}';
     }
     // 双向网关必须额外请求**全部消息**（t/m）。
     //
@@ -1807,48 +1822,6 @@ class AppState extends ChangeNotifier {
     // 因此这里追加 `t/m` 才能收到全球发给本地台站的消息。
     if (igateEnabled && igateTwoWay) f += ' t/m';
     return f;
-  }
-
-  /// 副链路的过滤字符串：同一个中心点，半径与呼号单独一套。
-  ///
-  /// 呼号用 `b/`（呼号列表），不用主链路那种 `~呼号`：APRSNETCN 服务器只认
-  /// r a b m t p d f s u q 这几个前缀，一条认不出来**整条过滤器作废**（退回
-  /// 全收），主链路那边的写法搬过来反而会把副链路变成不过滤。
-  String get acnFilterString {
-    var f = 'r/${filterLat.toStringAsFixed(2)}/${filterLng.toStringAsFixed(2)}/'
-        '$acnFilterRadius';
-    final calls = acnFilterCalls
-        .map((c) => c.trim().toUpperCase())
-        .where((c) => c.isNotEmpty)
-        .toList();
-    if (calls.isNotEmpty) f += ' b/${calls.join('/')}';
-    return f;
-  }
-
-  /// 改副链路的接收半径（公里）。落盘，断开时下次连上才生效。
-  void setAcnFilterRadius(int km) {
-    final v = km < 10 ? 10 : (km > 20000 ? 20000 : km);
-    if (v == acnFilterRadius) return;
-    acnFilterRadius = v;
-    persist();
-    _notify();
-  }
-
-  /// 往副链路的呼号列表里加一个（去重、补全大写），最多 8 个。
-  void addAcnFilterCall(String call) {
-    final c = call.trim().toUpperCase();
-    if (c.isEmpty || acnFilterCalls.contains(c)) return;
-    if (acnFilterCalls.length >= 8) return;
-    acnFilterCalls = [...acnFilterCalls, c];
-    persist();
-    _notify();
-  }
-
-  void removeAcnFilterCall(String call) {
-    if (!acnFilterCalls.contains(call)) return;
-    acnFilterCalls = [...acnFilterCalls]..remove(call);
-    persist();
-    _notify();
   }
 
   /// 业余无线电呼号国家/地区前缀表（呼号首位前缀 → 国家）
@@ -4115,8 +4088,6 @@ class AppState extends ChangeNotifier {
     _acnConfWarned = false;
     acnAccount = '';
     acnPassword = '';
-    acnFilterRadius = 1000;
-    acnFilterCalls = <String>[];
     acnLogin = null;
     _acnRetryAt = null;
     _acnAttempt = 0;
@@ -4415,13 +4386,6 @@ class AppState extends ChangeNotifier {
   /// 同一台服务器通常同一个呼号同一个 passcode，所以留空时沿用。
   String acnPasscode = '';
 
-  /// 这条链路自己的过滤器：半径（公里）与额外收的呼号。
-  ///
-  /// APRS-IS 按设置页上的范围与群呼号组装（[filterString]），这条链路关心的
-  /// 是半径里的人：半径可以另调，呼号可以单独列。
-  int acnFilterRadius = 1000;
-  List<String> acnFilterCalls = <String>[];
-
   /// 副链路的登录结果：null = 还没收到服务器的 logresp；'' = 已验证；
   /// 其他 = 服务器自己说的原因（`unverified` / `auth-failed` / `auth-required`）。
   ///
@@ -4688,9 +4652,6 @@ class AppState extends ChangeNotifier {
           (aprs.server.trim() == kAcnServerHost ? aprs.account : '');
       acnPassword = p.getString('acnPassword') ??
           (aprs.server.trim() == kAcnServerHost ? aprs.password : '');
-      acnFilterRadius = p.getInt('acnFilterRadius') ?? acnFilterRadius;
-      acnFilterCalls =
-          p.getStringList('acnFilterCalls') ?? acnFilterCalls;
       dataSource = p.getString('dataSource') ?? dataSource;
       // 容错：非法/旧值一律回落 APRS-IS，避免多来源判断失配。
       // pkwdwpl 是**只读**来源，即使旧配置里存了它也不能当发射来源。
@@ -4986,8 +4947,6 @@ class AppState extends ChangeNotifier {
     await p.setInt('acnPort', acnPort);
     await p.setString('acnAccount', acnAccount);
     await p.setString('acnPassword', acnPassword);
-    await p.setInt('acnFilterRadius', acnFilterRadius);
-    await p.setStringList('acnFilterCalls', acnFilterCalls);
     await p.setString('dataSource', dataSource);
     await p.setStringList('enabledSources', enabledSources.toList());
     // 老版本只认这一个开关（它没有 enabledSources）：照当前的启用状态同步
@@ -6118,7 +6077,8 @@ class AppState extends ChangeNotifier {
         acnPasscode.trim().isEmpty ? aprs.passcode : acnPasscode.trim();
     acnLink.account = acnAccount.trim();
     acnLink.password = acnPassword;
-    acnLink.filter = acnFilterString;
+    // 与 APRS-IS 同一套过滤规则（用户：「netcn 的过滤规则与 aprsis 共同」）。
+    acnLink.filter = filterString;
     final ok = await acnLink.connect();
     _acnConnecting = false;
     _setLinkUp(srcAcn, ok);

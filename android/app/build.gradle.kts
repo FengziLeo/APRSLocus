@@ -67,6 +67,13 @@ kotlin {
     }
 }
 
+dependencies {
+    // 实时更新（Live Updates）的两个方法在 androidx.core 1.17.0 才加进来：
+    // NotificationCompat.Builder#setRequestPromotedOngoing / setShortCriticalText。
+    // 平台的 Notification.Builder 上没有（真机诊断里两项都是「没有」）。
+    implementation("androidx.core:core-ktx:1.17.0")
+}
+
 flutter {
     source = "../.."
 }

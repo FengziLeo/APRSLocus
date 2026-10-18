@@ -419,6 +419,18 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.20', 'date': '2026-10-18',
+        'items': [
+            ('fix',
+             T('实时更新修好了：申请提升的两个方法在 androidx 兼容层上，平台的 '
+               'Notification.Builder 上没有，所以以前一直没反应。',
+               '即時更新修好了：申請提升的兩個方法在 androidx 相容層上，平台的 '
+               'Notification.Builder 上沒有，所以以前一直沒反應。',
+               'Live updates are fixed: the two request methods live on the androidx '
+               'compatibility layer rather than the platform Notification.Builder.')),
+        ],
+    },
+    {
         'ver': 'v2.1.19', 'date': '2026-10-18',
         'items': [
             ('up',

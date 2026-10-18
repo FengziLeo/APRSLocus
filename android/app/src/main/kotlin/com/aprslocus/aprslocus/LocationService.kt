@@ -489,113 +489,70 @@ class LocationService : Service() {
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .addAction(toggleAction)
             .addAction(exitAction)
-            .build()
-            .let { built ->
-                val out = if (liveUpdates) promote(built, short) else built
-                if (focusOn) injectXiaomiFocus(out, short)
-                out
+            .let { builder ->
+                // 实时更新的那两个方法在 androidx 的 NotificationCompat 上（1.16 起），
+                // 平台的 Notification.Builder 上没有 —— 真机诊断里
+                // setRequestPromotedOngoing / setShortCriticalText 都是「没有」。
+                if (liveUpdates) requestLiveUpdates(builder, short)
+                val built = builder.build()
+                if (focusOn) injectXiaomiFocus(built, short)
+                built
             }
     }
 
-    /// 小米 / Redmi / POCO 的「焦点通知」（超级岛）。
+    /// 申请实时更新：androidX 兼容层（1.16 起）上那两个方法，有就调。
     ///
-    /// MIUI / HyperOS 看到 extras 里这串 JSON 就接管渲染；系统不认、或者用户
-    /// 没在系统设置里允许焦点通知时，这串东西会被忽略，通知照普通通知显示。
-    /// 所以这里不需要回退分支，写失败也只是不生效。
-    ///
-    /// ⚠️ 这里只给最小的一份（ticker + aodTitle）。param_v2 里各个模板的字段
-    /// 要按官方模板库填，手上没有那份文档的准确字段名，所以没往里堆别的。
-    private fun injectXiaomiFocus(notif: Notification, short: String) {
-        if (!xiaomiFocusAllowed()) return
-        val ticker = (if (short.isNotEmpty()) short else lastNotificationText)
-            .replace("\\", "")
-            .replace("\"", "")
-            .replace("\n", " ")
-        val json = "{\"param_v2\":{\"baseInfo\":{\"businessId\":\"aprslocus\"}," +
-                "\"focusInfo\":{\"aodTitle\":\"APRSlocus\",\"ticker\":\"" + ticker + "\"}}}"
-        notif.extras.putString("miui.focus.param", json)
+    /// 平台的 `Notification.Builder` 上没有它们 —— 真机诊断里
+    /// `setRequestPromotedOngoing` / `setShortCriticalText` 都是「没有」，
+    /// 而 `canPostPromotedNotifications` 是「允许」，说明入口在兼容层。
+    /// 反射拿不到就等于这个版本不支持，通知照普通通知发。
+    private fun requestLiveUpdates(builder: NotificationCompat.Builder, short: String) {
+        val asked = invokeBool(builder, "setRequestPromotedOngoing",
+            "setRequestPromotedOngoingNotification", "setPromotedOngoing")
+        if (asked && short.isNotEmpty()) invokeText(builder, "setShortCriticalText", short)
     }
 
-    /// 这台设备允不允许发焦点通知（小米自己提供的 content provider）。
-    private fun xiaomiFocusAllowed(): Boolean {
-        val maker = (Build.MANUFACTURER + " " + Build.BRAND).lowercase()
-        if (!maker.contains("xiaomi") && !maker.contains("redmi") &&
-            !maker.contains("poco")
-        ) return false
-        return try {
-            val uri = android.net.Uri.parse("content://miui.statusbar.notification.public")
-            val extras = Bundle().apply { putString("package", packageName) }
-            val result = contentResolver.call(uri, "canShowFocus", null, extras)
-            result?.getBoolean("canShowFocus") == true
-        } catch (_: Throwable) {
-            false
-        }
-    }
-
-    /// 把常驻通知提成 Android 16 的「实时更新」（Live Updates）。
-    ///
-    /// **全程走反射**：这套 API 在编译 SDK 里叫不叫这个名字、有没有，都不该让
-    /// 构建挂掉（踩过一次 `Unresolved reference 'setRequestPromotedOngoing'`）。
-    ///
-    /// 也不拿 `canPostPromotedNotifications` 当门闩：那个方法本身也可能不存在，
-    /// 一票否决就把所有设备都挡住了。这里只要求「设置提升的那个方法存在」，
-    /// 之后提不提由系统决定；一条都没有就原样返回普通通知。
-    private fun promote(notif: Notification, short: String): Notification {
-        return try {
-            val builder = Notification.Builder.recoverBuilder(this, notif)
-            val names = listOf("setRequestPromotedOngoing",
-                "setRequestPromotedOngoingNotification", "setPromotedOngoing")
-            var called = false
-            for (name in names) {
-                if (setBoolTrue(Notification.Builder::class.java, builder, name)) {
-                    called = true
-                    break
+    /// 反射调「传 true 进去」的 Builder 方法（兼容层 / 平台层通用）。
+    private fun invokeBool(target: Any, vararg names: String): Boolean {
+        for (name in names) {
+            try {
+                val method = findMethod(target.javaClass, name,
+                    Boolean::class.javaObjectType)
+                if (method != null) {
+                    method.invoke(target, true)
+                    return true
                 }
+            } catch (_: Throwable) {
             }
-            if (!called) return notif
-            if (short.isNotEmpty()) {
-                try {
-                    Notification.Builder::class.java
-                        .getMethod("setShortCriticalText", CharSequence::class.java)
-                        .invoke(builder, short)
-                } catch (_: Throwable) {
-                    // 少了这一条就少一行胶囊文字，通知照发
-                }
+        }
+        return false
+    }
+
+    /// 反射调「传一段文字进去」的 Builder 方法。
+    private fun invokeText(target: Any, name: String, text: String): Boolean {
+        return try {
+            val method = findMethod(target.javaClass, name, CharSequence::class.java)
+            method?.invoke(target, text)
+            method != null
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
+    /// 在类及其父类里找方法（兼容 Builder 的方法可能声明在父类上）。
+    private fun findMethod(cls: Class<*>, name: String,
+                           arg: Class<*>): java.lang.reflect.Method? {
+        var current: Class<*>? = cls
+        while (current != null && current != Any::class.java) {
+            try {
+                return current.getMethod(name, arg)
+            } catch (_: Throwable) {
+                current = current.superclass
             }
-            builder.build()
-        } catch (_: Throwable) {
-            notif
         }
+        return null
     }
 
-
-    /// 反射调一个无参布尔方法；没有这个方法就返回 false。
-    private fun noArgBool(cls: Class<*>, target: Any, name: String): Boolean {
-        return try {
-            cls.getMethod(name).invoke(target) as? Boolean ?: false
-        } catch (_: Throwable) {
-            false
-        }
-    }
-
-    /// 反射调一个「传 true 进去」的方法；方法不存在就算不支持。
-    private fun setBoolTrue(cls: Class<*>, target: Any, name: String): Boolean {
-        return try {
-            cls.getMethod(name, Boolean::class.javaObjectType).invoke(target, true)
-            true
-        } catch (_: Throwable) {
-            false
-        }
-    }
-
-    private fun hasMethod(cls: Class<*>, name: String): Boolean {
-        return try {
-            cls.getMethod(name)
-            true
-        } catch (_: Throwable) {
-            false
-        }
-    }
 
     fun updateNotification(text: String, short: String = "") {
         // 记下来：刷新前台服务类型（音频采集开关）时要用同一份文本重新 startForeground
@@ -874,6 +831,10 @@ class LocationService : Service() {
             "setShortCriticalText", CharSequence::class.java))
         lines.add("hasPromotableCharacteristics：" + has(Notification::class.java,
             "hasPromotableCharacteristics"))
+        lines.add("NotificationCompat.setRequestPromotedOngoing：" +
+            compatHas("setRequestPromotedOngoing", Boolean::class.javaObjectType))
+        lines.add("NotificationCompat.setShortCriticalText：" +
+            compatHas("setShortCriticalText", CharSequence::class.java))
         lines.add("小米焦点 canShowFocus：" + xiaomiFocus(context))
         lines.add("小米焦点开关：" + (if (LocationService.focusOn()) "开" else "关"))
         lines.add("当前样式：" + (if (LocationService.liveUpdatesOn()) "实时更新" else "普通常驻通知"))

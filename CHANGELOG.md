@@ -1,5 +1,30 @@
 # 更新日志
 
+## [2.1.20] - 2026-10-18
+
+### 实时更新修好了
+
+- 「实时更新」一直没反应的原因找到了：申请提升的两个方法是 androidx 兼容层
+  （NotificationCompat，1.17.0 起）上的，平台的 Notification.Builder 上没有。
+  现在先问兼容层，兼容层没有才算这台设备不支持。
+- 「通知诊断」多两行：兼容层的 setRequestPromotedOngoing / setShortCriticalText
+  有没有。
+
+---
+
+## [2.1.20] - 2026-10-18 (English)
+
+### Live updates fixed
+
+- Why live updates never took effect: the two request methods live on the androidx
+  compatibility layer (NotificationCompat, since 1.17.0), not on the platform
+  Notification.Builder. The app now asks the compatibility layer first.
+- The notification check lists two more lines: whether the compatibility layer has
+  setRequestPromotedOngoing and setShortCriticalText.
+
+---
+
+
 ## [2.1.19] - 2026-10-18
 
 ### 通知

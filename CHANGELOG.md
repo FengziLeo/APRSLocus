@@ -1,5 +1,42 @@
 # 更新日志
 
+## [2.1.15] - 2026-10-18
+
+### 两条互联网链路摆平
+
+- **APRSNETCN 和 APRS-IS 是两条并列的链路**。可以只连它，不连 APRS-IS；也可以选它
+  作为发送链路。选中它发送时不会改从 APRS-IS 发。
+- **发送来源改成每张链路卡上的一个圆点**，原来那张「发送渠道」卡删掉了。
+- **这条链路有自己的 passcode**。留空就沿用 APRS-IS 那一格。
+- 设备页的链路行、系统面板、数据包页都把它列出来，设备页显示它自己收了多少条。
+
+### 台站详情
+
+- **状态报文单独一块**，写明「状态报文」。台站备注仍在呼号那一列。位置包里的备注
+  和 DTI `>` 的状态报文是两种报文，不再混在一起。
+
+---
+
+## [2.1.15] - 2026-10-18 (English)
+
+### The two internet links now sit level
+
+- **APRSNETCN and APRS-IS are two links of equal standing.** You can connect only
+  APRSNETCN, without APRS-IS, and you can make it the send link. Packets picked for it
+  never go out over APRS-IS instead.
+- **The send source is a dot on each link card.** The old send channel card is gone.
+- **This link has its own passcode.** Leave it empty to use the APRS-IS one.
+- The device page, the system panel and the packet page list it. The device page shows
+  how many packets this link has received.
+
+### Station detail
+
+- **The status packet gets a block of its own**, labelled as such. The station note stays
+  beside the callsign. A note inside a position packet and a `>` status packet are two
+  different packets, so they no longer share a spot.
+
+---
+
 ## [2.1.14] - 2026-10-18
 
 ### 三处按实测反馈改回来

@@ -419,6 +419,32 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.15', 'date': '2026-10-18',
+        'items': [
+            ('up',
+             T('APRSNETCN 和 APRS-IS 摆成两条并列的链路。可以只连它，也可以选它作为'
+               '发送链路，选了就不会改从 APRS-IS 发。',
+               'APRSNETCN 和 APRS-IS 擺成兩條並列的鏈路。可以只連它，也可以選它作為'
+               '發送鏈路，選了就不會改從 APRS-IS 發。',
+               'APRSNETCN now stands beside APRS-IS as its peer: either can be the only link '
+               'connected, and either can be the send link without falling back to the other.')),
+            ('up',
+             T('发送来源改成每张链路卡上的一个圆点，原来那张发送渠道卡删掉了。这条链路'
+               '有自己的 passcode，留空就沿用 APRS-IS 那一格。',
+               '發送來源改成每張鏈路卡上的一個圓點，原來那張發送渠道卡刪掉了。這條鏈路'
+               '有自己的 passcode，留空就沿用 APRS-IS 那一格。',
+               'The send source is now a dot on each link card; the old send channel card is '
+               'gone. This link has its own passcode, and leaving it empty uses the APRS-IS one.')),
+            ('fix',
+             T('台站详情里状态报文单独一块，写明标签。台站备注留在呼号那一列。两种报文'
+               '不再混在一起。',
+               '臺站詳情裡狀態報文單獨一塊，寫明標籤。臺站備註留在呼號那一列。兩種報文'
+               '不再混在一起。',
+               'On the station detail page the status packet has a block of its own with a label, '
+               'while the station note stays beside the callsign. The two no longer share a spot.')),
+        ],
+    },
+    {
         'ver': 'v2.1.14', 'date': '2026-10-18',
         'items': [
             ('fix',

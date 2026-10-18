@@ -4226,5 +4226,7 @@
   "notifStylePlainDesc": "Una notificación permanente en la barra; al expandirla se lee todo.",
   "notifStyleLive": "Actualizaciones en vivo",
   "notifDiag": "Comprobación de notificaciones",
-  "notifDiagDesc": "Muestra qué admite este teléfono para actualizaciones en vivo y notificaciones de foco."
+  "notifDiagDesc": "Muestra qué admite este teléfono para actualizaciones en vivo y notificaciones de foco.",
+  "notifStyleFocus": "Notificación de foco de Xiaomi",
+  "notifStyleFocusDesc": "En Xiaomi, Redmi y POCO prueba la notificación de foco (superisla). Sin permiso del fabricante vuelve a actualizaciones en vivo o a una notificación normal."
 }

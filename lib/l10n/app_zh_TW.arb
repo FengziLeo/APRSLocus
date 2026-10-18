@@ -4814,5 +4814,7 @@
   "notifStylePlainDesc": "通知列裡一條常駐通知，展開看全部文字。",
   "notifStyleLive": "即時更新",
   "notifDiag": "通知診斷",
-  "notifDiagDesc": "看這台手機支援不支援即時更新、焦點通知，缺哪一環。"
+  "notifDiagDesc": "看這台手機支援不支援即時更新、焦點通知，缺哪一環。",
+  "notifStyleFocus": "小米焦點通知",
+  "notifStyleFocusDesc": "小米、Redmi、POCO 上試小米的焦點通知（超級島）；沒有廠商許可時，照樣退回即時更新或普通通知。"
 }

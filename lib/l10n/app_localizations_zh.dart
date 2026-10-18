@@ -9306,6 +9306,12 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get notifDiagDesc => "看这台手机支持不支持实时更新、焦点通知，缺哪一环。";
 
+  @override
+  String get notifStyleFocus => "小米焦点通知";
+
+  @override
+  String get notifStyleFocusDesc => "小米、Redmi、POCO 上试小米的焦点通知（超级岛）；没有厂商许可时，照样退回实时更新或普通通知。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18608,5 +18614,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get notifDiagDesc => "看這台手機支援不支援即時更新、焦點通知，缺哪一環。";
+
+  @override
+  String get notifStyleFocus => "小米焦點通知";
+
+  @override
+  String get notifStyleFocusDesc => "小米、Redmi、POCO 上試小米的焦點通知（超級島）；沒有廠商許可時，照樣退回即時更新或普通通知。";
 
 }

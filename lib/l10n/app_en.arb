@@ -4226,5 +4226,7 @@
   "notifStylePlainDesc": "One ongoing notification in the shade; expand it to read everything.",
   "notifStyleLive": "Live updates",
   "notifDiag": "Notification check",
-  "notifDiagDesc": "Shows what this phone supports for live updates and focus notifications."
+  "notifDiagDesc": "Shows what this phone supports for live updates and focus notifications.",
+  "notifStyleFocus": "Xiaomi focus notification",
+  "notifStyleFocusDesc": "On Xiaomi, Redmi and POCO, tries the Xiaomi focus notification (super island). Without vendor permission it falls back to live updates or a normal notification."
 }

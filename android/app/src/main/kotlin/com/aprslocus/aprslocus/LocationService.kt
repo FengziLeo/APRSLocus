@@ -198,6 +198,10 @@ class LocationService : Service() {
         /// 的条件，不开就一直是今天这种普通常驻通知。
         @Volatile private var liveUpdates = false
 
+        /// 小米焦点通知（超级岛）开关：用户在「通知显示样式」里选的第三档。
+        /// 没有厂商许可时系统会忽略，这时还有 liveUpdates 那条路兜着。
+        @Volatile private var focusOn = false
+
         fun setBtActiveStatic(active: Boolean) {
             if (btActive == active) return
             btActive = active
@@ -214,9 +218,12 @@ class LocationService : Service() {
         /// 给文件末尾的诊断函数读当前样式用（companion 里的私有字段外面看不见）。
         fun liveUpdatesOn(): Boolean = liveUpdates
 
-        fun setLiveUpdatesStatic(on: Boolean) {
-            if (liveUpdates == on) return
+        fun focusOn(): Boolean = focusOn
+
+        fun setLiveUpdatesStatic(on: Boolean, focus: Boolean = false) {
+            if (liveUpdates == on && focusOn == focus) return
             liveUpdates = on
+            focusOn = focus
             instance?.let { it.updateNotification(it.lastNotificationText) }
         }
 
@@ -485,7 +492,7 @@ class LocationService : Service() {
             .build()
             .let { built ->
                 val out = if (liveUpdates) promote(built, short) else built
-                if (liveUpdates) injectXiaomiFocus(out, short)
+                if (focusOn) injectXiaomiFocus(out, short)
                 out
             }
     }
@@ -574,7 +581,7 @@ class LocationService : Service() {
     /// 反射调一个「传 true 进去」的方法；方法不存在就算不支持。
     private fun setBoolTrue(cls: Class<*>, target: Any, name: String): Boolean {
         return try {
-            cls.getMethod(name, Boolean::class.javaPrimitiveType).invoke(target, true)
+            cls.getMethod(name, Boolean::class.javaObjectType).invoke(target, true)
             true
         } catch (_: Throwable) {
             false
@@ -862,12 +869,13 @@ class LocationService : Service() {
         lines.add("机型：${Build.MANUFACTURER} ${Build.BRAND} ${Build.MODEL}")
         lines.add("canPostPromotedNotifications：" + bool(nm, "canPostPromotedNotifications"))
         lines.add("setRequestPromotedOngoing：" + has(Notification.Builder::class.java,
-            "setRequestPromotedOngoing", Boolean::class.javaPrimitiveType))
+            "setRequestPromotedOngoing", Boolean::class.javaObjectType))
         lines.add("setShortCriticalText：" + has(Notification.Builder::class.java,
             "setShortCriticalText", CharSequence::class.java))
         lines.add("hasPromotableCharacteristics：" + has(Notification::class.java,
             "hasPromotableCharacteristics"))
         lines.add("小米焦点 canShowFocus：" + xiaomiFocus(context))
+        lines.add("小米焦点开关：" + (if (LocationService.focusOn()) "开" else "关"))
         lines.add("当前样式：" + (if (LocationService.liveUpdatesOn()) "实时更新" else "普通常驻通知"))
         return lines.joinToString("\n")
     }

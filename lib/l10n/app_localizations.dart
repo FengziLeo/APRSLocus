@@ -16971,6 +16971,18 @@ abstract class AppLocalizations {
   /// **'看这台手机支持不支持实时更新、焦点通知，缺哪一环。'**
   String get notifDiagDesc;
 
+  /// No description provided for @notifStyleFocus.
+  ///
+  /// In zh, this message translates to:
+  /// **'小米焦点通知'**
+  String get notifStyleFocus;
+
+  /// No description provided for @notifStyleFocusDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'小米、Redmi、POCO 上试小米的焦点通知（超级岛）；没有厂商许可时，照样退回实时更新或普通通知。'**
+  String get notifStyleFocusDesc;
+
 }
 
 class _AppLocalizationsDelegate

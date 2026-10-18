@@ -9744,4 +9744,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get notifDiagDesc => "Muestra qué admite este teléfono para actualizaciones en vivo y notificaciones de foco.";
 
+  @override
+  String get notifStyleFocus => "Notificación de foco de Xiaomi";
+
+  @override
+  String get notifStyleFocusDesc => "En Xiaomi, Redmi y POCO prueba la notificación de foco (superisla). Sin permiso del fabricante vuelve a actualizaciones en vivo o a una notificación normal.";
+
 }

@@ -339,17 +339,17 @@ class LocService {
   /// 在部分 ROM 上会被当成新通知再弹一次 —— 用户报的「反复弹出待确认上报」。
   ///
   /// [live]：用户开了实时更新（Android 16 的 Live Updates），[short] 是状态栏
-  /// 药丸里那行超短文本（≤7 字符）。两者都算进去重键 —— 改了开关或胶囊文字
-  /// 不重发，用户会看不到变化。
+  /// 药丸里那行超短文本（≤7 字符）；[focus]：用户选的是小米那一档（焦点通知 /
+  /// 超级岛）。三者都算进去重键 —— 改了开关或胶囊文字不重发，用户看不到变化。
   Future<void> updateNotification(String text,
-      {bool live = false, String short = ''}) async {
-    final key = '$live|$short|$text';
+      {bool live = false, String short = '', bool focus = false}) async {
+    final key = '$live|$focus|$short|$text';
     if (!_notifDirty && key == _lastNotifText) return;
     _lastNotifText = key;
     _notifDirty = false;
     try {
-      await _channel.invokeMethod(
-          'updateNotification', {'text': text, 'short': short, 'live': live});
+      await _channel.invokeMethod('updateNotification',
+          {'text': text, 'short': short, 'live': live, 'focus': focus});
     } catch (_) {}
   }
 

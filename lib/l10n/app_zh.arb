@@ -4905,5 +4905,7 @@
   "notifStylePlainDesc": "通知栏里一条常驻通知，展开看全部文字。",
   "notifStyleLive": "实时更新",
   "notifDiag": "通知诊断",
-  "notifDiagDesc": "看这台手机支持不支持实时更新、焦点通知，缺哪一环。"
+  "notifDiagDesc": "看这台手机支持不支持实时更新、焦点通知，缺哪一环。",
+  "notifStyleFocus": "小米焦点通知",
+  "notifStyleFocusDesc": "小米、Redmi、POCO 上试小米的焦点通知（超级岛）；没有厂商许可时，照样退回实时更新或普通通知。"
 }

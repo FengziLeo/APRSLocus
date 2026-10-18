@@ -187,7 +187,8 @@ class MainActivity : FlutterActivity() {
                     val text = call.argument<String>("text") ?: "APRSlocus 运行中"
                     val short = call.argument<String>("short") ?: ""
                     val live = call.argument<Boolean>("live") ?: false
-                    LocationService.setLiveUpdatesStatic(live)
+                    val focus = call.argument<Boolean>("focus") ?: false
+                    LocationService.setLiveUpdatesStatic(live, focus)
                     updateServiceNotification(text, short)
                     result.success(true)
                 }

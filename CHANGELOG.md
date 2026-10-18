@@ -4,6 +4,8 @@
 
 ### 通知
 
+- **通知显示样式多一档「小米焦点通知」**：小米、Redmi、POCO 上试焦点通知
+  （超级岛）；没有厂商许可时照样退回实时更新或普通通知。
 - **显示页多一个「通知诊断」**：把本机的系统版本、机型、实时更新与焦点通知
   相关的那几个系统方法有没有、允不允许，一次列出来，可以复制。
 - 实时更新不再被「能力查询」一票否决：以前那个查询方法本身也可能不存在，
@@ -15,6 +17,9 @@
 
 ### Notifications
 
+- **A third notification style, the Xiaomi focus notification**, tries the super island on
+  Xiaomi, Redmi and POCO, falling back to live updates or a normal notification when the
+  vendor has not granted permission.
 - **The display page has a notification check**: it lists the system version, the model,
   and which of the live-update and focus-notification system methods exist and are
   allowed. The result can be copied.

@@ -9406,4 +9406,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get notifDiagDesc => "この端末がリアルタイム更新・焦点通知に対応しているかを見ます。";
 
+  @override
+  String get notifStyleFocus => "Xiaomi 焦点通知";
+
+  @override
+  String get notifStyleFocusDesc => "Xiaomi・Redmi・POCO では Xiaomi の焦点通知（スーパーアイランド）を試します。ベンダー許可がないときはリアルタイム更新か通常通知に戻ります。";
+
 }

@@ -421,6 +421,13 @@ CL = [
     {
         'ver': 'v2.1.19', 'date': '2026-10-18',
         'items': [
+            ('up',
+             T('通知显示样式多一档「小米焦点通知」，没有厂商许可时照样退回实时更新或'
+               '普通通知。',
+               '通知顯示樣式多一檔「小米焦點通知」，沒有廠商許可時照樣退回即時更新或'
+               '普通通知。',
+               'Notification style gains a Xiaomi focus option; without vendor permission it '
+               'falls back to live updates or a normal notification.')),
             ('fix',
              T('显示页多一个「通知诊断」，把本机支持到什么程度列成几行，可以复制。'
                '实时更新不再被缺一个能力查询就整体挡住。',

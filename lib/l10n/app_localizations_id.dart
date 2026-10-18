@@ -9695,4 +9695,10 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get notifDiagDesc => "Menampilkan dukungan ponsel ini untuk pembaruan langsung dan notifikasi fokus.";
 
+  @override
+  String get notifStyleFocus => "Notifikasi fokus Xiaomi";
+
+  @override
+  String get notifStyleFocusDesc => "Di Xiaomi, Redmi, dan POCO mencoba notifikasi fokus (super island). Tanpa izin vendor, kembali ke pembaruan langsung atau notifikasi biasa.";
+
 }

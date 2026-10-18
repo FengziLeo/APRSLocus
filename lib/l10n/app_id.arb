@@ -4226,5 +4226,7 @@
   "notifStylePlainDesc": "Satu notifikasi tetap di panel; buka untuk membaca semuanya.",
   "notifStyleLive": "Pembaruan langsung",
   "notifDiag": "Pemeriksaan notifikasi",
-  "notifDiagDesc": "Menampilkan dukungan ponsel ini untuk pembaruan langsung dan notifikasi fokus."
+  "notifDiagDesc": "Menampilkan dukungan ponsel ini untuk pembaruan langsung dan notifikasi fokus.",
+  "notifStyleFocus": "Notifikasi fokus Xiaomi",
+  "notifStyleFocusDesc": "Di Xiaomi, Redmi, dan POCO mencoba notifikasi fokus (super island). Tanpa izin vendor, kembali ke pembaruan langsung atau notifikasi biasa."
 }

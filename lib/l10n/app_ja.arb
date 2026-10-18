@@ -4226,5 +4226,7 @@
   "notifStylePlainDesc": "通知領域に常駐通知が 1 件。開くと全文が読めます。",
   "notifStyleLive": "リアルタイム更新",
   "notifDiag": "通知の診断",
-  "notifDiagDesc": "この端末がリアルタイム更新・焦点通知に対応しているかを見ます。"
+  "notifDiagDesc": "この端末がリアルタイム更新・焦点通知に対応しているかを見ます。",
+  "notifStyleFocus": "Xiaomi 焦点通知",
+  "notifStyleFocusDesc": "Xiaomi・Redmi・POCO では Xiaomi の焦点通知（スーパーアイランド）を試します。ベンダー許可がないときはリアルタイム更新か通常通知に戻ります。"
 }

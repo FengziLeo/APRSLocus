@@ -749,14 +749,19 @@ class AppState extends ChangeNotifier {
   /// 常驻通知的**显示样式**（显示页里选）。
   ///
   /// * `plain` = 通知栏里一条普通常驻通知（默认）；
-  /// * `live`  = 申请 Android 16 的实时更新（状态栏那一小条 + 倒计时胶囊），
-  ///   提不上去时**自动退回**普通通知，不会因此少一条通知。
+  /// * `live`  = 申请 Android 16 的实时更新（状态栏那一小条 + 倒计时胶囊）；
+  /// * `focus` = 小米那一档：尝试小米的焦点通知（超级岛），同时照样申请实时更新。
+  ///
+  /// 后两档提不上去时**都退回**普通通知，不会因此少一条通知；`focus` 在没有
+  /// 厂商许可的小米机上就等于「实时更新 + 普通通知」两路之一。
   String notifStyle = 'plain';
 
-  bool get notifLiveUpdates => notifStyle == 'live';
+  bool get notifLiveUpdates => notifStyle != 'plain';
+
+  bool get notifFocus => notifStyle == 'focus';
 
   void setNotifStyle(String v) {
-    if (v != 'plain' && v != 'live') return;
+    if (v != 'plain' && v != 'live' && v != 'focus') return;
     if (notifStyle == v) return;
     notifStyle = v;
     persist();
@@ -10727,7 +10732,7 @@ class AppState extends ChangeNotifier {
       short = l.beaconSoon;
     }
     loc.updateNotification(parts.join(' · '),
-        live: notifLiveUpdates, short: short);
+        live: notifLiveUpdates, short: short, focus: notifFocus);
   }
 }
 

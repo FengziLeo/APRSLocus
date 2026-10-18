@@ -9157,7 +9157,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
-  String get acnCardSubtitle => "APRSNET.CN 自己架的 APRS-IS 服务器，收发都能走它。";
+  String get acnCardSubtitle => "基于 APRSNETCN SERVER 协议的服务器，收发都能走它。";
 
   @override
   String get acnLinkSwitch => "同时连接 APRSNETCN";
@@ -9199,7 +9199,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceGroupRadio => "电台链路";
 
   @override
-  String get acnPageLead => "APRSNET.CN 自己架的一台 APRS-IS 服务器，协议与 APRS-IS 一样。地址填进连接设置，收发都走它；在这里打开，是让两条链路同时在线，各收各的。";
+  String get acnPageLead => "一台基于 APRSNETCN SERVER 协议的 APRS-IS 服务器。地址填进连接设置，收发都走它；在这里打开，是让两条链路同时在线，各收各的。";
 
   @override
   String get acnServerProto => "服务器协议";
@@ -18370,7 +18370,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
-  String get acnCardSubtitle => "APRSNET.CN 自己架的 APRS-IS 伺服器，收發都能走它。";
+  String get acnCardSubtitle => "基於 APRSNETCN SERVER 協定的伺服器，收發都能走它。";
 
   @override
   String get acnLinkSwitch => "同時連線 APRSNETCN";
@@ -18412,7 +18412,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceGroupRadio => "電台鏈路";
 
   @override
-  String get acnPageLead => "APRSNET.CN 自己架的一台 APRS-IS 伺服器，協定與 APRS-IS 一樣。位址填進連線設定，收發都走它；在這裡打開，是讓兩條鏈路同時在線，各收各的。";
+  String get acnPageLead => "一台基於 APRSNETCN SERVER 協定的 APRS-IS 伺服器。位址填進連線設定，收發都走它；在這裡打開，是讓兩條鏈路同時在線，各收各的。";
 
   @override
   String get acnServerProto => "伺服器協定";

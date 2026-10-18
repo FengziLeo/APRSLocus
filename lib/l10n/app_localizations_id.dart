@@ -9546,7 +9546,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
-  String get acnCardSubtitle => "Server APRS-IS milik APRSNET.CN. Bisa mengirim dan menerima.";
+  String get acnCardSubtitle => "Server berbasis protokol APRSNETCN SERVER. Bisa mengirim dan menerima.";
 
   @override
   String get acnLinkSwitch => "Hubungkan juga ke APRSNETCN";
@@ -9588,7 +9588,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get sourceGroupRadio => "Tautan radio";
 
   @override
-  String get acnPageLead => "Server APRS-IS milik APRSNET.CN dengan protokol yang sama. Masukkan alamatnya di pengaturan koneksi dan ia menjadi tautan utama, mengirim juga. Aktifkan di sini dan kedua tautan tetap tersambung, masing-masing menerima sendiri.";
+  String get acnPageLead => "Server APRS-IS berbasis protokol APRSNETCN SERVER. Masukkan alamatnya di pengaturan koneksi dan ia menjadi tautan utama, mengirim juga. Aktifkan di sini dan kedua tautan tetap tersambung, masing-masing menerima sendiri.";
 
   @override
   String get acnServerProto => "Protokol server";

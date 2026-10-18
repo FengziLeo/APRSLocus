@@ -9632,4 +9632,19 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get txChannelHint => "Paket hanya dikirim lewat tautan ini.";
 
+  @override
+  String get translateProviderBili => "Bilibili Index-Translate";
+
+  @override
+  String get translateProviderBiliDesc => "Tanpa kunci, gratis. Model terjemahan publik Bilibili; ketersediaannya tidak dijamin.";
+
+  @override
+  String get translateBiliUrl => "Endpoint";
+
+  @override
+  String get translateBiliModel => "Model";
+
+  @override
+  String get translateBiliTip => "Endpoint publik bisa membatasi permintaan. Kalau kamu punya deployment sendiri, isi alamat dan model itu.";
+
 }

@@ -4205,5 +4205,10 @@
   "acnFilterCalls": "También estos indicativos",
   "acnFilterCallsHint": "Indicativo, pulsa enter",
   "txChannel": "Canal de envío",
-  "txChannelHint": "Los paquetes salen solo por este enlace."
+  "txChannelHint": "Los paquetes salen solo por este enlace.",
+  "translateProviderBili": "Bilibili Index-Translate",
+  "translateProviderBiliDesc": "Sin clave y gratis. Modelo público de traducción de Bilibili; sin garantía de disponibilidad.",
+  "translateBiliUrl": "Endpoint",
+  "translateBiliModel": "Modelo",
+  "translateBiliTip": "El punto público puede limitar el uso. Si tienes tu propio despliegue, pon ahí la dirección y el modelo."
 }

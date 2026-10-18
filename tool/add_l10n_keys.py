@@ -36,19 +36,31 @@ CLASSES = {
 
 # ── 要加的键：key → (zh, zh_TW, en, ja, es, id) ──
 KEYS = {
-    # ── 发送渠道：两条互联网链路只选一条 ──
+    # ── 翻译接口：B 站 Index-Translate ──
     #
-    # 在线与发射是两件事：两条链路可以同时在线，报文只从选中的那条走。
-    'txChannel': (
-        '发送渠道', '發送渠道', 'Send channel', '送信経路',
-        'Canal de envío', 'Kanal kirim'),
-    'txChannelHint': (
-        '报文只从这一条发。',
-        '報文只從這一條發。',
-        'Packets go out on this link only.',
-        'パケットはこの 1 回線だけから送ります。',
-        'Los paquetes salen solo por este enlace.',
-        'Paket hanya dikirim lewat tautan ini.'),
+    # OpenAI 规范的公共接口，免密钥。中文语料上比网页端点稳，但不保证可用性。
+    'translateProviderBili': (
+        'B站 Index-Translate', 'B 站 Index-Translate', 'Bilibili Index-Translate',
+        'Bilibili Index-Translate', 'Bilibili Index-Translate',
+        'Bilibili Index-Translate'),
+    'translateProviderBiliDesc': (
+        '免密钥，免费。B 站公开的翻译模型，公共接口不保证一直可用。',
+        '免金鑰，免費。B 站公開的翻譯模型，公共介面不保證一直可用。',
+        "No key, no cost. Bilibili's public translation model; a free endpoint with no guarantee.",
+        'キー不要で無料。Bilibili が公開している翻訳モデル。公共の窓口なので可用性は保証されません。',
+        'Sin clave y gratis. Modelo público de traducción de Bilibili; sin garantía de disponibilidad.',
+        'Tanpa kunci, gratis. Model terjemahan publik Bilibili; ketersediaannya tidak dijamin.'),
+    'translateBiliUrl': (
+        '接口地址', '介面位址', 'Endpoint', 'エンドポイント', 'Endpoint', 'Endpoint'),
+    'translateBiliModel': (
+        '模型', '模型', 'Model', 'モデル', 'Modelo', 'Model'),
+    'translateBiliTip': (
+        '公共接口可能限流。自己部署时把地址和模型换成自己的。',
+        '公共介面可能限流。自己部署時把位址和模型換成自己的。',
+        'The public endpoint may rate-limit. Point the address and model at your own deployment if you run one.',
+        '公共の窓口は制限がかかる場合があります。自前で立てる場合はアドレスとモデルを差し替えてください。',
+        'El punto público puede limitar el uso. Si tienes tu propio despliegue, pon ahí la dirección y el modelo.',
+        'Endpoint publik bisa membatasi permintaan. Kalau kamu punya deployment sendiri, isi alamat dan model itu.'),
 }
 
 META = {

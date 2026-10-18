@@ -4884,5 +4884,10 @@
   "acnFilterCalls": "再加上这些呼号",
   "acnFilterCallsHint": "呼号，按回车加上",
   "txChannel": "发送渠道",
-  "txChannelHint": "报文只从这一条发。"
+  "txChannelHint": "报文只从这一条发。",
+  "translateProviderBili": "B站 Index-Translate",
+  "translateProviderBiliDesc": "免密钥，免费。B 站公开的翻译模型，公共接口不保证一直可用。",
+  "translateBiliUrl": "接口地址",
+  "translateBiliModel": "模型",
+  "translateBiliTip": "公共接口可能限流。自己部署时把地址和模型换成自己的。"
 }

@@ -321,12 +321,35 @@ void main() {
       expect(c.ready, isTrue);
     });
 
-    test('自动链顺序：Google 公开 → MyMemory → LibreTranslate', () {
+    test('自动链顺序：B 站 → Google 公开 → MyMemory → LibreTranslate', () {
       expect(TransProvider.autoChain, [
+        TransProvider.indexTranslate,
         TransProvider.googlePublic,
         TransProvider.mymemory,
         TransProvider.libre,
       ]);
+    });
+
+    test('B 站 Index-Translate 默认带着地址与模型，清空地址才不 ready', () {
+      final c = TranslateConfig(provider: TransProvider.indexTranslate);
+      expect(c.ready, isTrue);
+      expect(c.biliUrl, TransProvider.defaultBiliUrl);
+      expect(c.biliModel, TransProvider.defaultBiliModel);
+      c.biliUrl = '';
+      expect(c.ready, isFalse);
+      expect(c.missingField, 'biliUrl');
+    });
+
+    test('B 站接口地址与模型可 JSON 往返', () {
+      final c = TranslateConfig(
+        provider: TransProvider.indexTranslate,
+        biliUrl: 'https://my.host/v1/chat/completions',
+        biliModel: 'my-model',
+      );
+      final back = TranslateConfig.fromJson(c.toJson());
+      expect(back.provider, TransProvider.indexTranslate);
+      expect(back.biliUrl, 'https://my.host/v1/chat/completions');
+      expect(back.biliModel, 'my-model');
     });
 
     test('LibreTranslate 需要实例地址才 ready', () {

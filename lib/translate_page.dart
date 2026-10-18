@@ -29,6 +29,8 @@ class _TranslateSettingsPageState extends State<TranslateSettingsPage> {
   late final TextEditingController _baiduKey;
   late final TextEditingController _libreUrl;
   late final TextEditingController _libreKey;
+  late final TextEditingController _biliUrl;
+  late final TextEditingController _biliModel;
   late final TextEditingController _customUrl;
   late final TextEditingController _customHeaders;
   late final TextEditingController _customBody;
@@ -49,6 +51,8 @@ class _TranslateSettingsPageState extends State<TranslateSettingsPage> {
     _baiduKey = TextEditingController(text: cfg.baiduKey);
     _libreUrl = TextEditingController(text: cfg.libreUrl);
     _libreKey = TextEditingController(text: cfg.libreApiKey);
+    _biliUrl = TextEditingController(text: cfg.biliUrl);
+    _biliModel = TextEditingController(text: cfg.biliModel);
     _customUrl = TextEditingController(text: cfg.customUrl);
     _customHeaders = TextEditingController(text: cfg.customHeaders);
     _customBody = TextEditingController(text: cfg.customBody);
@@ -59,7 +63,7 @@ class _TranslateSettingsPageState extends State<TranslateSettingsPage> {
   void dispose() {
     for (final c in [
       _googleKey, _baiduId, _baiduKey,
-      _libreUrl, _libreKey,
+      _libreUrl, _libreKey, _biliUrl, _biliModel,
       _customUrl, _customHeaders, _customBody, _customPath,
     ]) {
       c.dispose();
@@ -74,6 +78,8 @@ class _TranslateSettingsPageState extends State<TranslateSettingsPage> {
       ..baiduKey = _baiduKey.text.trim()
       ..libreUrl = _libreUrl.text.trim()
       ..libreApiKey = _libreKey.text.trim()
+      ..biliUrl = _biliUrl.text.trim()
+      ..biliModel = _biliModel.text.trim()
       ..customUrl = _customUrl.text.trim()
       ..customHeaders = _customHeaders.text.trim()
       ..customBody = _customBody.text.trim()
@@ -99,6 +105,7 @@ class _TranslateSettingsPageState extends State<TranslateSettingsPage> {
         TransProvider.googlePublic => s.translateProviderGooglePublic,
         TransProvider.mymemory => s.translateProviderMyMemory,
         TransProvider.libre => s.translateProviderLibre,
+        TransProvider.indexTranslate => s.translateProviderBili,
         TransProvider.google => s.translateProviderGoogle,
         TransProvider.baidu => s.translateProviderBaidu,
         TransProvider.custom => s.translateProviderCustom,
@@ -243,6 +250,8 @@ class _TranslateSettingsPageState extends State<TranslateSettingsPage> {
     final items = <(String, String, String, IconData)>[
       (TransProvider.auto, s.translateProviderAuto, s.translateProviderAutoDesc,
           Icons.auto_awesome_rounded),
+      (TransProvider.indexTranslate, s.translateProviderBili,
+          s.translateProviderBiliDesc, Icons.smart_toy_rounded),
       (TransProvider.googlePublic, s.translateProviderGooglePublic,
           s.translateProviderGooglePublicDesc, Icons.g_mobiledata_rounded),
       (TransProvider.mymemory, s.translateProviderMyMemory,
@@ -344,6 +353,13 @@ class _TranslateSettingsPageState extends State<TranslateSettingsPage> {
           SettingsInput(s.translateLibreUrl, _libreUrl,
               onChanged: (_) => unawaited(_collect())),
           SettingsInput(s.translateLibreKey, _libreKey,
+              onChanged: (_) => unawaited(_collect())),
+        ] else if (cfg.provider == TransProvider.indexTranslate) ...[
+          SettingsHint(s.translateBiliTip,
+              color: C.green, icon: Icons.bolt_rounded),
+          SettingsInput(s.translateBiliUrl, _biliUrl,
+              onChanged: (_) => unawaited(_collect())),
+          SettingsInput(s.translateBiliModel, _biliModel,
               onChanged: (_) => unawaited(_collect())),
         ] else if (cfg.provider == 'google') ...[
           SettingsInput(s.translateGoogleKey, _googleKey,

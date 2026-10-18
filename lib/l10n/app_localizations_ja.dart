@@ -9343,4 +9343,19 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get txChannelHint => "パケットはこの 1 回線だけから送ります。";
 
+  @override
+  String get translateProviderBili => "Bilibili Index-Translate";
+
+  @override
+  String get translateProviderBiliDesc => "キー不要で無料。Bilibili が公開している翻訳モデル。公共の窓口なので可用性は保証されません。";
+
+  @override
+  String get translateBiliUrl => "エンドポイント";
+
+  @override
+  String get translateBiliModel => "モデル";
+
+  @override
+  String get translateBiliTip => "公共の窓口は制限がかかる場合があります。自前で立てる場合はアドレスとモデルを差し替えてください。";
+
 }

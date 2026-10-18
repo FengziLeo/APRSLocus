@@ -4205,5 +4205,10 @@
   "acnFilterCalls": "Juga panggilan ini",
   "acnFilterCallsHint": "Panggilan, tekan enter",
   "txChannel": "Kanal kirim",
-  "txChannelHint": "Paket hanya dikirim lewat tautan ini."
+  "txChannelHint": "Paket hanya dikirim lewat tautan ini.",
+  "translateProviderBili": "Bilibili Index-Translate",
+  "translateProviderBiliDesc": "Tanpa kunci, gratis. Model terjemahan publik Bilibili; ketersediaannya tidak dijamin.",
+  "translateBiliUrl": "Endpoint",
+  "translateBiliModel": "Model",
+  "translateBiliTip": "Endpoint publik bisa membatasi permintaan. Kalau kamu punya deployment sendiri, isi alamat dan model itu."
 }

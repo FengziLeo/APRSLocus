@@ -1,9 +1,10 @@
 /// ─── 聊天翻译 ───
 ///
-/// 支持三家接口：
+/// 支持这几家接口：
 ///   ① Google Cloud Translation v2（API Key）
 ///   ② 百度翻译开放平台（App ID + 密钥，sign = MD5(appid+q+salt+key)）
-///   ③ 自定义 HTTP 接口（URL / 方法 / 请求头 / 请求体模板 / 结果字段路径）
+///   ③ B 站 Index-Translate（OpenAI 规范的公共接口，免密钥）
+///   ④ 自定义 HTTP 接口（URL / 方法 / 请求头 / 请求体模板 / 结果字段路径）
 ///
 /// 设计要点：
 ///   - **语言码按接口分别映射**：界面内部统一用短码（zh / zh-TW / en / ja / id / es），
@@ -63,6 +64,29 @@ class TransLang {
   static bool isRtl(String code) => code == 'ar';
 
   static String labelOf(String code) => byCode(code)?.label ?? code;
+
+  /// → 英文语言名（给「把这句翻成某某语」这类提示词用）
+  ///
+  /// 大模型对英文语言名的理解比对本应用的自称标签更稳：界面上的
+  /// 「简体中文」直接拼进提示词，模型有时会把它理解成「用中文回答」。
+  static String englishName(String code) => switch (code) {
+        'zh' => 'Simplified Chinese',
+        'zh-TW' => 'Traditional Chinese',
+        'en' => 'English',
+        'ja' => 'Japanese',
+        'ko' => 'Korean',
+        'es' => 'Spanish',
+        'fr' => 'French',
+        'de' => 'German',
+        'ru' => 'Russian',
+        'pt' => 'Portuguese',
+        'it' => 'Italian',
+        'id' => 'Indonesian',
+        'th' => 'Thai',
+        'vi' => 'Vietnamese',
+        'ar' => 'Arabic',
+        _ => code,
+      };
 
   /// → Google 写法
   static String toGoogle(String code) => switch (code) {
@@ -159,6 +183,14 @@ class TransProvider {
   /// Google Cloud Translation v2（需 API Key，最稳定）
   static const String google = 'google';
 
+  /// B 站 Index-Translate：OpenAI 规范的公共接口，免密钥。
+  ///
+  /// 它是 B 站公开的翻译专用模型（Index-Translate-35B-A3B），走
+  /// `/chat/completions`：请求就是一句「把这段翻成某某语」，结果在
+  /// `choices.0.message.content`。公共接口不保证可用性，也不保证一直免费，
+  /// 所以它排在自动链的最前面，但后面还有别的接口接着。
+  static const String indexTranslate = 'indexTranslate';
+
   /// 百度翻译开放平台（需 App ID + 密钥）
   static const String baidu = 'baidu';
 
@@ -166,7 +198,17 @@ class TransProvider {
   static const String custom = 'custom';
 
   /// 「自动」模式按此顺序尝试（前者失败则退到后者）
-  static const List<String> autoChain = [googlePublic, mymemory, libre];
+  static const List<String> autoChain = [
+    indexTranslate,
+    googlePublic,
+    mymemory,
+    libre,
+  ];
+
+  /// 公共接口的默认地址与模型。自建部署时在设置里改掉这两项即可。
+  static const String defaultBiliUrl =
+      'https://index-translate.bilibili.com/v1/chat/completions';
+  static const String defaultBiliModel = 'Index-Translate-35B-A3B';
 }
 
 class TranslateConfig {
@@ -187,6 +229,15 @@ class TranslateConfig {
   /// LibreTranslate 的 API Key（公共实例现在需要；自建通常为空）
   String libreApiKey;
 
+  /// B 站 Index-Translate 的完整请求地址（含 `/chat/completions`）。
+  ///
+  /// 存整条 URL 而不拆成「基础地址 + 路径」：自建部署的路径未必相同，
+  /// 用户换地址时只改一格。
+  String biliUrl;
+
+  /// 模型名。默认就是官方那个翻译模型，自建时改成自己的。
+  String biliModel;
+
   String customUrl;
   String customMethod; // GET / POST
   String customHeaders; // JSON 对象文本
@@ -206,6 +257,8 @@ class TranslateConfig {
     this.baiduKey = '',
     this.libreUrl = 'https://libretranslate.com',
     this.libreApiKey = '',
+    this.biliUrl = TransProvider.defaultBiliUrl,
+    this.biliModel = TransProvider.defaultBiliModel,
     this.customUrl = '',
     this.customMethod = 'POST',
     this.customHeaders = '{"Content-Type": "application/json"}',
@@ -223,6 +276,8 @@ class TranslateConfig {
         'baiduKey': baiduKey,
         'libreUrl': libreUrl,
         'libreApiKey': libreApiKey,
+        'biliUrl': biliUrl,
+        'biliModel': biliModel,
         'customUrl': customUrl,
         'customMethod': customMethod,
         'customHeaders': customHeaders,
@@ -244,6 +299,8 @@ class TranslateConfig {
       baiduKey: s('baiduKey', c.baiduKey),
       libreUrl: s('libreUrl', c.libreUrl),
       libreApiKey: s('libreApiKey', c.libreApiKey),
+      biliUrl: s('biliUrl', c.biliUrl),
+      biliModel: s('biliModel', c.biliModel),
       customUrl: s('customUrl', c.customUrl),
       customMethod: s('customMethod', c.customMethod),
       customHeaders: s('customHeaders', c.customHeaders),
@@ -262,6 +319,8 @@ class TranslateConfig {
         TransProvider.mymemory => true,
         // 自建实例通常不需要 Key；公共实例需要由用户填，故不强制
         TransProvider.libre => libreUrl.trim().isNotEmpty,
+        // 地址留空就没法发；模型空着也不拦（请求里会回落到默认模型）
+        TransProvider.indexTranslate => biliUrl.trim().isNotEmpty,
         TransProvider.google => googleApiKey.trim().isNotEmpty,
         TransProvider.baidu =>
           baiduAppId.trim().isNotEmpty && baiduKey.trim().isNotEmpty,
@@ -275,6 +334,7 @@ class TranslateConfig {
         TransProvider.googlePublic => '',
         TransProvider.mymemory => '',
         TransProvider.libre => 'libreUrl',
+        TransProvider.indexTranslate => 'biliUrl',
         TransProvider.google => 'googleApiKey',
         TransProvider.baidu =>
           baiduAppId.trim().isEmpty ? 'baiduAppId' : 'baiduKey',
@@ -574,6 +634,8 @@ class TranslateService {
       ..baiduKey = from.baiduKey
       ..libreUrl = from.libreUrl
       ..libreApiKey = from.libreApiKey
+      ..biliUrl = from.biliUrl
+      ..biliModel = from.biliModel
       ..customUrl = from.customUrl
       ..customMethod = from.customMethod
       ..customHeaders = from.customHeaders
@@ -708,6 +770,8 @@ class TranslateService {
         TransProvider.googlePublic => await _googlePublic(text, from, to),
         TransProvider.mymemory => await _mymemoryOnly(text, from, to),
         TransProvider.libre => await _libre(text, from, to),
+        TransProvider.indexTranslate =>
+          await _indexTranslate(text, from, to),
         TransProvider.google => await _google(text, from, to),
         TransProvider.baidu => await _baidu(text, from, to),
         TransProvider.custom => await _custom(text, from, to),
@@ -1017,6 +1081,51 @@ class TranslateService {
     throw TranslateException(_fail('baidu', resp));
   }
 
+  /// B 站 Index-Translate：OpenAI 规范的公共接口（免密钥）。
+  ///
+  /// 它是翻译专用模型，不是通用聊天模型：请求就是一段「把这句翻成某语言」，
+  /// 带上 `enable_thinking: false` 让它别先输出思考过程。译文在
+  /// `choices[0].message.content`。接口由 B 站公开提供，不保证可用性；
+  /// 失败时自动模式会退到下一个接口（见 [_viaAutoChain]）。
+  Future<TranslateResult> _indexTranslate(
+      String text, String from, String to) async {
+    final url = config.biliUrl.trim();
+    if (url.isEmpty) throw TranslateException('bili-url-empty');
+    final model = config.biliModel.trim().isEmpty
+        ? TransProvider.defaultBiliModel
+        : config.biliModel.trim();
+    final target = TransLang.englishName(to);
+    final src = from == 'auto' ? '' : '${TransLang.englishName(from)} ';
+    final prompt = 'Translate the following ${src}text into $target. '
+        'Output only the translation, with no notes.\n\n$text';
+    final body = <String, dynamic>{
+      'model': model,
+      'enable_thinking': false,
+      'messages': [
+        {'role': 'user', 'content': prompt},
+      ],
+    };
+    final resp = await _send(
+      'POST',
+      Uri.parse(url),
+      headers: const {'Content-Type': 'application/json; charset=utf-8'},
+      body: jsonEncode(body),
+      // 大模型比翻译 API 慢，但它是自动模式的第一站：超时给短一点，
+      // 挂了要快点轮到下一个接口；用户明确选了它才给足时间。
+      timeout: config.provider == TransProvider.auto
+          ? const Duration(seconds: 12)
+          : const Duration(seconds: 40),
+    );
+    final map = _decodeJson(resp);
+    final content = _dig(map, 'choices.0.message.content');
+    final out = content is String ? content.trim() : '';
+    if (out.isEmpty) {
+      final err = map['error'] ?? map['message'];
+      throw TranslateException('index-translate-empty:${err ?? _trunc(resp)}');
+    }
+    return TranslateResult(out);
+  }
+
   /// 自定义接口：URL / 方法 / 请求头 / 请求体模板 / 结果字段路径全部由用户给定
   Future<TranslateResult> _custom(String text, String from, String to) async {
     final url = config.customUrl.trim();
@@ -1069,9 +1178,13 @@ class TranslateService {
     Uri uri, {
     Map<String, String>? headers,
     String? body,
+    Duration? timeout,
   }) async {
     try {
-      return await httpSend(method, uri, headers: headers, body: body);
+      return await httpSend(method, uri,
+          headers: headers,
+          body: body,
+          timeout: timeout ?? const Duration(seconds: 20));
     } on HttpStatusError catch (e) {
       throw TranslateException('${e.status} ${_trunc(e.body)}');
     } on TimeoutException {

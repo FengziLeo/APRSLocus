@@ -9243,6 +9243,21 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get txChannelHint => "报文只从这一条发。";
 
+  @override
+  String get translateProviderBili => "B站 Index-Translate";
+
+  @override
+  String get translateProviderBiliDesc => "免密钥，免费。B 站公开的翻译模型，公共接口不保证一直可用。";
+
+  @override
+  String get translateBiliUrl => "接口地址";
+
+  @override
+  String get translateBiliModel => "模型";
+
+  @override
+  String get translateBiliTip => "公共接口可能限流。自己部署时把地址和模型换成自己的。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18482,5 +18497,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get txChannelHint => "報文只從這一條發。";
+
+  @override
+  String get translateProviderBili => "B 站 Index-Translate";
+
+  @override
+  String get translateProviderBiliDesc => "免金鑰，免費。B 站公開的翻譯模型，公共介面不保證一直可用。";
+
+  @override
+  String get translateBiliUrl => "介面位址";
+
+  @override
+  String get translateBiliModel => "模型";
+
+  @override
+  String get translateBiliTip => "公共介面可能限流。自己部署時把位址和模型換成自己的。";
 
 }

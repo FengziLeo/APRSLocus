@@ -4793,5 +4793,10 @@
   "acnFilterCalls": "再加上這些呼號",
   "acnFilterCallsHint": "呼號，按 Enter 加上",
   "txChannel": "發送渠道",
-  "txChannelHint": "報文只從這一條發。"
+  "txChannelHint": "報文只從這一條發。",
+  "translateProviderBili": "B 站 Index-Translate",
+  "translateProviderBiliDesc": "免金鑰，免費。B 站公開的翻譯模型，公共介面不保證一直可用。",
+  "translateBiliUrl": "介面位址",
+  "translateBiliModel": "模型",
+  "translateBiliTip": "公共介面可能限流。自己部署時把位址和模型換成自己的。"
 }

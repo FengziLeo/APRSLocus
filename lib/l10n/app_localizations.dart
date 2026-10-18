@@ -16845,6 +16845,36 @@ abstract class AppLocalizations {
   /// **'报文只从这一条发。'**
   String get txChannelHint;
 
+  /// No description provided for @translateProviderBili.
+  ///
+  /// In zh, this message translates to:
+  /// **'B站 Index-Translate'**
+  String get translateProviderBili;
+
+  /// No description provided for @translateProviderBiliDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'免密钥，免费。B 站公开的翻译模型，公共接口不保证一直可用。'**
+  String get translateProviderBiliDesc;
+
+  /// No description provided for @translateBiliUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'接口地址'**
+  String get translateBiliUrl;
+
+  /// No description provided for @translateBiliModel.
+  ///
+  /// In zh, this message translates to:
+  /// **'模型'**
+  String get translateBiliModel;
+
+  /// No description provided for @translateBiliTip.
+  ///
+  /// In zh, this message translates to:
+  /// **'公共接口可能限流。自己部署时把地址和模型换成自己的。'**
+  String get translateBiliTip;
+
 }
 
 class _AppLocalizationsDelegate

@@ -9622,4 +9622,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get txChannelHint => "Packets go out on this link only.";
 
+  @override
+  String get translateProviderBili => "Bilibili Index-Translate";
+
+  @override
+  String get translateProviderBiliDesc => "No key, no cost. Bilibili's public translation model; a free endpoint with no guarantee.";
+
+  @override
+  String get translateBiliUrl => "Endpoint";
+
+  @override
+  String get translateBiliModel => "Model";
+
+  @override
+  String get translateBiliTip => "The public endpoint may rate-limit. Point the address and model at your own deployment if you run one.";
+
 }

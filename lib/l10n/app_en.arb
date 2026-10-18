@@ -4205,5 +4205,10 @@
   "acnFilterCalls": "Also these calls",
   "acnFilterCallsHint": "Callsign, press enter",
   "txChannel": "Send channel",
-  "txChannelHint": "Packets go out on this link only."
+  "txChannelHint": "Packets go out on this link only.",
+  "translateProviderBili": "Bilibili Index-Translate",
+  "translateProviderBiliDesc": "No key, no cost. Bilibili's public translation model; a free endpoint with no guarantee.",
+  "translateBiliUrl": "Endpoint",
+  "translateBiliModel": "Model",
+  "translateBiliTip": "The public endpoint may rate-limit. Point the address and model at your own deployment if you run one."
 }

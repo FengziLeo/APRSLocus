@@ -9714,4 +9714,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get aprsIsEntryDesc => "Dirección, puerto y passcode";
 
+  @override
+  String get txKindPosition => "Paquetes de posición y estado";
+
 }

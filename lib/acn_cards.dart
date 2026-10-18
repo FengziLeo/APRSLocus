@@ -158,12 +158,19 @@ class _AcnCardsState extends State<AcnCards> {
           _touched();
         }),
         _accountInputs(s),
-        // 与 APRS-IS 那张卡同一行：勾上就是这条链路发。没连上也能先选好，
-        // 连上就按这个发；另一条不会顶上来。
+        // 与 APRS-IS 那张卡同样的两行：位置/状态报文一行，消息一行。
+        // 勾上就是这条链路发；没连上也能先选好，另一条不会顶上来。
         SettingsTxPick(
-          s.txSourcePick,
+          S.of(context).txKindPosition,
+          icon: Icons.my_location_rounded,
           checked: st.dataSource == AppState.srcAcn,
           onTap: () => st.setTxSource(AppState.srcAcn),
+        ),
+        SettingsTxPick(
+          S.of(context).messages,
+          icon: Icons.forum_rounded,
+          checked: st.dataSourceMsg == AppState.srcAcn,
+          onTap: () => st.setTxMsgSource(AppState.srcAcn),
         ),
         if (_dirty) _reconnectRow(s),
         Padding(

@@ -4216,5 +4216,6 @@
   "aprsIsServerTitle": "Servidor APRS-IS",
   "aprsIsServerLead": "La dirección, el puerto y el passcode van aquí.",
   "aprsIsCardSubtitle": "Datos de acceso y estado de la conexión",
-  "aprsIsEntryDesc": "Dirección, puerto y passcode"
+  "aprsIsEntryDesc": "Dirección, puerto y passcode",
+  "txKindPosition": "Paquetes de posición y estado"
 }

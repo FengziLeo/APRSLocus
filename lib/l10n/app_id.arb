@@ -4216,5 +4216,6 @@
   "aprsIsServerTitle": "Server APRS-IS",
   "aprsIsServerLead": "Alamat, port, dan passcode diisi di sini.",
   "aprsIsCardSubtitle": "Detail login dan status koneksi",
-  "aprsIsEntryDesc": "Alamat, port, dan passcode"
+  "aprsIsEntryDesc": "Alamat, port, dan passcode",
+  "txKindPosition": "Paket posisi dan status"
 }

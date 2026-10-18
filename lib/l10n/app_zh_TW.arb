@@ -4804,5 +4804,6 @@
   "aprsIsServerTitle": "APRS-IS 伺服器",
   "aprsIsServerLead": "位址、埠與 passcode 都填在這裡。",
   "aprsIsCardSubtitle": "登入參數與連線狀態",
-  "aprsIsEntryDesc": "位址、埠與 passcode"
+  "aprsIsEntryDesc": "位址、埠與 passcode",
+  "txKindPosition": "位置與狀態報文"
 }

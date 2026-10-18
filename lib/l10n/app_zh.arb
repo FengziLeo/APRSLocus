@@ -4895,5 +4895,6 @@
   "aprsIsServerTitle": "APRS-IS 服务器",
   "aprsIsServerLead": "地址、端口与 passcode 都填在这里。",
   "aprsIsCardSubtitle": "登录参数与连接状态",
-  "aprsIsEntryDesc": "地址、端口与 passcode"
+  "aprsIsEntryDesc": "地址、端口与 passcode",
+  "txKindPosition": "位置与状态报文"
 }

@@ -515,12 +515,16 @@ class SettingsTxPick extends StatelessWidget {
   final bool checked;
   final bool enabled;
   final VoidCallback onTap;
+
+  /// 行首图标：一眼分出这一行是位置/状态还是消息。
+  final IconData? icon;
   const SettingsTxPick(
     this.label, {
     super.key,
     required this.checked,
     required this.onTap,
     this.enabled = true,
+    this.icon,
   });
 
   @override
@@ -539,6 +543,12 @@ class SettingsTxPick extends StatelessWidget {
             size: 18,
             color: !enabled ? C.greyLight : (checked ? C.orange : C.grey),
           ),
+          if (icon != null) ...[
+            const SizedBox(width: 8),
+            Icon(icon,
+                size: 14,
+                color: !enabled ? C.greyLight : (checked ? C.orange : C.grey)),
+          ],
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -649,9 +659,14 @@ class SettingsLinkEntry extends StatelessWidget {
   /// 平台不支持：整行置灰、开关换成锁，点不进去
   final bool enabled;
 
-  /// 发射圆点：非 null 才画，值表示「现在是不是它发」
-  final bool? tx;
-  final VoidCallback? onTx;
+  /// 发射圆点：非 null 才画。两类报文各一颗，值表示「现在是不是它发」。
+  ///
+  /// 位置与状态报文（[txPos]）和消息（[txMsg]）分开选：常见用法是位置走
+  /// 射频、消息走网络。两条选同一条也允许。
+  final bool? txPos;
+  final bool? txMsg;
+  final VoidCallback? onTxPos;
+  final VoidCallback? onTxMsg;
 
   const SettingsLinkEntry({
     super.key,
@@ -665,9 +680,39 @@ class SettingsLinkEntry extends StatelessWidget {
     required this.color,
     required this.onTap,
     this.enabled = true,
-    this.tx,
-    this.onTx,
+    this.txPos,
+    this.txMsg,
+    this.onTxPos,
+    this.onTxMsg,
   });
+
+  /// 一颗发射圆点：点一下让这条链路负责这一类报文。
+  ///
+  /// 圆点分不出两类报文，所以在前面加一个 12 px 的图形（位置 / 消息），
+  /// 与链路自己那一页上那两行的图标是同一个；完整说法在 tooltip 里。
+  Widget _txDot(IconData glyph, bool on, VoidCallback? onTap, String tip) {
+    return Tooltip(
+      message: tip,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(glyph, size: 12, color: on ? C.orange : C.greyLight),
+            const SizedBox(width: 3),
+            Icon(
+              on
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              size: 16,
+              color: on ? C.orange : C.greyLight,
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -730,29 +775,18 @@ class SettingsLinkEntry extends StatelessWidget {
               ],
             ),
           ),
-          if (tx != null) ...[
+          if (txPos != null || txMsg != null) ...[
             const SizedBox(width: 6),
-            GestureDetector(
-              onTap: onTx,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      tx!
-                          ? Icons.radio_button_checked_rounded
-                          : Icons.radio_button_unchecked_rounded,
-                      size: 18,
-                      color: tx! ? C.orange : C.greyLight,
-                    ),
-                    if (tx!)
-                      Text(S.of(context).dataSourceTxBadge,
-                          style: ts(9, c: C.orange, w: FontWeight.w700)),
-                  ],
-                ),
-              ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (txPos != null)
+                  _txDot(Icons.my_location_rounded, txPos!, onTxPos,
+                      S.of(context).txKindPosition),
+                if (txMsg != null)
+                  _txDot(Icons.forum_rounded, txMsg!, onTxMsg,
+                      S.of(context).messages),
+              ],
             ),
           ],
           const SizedBox(width: 6),

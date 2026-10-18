@@ -2294,6 +2294,12 @@ class AppState extends ChangeNotifier {
   /// 当前连接（数据来源）状态。TNC 模式下它表示「TNC 链路已建立」，
   /// 因此上层（连接卡片、状态栏、通知）无需分辨数据来源 —— 详见 [_syncConnFromLink]。
   bool connected = false;
+
+  /// 消息那条链路通不通。
+  ///
+  /// [connected] 量的是位置/状态报文那条链路，消息可能走另一条 —— 发消息
+  /// 前要问的是这一条，问错了就会出现「消息没发出去但界面说已发送」。
+  bool get msgLinkUp => isUp(dataSourceMsg);
   bool connecting = false;
   /// 连接状态（结构化）。
   ///
@@ -2331,6 +2337,13 @@ class AppState extends ChangeNotifier {
   /// 航点语句），不可能发报。因此 [enabledSources] 里出现 pkwdwpl 时它
   /// 只能“收”，发射永远落在另外三条之一上。
   String dataSource = 'aprsis';
+
+  /// **消息**（私聊 / 群发 / 位置点 / ack）走哪条链路发。
+  ///
+  /// 与 [dataSource]（位置与状态报文）分开选：常见用法是位置走射频、消息走
+  /// 网络。两条选同一条也允许，那就还是「全从这条链路发」。同样只在启用过
+  /// 且能发射的链路里选，谁都不顶替谁。
+  String dataSourceMsg = 'aprsis';
 
   /// 已启用的来源集合（至少一个；发射来源必须在此集合内）
   final Set<String> enabledSources = {srcAprsIs};
@@ -2424,8 +2437,16 @@ class AppState extends ChangeNotifier {
   /// IC-705 是否为当前发射来源
   bool get isIcomLanTx => dataSource == srcAudio && audio.config.source == AudioSource.icomLan;
 
+  /// 同一条 WLAN 电台链路，但指的是**消息**那条来源。
+  bool get isIcomLanTxMsg =>
+      dataSourceMsg == srcAudio && audio.config.source == AudioSource.icomLan;
+
   /// AFSK 系统声卡是否为当前发射来源
   bool get isAudioDeviceTx => dataSource == srcAudio && audio.config.source == AudioSource.device;
+
+  /// 同上，消息那条来源。
+  bool get isAudioDeviceTxMsg =>
+      dataSourceMsg == srcAudio && audio.config.source == AudioSource.device;
 
   /// 远程限制名单（黑名单）命中的结果；null = 没被限制 / 还没查到。
   ///
@@ -2808,6 +2829,9 @@ class AppState extends ChangeNotifier {
   /// （那会导致音频模式下群聊被放行、限长失效这类静默错误）。
   bool get usingRf => usingTnc || usingAudio;
 
+  /// 消息那条链路是不是射频（策略帧按它决定带不带 ack）。
+  bool get usingRfMsg => dataSourceMsg == srcTnc || dataSourceMsg == srcAudio;
+
   /// 当前射频来源的中继路径配置
   String get _rfPath => rfPathOf(dataSource);
 
@@ -2910,6 +2934,10 @@ class AppState extends ChangeNotifier {
         dataSource =
             enabledSources.firstWhere(canTransmit, orElse: () => dataSource);
       }
+      if (dataSourceMsg == s0) {
+        dataSourceMsg =
+            enabledSources.firstWhere(canTransmit, orElse: () => dataSourceMsg);
+      }
     }
     if (s0 == srcTnc || s0 == srcAudio) {
       // 射频链路的去重表与「听到过」列表都是**跨会话累积**的：换了设备、
@@ -2973,7 +3001,8 @@ class AppState extends ChangeNotifier {
   }
 
   /// 指定 IC-705 为发射来源
-  Future<void> setTxIcomLan() async {
+  /// 把 WLAN 电台设为发射来源；[forMsg] 为真时只改消息那条。
+  Future<void> setTxIcomLan({bool forMsg = false}) async {
     final wasOther = audio.config.source != AudioSource.icomLan;
     audio.config.source = AudioSource.icomLan;
     await audio.save();
@@ -2984,14 +3013,18 @@ class AppState extends ChangeNotifier {
       _setLinkUp(srcAudio, false);
       if (!_userDisconnected) await _connectAudio();
     }
-    setTxSource(srcAudio);
+    if (forMsg) {
+      setTxMsgSource(srcAudio);
+    } else {
+      setTxSource(srcAudio);
+    }
     persist();
     _notify();
     _updateNotification();
   }
 
-  /// 指定 AFSK 系统声卡为发射来源
-  Future<void> setTxAudioDevice() async {
+  /// 指定 AFSK 系统声卡为发射来源；[forMsg] 为真时只改消息那条。
+  Future<void> setTxAudioDevice({bool forMsg = false}) async {
     final wasOther = audio.config.source != AudioSource.device;
     audio.config.source = AudioSource.device;
     await audio.save();
@@ -3002,7 +3035,11 @@ class AppState extends ChangeNotifier {
       _setLinkUp(srcAudio, false);
       if (!_userDisconnected) await _connectAudio();
     }
-    setTxSource(srcAudio);
+    if (forMsg) {
+      setTxMsgSource(srcAudio);
+    } else {
+      setTxSource(srcAudio);
+    }
     persist();
     _notify();
     _updateNotification();
@@ -3153,6 +3190,18 @@ class AppState extends ChangeNotifier {
     _log(LogLevel.info, '连接', '发射来源切换为 ${_sourceName(s0)}');
     persist();
     _refreshConnected();
+    _notify();
+    _updateNotification();
+  }
+
+  /// 指定**消息**的发射来源（同样必须已启用、可发射）。
+  void setTxMsgSource(String src) {
+    final s0 = _normalizeSrc(src);
+    if (!enabledSources.contains(s0) || dataSourceMsg == s0) return;
+    if (!canTransmit(s0)) return;
+    dataSourceMsg = s0;
+    _log(LogLevel.info, '连接', '消息发射来源切换为 ${_sourceName(s0)}');
+    persist();
     _notify();
     _updateNotification();
   }
@@ -4093,6 +4142,7 @@ class AppState extends ChangeNotifier {
     _acnAttempt = 0;
     acnLast = null;
     dataSource = srcAprsIs;
+    dataSourceMsg = srcAprsIs;
     enabledSources
       ..clear()
       ..add(srcAprsIs);
@@ -4653,10 +4703,15 @@ class AppState extends ChangeNotifier {
       acnPassword = p.getString('acnPassword') ??
           (aprs.server.trim() == kAcnServerHost ? aprs.password : '');
       dataSource = p.getString('dataSource') ?? dataSource;
+      dataSourceMsg = p.getString('dataSourceMsg') ?? dataSource;
       // 容错：非法/旧值一律回落 APRS-IS，避免多来源判断失配。
       // pkwdwpl 是**只读**来源，即使旧配置里存了它也不能当发射来源。
       if (!canTransmit(dataSource)) {
         dataSource = srcAprsIs;
+      }
+      // 消息的发射来源同一条规矩；旧版本没存过这个键，就跟位置那条一致。
+      if (!canTransmit(dataSourceMsg)) {
+        dataSourceMsg = dataSource;
       }
       // 多选来源：旧版本只存了单个 dataSource，这里做一次迁移
       // （把旧值当成唯一启用项），避免升级后「什么都没启用」。
@@ -4679,6 +4734,10 @@ class AppState extends ChangeNotifier {
           canTransmit,
           orElse: () => srcAprsIs,
         );
+      }
+      // 消息那条同样要落在已启用集合里：落空就退回位置那条。
+      if (!enabledSources.contains(dataSourceMsg)) {
+        dataSourceMsg = dataSource;
       }
       igateEnabled = p.getBool('igateEnabled') ?? igateEnabled;
       igateTwoWay = p.getBool('igateTwoWay') ?? igateTwoWay;
@@ -4948,6 +5007,7 @@ class AppState extends ChangeNotifier {
     await p.setString('acnAccount', acnAccount);
     await p.setString('acnPassword', acnPassword);
     await p.setString('dataSource', dataSource);
+    await p.setString('dataSourceMsg', dataSourceMsg);
     await p.setStringList('enabledSources', enabledSources.toList());
     // 老版本只认这一个开关（它没有 enabledSources）：照当前的启用状态同步
     // 写一份，免得磁盘上留着的旧 true 在下次启动时把已经关掉的链路又补回来。
@@ -6446,8 +6506,16 @@ class AppState extends ChangeNotifier {
   ///
   /// 所有发报路径都必须经过它 —— 否则 TNC 模式下会出现
   /// 「界面上报成功、实际报文走 APRS-IS 发出」这类静默错误。
+  ///
+  /// 这一条是**位置与状态报文**（信标、状态帧、测试帧、手打报文）。消息
+  /// （私聊 / 群发 / 位置点 / ack）走 [_sendRawMsg]，两条来源可以不同。
   void _sendRaw(String raw) {
     _sendVia(dataSource, raw);
+  }
+
+  /// 发一条**消息**：走用户给消息单独选的那条链路。
+  void _sendRawMsg(String raw) {
+    _sendVia(dataSourceMsg, raw);
   }
 
   /// 按指定来源发送（网关向射频转递时需要指定，而不是走「发射来源」——
@@ -7642,10 +7710,10 @@ class AppState extends ChangeNotifier {
           }
           // 自动 ack（标准：{id 需要 ack，{id_ 不需要 ack）
           final ackId = parsed.$2;
-          if (ackId != null && connected && _autoAckEnabled) {
+          if (ackId != null && msgLinkUp && _autoAckEnabled) {
             // ack 包不带消息 ID，防止对方无限 ack 我们的 ack
             final ack = '$myFullCall>$_destHeader::${src.padRight(9)}:ack$ackId';
-            _sendRaw(ack);
+            _sendRawMsg(ack);
             _pushPacket(
               Packet(
                 ack,
@@ -7653,7 +7721,7 @@ class AppState extends ChangeNotifier {
                 'APRS',
                 'message',
                 DateTime.now(),
-                source: dataSource,
+                source: dataSourceMsg,
                 info: '自动 ack → $src ($ackId)',
               ),
             );
@@ -9269,8 +9337,8 @@ class AppState extends ChangeNotifier {
     _saveMessages();
     packetsTx++;
     AchievementCenter.instance.bump('sendMsg'); // 我发出去了吗？
-    if (connected) {
-      _sendRaw(raw);
+    if (msgLinkUp) {
+      _sendRawMsg(raw);
       _lastTx = DateTime.now();
     }
     _log(LogLevel.info, '消息', '发送给 $to：$text');
@@ -9281,7 +9349,7 @@ class AppState extends ChangeNotifier {
         'APRS',
         'message',
         DateTime.now(),
-        source: dataSource,
+        source: dataSourceMsg,
         info: '发给 $to：$text',
       ),
     );
@@ -9342,14 +9410,14 @@ class AppState extends ChangeNotifier {
     _saveMessages();
     packetsTx++;
     AchievementCenter.instance.bump('sendMsg');
-    if (connected) {
-      _sendRaw(raw);
+    if (msgLinkUp) {
+      _sendRawMsg(raw);
       _lastTx = DateTime.now();
     }
     _log(LogLevel.info, '消息', '发送位置点给 $target：${frame}');
     _pushPacket(
       Packet(raw, myFullCall, 'APRS', 'message', DateTime.now(),
-          source: dataSource, info: '发给 $target 位置点：${frame}'),
+          source: dataSourceMsg, info: '发给 $target 位置点：${frame}'),
     );
     _notify();
     return true;
@@ -9413,8 +9481,8 @@ class AppState extends ChangeNotifier {
     );
     _saveMessages();
     packetsTx++;
-    if (connected) {
-      _sendRaw(raw);
+    if (msgLinkUp) {
+      _sendRawMsg(raw);
       _lastTx = DateTime.now();
     }
     _log(LogLevel.info, '群发', '发送到 $groupCall：$text');
@@ -9425,7 +9493,7 @@ class AppState extends ChangeNotifier {
         'APRS',
         'message',
         DateTime.now(),
-        source: dataSource,
+        source: dataSourceMsg,
         info: '群发到 $groupCall：$text',
       ),
     );
@@ -9552,8 +9620,8 @@ class AppState extends ChangeNotifier {
 
   /// 尽力发送：连接就发，未连接只记录（等待重连后由定时器补发待发队列）
   void _trySend(String raw) {
-    if (connected) {
-      _sendRaw(raw);
+    if (msgLinkUp) {
+      _sendRawMsg(raw);
       _lastTx = DateTime.now();
       packetsTx++;
     } else {
@@ -9568,7 +9636,7 @@ class AppState extends ChangeNotifier {
     final list = List<String>.from(_pendingTx);
     _pendingTx.clear();
     for (final raw in list) {
-      _sendRaw(raw);
+      _sendRawMsg(raw);
       _lastTx = DateTime.now();
       packetsTx++;
     }
@@ -9778,22 +9846,22 @@ class AppState extends ChangeNotifier {
     final id = AprsFmt.randId();
     // 射频：带 ack 发（队友的自动 ack 是唯一的送达凭据）；
     // APRS-IS：no-ack（`{id_`）广播，避免群呼号被每个成员回 ack 造成噪声。
-    final raw = usingRf
+    final raw = usingRfMsg
         ? AprsFmt.message(myFullCall, gc, frame, id, path: txPath)
         : AprsFmt.messageNoAck(myFullCall, gc, frame, id, path: txPath);
     _trySend(raw);
     // 只有射频才记「待确认」：APRS-IS 用的是 no-ack，本来就不会有回执，
     // 记进去只会让 UI 永远显示「未确认」。射频下队友的标准自动 ack 会带
     // 这个 id 回来（见收到分支）。
-    if (usingRf) {
+    if (usingRfMsg) {
       _strategyAckWait[id] = (DateTime.now(), frame, gc);
       _pruneStrategyAckWait();
     }
     _log(LogLevel.info, '策略地图',
-        '发送到 $groupCall（${usingRf ? '射频' : 'APRS-IS'}）：$frame');
+        '发送到 $groupCall（${usingRfMsg ? '射频' : '网络'}）：$frame');
     _pushPacket(
       Packet(raw, myFullCall, 'APRS', 'message', DateTime.now(),
-          source: dataSource, info: '策略地图 → $groupCall：$frame'),
+          source: dataSourceMsg, info: '策略地图 → $groupCall：$frame'),
     );
     return true;
   }

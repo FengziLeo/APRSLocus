@@ -158,9 +158,11 @@ class DataSourceCard extends StatelessWidget {
           icon: Icons.wifi_tethering_rounded,
           enabled: state.icomLanOn,
           isTx: state.isIcomLanTx,
+          isTxMsg: state.isIcomLanTxMsg,
           up: state.icomLanOn && state.isUp(AppState.srcAudio),
           onToggle: (on) => state.toggleIcomLan(on),
           onSetTx: () => state.setTxIcomLan(),
+          onSetTxMsg: () => state.setTxIcomLan(forMsg: true),
           onConfigure: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => Ic705DevicePage(state: state)),
           ),
@@ -173,9 +175,11 @@ class DataSourceCard extends StatelessWidget {
           icon: Icons.graphic_eq_rounded,
           enabled: state.audioDeviceOn,
           isTx: state.isAudioDeviceTx,
+          isTxMsg: state.isAudioDeviceTxMsg,
           up: state.audioDeviceOn && state.isUp(AppState.srcAudio),
           onToggle: (on) => state.toggleAudioDevice(on),
           onSetTx: () => state.setTxAudioDevice(),
+          onSetTxMsg: () => state.setTxAudioDevice(forMsg: true),
           onConfigure: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => AudioSettingsPage(state: state)),
           ),
@@ -460,9 +464,11 @@ class DataSourceCard extends StatelessWidget {
     required IconData icon,
     bool? enabled,
     bool? isTx,
+    bool? isTxMsg,
     bool? up,
     ValueChanged<bool>? onToggle,
     VoidCallback? onSetTx,
+    VoidCallback? onSetTxMsg,
     VoidCallback? onConfigure,
     bool canTx = true,
     bool disabled = false,
@@ -473,7 +479,9 @@ class DataSourceCard extends StatelessWidget {
     final isUp = up ?? state.isUp(key);
     // 只读来源（PKWDWPL）永远不是发射来源，圆点也不画 ——
     // 否则用户会以为「选上它就能发」。
-    final isTxActive = isTx ?? (canTx && state.dataSource == key);
+    // 两类报文各一颗：位置与状态、消息，可以落在不同的链路上。
+    final posTx = isTx ?? (canTx && state.dataSource == key);
+    final msgTx = isTxMsg ?? (canTx && state.dataSourceMsg == key);
     return SettingsLinkEntry(
       title: title,
       // 平台不支持时把原因写在这里，状态行就不画了
@@ -485,8 +493,11 @@ class DataSourceCard extends StatelessWidget {
       onToggle: onToggle ?? (v) => state.toggleSource(key, v),
       icon: icon,
       color: C.blue,
-      tx: (!disabled && canTx) ? isTxActive : null,
-      onTx: isTxActive ? null : (onSetTx ?? () => state.setTxSource(key)),
+      txPos: (!disabled && canTx) ? posTx : null,
+      txMsg: (!disabled && canTx) ? msgTx : null,
+      onTxPos: posTx ? null : (onSetTx ?? () => state.setTxSource(key)),
+      onTxMsg:
+          msgTx ? null : (onSetTxMsg ?? () => state.setTxMsgSource(key)),
       onTap: () {
         if (onConfigure != null) onConfigure();
       },

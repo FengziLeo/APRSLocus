@@ -9665,4 +9665,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get aprsIsEntryDesc => "Alamat, port, dan passcode";
 
+  @override
+  String get txKindPosition => "Paket posisi dan status";
+
 }

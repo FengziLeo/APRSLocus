@@ -9276,6 +9276,9 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get aprsIsEntryDesc => "地址、端口与 passcode";
 
+  @override
+  String get txKindPosition => "位置与状态报文";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18548,5 +18551,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get aprsIsEntryDesc => "位址、埠與 passcode";
+
+  @override
+  String get txKindPosition => "位置與狀態報文";
 
 }

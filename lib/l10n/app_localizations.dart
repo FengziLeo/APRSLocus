@@ -16911,6 +16911,12 @@ abstract class AppLocalizations {
   /// **'地址、端口与 passcode'**
   String get aprsIsEntryDesc;
 
+  /// No description provided for @txKindPosition.
+  ///
+  /// In zh, this message translates to:
+  /// **'位置与状态报文'**
+  String get txKindPosition;
+
 }
 
 class _AppLocalizationsDelegate

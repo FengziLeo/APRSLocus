@@ -1096,6 +1096,8 @@ Future<AgentToolOutcome> executeAgentTool(
           'acn_on': st.acnOn,
           'acn_connected': st.acnConnected,
           'tx_source': st.dataSource,
+          // 消息可以走另一条链路（用户要的就分开选）。
+          'tx_source_msg': st.dataSourceMsg,
           'sources': {
             'aprsis': st.aprsIsOn,
             'acn': st.acnOn,

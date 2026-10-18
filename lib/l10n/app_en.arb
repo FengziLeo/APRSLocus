@@ -4216,5 +4216,6 @@
   "aprsIsServerTitle": "APRS-IS server",
   "aprsIsServerLead": "Address, port and passcode go here.",
   "aprsIsCardSubtitle": "Login details and connection state",
-  "aprsIsEntryDesc": "Address, port and passcode"
+  "aprsIsEntryDesc": "Address, port and passcode",
+  "txKindPosition": "Position and status packets"
 }

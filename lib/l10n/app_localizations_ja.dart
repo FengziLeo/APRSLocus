@@ -9376,4 +9376,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get aprsIsEntryDesc => "アドレス、ポート、passcode";
 
+  @override
+  String get txKindPosition => "位置と状態のパケット";
+
 }

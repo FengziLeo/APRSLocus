@@ -125,9 +125,16 @@ class _AprsIsCardsState extends State<AprsIsCards> {
         }),
         _passcodeInput(),
         SettingsTxPick(
-          S.of(context).txSourcePick,
+          S.of(context).txKindPosition,
+          icon: Icons.my_location_rounded,
           checked: st.dataSource == AppState.srcAprsIs,
           onTap: () => st.setTxSource(AppState.srcAprsIs),
+        ),
+        SettingsTxPick(
+          S.of(context).messages,
+          icon: Icons.forum_rounded,
+          checked: st.dataSourceMsg == AppState.srcAprsIs,
+          onTap: () => st.setTxMsgSource(AppState.srcAprsIs),
         ),
         SettingsInput(S.of(context).wsUrlOptional, _ws,
             onChanged: (v) {

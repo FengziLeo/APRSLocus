@@ -4216,5 +4216,6 @@
   "aprsIsServerTitle": "APRS-IS サーバー",
   "aprsIsServerLead": "アドレス、ポート、passcode はここに入力します。",
   "aprsIsCardSubtitle": "ログイン設定と接続状態",
-  "aprsIsEntryDesc": "アドレス、ポート、passcode"
+  "aprsIsEntryDesc": "アドレス、ポート、passcode",
+  "txKindPosition": "位置と状態のパケット"
 }

@@ -169,7 +169,8 @@ const List<BackupGroupSpec> kBackupGroups = [
     // 换机后清零表现为「最近用过的怎么全没了」，而它本来就是用来省重敲的。
     'packetSearchHistory', 'serverHistory',
     'sensorAssist',
-    'server', 'port', 'passcode', 'dataSource', 'enabledSources',
+    'server', 'port', 'passcode', 'dataSource', 'dataSourceMsg',
+    'enabledSources',
     // 名单账号口令（APRSNETCN 这类服务器才用得上）：和 passcode 同属「连这台
     // 服务器要带的东西」，换机后重敲一遍最容易出错，所以一并进备份。
     'aprsAccount', 'aprsPassword',

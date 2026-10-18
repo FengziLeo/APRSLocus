@@ -2338,7 +2338,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
       if (st.pkwdwplOn) S.of(context).dataSourcePkwdwpl,
       if (st.nmeaGpsOn) S.of(context).dataSourceNmeaGps,
     ];
-    final txIdx = [
+    final srcs = [
       if (st.aprsIsOn) AppState.srcAprsIs,
       if (st.acnOn) AppState.srcAcn,
       if (st.tncOn) AppState.srcTnc,
@@ -2348,17 +2348,26 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
       // 外接 GPS 只收不发（不进 canTransmit），所以永远不会是 dataSource；
       // 列出来只为与上一行**逐位对齐**（两个列表靠下标配对）。
       if (st.nmeaGpsOn) AppState.srcNmeaGps,
-    ].indexOf(st.dataSource);
+    ];
+    final txIdx = srcs.indexOf(st.dataSource);
+    final msgIdx = srcs.indexOf(st.dataSourceMsg);
+    // 两类报文的发射链路可能不是同一条：同一条时只写一个字，分开时各标各的。
+    String mark(int i) {
+      final tags = <String>[
+        if (i == txIdx) S.of(context).dataSourceTxBadge,
+        if (i == msgIdx && msgIdx != txIdx) S.of(context).messages,
+      ];
+      return tags.isEmpty ? '' : '(${tags.join('·')})';
+    }
+
     final srcLabel = names.isEmpty
         ? 'APRS-IS'
         : (names.length == 1
-            ? names.first
+            ? '${names.first}${mark(0)}'
             : names
                 .asMap()
                 .entries
-                .map((e) => e.key == txIdx
-                    ? '${e.value}(${S.of(context).dataSourceTxBadge})'
-                    : e.value)
+                .map((e) => '${e.value}${mark(e.key)}')
                 .join(' + '));
     final col = st.connected
         ? C.green

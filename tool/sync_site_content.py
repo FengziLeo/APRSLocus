@@ -419,6 +419,19 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.22', 'date': '2026-10-18',
+        'items': [
+            ('up',
+             T('通知栏的小图标换成 APP 自己的剪影，大图标用启动图标；实时更新的胶囊里'
+               '也是这颗。小米焦点通知那一档删掉了——要厂商白名单，没授权只会被系统忽略。',
+               '通知列的小圖示換成 APP 自己的剪影，大圖示用啟動圖示；即時更新的膠囊裡'
+               '也是這顆。小米焦點通知那一檔刪掉了——要廠商白名單，沒授權只會被系統忽略。',
+               'The notification small icon is the app\'s own silhouette with the launcher '
+               'icon as the large one, and the live-update pill shows it too. The Xiaomi focus '
+               'option is gone: it needs a vendor whitelist.')),
+        ],
+    },
+    {
         'ver': 'v2.1.21', 'date': '2026-10-18',
         'items': [
             ('fix',

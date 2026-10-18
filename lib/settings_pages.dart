@@ -3361,11 +3361,6 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
         S.of(context).notifStyleLive,
         S.of(context).notifLiveHint,
       ),
-      (
-        'focus',
-        S.of(context).notifStyleFocus,
-        S.of(context).notifStyleFocusDesc,
-      ),
     ];
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),

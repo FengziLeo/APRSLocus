@@ -124,7 +124,7 @@ class SmartBeaconTier {
 
 class AppState extends ChangeNotifier {
   /// 应用版本（用于信标备注、APRSlocus 识别）
-  static const appVersion = '2.1.21';
+  static const appVersion = '2.1.22';
   // 我的电台
   String myCall = 'BV2AAA';
   int mySsid = 0; // 0 = 无后缀, 1-15 = -1 到 -15
@@ -749,19 +749,15 @@ class AppState extends ChangeNotifier {
   /// 常驻通知的**显示样式**（显示页里选）。
   ///
   /// * `plain` = 通知栏里一条普通常驻通知（默认）；
-  /// * `live`  = 申请 Android 16 的实时更新（状态栏那一小条 + 倒计时胶囊）；
-  /// * `focus` = 小米那一档：尝试小米的焦点通知（超级岛），同时照样申请实时更新。
+  /// * `live`  = 申请 Android 16 的实时更新（状态栏那一小条 + 倒计时胶囊）。
   ///
-  /// 后两档提不上去时**都退回**普通通知，不会因此少一条通知；`focus` 在没有
-  /// 厂商许可的小米机上就等于「实时更新 + 普通通知」两路之一。
+  /// 提不上去时**退回**普通通知，不会因此少一条通知。
   String notifStyle = 'plain';
 
-  bool get notifLiveUpdates => notifStyle != 'plain';
-
-  bool get notifFocus => notifStyle == 'focus';
+  bool get notifLiveUpdates => notifStyle == 'live';
 
   void setNotifStyle(String v) {
-    if (v != 'plain' && v != 'live' && v != 'focus') return;
+    if (v != 'plain' && v != 'live') return;
     if (notifStyle == v) return;
     notifStyle = v;
     persist();
@@ -10732,7 +10728,7 @@ class AppState extends ChangeNotifier {
       short = l.beaconSoon;
     }
     loc.updateNotification(parts.join(' · '),
-        live: notifLiveUpdates, short: short, focus: notifFocus);
+        live: notifLiveUpdates, short: short);
   }
 }
 

@@ -1,5 +1,38 @@
 # 更新日志
 
+## [2.1.22] - 2026-10-18
+
+### 通知图标
+
+- **通知栏里的小图标换成 APP 自己的剪影**（一个信标点加两道弧），大图标用启动
+  图标。实时更新的胶囊里显示的也是这颗小图标，以前是系统那个定位图钉。
+- 消息通知与生命守护告警一并换掉，不再各用各的系统图标。
+
+### 去掉小米焦点通知那一档
+
+- 「通知显示样式」回到两档：普通常驻通知、实时更新。小米焦点通知要厂商白名单，
+  没有授权时那串参数只会被系统忽略，留着反而让人以为能用。
+
+---
+
+## [2.1.22] - 2026-10-18 (English)
+
+### Notification icon
+
+- **The notification's small icon is now the app's own silhouette** (a beacon dot with two
+  arcs), with the launcher icon as the large one. The live-update pill shows that small
+  icon too; it used to be the system location pin.
+- Message notifications and the life-safety alarm use the same icon now.
+
+### The Xiaomi focus option is gone
+
+- Notification style is back to two options: a normal ongoing notification, or live
+  updates. Xiaomi focus notifications need a vendor whitelist; without it the system just
+  ignores the parameters, and offering it only misleads.
+
+---
+
+
 ## [2.1.21] - 2026-10-18
 
 ### 实时更新真的接上了

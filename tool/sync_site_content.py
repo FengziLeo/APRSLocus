@@ -419,6 +419,27 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.16', 'date': '2026-10-18',
+        'items': [
+            ('up',
+             T('设置里的连接设置叫服务器。一级列出 APRS-IS 与 APRSNETCN SERVER 两条链路，'
+               '各有开关、连接状态与发射圆点，点进去才填地址和端口。',
+               '設定裡的連線設定叫伺服器。一級列出 APRS-IS 與 APRSNETCN SERVER 兩條鏈路，'
+               '各有開關、連線狀態與發射圓點，點進去才填位址和埠。',
+               'Settings now calls that page Servers. It lists the two internet links, APRS-IS and '
+               'APRSNETCN SERVER, each with its own switch, status and transmit dot; the address '
+               'and port live on that link\'s own page.')),
+            ('fix',
+             T('任何服务器地址都不预填。两条链路的地址框一开始都是空的，恢复出厂也清空。地址'
+               '空着时不去试默认服务器，24 小时台站同步直接跳过。',
+               '任何伺服器位址都不預填。兩條鏈路的位址框一開始都是空的，恢復出廠也清空。位址'
+               '空著時不去試預設伺服器，24 小時臺站同步直接跳過。',
+               'No server address is prefilled: both links start empty, a factory reset clears '
+               'them again, and an empty address never falls back to a default server, so the '
+               '24 hour station sync is skipped.')),
+        ],
+    },
+    {
         'ver': 'v2.1.15', 'date': '2026-10-18',
         'items': [
             ('up',

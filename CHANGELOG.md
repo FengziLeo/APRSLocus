@@ -1,5 +1,51 @@
 # 更新日志
 
+## [2.1.16] - 2026-10-18
+
+### 服务器页
+
+- **设置里的「连接设置」叫「服务器」**。一级列出两条互联网链路：APRS-IS 与 APRSNETCN
+  SERVER，各有自己的开关、连接状态与发射圆点，点进去才填地址和端口。
+- 过滤范围仍在一级。电台链路（TNC、WLAN 电台、声卡）留在设备页，一行一条。
+
+### 地址不预填
+
+- **任何服务器地址都不预填**。两条链路的地址框一开始都是空的，恢复出厂也清空。
+- 地址空着时不会去试一台默认服务器，24 小时台站同步直接跳过。
+- 首次运行的向导里两条链路都空着，重新跑向导才回填你自己存过的值。
+
+### 向导
+
+- 服务器那一步可以先选 APRS-IS 或 APRSNETCN SERVER，不再放 passcode 查询的引导。
+
+---
+
+## [2.1.16] - 2026-10-18 (English)
+
+### Server page
+
+- **Settings now calls the page “Servers”** instead of connection settings. It lists the
+  two internet links, APRS-IS and APRSNETCN SERVER, each with its own switch, status and
+  transmit dot. The address and port live on that link's own page.
+- The filter range stays on the same level. Radio links (TNC, WLAN radio, sound card)
+  stay on the device page, one row each.
+
+### No prefilled addresses
+
+- **No server address is prefilled.** Both links start empty, and a factory reset clears
+  them again.
+- With an empty address the app does not try a default server, and the 24 hour station
+  sync is skipped.
+- The first-run wizard leaves both links empty. Re-running it fills in the values you
+  saved yourself.
+
+### Wizard
+
+- The server step now lets you pick APRS-IS or APRSNETCN SERVER first. The passcode
+  lookup guide is gone.
+
+---
+
 ## [2.1.15] - 2026-10-18
 
 ### 两条互联网链路摆平

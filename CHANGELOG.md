@@ -1,5 +1,35 @@
 # 更新日志
 
+## [2.1.14] - 2026-10-18
+
+### 三处按实测反馈改回来
+
+- **状态报文回到呼号右侧**。上一版把备注与状态报文挪到发送消息下面，滚屏才看得到。
+  现在与备注同一列，位置和 2.1.12 一样。
+- **设备页的 APRSNETCN 勾选放回去**。那张数据来源卡里两条互联网链路并排，一眼
+  看到各自在不在线。
+- **连接设置页两条链路各一张卡**。APRSNETCN 不再是「互联网链路」卡里的一行：
+  它和「APRS-IS 连接」一样有自己的卡，地址、端口、账号、口令、筛选都在卡里。
+  发送渠道单独一张卡，报文只从选中的那条发。
+
+---
+
+## [2.1.14] - 2026-10-18 (English)
+
+### Three things put back after trying the build
+
+- **The status packet is back beside the callsign** on the station detail page. The
+  previous build put the note and the status in a card under the message box, where it
+  scrolled out of sight.
+- **The APRSNETCN switch is back on the device page.** Both internet links sit in that
+  data source card again, so you can see at a glance which of them is online.
+- **Each link has its own card on the connection settings page.** APRSNETCN is no longer
+  a row inside an "internet links" card: it has a card shaped like the APRS-IS one, with
+  its address, port, account, password and filter inside. The send channel is its own
+  card, and packets leave on the link picked there.
+
+---
+
 ## [2.1.13] - 2026-10-18
 
 ### 两条互联网链路摆在一起，发报文只走一条

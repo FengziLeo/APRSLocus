@@ -419,6 +419,31 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.14', 'date': '2026-10-18',
+        'items': [
+            ('fix',
+             T('台站详情的状态报文回到呼号右侧。上一版把它挪到发送消息下面，滚屏才看得到，'
+               '看着像没了。',
+               '臺站詳情的狀態報文回到呼號右側。上一版把它挪到傳送訊息下面，捲動才看得到，'
+               '看著像沒了。',
+               'The status packet is back beside the callsign on the station detail page; the '
+               'previous build moved it under the message box, where it scrolled out of sight.')),
+            ('fix',
+             T('设备页那张数据来源卡里，APRSNETCN 的勾选放回来了，两条互联网链路并排。',
+               '裝置頁那張資料來源卡裡，APRSNETCN 的勾選放回來了，兩條網際網路鏈路並排。',
+               'The APRSNETCN switch is back in the data source card on the device page, with '
+               'both internet links side by side.')),
+            ('up',
+             T('连接设置页把 APRSNETCN 做成 APRS-IS 那张卡的等价版本：自己的开关、状态、'
+               '登录结果、地址、端口、账号口令、筛选，发送渠道单独一张卡。',
+               '連線設定頁把 APRSNETCN 做成 APRS-IS 那張卡的等價版本：自己的開關、狀態、'
+               '登入結果、位址、連接埠、帳號密碼、篩選，發送渠道單獨一張卡。',
+               'On the connection settings page APRSNETCN now has a card that matches the '
+               'APRS-IS one: its own switch, state, login result, address, port, account, '
+               'password and filter, with the send channel on a card of its own.')),
+        ],
+    },
+    {
         'ver': 'v2.1.13', 'date': '2026-10-18',
         'items': [
             ('up',

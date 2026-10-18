@@ -940,6 +940,14 @@ private fun applyPromo(
                 if (short.isNotEmpty()) b.setShortCriticalText(short)
             }
         }
+        // 倒计时用系统自己的计时器（chronometer）：它自己一秒一跳，
+        // 我们不用为了「跳到下一秒」反复重发通知。部分 ROM 的胶囊不画它，
+        // 那种情况下就是那行文字顶上。
+        if (mode != PROMO_PLAIN && countdown > 0) {
+            b.setWhen(System.currentTimeMillis() + countdown * 1000)
+                .setUsesChronometer(true)
+                .setChronometerCountDown(true)
+        }
     } catch (_: Throwable) {
         // 放弃提升，通知照发
     }

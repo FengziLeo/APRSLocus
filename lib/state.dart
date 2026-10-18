@@ -5298,14 +5298,8 @@ class AppState extends ChangeNotifier {
       // 台站“有效状态”翻转（如超 5 分钟变离线、移动→静止）时才推进版本并通知，
       // 否则不触发任何页面重建；无翻转只刷新秒级 UI（tick）。
       if (_bumpStatusVersionIfChanged()) _notify();
-      // 实时更新里选了「发射倒计时」时，胶囊那行文字得跟着秒走。
-      // 只在倒计时期间每秒重发，其余情况仍然靠事件触发（没必要每秒开销）。
-      if (notifStyle == 'live' &&
-          notifLiveText == 'beacon' &&
-          (beaconPhase == BeaconPhase.counting ||
-              beaconPhase == BeaconPhase.coarseForced)) {
-        _updateNotification();
-      }
+      // 不用为倒计时的「下一秒」重发通知：那由系统的 chronometer 自己走。
+      // 以前这里每秒重发一次，前台服务通知被反复重建，通知容易消失，也费电。
       _checkStationAchievement();
       // 碰撞/摔倒（issue #26）：它**不能**只挂在定位回调上 —— 事件可能在没开定位、
       // 或定位很慢（静止后系统常常不再给点）的时候发生，而那正是这个功能要管的场景。
@@ -10784,12 +10778,10 @@ class AppState extends ChangeNotifier {
         break;
       case 'beacon':
         if (counting) {
+          // 只把「离下次上报还有多久」交给系统的 chronometer（countdown），
+          // 不塞一个会立刻不准的文字：那行字只在通知重建时才换，
+          // 中间十几秒里它一直是旧值，看起来像死掉了。
           countdown = beaconSecondsLeft;
-          // 两条都给：系统的倒计时（chronometer）不少 ROM 不画，
-          // 而胶囊那行文字是任何实现都看得见的。文字由每秒的重发推动。
-          short = beaconSecondsLeft >= 60
-              ? '${(beaconSecondsLeft / 60).ceil()}分'
-              : '${beaconSecondsLeft}s';
         } else if (beaconPhase == BeaconPhase.imminent) {
           short = l.beaconSoon;
         }

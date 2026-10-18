@@ -10721,18 +10721,20 @@ class AppState extends ChangeNotifier {
       parts.add(l.notifBeacon(nextBeaconIn));
     }
     // 实时更新的药丸里只放一行超短文本（建议 ≤7 字符）：倒计时是最想
-    // 一眼看到的值；没在倒计时就不写，让系统自己决定显示什么。
+    // 一眼看到的值。但倒计时不能靠这行文本 —— 换一次要重发一次通知，
+    // 而我们重发的时机跟不上一秒一跳，胶囊会停在旧值上。所以倒计时
+    // 交给系统的 chronometer（[countdown]），这行文本只在「即将上报」
+    // 这种不变的状态上使用。
     var short = '';
+    var countdown = 0;
     if (beaconPhase == BeaconPhase.counting ||
         beaconPhase == BeaconPhase.coarseForced) {
-      short = beaconSecondsLeft >= 60
-          ? '${(beaconSecondsLeft / 60).ceil()}分'
-          : '${beaconSecondsLeft}s';
+      countdown = beaconSecondsLeft;
     } else if (beaconPhase == BeaconPhase.imminent) {
       short = l.beaconSoon;
     }
     loc.updateNotification(parts.join(' · '),
-        live: notifLiveUpdates, short: short);
+        live: notifLiveUpdates, short: short, countdown: countdown);
   }
 }
 

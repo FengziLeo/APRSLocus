@@ -342,14 +342,18 @@ class LocService {
   /// 药丸里那行超短文本（≤7 字符）。两者都算进去重键 —— 改了开关或胶囊文字
   /// 不重发，用户看不到变化。
   Future<void> updateNotification(String text,
-      {bool live = false, String short = ''}) async {
-    final key = '$live|$short|$text';
+      {bool live = false, String short = '', int countdown = 0}) async {
+    final key = '$live|$short|$countdown|$text';
     if (!_notifDirty && key == _lastNotifText) return;
     _lastNotifText = key;
     _notifDirty = false;
     try {
-      await _channel.invokeMethod('updateNotification',
-          {'text': text, 'short': short, 'live': live});
+      await _channel.invokeMethod('updateNotification', {
+        'text': text,
+        'short': short,
+        'live': live,
+        'countdown': countdown
+      });
     } catch (_) {}
   }
 

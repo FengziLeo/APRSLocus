@@ -193,8 +193,9 @@ class MainActivity : FlutterActivity() {
                     val text = call.argument<String>("text") ?: "APRSlocus 运行中"
                     val short = call.argument<String>("short") ?: ""
                     val live = call.argument<Boolean>("live") ?: false
+                    val countdown = (call.argument<Number>("countdown") ?: 0).toLong()
                     LocationService.setLiveUpdatesStatic(live)
-                    updateServiceNotification(text, short)
+                    updateServiceNotification(text, short, countdown)
                     result.success(true)
                 }
                 "showMessage" -> {
@@ -1395,8 +1396,12 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun updateServiceNotification(text: String, short: String = "") {
-        LocationService.updateNotificationStatic(text, short)
+    private fun updateServiceNotification(
+        text: String,
+        short: String = "",
+        countdown: Long = 0
+    ) {
+        LocationService.updateNotificationStatic(text, short, countdown)
     }
 
     /// 音频采集会把麦克风带进前台服务：Android 14+ 必须让服务声明 microphone

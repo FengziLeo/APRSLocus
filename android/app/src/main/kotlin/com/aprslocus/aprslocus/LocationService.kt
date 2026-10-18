@@ -209,8 +209,8 @@ class LocationService : Service() {
         }
 
         /// 更新前台服务通知（同进程直连，MainActivity 调用）
-        fun updateNotificationStatic(text: String, short: String = "") {
-            instance?.updateNotification(text, short)
+        fun updateNotificationStatic(text: String, short: String = "", countdown: Long = 0) {
+            instance?.updateNotification(text, short, countdown)
         }
 
         /// 实时更新（Android 16 的 Live Updates）开关：用户在设置里选的。
@@ -221,7 +221,7 @@ class LocationService : Service() {
         fun setLiveUpdatesStatic(on: Boolean) {
             if (liveUpdates == on) return
             liveUpdates = on
-            instance?.let { it.updateNotification(it.lastNotificationText) }
+            instance?.let { it.republish() }
         }
 
         /// 动态切换定位模式（服务运行中立即生效：重建 provider 监听）
@@ -243,6 +243,11 @@ class LocationService : Service() {
 
     /// 最近一次通知文本：刷新前台服务类型时要复用同一通知（不能凭空造一条）
     private var lastNotificationText = "APRSlocus 运行中"
+
+    /// 与 [lastNotificationText] 一起记：重发时要一模一样地重建，
+    /// 只剩文字会把胶囊、倒计时弄丢。
+    private var lastNotificationShort = ""
+    private var lastCountdown = 0L
     private var locationManager: LocationManager? = null
     private var locationListener: LocationListener? = null
     private var wakeLock: PowerManager.WakeLock? = null
@@ -374,7 +379,8 @@ class LocationService : Service() {
             if (btActive && Build.VERSION.SDK_INT >= 34) {
                 type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
             }
-            startForeground(NOTIFICATION_ID, buildNotification(lastNotificationText), type)
+            startForeground(NOTIFICATION_ID,
+                buildNotification(lastNotificationText, lastNotificationShort, lastCountdown), type)
         } catch (_: Exception) {
             // 个别 ROM 不允许运行中重复声明类型；失败时保持原类型即可 ——
             // 前台服务与 APRS 连接不受影响，最坏情况是后台录音被系统限制。
@@ -437,17 +443,33 @@ class LocationService : Service() {
         }
     }
 
-    private fun buildNotification(text: String, short: String = ""): Notification =
+    private fun buildNotification(
+        text: String,
+        short: String = "",
+        countdown: Long = 0
+    ): Notification =
         ongoingNotification(
             this, text, short,
-            if (liveUpdates) promoMode(this) else PROMO_PLAIN
+            if (liveUpdates) promoMode(this) else PROMO_PLAIN,
+            countdown
         )
 
-    fun updateNotification(text: String, short: String = "") {
+    /// 用上一次的文本/胶囊/倒计时重建并发一次（换提升姿势、刷新前台服务类型时用）。
+    private fun republish() {
+        val nm = getSystemService(NotificationManager::class.java)
+        nm.notify(
+            NOTIFICATION_ID,
+            buildNotification(lastNotificationText, lastNotificationShort, lastCountdown)
+        )
+    }
+
+    fun updateNotification(text: String, short: String = "", countdown: Long = 0) {
         // 记下来：刷新前台服务类型（音频采集开关）时要用同一份文本重新 startForeground
         lastNotificationText = text
+        lastNotificationShort = short
+        lastCountdown = countdown
         val nm = getSystemService(NotificationManager::class.java)
-        nm.notify(NOTIFICATION_ID, buildNotification(text, short))
+        nm.notify(NOTIFICATION_ID, buildNotification(text, short, countdown))
     }
 
     /// 按当前模式重建 provider 监听（模式切换时调用）
@@ -696,7 +718,8 @@ private fun ongoingNotification(
     ctx: Context,
     text: String,
     short: String,
-    mode: Int
+    mode: Int,
+    countdown: Long
 ): Notification {
     val pendingIntent = PendingIntent.getActivity(
         ctx, 0,
@@ -759,6 +782,14 @@ private fun ongoingNotification(
             if (short.isNotEmpty()) builder.setShortCriticalText(short)
         }
     }
+    // 倒计时交给系统走（chronometer），不靠自己每秒重发通知：
+    // 胶囊里那行超短文本是死的，重发跟不上秒，「距下次上报」就只能停在旧值上。
+    if (mode != PROMO_PLAIN && countdown > 0) {
+        builder
+            .setWhen(System.currentTimeMillis() + countdown * 1000)
+            .setUsesChronometer(true)
+            .setChronometerCountDown(true)
+    }
     return builder.build()
 }
 
@@ -787,7 +818,7 @@ private fun promoMode(ctx: Context): Int {
     if (cached != Int.MIN_VALUE) return cached
     var decided = PROMO_NONE
     for (m in intArrayOf(PROMO_REQUEST, PROMO_COLORIZED)) {
-        if (promotable(ongoingNotification(ctx, "诊断", "9s", m))) {
+        if (promotable(ongoingNotification(ctx, "诊断", "9s", m, 0))) {
             decided = m
             break
         }

@@ -9266,7 +9266,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get acnLinkStatus => "2 本目の回線";
 
   @override
-  String get acnLinkNote => "送信はメイン回線とこの回線の両方から 1 通ずつ行います。ここで受信した局はサーバー由来として表示され、ゲートウェイ転送は行いません。";
+  String get acnLinkNote => "送信は「送信チャネル」で選んだ回線から行います。ここで受信した局はサーバー由来として表示され、ゲートウェイ転送は行いません。";
 
   @override
   String get acnAccountNote => "サーバーがホワイトリストの局に発行するアカウントとパスワードです。空欄なら passcode のみで受信します。";

@@ -9545,7 +9545,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get acnLinkStatus => "Second link";
 
   @override
-  String get acnLinkNote => "Sending goes out on both links, one copy each. Stations heard here are marked as coming from the server and are never gatewayed.";
+  String get acnLinkNote => "Messages go out on the link picked under Send channel. Stations heard here are marked as coming from the server and are never gatewayed.";
 
   @override
   String get acnAccountNote => "Account and password issued by the server. Leave both empty to receive on the passcode alone.";

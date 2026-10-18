@@ -9604,7 +9604,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get acnLinkStatus => "Segundo enlace";
 
   @override
-  String get acnLinkNote => "El envío sale por los dos enlaces, una copia por cada uno. Las estaciones recibidas aquí se marcan como del servidor y no se reenvían.";
+  String get acnLinkNote => "Los mensajes salen por el enlace elegido en Canal de envío. Las estaciones recibidas aquí se marcan como del servidor y no se reenvían.";
 
   @override
   String get acnAccountNote => "Cuenta y contraseña que emite el servidor. Si se dejan vacías, se recibe solo con el passcode.";

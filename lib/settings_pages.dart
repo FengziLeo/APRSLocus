@@ -15,7 +15,7 @@ import 'tile_map.dart';
 import 'audio.dart';
 import 'audio_page.dart';
 import 'device_page.dart';
-import 'acn_link_page.dart';
+import 'acn_cards.dart';
 import 'ic705_device_page.dart';
 import 'platform_caps.dart';
 import 'pkwdwpl_device_page.dart';
@@ -2273,28 +2273,28 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           icon: Icons.wifi_rounded,
           color: C.purple,
           body: Column(children: [
-            // ⓪ 两条互联网链路先摆出来：APRS-IS 与 APRSNETCN 都是「一条 TCP
-            //    登录」，不是设备。用户的话：「应该在链接页面同时显示两个渠道，
-            //    而不是只在设备页面上」。参数仍旧各归各的页，这里只管开关、
-            //    状态与入口。
-            _channelsCard(),
-            const SizedBox(height: 12),
+            // ⓪ 两条互联网链路：APRS-IS 与 APRSNETCN SERVER 各一张自己的卡。
+            //    用户：「netcn 是等价 is」—— 两条都是「一条 TCP 登录」（自己的
+            //    地址、账号、过滤器），不是主链路旁边挂的一个开关，所以形状也一致。
+            _connectionCard(),
+            const SizedBox(height: 16),
+            _filterCard(),
+            const SizedBox(height: 16),
+            _storageCard(),
+            if (tcpLinkPlatformSupported) ...[
+              const SizedBox(height: 16),
+              AcnCards(state: st),
+            ],
+            const SizedBox(height: 16),
+            // 报文从哪条链路发出：两条都在线时只走选中的那条，同一条消息不会
+            // 在两台服务器上各出现一次。
+            _txChannelCard(),
+            const SizedBox(height: 16),
             // ① 指路：电台那几条（TNC / WLAN 电台 / 声卡 / PKWDWPL）仍在
             //    「设置 → 设备」里启用（用户反馈三处重复「感觉乱套了」，
             //    所以这里只留一句指路，不重复摆一份来源卡）。
             SettingsHint(S.of(context).sourceMovedHint),
             const SizedBox(height: 6),
-            // 多选：**每条已启用的来源都要有自己的卡片**，顺序固定为
-            // APRS-IS → TNC → 音频。此前只按「发射来源」显示一张，
-            // 于是「APRS-IS + TNC」时 TNC 的绑定状态/统计完全看不到。
-            if (st.aprsIsOn) ...[
-              _connectionCard(),
-              const SizedBox(height: 16),
-              _filterCard(),
-              const SizedBox(height: 16),
-              _storageCard(),
-              const SizedBox(height: 16),
-            ],
             if (st.tncOn) ...[
               _tncCard(),
               const SizedBox(height: 16),
@@ -2317,73 +2317,20 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     });
   }
 
-  /// ⓪ 两条互联网链路：并排放在连接设置页。
+  /// 报文从哪条链路发出：两条都在线时二选一。
   ///
-  /// APRS-IS 与 APRSNETCN SERVER 都是「一条 TCP 登录」（地址 + 端口 + passcode），
-  /// 都不是设备。之前 APRSNETCN 只挂在「设置 → 设备」的报文链路卡里，
-  /// 用户的说法是「应该在链接页面同时显示两个渠道，而不是只在设备页面上」。
-  ///
-  /// 这里只管开关、状态与入口：服务器地址、账号口令与它自己的参数仍在
-  /// 各自的子页（APRS-IS 是下面的连接卡，APRSNETCN 是 [AcnLinkPage]）。
-  Widget _channelsCard() {
+  /// 在线与发射是两件事：两条链路可以同时在线、各收各的，但报文只从选中的
+  /// 那条走 —— 两条一起发，同一条消息会在两台服务器上各出现一次。
+  Widget _txChannelCard() {
     final s = S.of(context);
     return SettingsSectionCard(
-      title: s.sourceGroupInternet,
-      subtitle: s.channelsSubtitle,
-      icon: Icons.lan_rounded,
-      color: C.purple,
+      title: s.txChannel,
+      subtitle: s.txChannelHint,
+      icon: Icons.send_rounded,
+      color: C.cyan,
       children: [
-        SettingsSwitch(
-          s.dataSourceAprsIs,
-          value: st.aprsIsOn,
-          color: C.purple,
-          onChanged: (v) => st.toggleSource(AppState.srcAprsIs, v),
-        ),
-        SettingsRow2(
-          s.connection,
-          st.connected ? s.connected : s.disconnected,
-          valueColor: st.connected ? C.green : C.grey,
-        ),
-        // 副链路只有裸 TCP，Web 上没有（与设备页原来那个口径一致）
-        if (tcpLinkPlatformSupported) ...[
-          SettingsSwitch(
-            s.acnCardTitle,
-            value: st.acnOn,
-            color: C.purple,
-            onChanged: st.setAcnOn,
-          ),
-          SettingsRow2(
-            s.acnLinkStatus,
-            st.acnConnected ? s.connected : s.disconnected,
-            valueColor: st.acnConnected ? C.green : C.grey,
-          ),
-          // 服务器认不认这个登录：口令填错时链路会连着又断开，只有这一行
-          // 说得出原因（服务器回 `not authorized (auth-failed)`）。
-          if (st.acnLogin != null)
-            SettingsRow2(
-              s.acnLoginTitle,
-              st.acnLogin == ''
-                  ? s.acnLoginOk
-                  : (st.acnLogin == 'unverified'
-                      ? s.unverified
-                      : s.acnLoginRejected),
-              valueColor: st.acnLogin == '' ? C.slate : C.orange,
-            ),
-          SettingsNavRow(
-            title: s.acnOpenSettings,
-            subtitle: '${st.acnServer}:${st.acnPort}',
-            icon: Icons.hub_rounded,
-            color: C.purple,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => AcnLinkPage(state: st)),
-            ),
-          ),
-        ],
-        // 在线与发射是两件事：两条链路都可以在线，报文只从选中的那条走。
-        // 用户「发消息只选一种渠道」：两条一起发，同一条消息会在两台服务器
-        // 各出现一次。
         SettingsChoice<String>(
-          s.txChannel,
+          s.sourceGroupInternet,
           value: st.txChannel,
           options: [
             AppState.txChanAprsIs,
@@ -2392,10 +2339,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           labelOf: (v) =>
               v == AppState.txChanAcn ? s.acnCardTitle : s.dataSourceAprsIs,
           onChanged: st.setTxChannel,
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
-          child: Text(s.txChannelHint, style: ts(10, c: C.grey)),
         ),
       ],
     );
@@ -2411,6 +2354,14 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
       icon: Icons.dns_rounded,
       color: C.purple,
       children: [
+        // 这一页两条链路各一张卡，开关也各在自己卡里（设备页那张卡里同样有，
+        // 与 APRSNETCN 那张卡一个口径）。
+        SettingsSwitch(
+          S.of(context).dataSourceAprsIs,
+          value: st.aprsIsOn,
+          color: C.purple,
+          onChanged: (v) => st.toggleSource(AppState.srcAprsIs, v),
+        ),
         _connBanner(),
         Divider(height: 1, color: C.border),
         SettingsRow2(S.of(context).connection,

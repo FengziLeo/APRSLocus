@@ -9555,7 +9555,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get acnLinkStatus => "Tautan kedua";
 
   @override
-  String get acnLinkNote => "Pengiriman keluar lewat kedua tautan, satu salinan masing-masing. Stasiun yang diterima di sini ditandai berasal dari server dan tidak diteruskan.";
+  String get acnLinkNote => "Pesan dikirim lewat tautan yang dipilih di Kanal kirim. Stasiun yang diterima di sini ditandai berasal dari server dan tidak diteruskan.";
 
   @override
   String get acnAccountNote => "Akun dan kata sandi dari server. Kosongkan keduanya untuk menerima dengan passcode saja.";

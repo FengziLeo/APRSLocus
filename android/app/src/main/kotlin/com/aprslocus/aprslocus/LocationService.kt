@@ -77,7 +77,7 @@ object NotifHelper {
             .setContentTitle(title)
             .setContentText(text)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-            .setSmallIcon(R.drawable.ic_stat_aprs)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setLargeIcon(android.graphics.BitmapFactory.decodeResource(
                 context.resources, R.mipmap.ic_launcher))
             .setContentIntent(pi)
@@ -118,7 +118,7 @@ object NotifHelper {
             .setContentTitle("📻 $from")
             .setContentText(text)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-            .setSmallIcon(R.drawable.ic_stat_aprs)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setLargeIcon(android.graphics.BitmapFactory.decodeResource(
                 context.resources, R.mipmap.ic_launcher))
             .setContentIntent(pi)
@@ -474,7 +474,7 @@ class LocationService : Service() {
             .setContentText(text)
             // 小图标用 APP 自己的单色剪影（状态栏与实时更新的胶囊只看它），
             // 大图标用启动图标，展开时就是 APP 的脸。
-            .setSmallIcon(R.drawable.ic_stat_aprs)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setLargeIcon(android.graphics.BitmapFactory.decodeResource(
                 resources, R.mipmap.ic_launcher))
             .setContentIntent(pendingIntent)

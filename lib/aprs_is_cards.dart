@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'input_history.dart';
@@ -36,6 +38,10 @@ class _AprsIsCardsState extends State<AprsIsCards> {
   late final String? _origWs;
   bool _configDirty = false;
 
+  /// 落盘防抖：地址是一个字一个字敲出来的，每敲一下就写一遍整份偏好没必要；
+  /// 但**必须**写 —— 只改内存里的 `aprs.server` 的话，退出页面就丢了。
+  Timer? _saveTimer;
+
   AppState get st => widget.state;
 
   @override
@@ -54,6 +60,7 @@ class _AprsIsCardsState extends State<AprsIsCards> {
 
   @override
   void dispose() {
+    _saveTimer?.cancel();
     _serverFocus.removeListener(_onServerFocus);
     _serverFocus.dispose();
     _server.dispose();
@@ -77,7 +84,15 @@ class _AprsIsCardsState extends State<AprsIsCards> {
     _server.text = v;
     st.aprs.server = v.trim();
     _checkConfigDirty();
+    _save();
     setState(() {});
+  }
+
+  /// 改完参数就把当前值写进偏好（防抖 400ms）。以前这里只改内存、不落盘，
+  /// 表现就是「服务器地址填了、退出再进来又是空的」。
+  void _save() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 400), st.persist);
   }
 
   void _checkConfigDirty() {
@@ -122,6 +137,7 @@ class _AprsIsCardsState extends State<AprsIsCards> {
           final n = int.tryParse(v);
           if (n != null) st.aprs.port = n;
           _checkConfigDirty();
+          _save();
         }),
         _passcodeInput(),
         SettingsTxPick(
@@ -141,6 +157,7 @@ class _AprsIsCardsState extends State<AprsIsCards> {
             onChanged: (v) {
           st.aprs.wsUrl = v.trim().isEmpty ? null : v.trim();
           _checkConfigDirty();
+          _save();
         }),
         if (_configDirty) ...[
           Divider(height: 1, color: C.border),
@@ -207,6 +224,7 @@ class _AprsIsCardsState extends State<AprsIsCards> {
             onChanged: (x) {
               st.aprs.server = x.trim();
               _checkConfigDirty();
+              _save();
             },
             // 「最近连过的服务器」：地址是一串不短的域名，重敲一遍最容易出错
             trailing: st.serverHistory.isEmpty
@@ -269,6 +287,7 @@ class _AprsIsCardsState extends State<AprsIsCards> {
           onChanged: (v) {
             st.aprs.passcode = v.trim().isEmpty ? '-1' : v.trim();
             _checkConfigDirty();
+            _save();
           },
           decoration: InputDecoration(
             hintText: S.of(context).passcodeUnverifiedHint,

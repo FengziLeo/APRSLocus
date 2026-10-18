@@ -4,9 +4,14 @@
 
 ### 通知图标
 
-- **通知栏里的小图标换成 APP 自己的剪影**（一个信标点加两道弧），大图标用启动
-  图标。实时更新的胶囊里显示的也是这颗小图标，以前是系统那个定位图钉。
+- **通知栏里的小图标与大图标都用 APP 的 logo**，实时更新的胶囊里也是它 ——
+  以前那里是系统那个定位图钉，连接前后还会换成两个样子。
 - 消息通知与生命守护告警一并换掉，不再各用各的系统图标。
+
+### 服务器地址能存住了
+
+- APRS-IS 那页的地址、端口、passcode、WebSocket 地址，改完就落盘（防抖 400ms）。
+  以前只改了内存里那份配置，退出页面再进来又变回空。
 
 ### 去掉小米焦点通知那一档
 
@@ -19,10 +24,16 @@
 
 ### Notification icon
 
-- **The notification's small icon is now the app's own silhouette** (a beacon dot with two
-  arcs), with the launcher icon as the large one. The live-update pill shows that small
-  icon too; it used to be the system location pin.
+- **Both the notification's small and large icon are the app's logo now**, including the
+  live-update pill. It used to be the system location pin, and changed shape once the
+  link connected.
 - Message notifications and the life-safety alarm use the same icon now.
+
+### The server address is saved
+
+- Address, port, passcode and WebSocket URL on the APRS-IS page are written to preferences
+  as you edit them (400 ms debounce). Before this, only the in-memory config changed, so
+  they came back empty after leaving the page.
 
 ### The Xiaomi focus option is gone
 

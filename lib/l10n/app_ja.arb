@@ -270,7 +270,7 @@
   "oobeWelcomeIs": "APRS-IS 接続",
   "oobeCallTitle": "あなたのコールサイン",
   "oobeSymbolTitle": "局のシンボルを選択",
-  "oobeServerTitle": "APRS-IS サーバー（任意）",
+  "oobeServerTitle": "サーバー（任意）",
   "weatherData": "気象データ",
   "fmoInfo": "FMO 局情報",
   "aprslocusInfo": "APRSlocus 情報",

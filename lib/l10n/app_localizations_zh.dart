@@ -837,7 +837,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get oobeSymbolTitle => '选择台站符号';
 
   @override
-  String get oobeServerTitle => 'APRS-IS 服务器（可选）';
+  String get oobeServerTitle => '服务器（可选）';
 
   @override
   String get weatherData => '气象数据';
@@ -10110,7 +10110,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get oobeSymbolTitle => '選擇臺站符號';
 
   @override
-  String get oobeServerTitle => 'APRS-IS 伺服器（選填）';
+  String get oobeServerTitle => '伺服器（可選）';
 
   @override
   String get weatherData => '氣象資料';

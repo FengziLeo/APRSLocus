@@ -840,7 +840,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get oobeSymbolTitle => '局のシンボルを選択';
 
   @override
-  String get oobeServerTitle => 'APRS-IS サーバー（任意）';
+  String get oobeServerTitle => 'サーバー（任意）';
 
   @override
   String get weatherData => '気象データ';

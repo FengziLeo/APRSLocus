@@ -848,7 +848,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get oobeSymbolTitle => 'Pilih simbol stasiun';
 
   @override
-  String get oobeServerTitle => 'Server APRS-IS (opsional)';
+  String get oobeServerTitle => 'Server (opsional)';
 
   @override
   String get weatherData => 'Data cuaca';

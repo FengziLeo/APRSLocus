@@ -270,7 +270,7 @@
   "oobeWelcomeIs": "Umpan APRS-IS",
   "oobeCallTitle": "Tanda panggil Anda",
   "oobeSymbolTitle": "Pilih simbol stasiun",
-  "oobeServerTitle": "Server APRS-IS (opsional)",
+  "oobeServerTitle": "Server (opsional)",
   "weatherData": "Data cuaca",
   "fmoInfo": "Info stasiun FMO",
   "aprslocusInfo": "Info APRSlocus",

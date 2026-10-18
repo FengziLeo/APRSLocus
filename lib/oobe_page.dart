@@ -1069,40 +1069,6 @@ class _OobePageState extends State<OobePage> {
                   S.of(context).passcodeImportantDesc,
                   style: ts(11, c: C.red, w: FontWeight.w500, h: 1.4),
                 ),
-                SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () => launchUrl(
-                    Uri.parse('https://aprs.cool/AprsPG'),
-                    mode: LaunchMode.externalApplication,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: C.surfaceFill,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: C.red.withValues(alpha: 0.3)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.open_in_new_rounded, size: 14, color: C.red),
-                        SizedBox(width: 6),
-                        Text(
-                          S.of(context).lookupPasscode,
-                          style: ts(12, c: C.red, w: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  S.of(context).passcodeLookupHint,
-                  style: ts(10, c: C.grey),
-                ),
               ],
             ),
           ),

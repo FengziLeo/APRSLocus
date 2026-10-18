@@ -269,7 +269,7 @@
   "oobeWelcomeIs": "Conexión APRS-IS",
   "oobeCallTitle": "Tu indicativo",
   "oobeSymbolTitle": "Elegir símbolo de estación",
-  "oobeServerTitle": "Servidor APRS-IS (opcional)",
+  "oobeServerTitle": "Servidor (opcional)",
   "weatherData": "Datos meteorológicos",
   "fmoInfo": "Información FMO",
   "aprslocusInfo": "Información de APRSlocus",

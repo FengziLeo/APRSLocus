@@ -850,7 +850,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get oobeSymbolTitle => 'Elegir símbolo de estación';
 
   @override
-  String get oobeServerTitle => 'Servidor APRS-IS (opcional)';
+  String get oobeServerTitle => 'Servidor (opcional)';
 
   @override
   String get weatherData => 'Datos meteorológicos';

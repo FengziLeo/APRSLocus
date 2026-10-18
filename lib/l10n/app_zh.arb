@@ -319,7 +319,7 @@
   "oobeWelcomeIs": "接入 APRS-IS",
   "oobeCallTitle": "你的呼号",
   "oobeSymbolTitle": "选择台站符号",
-  "oobeServerTitle": "APRS-IS 服务器（可选）",
+  "oobeServerTitle": "服务器（可选）",
   "weatherData": "气象数据",
   "fmoInfo": "FMO 台站信息",
   "aprslocusInfo": "APRSlocus 信息",

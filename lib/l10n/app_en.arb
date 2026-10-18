@@ -319,7 +319,7 @@
   "oobeWelcomeIs": "APRS-IS feed",
   "oobeCallTitle": "Set callsign",
   "oobeSymbolTitle": "Choose station symbol",
-  "oobeServerTitle": "APRS-IS server (optional)",
+  "oobeServerTitle": "Server (optional)",
   "weatherData": "Weather data",
   "fmoInfo": "FMO info",
   "aprslocusInfo": "APRSlocus info",

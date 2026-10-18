@@ -512,6 +512,37 @@ class LocationService : Service() {
         if (asked && short.isNotEmpty()) invokeText(builder, "setShortCriticalText", short)
     }
 
+    /// 小米 / Redmi / POCO 的「焦点通知」（超级岛）。
+    ///
+    /// MIUI / HyperOS 看到 extras 里这串 JSON 就接管渲染；没有厂商许可、或者
+    /// 系统不认这张表时，这串东西会被忽略，通知照普通通知显示。
+    private fun injectXiaomiFocus(notif: Notification, short: String) {
+        if (!xiaomiFocusAllowed()) return
+        val ticker = (if (short.isNotEmpty()) short else lastNotificationText)
+            .replace("\\", "")
+            .replace("\"", "")
+            .replace("\n", " ")
+        val json = "{\"param_v2\":{\"baseInfo\":{\"businessId\":\"aprslocus\"}," +
+                "\"focusInfo\":{\"aodTitle\":\"APRSlocus\",\"ticker\":\"" + ticker + "\"}}}"
+        notif.extras.putString("miui.focus.param", json)
+    }
+
+    /// 这台设备允不允许发焦点通知（小米自己的 content provider）。
+    private fun xiaomiFocusAllowed(): Boolean {
+        val maker = (Build.MANUFACTURER + " " + Build.BRAND).lowercase()
+        if (!maker.contains("xiaomi") && !maker.contains("redmi") &&
+            !maker.contains("poco")
+        ) return false
+        return try {
+            val uri = android.net.Uri.parse("content://miui.statusbar.notification.public")
+            val extras = Bundle().apply { putString("package", packageName) }
+            val result = contentResolver.call(uri, "canShowFocus", null, extras)
+            result?.getBoolean("canShowFocus") == true
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
     /// 反射调「传 true 进去」的 Builder 方法（兼容层 / 平台层通用）。
     private fun invokeBool(target: Any, vararg names: String): Boolean {
         for (name in names) {
@@ -839,6 +870,22 @@ class LocationService : Service() {
         lines.add("小米焦点开关：" + (if (LocationService.focusOn()) "开" else "关"))
         lines.add("当前样式：" + (if (LocationService.liveUpdatesOn()) "实时更新" else "普通常驻通知"))
         return lines.joinToString("\n")
+    }
+
+    /// androidx 兼容层的 Builder 上有没有这个方法（按参数个数判断，命名不完全一致）。
+    private fun compatHas(name: String, arg: Class<*>): String {
+        return try {
+            var cls: Class<*>? = androidx.core.app.NotificationCompat.Builder::class.java
+            while (cls != null && cls != Any::class.java) {
+                if (cls.methods.any { it.name == name && it.parameterCount == 1 }) {
+                    return "有"
+                }
+                cls = cls.superclass
+            }
+            "没有"
+        } catch (_: Throwable) {
+            "查不到"
+        }
     }
 
     /// 小米的焦点通知（超级岛）允不允许发。

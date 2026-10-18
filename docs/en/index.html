@@ -637,9 +637,10 @@ html{overflow-x:hidden}
         <span class="cl-date">2026-10-18</span>
       </div>
       <div class="cl-body">
-        <div class="cl-item"><span class="cl-dot up"></span>The APRSNETCN SERVER page says it straight: an APRS-IS server built on the APRSNETCN SERVER protocol. Put its address in the connection settings and it carries traffic both ways; switching it on here runs both links at once, each with its own feed.</div>
-        <div class="cl-item"><span class="cl-dot new"></span>With both links online, every packet goes out once per server; when the main link already points at the same machine it goes out once.</div>
-        <div class="cl-item"><span class="cl-dot new"></span>The station detail page carries a source badge next to the callsign: APRS-IS, APRSNETCN, TNC, sound card, PKWDWPL, and APRSNETCN for stations the 24-hour station API brought in. It is saved with the station, so it survives a restart.</div>
+        <div class="cl-item"><span class="cl-dot up"></span>The connection settings page lists both internet links: APRS-IS and APRSNETCN SERVER each with a switch, its state and the login result, while address and account stay on their own pages. The tile on the device page is gone.</div>
+        <div class="cl-item"><span class="cl-dot new"></span>The send channel is a single choice now: pick APRS-IS or APRSNETCN SERVER and packets leave on that link only, falling back to the main link when the secondary one is offline.</div>
+        <div class="cl-item"><span class="cl-dot new"></span>The APRSNETCN link has its own filter: a radius of one thousand kilometres by default plus any callsigns you add, instead of the main link's range and group calls.</div>
+        <div class="cl-item"><span class="cl-dot new"></span>A new translation provider, Bilibili Index-Translate: no key, first stop in auto mode, with an editable endpoint and model for self-hosted deployments. Station sync now pages through the whole list.</div>
       </div>
     </div>
     <div class="cl-version reveal">

@@ -2,33 +2,41 @@
 
 ## [2.1.12] - 2026-10-18
 
-### 两台服务器各发一份，台站标出走的是哪条
+### 两条互联网链路摆在一起，发报文只走一条
 
-- **APRSNETCN SERVER 就是另一台 APRS-IS 服务器**。那一页的说明改成直说：基于
-  APRSNETCN SERVER 协议的服务器，地址填进连接设置，收发都走它；在这一页打开，
-  是让它与主链路同时在线，各收各的。
-- **第二条链路也发报文**。两条链路都在线时，发出去的每一帧两台服务器各收一份；
-  主链路指的就是同一台机器时只发一次。
-- **台站详情页标出来源**。呼号旁边一枚标签：APRS-IS、APRSNETCN、TNC、声卡、
-  PKWDWPL，服务器 24 小时台站接口补进来的也标 APRSNETCN。看的是最后一条报文
-  从哪条链路进来，跟着台站一起存，重启还在。
+- **连接设置页同时显示两条互联网链路**。APRS-IS 与 APRSNETCN SERVER 各一行开关、
+  连接状态和登录结果，地址与账号在各自的子页里填。设备页那一格删了，这两条都是
+  服务器链接。
+- **发送渠道只选一条**。下拉里选 APRS-IS 或 APRSNETCN SERVER，报文只从选中的那条
+  走。选中的副链路没在线时退回主链路，日志说一次。
+- **APRSNETCN 有自己的筛选**。半径默认一千公里，可以另外加呼号，不再沿用主链路
+  那套范围与群呼号。
+- **翻译接口多了 B 站 Index-Translate**。免密钥，免费，自动模式里排第一站。地址与
+  模型两格都能改，自己部署也能用。
+- **APRSNETCN 的台站同步翻页拉完**，不再只拿前两千台。
+- **台站详情的备注与状态报文**挪到呼号下面，各占一整行；来源标签跟着台站一起存。
 
 ---
 
 ## [2.1.12] - 2026-10-18 (English)
 
-### Two servers, one copy each, and every station says which link it came from
+### Two internet links side by side, and packets leave on one of them
 
-- **APRSNETCN SERVER is simply another APRS-IS server.** Its page now says so straight:
-  a server built on the APRSNETCN SERVER protocol, put its address in the connection
-  settings and it carries traffic both ways; switched on there, it runs alongside the main
-  link and each keeps its own feed.
-- **The second link sends too.** With both links online, every packet goes out once per
-  server; when the main link already points at the same machine it goes out once.
-- **The station detail page says where the station came from.** A badge next to the
-  callsign: APRS-IS, APRSNETCN, TNC, sound card, PKWDWPL, and APRSNETCN for stations the
-  24-hour station API brought in. It follows the last packet heard and is saved with the
-  station, so it survives a restart.
+- **The connection settings page lists both internet links.** APRS-IS and APRSNETCN
+  SERVER each get a switch, their state and the login result; address and account stay
+  on their own pages. The tile on the device page is gone, both of these are servers.
+- **The send channel is a single choice.** Pick APRS-IS or APRSNETCN SERVER from the
+  dropdown and packets leave on that one link. When the picked secondary link is not
+  online they fall back to the main link, said once in the log.
+- **APRSNETCN has its own filter.** A radius of one thousand kilometres by default, plus
+  any callsigns you add; it no longer reuses the main link's range and group calls.
+- **A new translation provider: Bilibili Index-Translate.** No key, no cost, and it sits
+  first in auto mode. Both the endpoint and the model are editable, so a self-hosted
+  deployment works too.
+- **APRSNETCN station sync pages through the whole list** instead of the first two
+  thousand stations.
+- **The station detail page** puts the note and the status packet under the callsign, one
+  full row each; the source badge is saved with the station.
 
 ---
 

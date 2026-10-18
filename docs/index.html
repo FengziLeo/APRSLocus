@@ -639,9 +639,10 @@ html{overflow-x:hidden}
         <span class="cl-date">2026-10-18</span>
       </div>
       <div class="cl-body">
-        <div class="cl-item"><span class="cl-dot up"></span>APRSNETCN SERVER 那一页改成直说：一台基于 APRSNETCN SERVER 协议的 APRS-IS 服务器，地址填进连接设置，收发都走它；在这一页打开，是让它与主链路同时在线，各收各的。</div>
-        <div class="cl-item"><span class="cl-dot new"></span>两条链路都在线时，发出去的每一帧两台服务器各收一份，主链路指的是同一台机器时只发一次。</div>
-        <div class="cl-item"><span class="cl-dot new"></span>台站详情页的呼号旁边加一枚来源标签：APRS-IS、APRSNETCN、TNC、声卡、PKWDWPL，服务器 24 小时台站接口补进来的也标 APRSNETCN。它跟着台站一起存，重启还在。</div>
+        <div class="cl-item"><span class="cl-dot up"></span>连接设置页同时列出两条互联网链路：APRS-IS 与 APRSNETCN SERVER 各有开关、连接状态与登录结果，地址账号在各自的子页里填。设备页里那一格删了。</div>
+        <div class="cl-item"><span class="cl-dot new"></span>发送渠道改成单选。下拉里选 APRS-IS 或 APRSNETCN SERVER，报文只从选中的那条走；副链路没在线时退回主链路。</div>
+        <div class="cl-item"><span class="cl-dot new"></span>APRSNETCN 链路有了自己的筛选：半径默认一千公里，可以另外加呼号，不再沿用主链路的范围与群呼号。</div>
+        <div class="cl-item"><span class="cl-dot new"></span>翻译接口多了 B 站 Index-Translate，免密钥，自动模式里排第一站；地址与模型都能改，自己部署也能用。台站同步改成翻页拉完，不再只拿前两千台。</div>
       </div>
     </div>
     <div class="cl-version reveal">

@@ -422,33 +422,37 @@ CL = [
         'ver': 'v2.1.12', 'date': '2026-10-18',
         'items': [
             ('up',
-             T('APRSNETCN SERVER 那一页改成直说：一台基于 APRSNETCN SERVER 协议'
-               '的 APRS-IS 服务器，地址填进连接设置，收发都走它；在这一页打开，是让它'
-               '与主链路同时在线，各收各的。',
-               'APRSNETCN SERVER 那一頁改成直說：一臺基於 APRSNETCN SERVER 協定'
-               '的 APRS-IS 伺服器，位址填進連線設定，收發都走它；在這一頁打開，是讓它'
-               '與主鏈路同時在線，各收各的。',
-               'The APRSNETCN SERVER page says it straight: an APRS-IS server built on the '
-               'APRSNETCN SERVER protocol. Put its address in the connection settings and it '
-               'carries traffic both ways; switching it on here runs both links at once, each '
-               'with its own feed.')),
+             T('连接设置页同时列出两条互联网链路：APRS-IS 与 APRSNETCN SERVER 各有开关、'
+               '连接状态与登录结果，地址账号在各自的子页里填。设备页里那一格删了。',
+               '連線設定頁同時列出兩條網際網路鏈路：APRS-IS 與 APRSNETCN SERVER 各有開關、'
+               '連線狀態與登入結果，位址帳號在各自的子頁裡填。裝置頁裡那一格刪了。',
+               'The connection settings page lists both internet links: APRS-IS and APRSNETCN '
+               'SERVER each with a switch, its state and the login result, while address and '
+               'account stay on their own pages. The tile on the device page is gone.')),
             ('new',
-             T('两条链路都在线时，发出去的每一帧两台服务器各收一份，主链路指的是同一台'
-               '机器时只发一次。',
-               '兩條鏈路都在線時，送出去的每一幀兩臺伺服器各收一份，主鏈路指的是同一臺'
-               '機器時只送一次。',
-               'With both links online, every packet goes out once per server; when the main '
-               'link already points at the same machine it goes out once.')),
+             T('发送渠道改成单选。下拉里选 APRS-IS 或 APRSNETCN SERVER，报文只从选中的'
+               '那条走；副链路没在线时退回主链路。',
+               '發送渠道改成單選。下拉裡選 APRS-IS 或 APRSNETCN SERVER，報文只從選中的'
+               '那條走；副鏈路沒在線時退回主鏈路。',
+               'The send channel is a single choice now: pick APRS-IS or APRSNETCN SERVER and '
+               'packets leave on that link only, falling back to the main link when the '
+               'secondary one is offline.')),
             ('new',
-             T('台站详情页的呼号旁边加一枚来源标签：APRS-IS、APRSNETCN、TNC、声卡、'
-               'PKWDWPL，服务器 24 小时台站接口补进来的也标 APRSNETCN。它跟着台站一起存，'
-               '重启还在。',
-               '臺站詳情頁的呼號旁邊加一枚來源標籤：APRS-IS、APRSNETCN、TNC、音效卡、'
-               'PKWDWPL，伺服器 24 小時臺站介面補進來的也標 APRSNETCN。它跟著臺站一起存，'
-               '重啟還在。',
-               'The station detail page carries a source badge next to the callsign: APRS-IS, '
-               'APRSNETCN, TNC, sound card, PKWDWPL, and APRSNETCN for stations the 24-hour '
-               'station API brought in. It is saved with the station, so it survives a restart.')),
+             T('APRSNETCN 链路有了自己的筛选：半径默认一千公里，可以另外加呼号，不再沿用'
+               '主链路的范围与群呼号。',
+               'APRSNETCN 鏈路有了自己的篩選：半徑預設一千公里，可以另外加呼號，不再沿用'
+               '主鏈路的範圍與群呼號。',
+               'The APRSNETCN link has its own filter: a radius of one thousand kilometres by '
+               'default plus any callsigns you add, instead of the main link\'s range and '
+               'group calls.')),
+            ('new',
+             T('翻译接口多了 B 站 Index-Translate，免密钥，自动模式里排第一站；地址与模型'
+               '都能改，自己部署也能用。台站同步改成翻页拉完，不再只拿前两千台。',
+               '翻譯介面多了 B 站 Index-Translate，免金鑰，自動模式裡排第一站；位址與模型'
+               '都能改，自己部署也能用。臺站同步改成翻頁拉完，不再只拿前兩千臺。',
+               'A new translation provider, Bilibili Index-Translate: no key, first stop in '
+               'auto mode, with an editable endpoint and model for self-hosted deployments. '
+               'Station sync now pages through the whole list.')),
         ],
     },
     {

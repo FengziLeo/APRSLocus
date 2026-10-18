@@ -63,22 +63,22 @@ PAGES = [
 # ⚠ 换一期公告时这里必须一起改，否则会出现「正文是新的、标题还是上一期」。
 HEAD = {
     'zh': {
-        'kicker': '📡 APRSNETCN OA · 周六空中签到',
-        'title': '本周六，向轮值呼号发一条报文',
-        'en': 'APRSNETCN OA · test round',
-        'sub': 'APRSNET.CN 每周六办一次空中签到。北京时间 10 月 17 日 00:00 到 23:59，把报文发给当周的轮值呼号 BG7LZQ-3，收到 ACK 就算签到，网络和射频都算。',
+        'kicker': '📡 APRSNETCN OA · #261024 半间猫窝',
+        'title': '本周六，向 BH6RIZ-6 发一条报文',
+        'en': 'APALOC in the official TOCALL library',
+        'sub': '本轮由 APRSNETCN 与 CATHAM 半间猫窝共同承办。北京时间 10 月 24 日 00:00 到 23:59，把报文发给轮值呼号 BH6RIZ-6，收到 ACK 就算签到，网络和射频都算。',
     },
     'zh_TW': {
-        'kicker': '📡 APRSNETCN OA · 週六空中簽到',
-        'title': '本週六，向輪值呼號發一條報文',
-        'en': 'APRSNETCN OA · test round',
-        'sub': 'APRSNET.CN 每週六辦一次空中簽到。北京時間 10 月 17 日 00:00 到 23:59，把報文發給當週的輪值呼號 BG7LZQ-3，收到 ACK 就算簽到，網路和射頻都算。',
+        'kicker': '📡 APRSNETCN OA · #261024 半間貓窩',
+        'title': '本週六，向 BH6RIZ-6 發一條報文',
+        'en': 'APALOC in the official TOCALL library',
+        'sub': '本輪由 APRSNETCN 與 CATHAM 半間貓窩共同承辦。北京時間 10 月 24 日 00:00 到 23:59，把報文發給輪值呼號 BH6RIZ-6，收到 ACK 就算簽到，網路和射頻都算。',
     },
     'en': {
-        'kicker': '📡 APRSNETCN OA · Saturday check-in',
-        'title': 'This Saturday, send a packet to the duty station',
-        'en': 'APRSNETCN OA · test round',
-        'sub': 'APRSNET.CN runs an on-air check-in every Saturday. On 17 October, 00:00 to 23:59 Beijing time, send a message to the duty callsign BG7LZQ-3; an ACK puts you on the roster. Network and RF both count.',
+        'kicker': '📡 APRSNETCN OA · #261024 Half a Cat Bed',
+        'title': 'This Saturday, send a packet to BH6RIZ-6',
+        'en': 'APALOC in the official TOCALL library',
+        'sub': 'Round #261024 is co-hosted by APRSNETCN and CATHAM 半间猫窝. On 24 October, 00:00 to 23:59 Beijing time, send a message to the duty callsign BH6RIZ-6; an ACK puts you on the roster. Network and RF both count.',
     },
 }
 

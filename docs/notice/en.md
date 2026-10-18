@@ -1,6 +1,8 @@
-# APRSNETCN OA · This Saturday, send a packet to BG7LZQ-3
+# APRSNETCN OA · #261024 Half a Cat Bed · APALOC in the official TOCALL library
 
 APRSNETCN OA is an APRS message check-in run by APRSNET.CN. It lasts a whole Saturday, Beijing time. OA stands for On Air.
+
+Round #261024 is co-hosted by APRSNETCN and CATHAM 半间猫窝.
 
 One station is on duty each week. Send it a message, it answers with an ACK, and you are on that day's roster. The duty callsign changes every week.
 
@@ -8,15 +10,16 @@ No sign-up, and nothing to be present for.
 
 ## 📡 When, and who is on duty
 
-- Saturday, 17 October 2026, 00:00–23:59 Beijing time (UTC+8)
-- In UTC that is 16:00 on 16 October to 15:59 on 17 October
-- The duty callsign this week is **BG7LZQ-3**
+- Round #261024, called 半间猫窝 (Half a Cat Bed)
+- Saturday, 24 October 2026, 00:00–23:59 Beijing time (UTC+8)
+- In UTC that is 16:00 on 23 October to 15:59 on 24 October
+- The duty callsign this week is **BH6RIZ-6**, and zelin is at the key
 
 @video https://aprsnet.cn/oa/en/embed.html
 
 ## 📮 How to join
 
-Address the message to **BG7LZQ-3**.
+Address the message to **BH6RIZ-6**.
 
 Send **CQ CNNET BG7XXX OL62** with your own call and your own grid. When the duty station answers with an ACK, send **U CNNET**.
 
@@ -40,15 +43,23 @@ The roster image and the grid image can be downloaded the same day.
 
 ## 🙋 About this round
 
-This is the first round, so the flow will keep changing. The activity page always carries the current version.
-
 No scoring, no leaderboard, and no commercial use.
+
+The flow keeps changing; the activity page always carries the current one.
 
 If you miss this one, there is another round next Saturday.
 
 In APRSLocus, open the Messages page and set the recipient to the duty callsign.
 
 The roster for the day is on the activity page. **[Open the activity page](https://oa.aprsnet.cn)**
+
+---
+
+## 🔔 What is new: 2.1.22
+
+- The notification's small and large icons are the app's logo now, and the live-update pill shows it too. Message notifications and the life-safety alarm use it as well.
+- Address, port, passcode and WebSocket URL on the APRS-IS page are written to preferences as you edit them, so they no longer come back empty.
+- Notification style is back to two options: a normal ongoing notification, or live updates. The Xiaomi focus option needed a vendor whitelist, so it is gone.
 
 ---
 

@@ -761,6 +761,7 @@ class AppState extends ChangeNotifier {
     if (notifStyle == v) return;
     notifStyle = v;
     persist();
+    loc.setLiveUpdates(notifLiveUpdates);
     _updateNotification();
     _notify();
   }
@@ -4631,7 +4632,10 @@ class AppState extends ChangeNotifier {
           p.getBool('beaconIncludeSteps') ?? beaconIncludeSteps;
       beaconIncludeSats =
           p.getBool('beaconIncludeSats') ?? beaconIncludeSats;
-      notifStyle = p.getString('notifStyle') ?? notifStyle;
+      // 只认两种值：早期版本存过 'focus'（小米焦点通知那一档已删）。
+      // 不归一化的话它既不是 plain 也不是 live，用户选了实时更新也永远提不上去。
+      notifStyle = p.getString('notifStyle') == 'live' ? 'live' : 'plain';
+      loc.setLiveUpdates(notifLiveUpdates);
       // 计步基线：跨重启必须留着，否则重启后「今日步数」会从 0 重新数
       _stepsBaseline = p.getInt('stepsBaseline') ?? _stepsBaseline;
       _stepsDayKey = p.getString('stepsDayKey') ?? _stepsDayKey;

@@ -437,82 +437,11 @@ class LocationService : Service() {
         }
     }
 
-    private fun buildNotification(text: String, short: String = ""): Notification {
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    private fun buildNotification(text: String, short: String = ""): Notification =
+        ongoingNotification(
+            this, text, short,
+            if (liveUpdates) promoMode(this) else PROMO_PLAIN
         )
-        // 连接/断开按钮
-        val toggleIntent = Intent(this, LocationService::class.java).apply {
-            action = ACTION_TOGGLE_CONNECT
-        }
-        val togglePi = PendingIntent.getService(
-            this, 1, toggleIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val toggleAction = NotificationCompat.Action.Builder(
-            android.R.drawable.ic_media_play,
-            "连接/断开",
-            togglePi
-        ).build()
-        // 退出按钮
-        val exitIntent = Intent(this, LocationService::class.java).apply {
-            action = ACTION_EXIT
-        }
-        val exitPi = PendingIntent.getService(
-            this, 2, exitIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val exitAction = NotificationCompat.Action.Builder(
-            android.R.drawable.ic_menu_close_clear_cancel,
-            "退出",
-            exitPi
-        ).build()
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("APRSlocus")
-            .setContentText(text)
-            // 小图标用 APP 自己的单色剪影（状态栏与实时更新的胶囊只看它），
-            // 大图标用启动图标，展开时就是 APP 的脸。
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setLargeIcon(android.graphics.BitmapFactory.decodeResource(
-                resources, R.mipmap.ic_launcher))
-            .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .setSilent(true)
-            // setOnlyAlertOnce：文字刷新（台站数/收包数/信标倒计时）不该再响一次。
-            // setSilent 管的是「这条通知本身静音」，但部分 ROM 会在文字变化时把
-            // 常驻通知当成新通知重新弹一遍；加上它才有「更新不打扰」的保证。
-            .setOnlyAlertOnce(true)
-            // 实时更新（Live Updates）要求通知用 BigTextStyle / CallStyle /
-            // ProgressStyle / MetricStyle 之一：展开式正文既符合要求，本身也
-            // 比一行截断好看（长文本在折叠态本来就显示不全）。
-            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-            .addAction(toggleAction)
-            .addAction(exitAction)
-            .let { builder ->
-                // 实时更新的那两个方法在 androidx 的 NotificationCompat 上（1.17 起），
-                // 平台的 Notification.Builder 上没有 —— 真机诊断里
-                // setRequestPromotedOngoing / setShortCriticalText 都是「没有」。
-                if (liveUpdates) requestLiveUpdates(builder, short)
-                builder.build()
-            }
-    }
-
-    /// 申请实时更新：调用 androidx 兼容层上那两个方法。
-    ///
-    /// **直接调**，不走反射 —— release 包会经过 R8，没人引用的库方法会被裁掉，
-    /// 反射在那时就找不到它们了（2.1.20 里正是这样：诊断显示兼容层「没有」，
-    /// 而依赖确实是 androidx.core 1.17.0）。兼容层自己会处理老系统：低版本上
-    /// 这两个调用什么也不做。
-    private fun requestLiveUpdates(builder: NotificationCompat.Builder, short: String) {
-        try {
-            builder.setRequestPromotedOngoing(true)
-            if (short.isNotEmpty()) builder.setShortCriticalText(short)
-        } catch (_: Throwable) {
-            // 老版本兼容层没有这两个方法时不至于让通知发不出去
-        }
-    }
 
     fun updateNotification(text: String, short: String = "") {
         // 记下来：刷新前台服务类型（音频采集开关）时要用同一份文本重新 startForeground
@@ -759,10 +688,134 @@ class LocationService : Service() {
     }
 }
 
+/// 常驻通知的唯一构造点。
+///
+/// 服务发通知、诊断量能力都用它：诊断如果自己另拼一条，测的就不是真正出去的那条。
+/// [mode] 见 [PROMO_REQUEST] / [PROMO_COLORIZED] / [PROMO_PLAIN]。
+private fun ongoingNotification(
+    ctx: Context,
+    text: String,
+    short: String,
+    mode: Int
+): Notification {
+    val pendingIntent = PendingIntent.getActivity(
+        ctx, 0,
+        Intent(ctx, MainActivity::class.java),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+    // 连接/断开按钮
+    val toggleIntent = Intent(ctx, LocationService::class.java).apply {
+        action = LocationService.ACTION_TOGGLE_CONNECT
+    }
+    val togglePi = PendingIntent.getService(
+        ctx, 1, toggleIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+    val toggleAction = NotificationCompat.Action.Builder(
+        android.R.drawable.ic_media_play,
+        "连接/断开",
+        togglePi
+    ).build()
+    // 退出按钮
+    val exitIntent = Intent(ctx, LocationService::class.java).apply {
+        action = LocationService.ACTION_EXIT
+    }
+    val exitPi = PendingIntent.getService(
+        ctx, 2, exitIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+    val exitAction = NotificationCompat.Action.Builder(
+        android.R.drawable.ic_menu_close_clear_cancel,
+        "退出",
+        exitPi
+    ).build()
+    val builder = NotificationCompat.Builder(ctx, LocationService.CHANNEL_ID)
+        .setContentTitle("APRSlocus")
+        .setContentText(text)
+        // 小图标用 APP 自己的单色剪影（状态栏与实时更新的胶囊只看它），
+        // 大图标用启动图标，展开时就是 APP 的脸。
+        .setSmallIcon(R.mipmap.ic_launcher)
+        .setLargeIcon(android.graphics.BitmapFactory.decodeResource(
+            ctx.resources, R.mipmap.ic_launcher))
+        .setContentIntent(pendingIntent)
+        .setOngoing(true)
+        .setSilent(true)
+        // setOnlyAlertOnce：文字刷新（台站数/收包数/信标倒计时）不该再响一次。
+        // setSilent 管的是「这条通知本身静音」，但部分 ROM 会在文字变化时把
+        // 常驻通知当成新通知重新弹一遍；加上它才有「更新不打扰」的保证。
+        .setOnlyAlertOnce(true)
+        // 提升（实时更新）要求通知用 BigTextStyle / CallStyle / ProgressStyle /
+        // MetricStyle 之一：展开式正文既符合要求，本身也比一行截断好看。
+        .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+        .addAction(toggleAction)
+        .addAction(exitAction)
+    when (mode) {
+        PROMO_REQUEST -> {
+            builder.setRequestPromotedOngoing(true)
+            if (short.isNotEmpty()) builder.setShortCriticalText(short)
+        }
+        PROMO_COLORIZED -> {
+            builder.setColorized(true)
+            if (short.isNotEmpty()) builder.setShortCriticalText(short)
+        }
+    }
+    return builder.build()
+}
+
+/// 不提升：普通常驻通知（也是 [promoMode] 判不出来时的退路）。
+private const val PROMO_PLAIN = -1
+
+/// 带 `requestPromotedOngoing` 请求：Android 16 QPR1（SDK 36.1）起才有这个接口。
+private const val PROMO_REQUEST = 0
+
+/// 带彩色标记：Android 16 首发版没有请求接口，只认「彩色 + 可提升样式」这条老规矩。
+private const val PROMO_COLORIZED = 1
+
+/// 两种都不认：这台机器的系统不会提升常驻通知，就是普通通知。
+private const val PROMO_NONE = 2
+
+@Volatile private var promoModeCache = Int.MIN_VALUE
+
+/// 本机系统认哪种提升姿势。
+///
+/// 不用版本号猜：两个 Android 16 分支的门槛不一样（QPR1 要求请求标记且**不能**
+/// 是彩色，首发版反过来只认彩色），ROM 还可能自己改。两种各造一条真通知，
+/// 问系统 `hasPromotableCharacteristics()` 认哪条，认下就缓存。
+/// 判断交给系统，比我们自己列举条件可靠。
+private fun promoMode(ctx: Context): Int {
+    val cached = promoModeCache
+    if (cached != Int.MIN_VALUE) return cached
+    var decided = PROMO_NONE
+    for (m in intArrayOf(PROMO_REQUEST, PROMO_COLORIZED)) {
+        if (promotable(ongoingNotification(ctx, "诊断", "9s", m))) {
+            decided = m
+            break
+        }
+    }
+    promoModeCache = decided
+    return decided
+}
+
+/// 系统会不会把这条通知提上去（平台同一套判据，见 hasPromotableCharacteristics）。
+private fun promotable(n: Notification): Boolean = try {
+    Notification::class.java.getMethod("hasPromotableCharacteristics").invoke(n) == true
+} catch (_: Throwable) {
+    false
+}
+
+private fun promoModeName(m: Int): String = when (m) {
+    PROMO_REQUEST -> "请求接口"
+    PROMO_COLORIZED -> "彩色通知"
+    PROMO_NONE -> "系统不认提升"
+    else -> "未开"
+}
+
 /// 通知相关的自查结果：本机支持到什么程度。用户点了「通知诊断」才看。
 ///
 /// 为什么做成一行行文字：这台机器上到底缺哪一环，只能由设备自己说 ——
 /// 「支持实时更新」不是个是/否问题，是四五个方法的组合。
+///
+/// 前几行是「方法在不在」，最后两行是「真造一条通知，系统认不认」—— 后者才算数。
 fun diag(context: Context): String {
     val nm = context.getSystemService(NotificationManager::class.java)
     fun has(cls: Class<*>, name: String, vararg args: Class<*>): String =
@@ -785,32 +838,16 @@ fun diag(context: Context): String {
     lines.add("系统：Android ${Build.VERSION.RELEASE}（SDK ${Build.VERSION.SDK_INT}）")
     lines.add("机型：${Build.MANUFACTURER} ${Build.BRAND} ${Build.MODEL}")
     lines.add("canPostPromotedNotifications：" + bool(nm, "canPostPromotedNotifications"))
+    // 参数类型必须与平台声明一致：boolean 用基本类型，shortCriticalText 收的是 String。
+    // 以前这里写成 Boolean::class.javaObjectType / CharSequence，两个都永远查不到 ——
+    // 诊断因此把「平台没这个方法」当成了结论，绕去用兼容层。
     lines.add("setRequestPromotedOngoing：" + has(Notification.Builder::class.java,
-        "setRequestPromotedOngoing", Boolean::class.javaObjectType))
+        "setRequestPromotedOngoing", Boolean::class.javaPrimitiveType!!))
     lines.add("setShortCriticalText：" + has(Notification.Builder::class.java,
-        "setShortCriticalText", CharSequence::class.java))
+        "setShortCriticalText", String::class.java))
     lines.add("hasPromotableCharacteristics：" + has(Notification::class.java,
         "hasPromotableCharacteristics"))
-    lines.add("NotificationCompat.setRequestPromotedOngoing：" +
-        compatHas("setRequestPromotedOngoing", Boolean::class.javaObjectType))
-    lines.add("NotificationCompat.setShortCriticalText：" +
-        compatHas("setShortCriticalText", CharSequence::class.java))
+    lines.add("系统认的提升姿势：" + promoModeName(promoMode(context)))
     lines.add("当前样式：" + (if (LocationService.liveUpdatesOn()) "实时更新" else "普通常驻通知"))
     return lines.joinToString("\n")
 }
-
-/// androidx 兼容层的 Builder 上有没有这个方法（按参数个数判断，命名不完全一致）。
-private fun compatHas(name: String, arg: Class<*>): String {
-        return try {
-            var cls: Class<*>? = androidx.core.app.NotificationCompat.Builder::class.java
-            while (cls != null && cls != Any::class.java) {
-                if (cls.methods.any { it.name == name && it.parameterCount == 1 }) {
-                    return "有"
-                }
-                cls = cls.superclass
-            }
-            "没有"
-        } catch (_: Throwable) {
-            "查不到"
-        }
-    }

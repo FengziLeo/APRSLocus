@@ -353,6 +353,17 @@ class LocService {
     } catch (_) {}
   }
 
+  /// 常驻通知要不要申请 Android 16 的提升（实时更新）。
+  ///
+  /// 独立的通道方法，不蹭 [updateNotification]：那是「通知文字变了」，
+  /// 而这是「换一条策略」，跟着文字走会在没刷新文字时丢掉。
+  void setLiveUpdates(bool on) {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+    try {
+      _channel.invokeMethod('setLiveUpdates', {'on': on}).catchError((_) {});
+    } catch (_) {}
+  }
+
   /// 通知能力自查（Android 专有）：这台机器支不支持实时更新 / 焦点通知，
   /// 到底缺哪一环。没这个平台就返回空串。
   Future<String> notifDiag() async {

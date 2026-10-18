@@ -1,4 +1,4 @@
-# ⚠️ 今天请勿更新 App，新版本正在调试
+# APRSNETCN OA · 本周六，向 BG7LZQ-3 发一条报文
 
 APRSNETCN OA 是 APRSNET.CN 发起的 APRS 报文签到活动。按北京时间的周六算，一整天都能签到。OA 是 On Air 的缩写。
 
@@ -56,9 +56,9 @@ APRSNETCN OA 是 APRSNET.CN 发起的 APRS 报文签到活动。按北京时间�
 
 Qingling（清零）渠道上误发的 2.2.0 已经下架，通道恢复正常。
 
-现在检查更新会拿到最新正式版 2.1.9。之前装过 2.2.0 的话，请先卸载 2.2.0，再安装 2.1.9。
+现在检查更新会拿到最新正式版 2.1.22。之前装过 2.2.0 的话，请先卸载 2.2.0，再安装 2.1.22。
 
-**[下载 2.1.9](https://github.com/dariondong/APRSLocus/releases/download/v2.1.9/APRSLocus_2.1.9.apk)**
+**[下载 2.1.22](https://github.com/dariondong/APRSLocus/releases/download/v2.1.22/APRSLocus_2.1.22.apk)**
 
 ---
 

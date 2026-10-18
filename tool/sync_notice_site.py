@@ -64,19 +64,19 @@ PAGES = [
 HEAD = {
     'zh': {
         'kicker': '📡 APRSNETCN OA · 周六空中签到',
-        'title': '今天请勿更新 App，新版本正在调试',
+        'title': '本周六，向轮值呼号发一条报文',
         'en': 'APRSNETCN OA · test round',
         'sub': 'APRSNET.CN 每周六办一次空中签到。北京时间 10 月 17 日 00:00 到 23:59，把报文发给当周的轮值呼号 BG7LZQ-3，收到 ACK 就算签到，网络和射频都算。',
     },
     'zh_TW': {
         'kicker': '📡 APRSNETCN OA · 週六空中簽到',
-        'title': '今天請勿更新 App，新版本正在除錯',
+        'title': '本週六，向輪值呼號發一條報文',
         'en': 'APRSNETCN OA · test round',
         'sub': 'APRSNET.CN 每週六辦一次空中簽到。北京時間 10 月 17 日 00:00 到 23:59，把報文發給當週的輪值呼號 BG7LZQ-3，收到 ACK 就算簽到，網路和射頻都算。',
     },
     'en': {
         'kicker': '📡 APRSNETCN OA · Saturday check-in',
-        'title': 'Do not update the App today, the new version is still being debugged',
+        'title': 'This Saturday, send a packet to the duty station',
         'en': 'APRSNETCN OA · test round',
         'sub': 'APRSNET.CN runs an on-air check-in every Saturday. On 17 October, 00:00 to 23:59 Beijing time, send a message to the duty callsign BG7LZQ-3; an ACK puts you on the roster. Network and RF both count.',
     },

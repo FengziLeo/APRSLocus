@@ -929,10 +929,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get beaconCatDesc => 'GPS · Beacon · Posisi manual';
 
   @override
-  String get connectionCat => 'Koneksi';
+  String get connectionCat => 'Server';
 
   @override
-  String get connectionCatDesc => 'Server · Jangkauan filter';
+  String get connectionCatDesc => 'Dua tautan · jangkauan filter';
 
   @override
   String get displayCat => 'Tampilan';
@@ -1003,7 +1003,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get stationSettingsSubtitle => 'Tanda panggil, simbol & beacon';
 
   @override
-  String get connectionSettingsSubtitle => 'Server APRS-IS & jangkauan terima';
+  String get connectionSettingsSubtitle => 'Kedua tautan bisa tersambung bersamaan, dan tiap paket diterima di keduanya.';
 
   @override
   String get chatSettingsSubtitle => 'Riwayat pesan & kontak';
@@ -3598,7 +3598,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get advancedSettings2 => 'Pengaturan lanjutan';
 
   @override
-  String get connectionSettings2 => 'Pengaturan koneksi';
+  String get connectionSettings2 => 'Server';
 
   @override
   String get myCallsign => 'Tanda panggil saya';
@@ -7720,7 +7720,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get linkNotConnected => 'Tidak terhubung';
 
   @override
-  String get linkTapForSettings => 'Ketuk untuk membuka pengaturan koneksi';
+  String get linkTapForSettings => 'Ketuk untuk membuka pengaturan server';
 
   @override
   String get uiMaterialGlassFull => 'Kaca buram penuh';
@@ -9588,7 +9588,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get sourceGroupRadio => "Tautan radio";
 
   @override
-  String get acnPageLead => "Server APRS-IS berbasis protokol APRSNETCN SERVER. Masukkan alamatnya di pengaturan koneksi dan ia menjadi tautan utama, mengirim juga. Aktifkan di sini dan kedua tautan tetap tersambung, masing-masing menerima sendiri.";
+  String get acnPageLead => "Server APRS-IS berbasis protokol APRSNETCN SERVER. Alamatnya diisi di Pengaturan → Server, dan tautan ini bisa mengirim maupun menerima. Kedua tautan bisa tersambung bersamaan, masing-masing menerima sendiri.";
 
   @override
   String get acnServerProto => "Protokol server";
@@ -9652,5 +9652,17 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get acnPasscodeHint => "Kosongkan untuk memakai passcode tautan APRS-IS";
+
+  @override
+  String get aprsIsServerTitle => "Server APRS-IS";
+
+  @override
+  String get aprsIsServerLead => "Alamat, port, dan passcode diisi di sini.";
+
+  @override
+  String get aprsIsCardSubtitle => "Detail login dan status koneksi";
+
+  @override
+  String get aprsIsEntryDesc => "Alamat, port, dan passcode";
 
 }

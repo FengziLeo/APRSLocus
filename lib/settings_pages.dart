@@ -7,7 +7,6 @@ import 'state.dart';
 import 'models.dart';
 import 'widgets.dart';
 import 'settings_widgets.dart';
-import 'input_history.dart';
 import 'garmin_page.dart';
 import 'hr_card.dart';
 import 'log_page.dart';
@@ -15,7 +14,8 @@ import 'tile_map.dart';
 import 'audio.dart';
 import 'audio_page.dart';
 import 'device_page.dart';
-import 'acn_cards.dart';
+import 'acn_link_page.dart';
+import 'aprs_is_cards.dart';
 import 'ic705_device_page.dart';
 import 'platform_caps.dart';
 import 'pkwdwpl_device_page.dart';
@@ -2188,13 +2188,6 @@ class ConnectionSettingsPage extends StatefulWidget {
 }
 
 class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
-  late final TextEditingController _server;
-
-  /// 服务器输入框的焦点：**离开时**把这次连的地址记进历史（见 lib/input_history.dart）。
-  final _serverFocus = FocusNode();
-  late final TextEditingController _port;
-  late final TextEditingController _ws;
-  late final TextEditingController _pass;
   late final TextEditingController _filterLat;
   late final TextEditingController _filterLng;
   late final TextEditingController _filterRadius;
@@ -2204,12 +2197,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
   // 在线判定时长（分钟）——原先写死 5 分钟，现改为用户可配置
   late final TextEditingController _onlineWindow;
 
-  bool _configDirty = false;
-
-  String _origServer = '';
-  int _origPort = 14580;
-  String _origPass = '';
-  String? _origWs;
   int _origFilterRadius = 300;
   bool _origFilterFollow = false;
   double _origFilterLat = 39.90;
@@ -2220,11 +2207,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
   @override
   void initState() {
     super.initState();
-    _server = TextEditingController(text: st.aprs.server);
-    _serverFocus.addListener(_onServerFocus);
-    _port = TextEditingController(text: '${st.aprs.port}');
-    _ws = TextEditingController(text: st.aprs.wsUrl ?? '');
-    _pass = TextEditingController(text: st.aprs.passcode);
     _filterLat = TextEditingController(text: st.filterLat.toStringAsFixed(2));
     _filterLng = TextEditingController(text: st.filterLng.toStringAsFixed(2));
     _filterRadius = TextEditingController(text: '${st.filterRadius}');
@@ -2232,10 +2214,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     _maxPackets = TextEditingController(text: '${st.maxPackets}');
     _maxTrackPts = TextEditingController(text: '${st.maxTrackPts}');
     _onlineWindow = TextEditingController(text: '${st.onlineWindowMin}');
-    _origServer = st.aprs.server;
-    _origPort = st.aprs.port;
-    _origPass = st.aprs.passcode;
-    _origWs = st.aprs.wsUrl;
     _origFilterRadius = st.filterRadius;
     _origFilterFollow = st.filterFollow;
     _origFilterLat = st.filterLat;
@@ -2244,12 +2222,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
 
   @override
   void dispose() {
-    _serverFocus.removeListener(_onServerFocus);
-    _serverFocus.dispose();
-    _server.dispose();
-    _port.dispose();
-    _ws.dispose();
-    _pass.dispose();
     _filterLat.dispose();
     _filterLng.dispose();
     _filterRadius.dispose();
@@ -2273,17 +2245,12 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           icon: Icons.wifi_rounded,
           color: C.purple,
           body: Column(children: [
-            // ⓪ 两条互联网链路，一张卡一条：APRS-IS、APRSNETCN SERVER。
-            //    用户：「netcn 是等价 is」—— 两条都是「一条 TCP 登录」，各有自己的
-            //    地址、端口、凭证、过滤器，也各自能当发射链路。所以这里的形状是
-            //    「链路卡 + 筛选卡」× 2，谁也不挂在谁下面。
-            _connectionCard(),
+            // 一级页只摆两条互联网链路的入口：点进去才是各自的地址、端口、
+            // 凭证与发射圆点。用户：「netcn 是等价 is」—— 两条都是「一条 TCP
+            // 登录」，谁也不挂在谁下面，所以在这里是并列的两个大选项。
+            _linkEntries(),
             const SizedBox(height: 12),
             _filterCard(),
-            if (tcpLinkPlatformSupported) ...[
-              const SizedBox(height: 16),
-              AcnCards(state: st),
-            ],
             const SizedBox(height: 16),
             _storageCard(),
             const SizedBox(height: 16),
@@ -2314,210 +2281,46 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     });
   }
 
-  /// APRS-IS 连接卡片。
-  /// 原先拆成「服务器（连接状态）」+「服务器配置」两张卡，标题都指向服务器、
-  /// 语义重复；现合并为一张：连接状态 → 服务器参数 → 配置变更提示。
-  Widget _connectionCard() {
+  /// 一级页上的两个大选项：这是哪台服务器、现在通不通，点进去改设置。
+  Widget _linkEntries() {
+    final s = S.of(context);
     return SettingsSectionCard(
-      title: S.of(context).connectionCard2,
-      subtitle: S.of(context).settingsConnStatusSubtitle,
+      title: s.sourceGroupInternet,
+      subtitle: s.channelsSubtitle,
       icon: Icons.dns_rounded,
       color: C.purple,
       children: [
-        // 这一页两条链路各一张卡，开关也各在自己卡里（设备页那张卡里同样有，
-        // 与 APRSNETCN 那张卡一个口径）。
-        SettingsSwitch(
-          S.of(context).dataSourceAprsIs,
-          value: st.aprsIsOn,
-          color: C.purple,
-          onChanged: (v) => st.toggleSource(AppState.srcAprsIs, v),
-        ),
-        SettingsRow2(S.of(context).connection,
-            localizedConnectionInfo(context, st.connInfo),
-            valueColor: st.isUp(AppState.srcAprsIs) ? C.green : C.grey),
-        _serverInput(),
-        SettingsInput(S.of(context).port, _port,
-            onChanged: (v) {
-          final n = int.tryParse(v);
-          if (n != null) st.aprs.port = n;
-          _checkConfigDirty();
-        }),
-        _passcodeInput(),
-        SettingsTxPick(
-          S.of(context).txSourcePick,
-          checked: st.dataSource == AppState.srcAprsIs,
-          onTap: () => st.setTxSource(AppState.srcAprsIs),
-        ),
-        SettingsInput(S.of(context).wsUrlOptional, _ws,
-            onChanged: (v) {
-          st.aprs.wsUrl = v.trim().isEmpty ? null : v.trim();
-          _checkConfigDirty();
-        }),
-        if (_configDirty) ...[
-          Divider(height: 1, color: C.border),
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(children: [
-              Icon(Icons.info_outline_rounded,
-                  color: C.orange, size: 20),
-              SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(S.of(context).configChanged,
-                          style: ts(13, c: C.orange, w: FontWeight.w700)),
-                      Text(S.of(context).reconnectToApply,
-                          style: ts(11,
-                              c: C.orange.withValues(alpha: 0.8))),
-                    ]),
-              ),
-              SizedBox(width: 8),
-              IconButton(
-                icon: Icon(Icons.refresh_rounded,
-                    color: C.orange, size: 22),
-                tooltip: S.of(context).reconnect,
-                onPressed: () async {
-                  setState(() => _configDirty = false);
-                  await st.reconnect();
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(st.connected
-                            ? S.of(context).reconnected
-                            : S.of(context).connectFailedCheckConfig),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                },
-              ),
-            ]),
+        SettingsLinkEntry(
+          title: s.dataSourceAprsIs,
+          subtitle: s.aprsIsEntryDesc,
+          status: st.aprs.server.trim().isEmpty
+              ? s.serverMissing
+              : '${st.aprs.server.trim()}:${st.aprs.port}',
+          up: st.isUp(AppState.srcAprsIs),
+          on: st.aprsIsOn,
+          onToggle: (v) => st.toggleSource(AppState.srcAprsIs, v),
+          icon: Icons.cloud_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => AprsIsServerPage(state: st)),
           ),
-        ],
+        ),
+        // 第二条链路只有裸 TCP，Web 上没有（与设备页那张卡同一个口径）
+        if (tcpLinkPlatformSupported)
+          SettingsLinkEntry(
+            title: s.acnCardTitle,
+            subtitle: s.acnOpenSettings,
+            status: st.acnServer.trim().isEmpty
+                ? s.serverMissing
+                : '${st.acnServer.trim()}:${st.acnPort}',
+            up: st.acnConnected,
+            on: st.acnOn,
+            onToggle: st.setAcnOn,
+            icon: Icons.hub_rounded,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => AcnLinkPage(state: st)),
+            ),
+          ),
       ],
-    );
-  }
-
-  /// 输入框失焦时把这次填的地址记进历史（`onChanged` 里记就会变成逐字母的记录）。
-  void _onServerFocus() {
-    if (_serverFocus.hasFocus) return;
-    st.rememberInput(InputHistory.server, _server.text);
-  }
-
-  /// 从历史里挑一台：写回输入框与配置。
-  ///
-  /// 程序赋值不会触发 `onChanged`，所以配置与「配置已改」提示要在这里补上一遍，
-  /// 否则挑完历史后页面还以为什么都没改。
-  void _pickServer(String v) {
-    _server.text = v;
-    st.aprs.server = v.trim();
-    _checkConfigDirty();
-    setState(() {});
-  }
-
-  /// 服务器地址输入（没填时给「未配置」徽标 + 一句原因）。
-  ///
-  /// 用户要求：没有配置服务器时要点出**连不上的原因**并提示去配置，与 Passcode
-  /// 填 -1 的验证提示一个口径。服务器这一项空了以后，点多少次「连接」都不会成功，
-  /// 而空输入框自己看不出这件事。
-  ///
-  /// 挂在 ValueListenableBuilder 上是为了让徽标与这句话**逐字**跟着输入走：
-  /// `_checkConfigDirty()` 只在「脏」翻转时才 setState（把原本就有的地址删空时
-  /// 它不翻），跟着它刷会留下一个过期的徽标。
-  Widget _serverInput() {
-    return ValueListenableBuilder<TextEditingValue>(
-      valueListenable: _server,
-      builder: (_, v, _) {
-        final missing = v.text.trim().isEmpty;
-        return Column(children: [
-          SettingsInput(
-            S.of(context).server,
-            _server,
-            focusNode: _serverFocus,
-            badge: missing ? S.of(context).serverMissing : null,
-            onChanged: (x) {
-              st.aprs.server = x.trim();
-              _checkConfigDirty();
-            },
-            // 「最近连过的服务器」：地址是一串不短的域名，重敲一遍最容易出错
-            trailing: st.serverHistory.isEmpty
-                ? null
-                : HistoryButton(
-                    entries: st.serverHistory,
-                    title: S.of(context).serverHistoryTitle,
-                    onPick: _pickServer,
-                    onDelete: (v) => st.forgetInput(InputHistory.server, v),
-                    onClear: () => st.clearInputHistory(InputHistory.server),
-                  ),
-          ),
-          if (missing)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 6, 14, 8),
-              child: Row(children: [
-                Icon(Icons.warning_amber_rounded, size: 14, color: C.red),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    S.of(context).serverMissingWarning,
-                    style: ts(10.5, c: C.red, h: 1.4),
-                  ),
-                ),
-              ]),
-            ),
-        ]);
-      },
-    );
-  }
-
-  /// Passcode 输入（未验证时醒目提示）
-  Widget _passcodeInput() {
-    final isDefault = _pass.text.trim().isEmpty || _pass.text.trim() == '-1';
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: C.border, width: 0.4)),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Text(S.of(context).passcode, style: ts(12, c: C.slate)),
-          if (isDefault) ...[
-            const SizedBox(width: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: C.orangeBg,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(S.of(context).unverified,
-                  style: ts(9, c: C.orange, w: FontWeight.w700)),
-            ),
-          ],
-        ]),
-        const SizedBox(height: 6),
-        TextField(
-          controller: _pass,
-          style: ts(13, w: FontWeight.w600),
-          onChanged: (v) {
-            st.aprs.passcode = v.trim().isEmpty ? '-1' : v.trim();
-            _checkConfigDirty();
-          },
-          decoration: InputDecoration(
-            hintText: S.of(context).passcodeUnverifiedHint,
-            hintStyle: ts(13, c: C.greyLight),
-            isDense: true,
-            filled: true,
-            fillColor: C.bgSoft,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(S.of(context).passcodeMessageWarning,
-            style: ts(10, c: C.grey)),
-      ]),
     );
   }
 
@@ -3286,18 +3089,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     final lngText = st.filterLng.toStringAsFixed(4);
     if (_filterLat.text != latText) _filterLat.text = latText;
     if (_filterLng.text != lngText) _filterLng.text = lngText;
-  }
-
-  void _checkConfigDirty() {
-    // 仅服务器相关配置变化才显示顶部"重新连接"横幅；
-    // 过滤范围修改通过卡片内的"保存并应用过滤"按钮应用（见 _filterCard）
-    final dirty = st.aprs.server != _origServer ||
-        st.aprs.port != _origPort ||
-        st.aprs.passcode != _origPass ||
-        st.aprs.wsUrl != _origWs;
-    if (dirty != _configDirty) {
-      setState(() => _configDirty = dirty);
-    }
   }
 }
 

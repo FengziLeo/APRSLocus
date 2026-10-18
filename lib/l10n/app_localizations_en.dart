@@ -929,10 +929,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get beaconCatDesc => 'GPS · Beaconing · Manual position';
 
   @override
-  String get connectionCat => 'Connection';
+  String get connectionCat => 'Servers';
 
   @override
-  String get connectionCatDesc => 'Server · Range filter';
+  String get connectionCatDesc => 'Two links · filter range';
 
   @override
   String get displayCat => 'Display';
@@ -1003,7 +1003,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stationSettingsSubtitle => 'Callsign, symbol & beaconing';
 
   @override
-  String get connectionSettingsSubtitle => 'APRS-IS server & receive range';
+  String get connectionSettingsSubtitle => 'Both links can be online at once, each getting its own copy of every packet.';
 
   @override
   String get chatSettingsSubtitle => 'Message history & contacts';
@@ -3600,7 +3600,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get advancedSettings2 => 'Advanced settings';
 
   @override
-  String get connectionSettings2 => 'Connection settings';
+  String get connectionSettings2 => 'Servers';
 
   @override
   String get myCallsign => 'My callsign';
@@ -7715,7 +7715,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get linkNotConnected => 'Not connected';
 
   @override
-  String get linkTapForSettings => 'Tap to open connection settings';
+  String get linkTapForSettings => 'Tap to open server settings';
 
   @override
   String get uiMaterialGlassFull => 'Full frosted glass';
@@ -9578,7 +9578,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceGroupRadio => "Radio links";
 
   @override
-  String get acnPageLead => "An APRS-IS server built on the APRSNETCN SERVER protocol. Put its address in the connection settings and it is your main link, sending included. Turn it on here and both links stay online, each with its own feed.";
+  String get acnPageLead => "An APRS-IS server built on the APRSNETCN SERVER protocol. Its address goes in Settings → Servers, and the link can send and receive. Both links can stay online at once, each with its own feed.";
 
   @override
   String get acnServerProto => "Server proto";
@@ -9642,5 +9642,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get acnPasscodeHint => "Leave it empty to use the APRS-IS link's passcode";
+
+  @override
+  String get aprsIsServerTitle => "APRS-IS server";
+
+  @override
+  String get aprsIsServerLead => "Address, port and passcode go here.";
+
+  @override
+  String get aprsIsCardSubtitle => "Login details and connection state";
+
+  @override
+  String get aprsIsEntryDesc => "Address, port and passcode";
 
 }

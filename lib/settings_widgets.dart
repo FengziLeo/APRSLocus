@@ -624,6 +624,105 @@ class SettingsNavRow extends StatelessWidget {
   }
 }
 
+/// 一级页上的链路入口（一台服务器一行）。
+///
+/// 与 [SettingsNavRow] 的区别：这一行自带开关，能直接开关整条链路，
+/// 字与图标底座也更大 —— 用户在「设置 → 服务器」一级把它读作「一台服务器」，
+/// 而不是一条设置项。状态行是「通不通 + 地址」，副标题说里面能改什么。
+class SettingsLinkEntry extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String status;
+  final bool up;
+  final bool on;
+  final ValueChanged<bool> onToggle;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  const SettingsLinkEntry({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.status,
+    required this.up,
+    required this.on,
+    required this.onToggle,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+        decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: C.border, width: 0.4))),
+        child: Row(children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: on ? 0.14 : 0.06),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(icon, size: 20, color: on ? color : C.greyLight),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: ts(13,
+                        c: on ? C.slate : C.grey, w: FontWeight.w700),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 3),
+                Row(children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: up ? C.green : C.greyLight,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: Text(status,
+                        style: ts(10.5, c: up ? C.green : C.grey),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                ]),
+                const SizedBox(height: 2),
+                Text(subtitle,
+                    style: ts(10, c: C.greyLight),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+              ],
+            ),
+          ),
+          const SizedBox(width: 6),
+          Switch(
+            value: on,
+            onChanged: onToggle,
+            activeThumbColor: color,
+            activeTrackColor: color.withValues(alpha: 0.25),
+            inactiveThumbColor: C.grey,
+            inactiveTrackColor: C.greyBg,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          Icon(Icons.chevron_right_rounded, size: 18, color: C.greyLight),
+        ]),
+      ),
+    );
+  }
+}
+
 /// 分区内统一提示说明块
 class SettingsHint extends StatelessWidget {
   final String text;

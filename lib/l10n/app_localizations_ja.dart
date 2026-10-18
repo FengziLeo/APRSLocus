@@ -921,10 +921,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get beaconCatDesc => 'GPS · ビーコン · 手動位置';
 
   @override
-  String get connectionCat => '接続';
+  String get connectionCat => 'サーバー';
 
   @override
-  String get connectionCatDesc => 'サーバー · フィルター範囲';
+  String get connectionCatDesc => '2 つの回線とフィルター範囲';
 
   @override
   String get displayCat => '表示';
@@ -994,7 +994,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get stationSettingsSubtitle => 'コールサイン・シンボル・ビーコン';
 
   @override
-  String get connectionSettingsSubtitle => 'APRS-IS サーバーと受信範囲';
+  String get connectionSettingsSubtitle => '2 つの回線は同時に接続でき、パケットは両方に 1 通ずつ届きます。';
 
   @override
   String get chatSettingsSubtitle => 'メッセージ履歴と連絡先';
@@ -3482,7 +3482,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get advancedSettings2 => '詳細設定';
 
   @override
-  String get connectionSettings2 => '接続設定';
+  String get connectionSettings2 => 'サーバー';
 
   @override
   String get myCallsign => 'マイコールサイン';
@@ -7476,7 +7476,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get linkNotConnected => '未接続';
 
   @override
-  String get linkTapForSettings => 'タップして接続設定を開く';
+  String get linkTapForSettings => 'タップしてサーバー設定を開く';
 
   @override
   String get uiMaterialGlassFull => 'フルすりガラス';
@@ -9299,7 +9299,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get sourceGroupRadio => "無線回線";
 
   @override
-  String get acnPageLead => "APRSNETCN SERVER プロトコルに基づく APRS-IS サーバーです。接続設定にアドレスを入れればメイン回線として送受信でき、ここで有効にすると 2 本同時に接続し、それぞれ受信します。";
+  String get acnPageLead => "APRSNETCN SERVER プロトコルに基づく APRS-IS サーバーです。アドレスは「設定 → サーバー」に入れ、送受信のどちらもこの回線で行います。2 本の回線は同時に接続でき、それぞれ受信します。";
 
   @override
   String get acnServerProto => "サーバー協定";
@@ -9363,5 +9363,17 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get acnPasscodeHint => "空欄なら APRS-IS 側の passcode を使います";
+
+  @override
+  String get aprsIsServerTitle => "APRS-IS サーバー";
+
+  @override
+  String get aprsIsServerLead => "アドレス、ポート、passcode はここに入力します。";
+
+  @override
+  String get aprsIsCardSubtitle => "ログイン設定と接続状態";
+
+  @override
+  String get aprsIsEntryDesc => "アドレス、ポート、passcode";
 
 }

@@ -10,9 +10,8 @@ import 'widgets.dart';
 
 /// ─── APRSNETCN SERVER 的整页 ───
 ///
-/// 卡本身在 [AcnCards]：「设置 → 连接设置」把它摆在 APRS-IS 那几张卡下面，
-/// 两条链路形状一致。这里只是把它单独包成一页 —— 设备页那行勾选旁边的
-/// 设置按钮点进来，能一次看到这台服务器公布的全部东西。
+/// 卡本身在 `AcnCards`。这里把它包成一页：「设置 → 服务器」一级的第二个
+/// 入口点进来，与 APRS-IS 那一页（`AprsIsServerPage`）并列。
 class AcnLinkPage extends StatefulWidget {
   final AppState state;
   const AcnLinkPage({super.key, required this.state});

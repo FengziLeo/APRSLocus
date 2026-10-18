@@ -16887,6 +16887,30 @@ abstract class AppLocalizations {
   /// **'留空就用 APRS-IS 那条链路的 passcode'**
   String get acnPasscodeHint;
 
+  /// No description provided for @aprsIsServerTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'APRS-IS 服务器'**
+  String get aprsIsServerTitle;
+
+  /// No description provided for @aprsIsServerLead.
+  ///
+  /// In zh, this message translates to:
+  /// **'地址、端口与 passcode 都填在这里。'**
+  String get aprsIsServerLead;
+
+  /// No description provided for @aprsIsCardSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'登录参数与连接状态'**
+  String get aprsIsCardSubtitle;
+
+  /// No description provided for @aprsIsEntryDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'地址、端口与 passcode'**
+  String get aprsIsEntryDesc;
+
 }
 
 class _AppLocalizationsDelegate

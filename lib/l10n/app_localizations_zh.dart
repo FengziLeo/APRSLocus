@@ -918,10 +918,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get beaconCatDesc => 'GPS · 信标 · 手动定位';
 
   @override
-  String get connectionCat => '连接';
+  String get connectionCat => '服务器';
 
   @override
-  String get connectionCatDesc => '服务器 · 过滤范围';
+  String get connectionCatDesc => '两条链路与过滤范围';
 
   @override
   String get displayCat => '显示';
@@ -991,7 +991,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get stationSettingsSubtitle => '呼号、符号与信标';
 
   @override
-  String get connectionSettingsSubtitle => 'APRS-IS 服务器与接收范围';
+  String get connectionSettingsSubtitle => '两条链路可以同时在线，报文两边各收一份。';
 
   @override
   String get chatSettingsSubtitle => '消息记录与联系人';
@@ -3448,7 +3448,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get advancedSettings2 => '高级设置';
 
   @override
-  String get connectionSettings2 => '连接设置';
+  String get connectionSettings2 => '服务器';
 
   @override
   String get myCallsign => '我的呼号';
@@ -7395,7 +7395,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get linkNotConnected => '未连接';
 
   @override
-  String get linkTapForSettings => '点一下查看连接设置';
+  String get linkTapForSettings => '点一下查看服务器设置';
 
   @override
   String get uiMaterialGlassFull => '满血磨砂玻璃';
@@ -9199,7 +9199,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceGroupRadio => "电台链路";
 
   @override
-  String get acnPageLead => "一台基于 APRSNETCN SERVER 协议的 APRS-IS 服务器。地址填进连接设置，收发都走它；在这里打开，是让两条链路同时在线，各收各的。";
+  String get acnPageLead => "一台基于 APRSNETCN SERVER 协议的 APRS-IS 服务器。地址填在「设置 → 服务器」里，收发都走它。两条链路可以同时在线，各收各的。";
 
   @override
   String get acnServerProto => "服务器协议";
@@ -9263,6 +9263,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get acnPasscodeHint => "留空就用 APRS-IS 那条链路的 passcode";
+
+  @override
+  String get aprsIsServerTitle => "APRS-IS 服务器";
+
+  @override
+  String get aprsIsServerLead => "地址、端口与 passcode 都填在这里。";
+
+  @override
+  String get aprsIsCardSubtitle => "登录参数与连接状态";
+
+  @override
+  String get aprsIsEntryDesc => "地址、端口与 passcode";
 
 }
 
@@ -10179,10 +10191,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get beaconCatDesc => 'GPS · 信標 · 手動定位';
 
   @override
-  String get connectionCat => '連線';
+  String get connectionCat => '伺服器';
 
   @override
-  String get connectionCatDesc => '伺服器 · 篩選範圍';
+  String get connectionCatDesc => '兩條鏈路與過濾範圍';
 
   @override
   String get displayCat => '顯示';
@@ -10252,7 +10264,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get stationSettingsSubtitle => '呼號、符號與信標';
 
   @override
-  String get connectionSettingsSubtitle => 'APRS-IS 伺服器與接收範圍';
+  String get connectionSettingsSubtitle => '兩條鏈路可以同時在線，報文兩邊各收一份。';
 
   @override
   String get chatSettingsSubtitle => '訊息記錄與聯絡人';
@@ -12709,7 +12721,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get advancedSettings2 => '高階設定';
 
   @override
-  String get connectionSettings2 => '連線設定';
+  String get connectionSettings2 => '伺服器';
 
   @override
   String get myCallsign => '我的呼號';
@@ -16656,7 +16668,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get linkNotConnected => '未連線';
 
   @override
-  String get linkTapForSettings => '點一下查看連線設定';
+  String get linkTapForSettings => '點一下查看伺服器設定';
 
   @override
   String get uiMaterialGlassFull => '滿血磨砂玻璃';
@@ -18460,7 +18472,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceGroupRadio => "電台鏈路";
 
   @override
-  String get acnPageLead => "一台基於 APRSNETCN SERVER 協定的 APRS-IS 伺服器。位址填進連線設定，收發都走它；在這裡打開，是讓兩條鏈路同時在線，各收各的。";
+  String get acnPageLead => "一台基於 APRSNETCN SERVER 協定的 APRS-IS 伺服器。位址填在「設定 → 伺服器」裡，收發都走它。兩條鏈路可以同時在線，各收各的。";
 
   @override
   String get acnServerProto => "伺服器協定";
@@ -18524,5 +18536,17 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get acnPasscodeHint => "留空就用 APRS-IS 那條鏈路的 passcode";
+
+  @override
+  String get aprsIsServerTitle => "APRS-IS 伺服器";
+
+  @override
+  String get aprsIsServerLead => "位址、埠與 passcode 都填在這裡。";
+
+  @override
+  String get aprsIsCardSubtitle => "登入參數與連線狀態";
+
+  @override
+  String get aprsIsEntryDesc => "位址、埠與 passcode";
 
 }

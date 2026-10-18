@@ -932,10 +932,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get beaconCatDesc => 'GPS · Baliza · Posición manual';
 
   @override
-  String get connectionCat => 'Conexión';
+  String get connectionCat => 'Servidores';
 
   @override
-  String get connectionCatDesc => 'Servidor · Filtro de rango';
+  String get connectionCatDesc => 'Dos enlaces · filtro de rango';
 
   @override
   String get displayCat => 'Pantalla';
@@ -1008,7 +1008,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get connectionSettingsSubtitle =>
-      'Servidor APRS-IS y rango de recepción';
+      'Los dos enlaces pueden estar en línea a la vez y cada uno recibe su copia de cada paquete.';
 
   @override
   String get chatSettingsSubtitle => 'Historial de mensajes y contactos';
@@ -3621,7 +3621,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get advancedSettings2 => 'Ajustes avanzados';
 
   @override
-  String get connectionSettings2 => 'Ajustes de conexión';
+  String get connectionSettings2 => 'Servidores';
 
   @override
   String get myCallsign => 'Mi indicativo';
@@ -7768,7 +7768,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get linkNotConnected => 'Sin conexión';
 
   @override
-  String get linkTapForSettings => 'Toca para abrir los ajustes de conexión';
+  String get linkTapForSettings => 'Toca para abrir los ajustes del servidor';
 
   @override
   String get uiMaterialGlassFull => 'Cristal esmerilado intenso';
@@ -9637,7 +9637,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sourceGroupRadio => "Enlaces de radio";
 
   @override
-  String get acnPageLead => "Un servidor APRS-IS basado en el protocolo APRSNETCN SERVER. Si pones su dirección en los ajustes de conexión, es tu enlace principal y también envía. Si lo activas aquí, los dos enlaces siguen en línea y cada uno recibe lo suyo.";
+  String get acnPageLead => "Un servidor APRS-IS basado en el protocolo APRSNETCN SERVER. Su dirección va en Ajustes → Servidores, y el enlace sirve para enviar y recibir. Los dos enlaces pueden estar en línea a la vez, cada uno con su propio flujo.";
 
   @override
   String get acnServerProto => "Protocolo del servidor";
@@ -9701,5 +9701,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get acnPasscodeHint => "Déjalo vacío para usar el passcode del enlace APRS-IS";
+
+  @override
+  String get aprsIsServerTitle => "Servidor APRS-IS";
+
+  @override
+  String get aprsIsServerLead => "La dirección, el puerto y el passcode van aquí.";
+
+  @override
+  String get aprsIsCardSubtitle => "Datos de acceso y estado de la conexión";
+
+  @override
+  String get aprsIsEntryDesc => "Dirección, puerto y passcode";
 
 }

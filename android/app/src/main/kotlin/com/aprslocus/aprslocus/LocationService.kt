@@ -323,6 +323,9 @@ class LocationService : Service() {
         super.onCreate()
         instance = this
         createNotificationChannel()
+        // 看门狗从服务起来就开工：有服务就必须有通知。
+        notifWatch.removeCallbacks(notifWatchRun)
+        notifWatch.postDelayed(notifWatchRun, 10000L)
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
@@ -416,6 +419,7 @@ class LocationService : Service() {
 
     override fun onDestroy() {
         instance = null
+        notifWatch.removeCallbacks(notifWatchRun)
         stopLocationUpdates()
         lastKnownPoll.removeCallbacks(lastKnownRunnable)
         try {
@@ -555,6 +559,24 @@ class LocationService : Service() {
                 republish()
             }
         }, 1500)
+    }
+
+    /// 通知看门狗：服务活着，那条通知就必须在。
+    ///
+    /// 不赌任何单一原因（提升、ROM 清理、系统回收、用户手滑划掉）。
+    /// 十秒查一次通知列表，不在了就照上一次的内容重发一条。前台服务的
+    /// 通知没了，等于后台在用户眼里也没了。
+    private val notifWatch = Handler(Looper.getMainLooper())
+    private val notifWatchRun = object : Runnable {
+        override fun run() {
+            try {
+                val nm = getSystemService(NotificationManager::class.java)
+                if (nm.activeNotifications.none { it.id == NOTIFICATION_ID }) republish()
+            } catch (_: Throwable) {
+                // 查不到就下次再查
+            }
+            notifWatch.postDelayed(this, 10000L)
+        }
     }
 
     /// 用上一次的文本/胶囊/倒计时重建并发一次（换提升姿势、刷新前台服务类型时用）。
@@ -1102,5 +1124,17 @@ fun diag(context: Context, liveText: String = ""): String {
         else -> ch.importance.toString()
     })
     lines.addAll(LocationService.lastNotifReport())
+    // 真发一条测试通知（不同 id，用同一套构造），马上看它在不在，然后撤掉。
+    // 「到底能不能发出去」问系统最准：能发而用户看不到，与压根发不出去，
+    // 是两个完全不同的毛病。
+    val probeId = 9901
+    lines.add("测试通知：" + try {
+        nm.notify(probeId, ongoingNotification(context, "通知自检", "", PROMO_PLAIN, 0))
+        val seen = nm.activeNotifications.any { it.id == probeId }
+        nm.cancel(probeId)
+        if (seen) "发出去了，系统里有" else "发出去但系统没有"
+    } catch (e: Throwable) {
+        "出错（" + e.javaClass.simpleName + "）"
+    })
     return lines.joinToString("\n")
 }

@@ -7001,14 +7001,13 @@ class AppState extends ChangeNotifier {
         return;
       }
       if (_serviceUpRetry >= 3) {
-        locStatus = '定位服务起不来';
+        locStatus = '定位失败';
         _log(LogLevel.error, '定位', '前台服务三次都没起来');
         _notify();
         return;
       }
       _serviceUpRetry++;
       _log(LogLevel.error, '定位', '前台服务没起来，第 $_serviceUpRetry 次重试');
-      locStatus = '定位服务重试 $_serviceUpRetry/3';
       _notify();
       await startTracking();
     });

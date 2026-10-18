@@ -3153,6 +3153,7 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
                 SettingsHint(S.of(context).themeFixedPrimary, color: C.orange),
               _uiMaterialSelector(st),
               _uiLayoutSelector(st),
+              _notifStyleSelector(st),
               _languageSelector(st),
               _uiScaleSelector(st),
               SettingsRow2(S.of(context).unit, S.of(context).metricUnits),
@@ -3336,6 +3337,92 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
               ),
             ),
           SettingsHint(S.of(context).uiLayoutHint),
+        ],
+      ),
+    );
+  }
+
+  /// 常驻通知的显示样式。
+  ///
+  /// 两档的区别是**系统画在哪儿**：实时更新会被提到状态栏那一小条（Android 16
+  /// 的 Live Updates，可带一行倒计时胶囊），普通常驻通知就只在通知栏里。提不上
+  /// 去的时候实时更新也会退回普通通知，所以选了它不会少一条通知。
+  Widget _notifStyleSelector(AppState st) {
+    final options = <(String, String, String)>[
+      (
+        'plain',
+        S.of(context).notifStylePlain,
+        S.of(context).notifStylePlainDesc,
+      ),
+      (
+        'live',
+        S.of(context).notifStyleLive,
+        S.of(context).notifLiveHint,
+      ),
+    ];
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: C.border, width: 0.4))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(S.of(context).notifStyleTitle, style: ts(12, c: C.slate)),
+          const SizedBox(height: 8),
+          for (final (value, name, desc) in options)
+            GestureDetector(
+              onTap: () => st.setNotifStyle(value),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: st.notifStyle == value ? C.cyanBg : C.bgSoft,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: st.notifStyle == value ? C.cyan : C.border,
+                    width: st.notifStyle == value ? 1.5 : 1,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 1),
+                      child: Icon(
+                        st.notifStyle == value
+                            ? Icons.radio_button_checked_rounded
+                            : Icons.radio_button_unchecked_rounded,
+                        size: 16,
+                        color:
+                            st.notifStyle == value ? C.cyan : C.greyLight,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: ts(
+                              12,
+                              c: st.notifStyle == value ? C.cyan : C.slate,
+                              w: st.notifStyle == value
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(desc, style: ts(10, c: C.grey, h: 1.3)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );

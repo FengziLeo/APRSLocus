@@ -192,6 +192,12 @@ class LocationService : Service() {
          */
         @Volatile private var btActive = false
 
+        /// 实时更新（Android 16 的 Live Updates）开关。
+        ///
+        /// 用户在设置里选，默认不开：提不提得上去还取决于系统设置与通知本身
+        /// 的条件，不开就一直是今天这种普通常驻通知。
+        @Volatile private var liveUpdates = false
+
         fun setBtActiveStatic(active: Boolean) {
             if (btActive == active) return
             btActive = active
@@ -199,8 +205,16 @@ class LocationService : Service() {
         }
 
         /// 更新前台服务通知（同进程直连，MainActivity 调用）
-        fun updateNotificationStatic(text: String) {
-            instance?.updateNotification(text)
+        fun updateNotificationStatic(text: String, short: String = "") {
+            instance?.updateNotification(text, short)
+        }
+
+        /// 实时更新（Android 16 的 Live Updates）开关：用户在设置里选的。
+        /// 换开关时立刻重发一次通知，否则要等到下一次文字变化才生效。
+        fun setLiveUpdatesStatic(on: Boolean) {
+            if (liveUpdates == on) return
+            liveUpdates = on
+            instance?.let { it.updateNotification(it.lastNotificationText) }
         }
 
         /// 动态切换定位模式（服务运行中立即生效：重建 provider 监听）
@@ -416,7 +430,7 @@ class LocationService : Service() {
         }
     }
 
-    private fun buildNotification(text: String): Notification {
+    private fun buildNotification(text: String, short: String = ""): Notification {
         val pendingIntent = PendingIntent.getActivity(
             this, 0,
             Intent(this, MainActivity::class.java),
@@ -459,16 +473,81 @@ class LocationService : Service() {
             // setSilent 管的是「这条通知本身静音」，但部分 ROM 会在文字变化时把
             // 常驻通知当成新通知重新弹一遍；加上它才有「更新不打扰」的保证。
             .setOnlyAlertOnce(true)
+            // 实时更新（Live Updates）要求通知用 BigTextStyle / CallStyle /
+            // ProgressStyle / MetricStyle 之一：展开式正文既符合要求，本身也
+            // 比一行截断好看（长文本在折叠态本来就显示不全）。
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .addAction(toggleAction)
             .addAction(exitAction)
             .build()
+            .let { built ->
+                val out = if (liveUpdates) promote(built, short) else built
+                if (liveUpdates) injectXiaomiFocus(out, short)
+                out
+            }
     }
 
-    fun updateNotification(text: String) {
+    /// 小米 / Redmi / POCO 的「焦点通知」（超级岛）。
+    ///
+    /// MIUI / HyperOS 看到 extras 里这串 JSON 就接管渲染；系统不认、或者用户
+    /// 没在系统设置里允许焦点通知时，这串东西会被忽略，通知照普通通知显示。
+    /// 所以这里不需要回退分支，写失败也只是不生效。
+    ///
+    /// ⚠️ 这里只给最小的一份（ticker + aodTitle）。param_v2 里各个模板的字段
+    /// 要按官方模板库填，手上没有那份文档的准确字段名，所以没往里堆别的。
+    private fun injectXiaomiFocus(notif: Notification, short: String) {
+        if (!xiaomiFocusAllowed()) return
+        val ticker = (if (short.isNotEmpty()) short else lastNotificationText)
+            .replace("\\", "")
+            .replace("\"", "")
+            .replace("\n", " ")
+        val json = "{\"param_v2\":{\"baseInfo\":{\"businessId\":\"aprslocus\"}," +
+                "\"focusInfo\":{\"aodTitle\":\"APRSlocus\",\"ticker\":\"" + ticker + "\"}}}"
+        notif.extras.putString("miui.focus.param", json)
+    }
+
+    /// 这台设备允不允许发焦点通知（小米自己提供的 content provider）。
+    private fun xiaomiFocusAllowed(): Boolean {
+        val maker = (Build.MANUFACTURER + " " + Build.BRAND).lowercase()
+        if (!maker.contains("xiaomi") && !maker.contains("redmi") &&
+            !maker.contains("poco")
+        ) return false
+        return try {
+            val uri = android.net.Uri.parse("content://miui.statusbar.notification.public")
+            val extras = Bundle().apply { putString("package", packageName) }
+            val result = contentResolver.call(uri, "canShowFocus", null, extras)
+            result?.getBoolean("canShowFocus") == true
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
+    /// 把常驻通知提成 Android 16 的「实时更新」。
+    ///
+    /// 提不上去的情况全都原地退回普通通知（不抛异常、不影响前台服务）：
+    /// 系统低于 16、用户在系统设置里不允许这个应用发提升通知、通知本身不满足
+    /// 条件（`hasPromotableCharacteristics`）。Android 15 没有公开的
+    /// `setRequestPromotedOngoing`，那一代就只能停在普通常驻通知。
+    private fun promote(notif: Notification, short: String): Notification {
+        if (Build.VERSION.SDK_INT < 36) return notif
+        return try {
+            val nm = getSystemService(NotificationManager::class.java)
+            if (nm == null || !nm.canPostPromotedNotifications()) return notif
+            val builder = Notification.Builder.recoverBuilder(this, notif)
+            builder.setRequestPromotedOngoing(true)
+            if (short.isNotEmpty()) builder.setShortCriticalText(short)
+            val promoted = builder.build()
+            if (promoted.hasPromotableCharacteristics()) promoted else notif
+        } catch (_: Throwable) {
+            notif
+        }
+    }
+
+    fun updateNotification(text: String, short: String = "") {
         // 记下来：刷新前台服务类型（音频采集开关）时要用同一份文本重新 startForeground
         lastNotificationText = text
         val nm = getSystemService(NotificationManager::class.java)
-        nm.notify(NOTIFICATION_ID, buildNotification(text))
+        nm.notify(NOTIFICATION_ID, buildNotification(text, short))
     }
 
     /// 按当前模式重建 provider 监听（模式切换时调用）

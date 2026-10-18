@@ -4896,5 +4896,12 @@
   "aprsIsServerLead": "地址、端口与 passcode 都填在这里。",
   "aprsIsCardSubtitle": "登录参数与连接状态",
   "aprsIsEntryDesc": "地址、端口与 passcode",
-  "txKindPosition": "位置与状态报文"
+  "txKindPosition": "位置与状态报文",
+  "notifLiveTitle": "实时通知",
+  "notifLiveHint": "开启后，Android 16 会把常驻通知提成状态栏那一小条，显示距下次上报的倒计时。系统不支持或不允许时，还是普通常驻通知。",
+  "notifTitle": "通知",
+  "notifStyleTitle": "通知显示样式",
+  "notifStylePlain": "普通常驻通知",
+  "notifStylePlainDesc": "通知栏里一条常驻通知，展开看全部文字。",
+  "notifStyleLive": "实时更新"
 }

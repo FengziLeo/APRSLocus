@@ -337,12 +337,19 @@ class LocService {
   /// **文字没变就不重发**（服务刚重启过时会强制重发一次，见 [_notifDirty]）。
   /// 去重的理由见 [_lastNotifText]：调用点太密，而同一条文字反复 `notify()`
   /// 在部分 ROM 上会被当成新通知再弹一次 —— 用户报的「反复弹出待确认上报」。
-  Future<void> updateNotification(String text) async {
-    if (!_notifDirty && text == _lastNotifText) return;
-    _lastNotifText = text;
+  ///
+  /// [live]：用户开了实时更新（Android 16 的 Live Updates），[short] 是状态栏
+  /// 药丸里那行超短文本（≤7 字符）。两者都算进去重键 —— 改了开关或胶囊文字
+  /// 不重发，用户会看不到变化。
+  Future<void> updateNotification(String text,
+      {bool live = false, String short = ''}) async {
+    final key = '$live|$short|$text';
+    if (!_notifDirty && key == _lastNotifText) return;
+    _lastNotifText = key;
     _notifDirty = false;
     try {
-      await _channel.invokeMethod('updateNotification', {'text': text});
+      await _channel.invokeMethod(
+          'updateNotification', {'text': text, 'short': short, 'live': live});
     } catch (_) {}
   }
 

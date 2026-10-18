@@ -9668,4 +9668,25 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get txKindPosition => "Paket posisi dan status";
 
+  @override
+  String get notifLiveTitle => "Pembaruan langsung";
+
+  @override
+  String get notifLiveHint => "Di Android 16, notifikasi tetap naik ke pil bilah status dan menampilkan hitung mundur beacon berikutnya. Kalau tidak didukung, tetap notifikasi biasa.";
+
+  @override
+  String get notifTitle => "Notifikasi";
+
+  @override
+  String get notifStyleTitle => "Gaya notifikasi";
+
+  @override
+  String get notifStylePlain => "Notifikasi tetap biasa";
+
+  @override
+  String get notifStylePlainDesc => "Satu notifikasi tetap di panel; buka untuk membaca semuanya.";
+
+  @override
+  String get notifStyleLive => "Pembaruan langsung";
+
 }

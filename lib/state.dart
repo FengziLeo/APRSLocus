@@ -746,6 +746,24 @@ class AppState extends ChangeNotifier {
     _updateNotification();
   }
 
+  /// 常驻通知的**显示样式**（显示页里选）。
+  ///
+  /// * `plain` = 通知栏里一条普通常驻通知（默认）；
+  /// * `live`  = 申请 Android 16 的实时更新（状态栏那一小条 + 倒计时胶囊），
+  ///   提不上去时**自动退回**普通通知，不会因此少一条通知。
+  String notifStyle = 'plain';
+
+  bool get notifLiveUpdates => notifStyle == 'live';
+
+  void setNotifStyle(String v) {
+    if (v != 'plain' && v != 'live') return;
+    if (notifStyle == v) return;
+    notifStyle = v;
+    persist();
+    _updateNotification();
+    _notify();
+  }
+
   /// 地图页上报状态栏的样式（issue #21-2）。
   ///
   /// * true（默认）= **详细**：多一行判据（当前档位 / 还差多少秒·多少米 /
@@ -4113,6 +4131,7 @@ class AppState extends ChangeNotifier {
     emergencyTel = '120';
     beaconIncludeSteps = false;
     beaconIncludeSats = false;
+    notifStyle = 'plain';
     _stepsBaseline = -1;
     _stepsDayKey = '';
     _stepsCarry = 0;
@@ -4611,6 +4630,7 @@ class AppState extends ChangeNotifier {
           p.getBool('beaconIncludeSteps') ?? beaconIncludeSteps;
       beaconIncludeSats =
           p.getBool('beaconIncludeSats') ?? beaconIncludeSats;
+      notifStyle = p.getString('notifStyle') ?? notifStyle;
       // 计步基线：跨重启必须留着，否则重启后「今日步数」会从 0 重新数
       _stepsBaseline = p.getInt('stepsBaseline') ?? _stepsBaseline;
       _stepsDayKey = p.getString('stepsDayKey') ?? _stepsDayKey;
@@ -4993,6 +5013,7 @@ class AppState extends ChangeNotifier {
     await p.setString('emergencyTel', emergencyTel);
     await p.setBool('beaconIncludeSteps', beaconIncludeSteps);
     await p.setBool('beaconIncludeSats', beaconIncludeSats);
+    await p.setString('notifStyle', notifStyle);
     await p.setInt('stepsBaseline', _stepsBaseline);
     await p.setString('stepsDayKey', _stepsDayKey);
     await p.setInt('stepsCarry', _stepsCarry);
@@ -10694,7 +10715,19 @@ class AppState extends ChangeNotifier {
         (!usingRf || (usingTnc ? tnc.config.rfBeacon : audio.config.rfBeacon))) {
       parts.add(l.notifBeacon(nextBeaconIn));
     }
-    loc.updateNotification(parts.join(' · '));
+    // 实时更新的药丸里只放一行超短文本（建议 ≤7 字符）：倒计时是最想
+    // 一眼看到的值；没在倒计时就不写，让系统自己决定显示什么。
+    var short = '';
+    if (beaconPhase == BeaconPhase.counting ||
+        beaconPhase == BeaconPhase.coarseForced) {
+      short = beaconSecondsLeft >= 60
+          ? '${(beaconSecondsLeft / 60).ceil()}分'
+          : '${beaconSecondsLeft}s';
+    } else if (beaconPhase == BeaconPhase.imminent) {
+      short = l.beaconSoon;
+    }
+    loc.updateNotification(parts.join(' · '),
+        live: notifLiveUpdates, short: short);
   }
 }
 

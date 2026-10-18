@@ -4217,5 +4217,12 @@
   "aprsIsServerLead": "Alamat, port, dan passcode diisi di sini.",
   "aprsIsCardSubtitle": "Detail login dan status koneksi",
   "aprsIsEntryDesc": "Alamat, port, dan passcode",
-  "txKindPosition": "Paket posisi dan status"
+  "txKindPosition": "Paket posisi dan status",
+  "notifLiveTitle": "Pembaruan langsung",
+  "notifLiveHint": "Di Android 16, notifikasi tetap naik ke pil bilah status dan menampilkan hitung mundur beacon berikutnya. Kalau tidak didukung, tetap notifikasi biasa.",
+  "notifTitle": "Notifikasi",
+  "notifStyleTitle": "Gaya notifikasi",
+  "notifStylePlain": "Notifikasi tetap biasa",
+  "notifStylePlainDesc": "Satu notifikasi tetap di panel; buka untuk membaca semuanya.",
+  "notifStyleLive": "Pembaruan langsung"
 }

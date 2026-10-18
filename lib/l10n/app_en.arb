@@ -4217,5 +4217,12 @@
   "aprsIsServerLead": "Address, port and passcode go here.",
   "aprsIsCardSubtitle": "Login details and connection state",
   "aprsIsEntryDesc": "Address, port and passcode",
-  "txKindPosition": "Position and status packets"
+  "txKindPosition": "Position and status packets",
+  "notifLiveTitle": "Live updates",
+  "notifLiveHint": "On Android 16 this promotes the ongoing notification to the status bar pill and shows the countdown to the next beacon. Where the system lacks it or the app is not allowed, it stays a normal ongoing notification.",
+  "notifTitle": "Notifications",
+  "notifStyleTitle": "Notification style",
+  "notifStylePlain": "Normal ongoing notification",
+  "notifStylePlainDesc": "One ongoing notification in the shade; expand it to read everything.",
+  "notifStyleLive": "Live updates"
 }

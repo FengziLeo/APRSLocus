@@ -16917,6 +16917,48 @@ abstract class AppLocalizations {
   /// **'位置与状态报文'**
   String get txKindPosition;
 
+  /// No description provided for @notifLiveTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'实时通知'**
+  String get notifLiveTitle;
+
+  /// No description provided for @notifLiveHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启后，Android 16 会把常驻通知提成状态栏那一小条，显示距下次上报的倒计时。系统不支持或不允许时，还是普通常驻通知。'**
+  String get notifLiveHint;
+
+  /// No description provided for @notifTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'通知'**
+  String get notifTitle;
+
+  /// No description provided for @notifStyleTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'通知显示样式'**
+  String get notifStyleTitle;
+
+  /// No description provided for @notifStylePlain.
+  ///
+  /// In zh, this message translates to:
+  /// **'普通常驻通知'**
+  String get notifStylePlain;
+
+  /// No description provided for @notifStylePlainDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'通知栏里一条常驻通知，展开看全部文字。'**
+  String get notifStylePlainDesc;
+
+  /// No description provided for @notifStyleLive.
+  ///
+  /// In zh, this message translates to:
+  /// **'实时更新'**
+  String get notifStyleLive;
+
 }
 
 class _AppLocalizationsDelegate

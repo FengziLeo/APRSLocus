@@ -9658,4 +9658,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get txKindPosition => "Position and status packets";
 
+  @override
+  String get notifLiveTitle => "Live updates";
+
+  @override
+  String get notifLiveHint => "On Android 16 this promotes the ongoing notification to the status bar pill and shows the countdown to the next beacon. Where the system lacks it or the app is not allowed, it stays a normal ongoing notification.";
+
+  @override
+  String get notifTitle => "Notifications";
+
+  @override
+  String get notifStyleTitle => "Notification style";
+
+  @override
+  String get notifStylePlain => "Normal ongoing notification";
+
+  @override
+  String get notifStylePlainDesc => "One ongoing notification in the shade; expand it to read everything.";
+
+  @override
+  String get notifStyleLive => "Live updates";
+
 }

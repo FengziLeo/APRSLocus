@@ -57,22 +57,22 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
         icon: Icons.devices_other_rounded,
         color: C.indigo,
         body: Column(children: [
-          // ① 数据来源（多选 + 发射来源）
+          // 数据来源（多选 + 发射来源）
           DataSourceCard(
             state: state,
             extra: s.dataSourceSwitchHint,
           ),
           const SizedBox(height: 16),
-          // ② 网关
+          // ① 网关
           _igateCard(context, s),
           const SizedBox(height: 16),
-          // ③ 每条链路的状态（只读结论，避免在概览页误改参数）
+          // ② 每条链路的状态（只读结论，避免在概览页误改参数）
           _linksCard(context, s),
           const SizedBox(height: 16),
-          // ④ 子页入口
+          // ③ 子页入口
           _entriesCard(context, s),
           const SizedBox(height: 16),
-          // ⑤ 自检（折叠：结果很长，但排查时最有用）
+          // ④ 自检（折叠：结果很长，但排查时最有用）
           SettingsFold(
             title: s.diagTitle,
             subtitle: s.diagSubtitle,
@@ -269,7 +269,7 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
     );
   }
 
-  /// ④ 子页入口
+  /// ③ 子页入口
   Widget _entriesCard(BuildContext context, S s) {
     return SettingsSectionCard(
       title: s.deviceEntries,

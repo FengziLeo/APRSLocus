@@ -9279,6 +9279,27 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get txKindPosition => "位置与状态报文";
 
+  @override
+  String get notifLiveTitle => "实时通知";
+
+  @override
+  String get notifLiveHint => "开启后，Android 16 会把常驻通知提成状态栏那一小条，显示距下次上报的倒计时。系统不支持或不允许时，还是普通常驻通知。";
+
+  @override
+  String get notifTitle => "通知";
+
+  @override
+  String get notifStyleTitle => "通知显示样式";
+
+  @override
+  String get notifStylePlain => "普通常驻通知";
+
+  @override
+  String get notifStylePlainDesc => "通知栏里一条常驻通知，展开看全部文字。";
+
+  @override
+  String get notifStyleLive => "实时更新";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18554,5 +18575,26 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get txKindPosition => "位置與狀態報文";
+
+  @override
+  String get notifLiveTitle => "即時通知";
+
+  @override
+  String get notifLiveHint => "開啟後，Android 16 會把常駐通知提成狀態列那一小條，顯示距下次上報的倒數。系統不支援或不允許時，還是普通常駐通知。";
+
+  @override
+  String get notifTitle => "通知";
+
+  @override
+  String get notifStyleTitle => "通知顯示樣式";
+
+  @override
+  String get notifStylePlain => "普通常駐通知";
+
+  @override
+  String get notifStylePlainDesc => "通知列裡一條常駐通知，展開看全部文字。";
+
+  @override
+  String get notifStyleLive => "即時更新";
 
 }

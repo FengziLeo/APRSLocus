@@ -9717,4 +9717,25 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get txKindPosition => "Paquetes de posición y estado";
 
+  @override
+  String get notifLiveTitle => "Actualizaciones en vivo";
+
+  @override
+  String get notifLiveHint => "En Android 16 la notificación permanente pasa a la píldora de la barra de estado y muestra la cuenta atrás del próximo balizamiento. Si el sistema no lo admite, sigue siendo una notificación normal.";
+
+  @override
+  String get notifTitle => "Notificaciones";
+
+  @override
+  String get notifStyleTitle => "Estilo de notificación";
+
+  @override
+  String get notifStylePlain => "Notificación permanente normal";
+
+  @override
+  String get notifStylePlainDesc => "Una notificación permanente en la barra; al expandirla se lee todo.";
+
+  @override
+  String get notifStyleLive => "Actualizaciones en vivo";
+
 }

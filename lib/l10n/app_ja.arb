@@ -4217,5 +4217,12 @@
   "aprsIsServerLead": "アドレス、ポート、passcode はここに入力します。",
   "aprsIsCardSubtitle": "ログイン設定と接続状態",
   "aprsIsEntryDesc": "アドレス、ポート、passcode",
-  "txKindPosition": "位置と状態のパケット"
+  "txKindPosition": "位置と状態のパケット",
+  "notifLiveTitle": "リアルタイム通知",
+  "notifLiveHint": "Android 16 では常駐通知がステータスバーのカプセルに昇格し、次のビーコンの残り時間が出ます。未対応・不許可のときは通常の常駐通知のままです。",
+  "notifTitle": "通知",
+  "notifStyleTitle": "通知の表示スタイル",
+  "notifStylePlain": "通常の常駐通知",
+  "notifStylePlainDesc": "通知領域に常駐通知が 1 件。開くと全文が読めます。",
+  "notifStyleLive": "リアルタイム更新"
 }

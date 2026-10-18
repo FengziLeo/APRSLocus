@@ -9379,4 +9379,25 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get txKindPosition => "位置と状態のパケット";
 
+  @override
+  String get notifLiveTitle => "リアルタイム通知";
+
+  @override
+  String get notifLiveHint => "Android 16 では常駐通知がステータスバーのカプセルに昇格し、次のビーコンの残り時間が出ます。未対応・不許可のときは通常の常駐通知のままです。";
+
+  @override
+  String get notifTitle => "通知";
+
+  @override
+  String get notifStyleTitle => "通知の表示スタイル";
+
+  @override
+  String get notifStylePlain => "通常の常駐通知";
+
+  @override
+  String get notifStylePlainDesc => "通知領域に常駐通知が 1 件。開くと全文が読めます。";
+
+  @override
+  String get notifStyleLive => "リアルタイム更新";
+
 }

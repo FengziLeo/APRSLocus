@@ -4217,5 +4217,12 @@
   "aprsIsServerLead": "La dirección, el puerto y el passcode van aquí.",
   "aprsIsCardSubtitle": "Datos de acceso y estado de la conexión",
   "aprsIsEntryDesc": "Dirección, puerto y passcode",
-  "txKindPosition": "Paquetes de posición y estado"
+  "txKindPosition": "Paquetes de posición y estado",
+  "notifLiveTitle": "Actualizaciones en vivo",
+  "notifLiveHint": "En Android 16 la notificación permanente pasa a la píldora de la barra de estado y muestra la cuenta atrás del próximo balizamiento. Si el sistema no lo admite, sigue siendo una notificación normal.",
+  "notifTitle": "Notificaciones",
+  "notifStyleTitle": "Estilo de notificación",
+  "notifStylePlain": "Notificación permanente normal",
+  "notifStylePlainDesc": "Una notificación permanente en la barra; al expandirla se lee todo.",
+  "notifStyleLive": "Actualizaciones en vivo"
 }

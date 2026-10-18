@@ -5300,6 +5300,16 @@ class AppState extends ChangeNotifier {
       if (_bumpStatusVersionIfChanged()) _notify();
       // 不用为倒计时的「下一秒」重发通知：那由系统的 chronometer 自己走。
       // 以前这里每秒重发一次，前台服务通知被反复重建，通知容易消失，也费电。
+      // 但胶囊那条短文本得我们自己推：每 **5 秒** 推一次，既能看见它在动，
+      // 又不会把通知一秒重建一次。
+      if (notifLiveUpdates &&
+          notifLiveText == 'beacon' &&
+          (beaconPhase == BeaconPhase.counting ||
+              beaconPhase == BeaconPhase.coarseForced) &&
+          beaconSecondsLeft > 0 &&
+          beaconSecondsLeft % 5 == 0) {
+        _updateNotification();
+      }
       _checkStationAchievement();
       // 碰撞/摔倒（issue #26）：它**不能**只挂在定位回调上 —— 事件可能在没开定位、
       // 或定位很慢（静止后系统常常不再给点）的时候发生，而那正是这个功能要管的场景。
@@ -10815,6 +10825,10 @@ class AppState extends ChangeNotifier {
           // 不塞一个会立刻不准的文字：那行字只在通知重建时才换，
           // 中间十几秒里它一直是旧值，看起来像死掉了。
           countdown = beaconSecondsLeft;
+          // 计时器只在部分 ROM 的胶囊里画得出来。这台 HyperOS 的胶囊只认
+          // 短文本，短文本空着就退回标题（用户实测：倒计时位置显示 APRSlocus）。
+          // 两者都给：画得出计时器就看计时器，画不出就看这行秒数。
+          short = '${beaconSecondsLeft}s';
         } else if (beaconPhase == BeaconPhase.imminent) {
           short = l.beaconSoon;
         }

@@ -172,7 +172,7 @@
 右侧圆点标记的那条。同一个呼号从两条链路发出去会造成重复报文。</p>
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>来源</th><th>链路</th><th>收</th><th>发</th></tr></thead><tbody>
-<tr><td><b>APRS-IS</b></td><td>互联网 TCP，默认 <code>rotate.aprs2.net:14580</code></td><td>✓</td><td>✓</td></tr>
+<tr><td><b>APRS-IS</b></td><td>互联网 TCP，服务器地址自己填</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>TNC</b></td><td>蓝牙 SPP / USB 串口（OTG），KISS 协议，接电台</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>音频</b></td><td>耳机口接电台，AFSK 1200（Bell 202）</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>PKWDWPL</b></td><td>蓝牙/串口读 Kenwood 的 <code>$PKWDWPL</code> 航点语句</td><td>✓</td><td><b>✗ 只读</b></td></tr>
@@ -184,7 +184,7 @@
   <section class="chapter reveal" id="aprsis">
     <h2 id="aprsis">接上 APRS-IS<a class="hdr-anchor" href="#aprsis" aria-label="本节永久链接" title="本节永久链接">#</a></h2>
 <ol class="m-steps">
-<li><b>设置 → 连接</b>，确认服务器 <code>rotate.aprs2.net</code>、端口 <code>14580</code>（默认即可）。</li>
+<li><b>设置 → 连接</b>，填入服务器地址与端口 <code>14580</code>。</li>
 <li>填入 <b>Passcode</b>（用完整呼号生成，见 <a href="start.html#passcode">快速上手</a>）。</li>
 <li>点 <b>「保存并应用」</b> —— 连接页的改动不保存不会生效。</li>
 <li>回主页看链路状态卡：变成「已连接」、收包计数开始增长。</li>

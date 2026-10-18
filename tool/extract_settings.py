@@ -249,7 +249,7 @@ def defaults():
             if val:
                 nested.setdefault(m.group(2), val.strip().strip("'\""))
 
-    nested.setdefault('server', 'rotate.aprs2.net')   # OOBE 里写死的默认
+    nested.setdefault('server', '')   # 软件不预置服务器地址
     nested.setdefault('port', '14580')
     nested.setdefault('passcode', '-1')
     return top, nested

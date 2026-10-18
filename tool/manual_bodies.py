@@ -135,7 +135,7 @@ organised by <b>task</b> — for “I need to get one thing done”.</p></div></
 <li><b>呼号与 SSID</b> —— 输入完整呼号（含 SSID，如 <code>BG7LZQ-3</code>）；<b>留空无法继续</b>。</li>
 <li><b>台站符号</b> —— 代表台站类型，随每条信标发送。</li>
 <li><b>接收地区</b> —— 勾选要收的国家/地区；<b>不勾 = 全收</b>。</li>
-<li><b>服务器与 Passcode</b> —— 服务器默认 <code>rotate.aprs2.net</code> 可不动；Passcode 见下一节。</li>
+<li><b>服务器与 Passcode</b> —— 服务器地址自己填，软件不预置；Passcode 见下一节。</li>
 </ol>
 <div class="callout tip"><span class="co-ic">✅</span><div><p><b>怎么算完成：</b>向导最后一页点完成后，主页顶部的链路状态卡应显示<b>已连接</b>；
 若显示黄色「未验证」，说明 Passcode 还没填对，继续看下一节。</p></div></div>
@@ -148,7 +148,7 @@ organised by <b>task</b> — for “I need to get one thing done”.</p></div></
 <li><b>呼號與 SSID</b> —— 輸入完整呼號（含 SSID，如 <code>BG7LZQ-3</code>）；<b>留空無法繼續</b>。</li>
 <li><b>臺站符號</b> —— 代表臺站類型，隨每一則信標發送。</li>
 <li><b>接收地區</b> —— 勾選要收的國家/地區；<b>不勾 = 全收</b>。</li>
-<li><b>伺服器與 Passcode</b> —— 伺服器預設 <code>rotate.aprs2.net</code> 可不動；Passcode 見下一節。</li>
+<li><b>伺服器與 Passcode</b> —— 伺服器位址自己填，軟體不預置；Passcode 見下一節。</li>
 </ol>
 <div class="callout tip"><span class="co-ic">✅</span><div><p><b>怎麼算完成：</b>引導最後一頁點完成后，首頁頂部的鏈路狀態卡應顯示<b>已連線</b>；
 若顯示黃色「未驗證」，代表 Passcode 還沒填對，繼續看下一節。</p></div></div>
@@ -162,7 +162,7 @@ organised by <b>task</b> — for “I need to get one thing done”.</p></div></
 <li><b>Callsign &amp; SSID</b> — full callsign including the SSID (e.g. <code>BG7LZQ-3</code>); <b>it cannot be left empty</b>.</li>
 <li><b>Station symbol</b> — states your station type and travels with every beacon.</li>
 <li><b>Receive area</b> — tick the countries/regions you want; <b>nothing ticked = receive everything</b>.</li>
-<li><b>Server &amp; Passcode</b> — the server defaults to <code>rotate.aprs2.net</code>; Passcode next.</li>
+<li><b>Server &amp; Passcode</b> — you enter the address yourself; nothing is prefilled. Passcode next.</li>
 </ol>
 <div class="callout tip"><span class="co-ic">✅</span><div><p><b>Done when:</b> after the last page the link status card at the top reads <b>connected</b>.
 A yellow “unverified” banner means the Passcode is still wrong — next section.</p></div></div>
@@ -350,7 +350,7 @@ the scroll position should still be there.</p></div></div>
 右侧圆点标记的那条。同一个呼号从两条链路发出去会造成重复报文。</p>
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>来源</th><th>链路</th><th>收</th><th>发</th></tr></thead><tbody>
-<tr><td><b>APRS-IS</b></td><td>互联网 TCP，默认 <code>rotate.aprs2.net:14580</code></td><td>✓</td><td>✓</td></tr>
+<tr><td><b>APRS-IS</b></td><td>互联网 TCP，服务器地址自己填</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>TNC</b></td><td>蓝牙 SPP / USB 串口（OTG），KISS 协议，接电台</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>音频</b></td><td>耳机口接电台，AFSK 1200（Bell 202）</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>PKWDWPL</b></td><td>蓝牙/串口读 Kenwood 的 <code>$PKWDWPL</code> 航点语句</td><td>✓</td><td><b>✗ 只读</b></td></tr>
@@ -363,7 +363,7 @@ the scroll position should still be there.</p></div></div>
 右側圓點標記的那條。同一個呼號從兩條鏈路發出去會造成重複封包。</p>
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>來源</th><th>鏈路</th><th>收</th><th>發</th></tr></thead><tbody>
-<tr><td><b>APRS-IS</b></td><td>網際網路 TCP，預設 <code>rotate.aprs2.net:14580</code></td><td>✓</td><td>✓</td></tr>
+<tr><td><b>APRS-IS</b></td><td>網際網路 TCP，伺服器位址自己填</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>TNC</b></td><td>藍牙 SPP / USB 序列埠（OTG），KISS 協定，接電臺</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>音訊</b></td><td>耳機孔接電臺，AFSK 1200（Bell 202）</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>PKWDWPL</b></td><td>藍牙/序列埠讀 Kenwood 的 <code>$PKWDWPL</code> 航點語句</td><td>✓</td><td><b>✗ 唯讀</b></td></tr>
@@ -377,7 +377,7 @@ only <b>one transmit source</b> — the one marked with the dot. Transmitting th
 two links produces duplicate packets.</p>
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>Source</th><th>Link</th><th>RX</th><th>TX</th></tr></thead><tbody>
-<tr><td><b>APRS-IS</b></td><td>internet TCP, default <code>rotate.aprs2.net:14580</code></td><td>✓</td><td>✓</td></tr>
+<tr><td><b>APRS-IS</b></td><td>internet TCP, you enter the server address</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>TNC</b></td><td>Bluetooth SPP / USB serial (OTG), KISS, into a radio</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>Audio</b></td><td>headphone jack into a radio, AFSK 1200 (Bell 202)</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>PKWDWPL</b></td><td>Bluetooth/serial reader of a Kenwood radio’s <code>$PKWDWPL</code> waypoints</td><td>✓</td><td><b>✗ receive-only</b></td></tr>
@@ -389,7 +389,7 @@ reception, raise the radius or stop following your position.</p></div></div>
 '''),
     ('aprsis', T('接上 APRS-IS', '接上 APRS-IS', 'Connect APRS-IS'), '''
 <ol class="m-steps">
-<li><b>设置 → 连接</b>，确认服务器 <code>rotate.aprs2.net</code>、端口 <code>14580</code>（默认即可）。</li>
+<li><b>设置 → 连接</b>，填入服务器地址与端口 <code>14580</code>。</li>
 <li>填入 <b>Passcode</b>（用完整呼号生成，见 <a href="start.html#passcode">快速上手</a>）。</li>
 <li>点 <b>「保存并应用」</b> —— 连接页的改动不保存不会生效。</li>
 <li>回主页看链路状态卡：变成「已连接」、收包计数开始增长。</li>
@@ -401,7 +401,7 @@ reception, raise the radius or stop following your position.</p></div></div>
 </ul>
 ''', '''
 <ol class="m-steps">
-<li><b>設定 → 連線</b>，確認伺服器 <code>rotate.aprs2.net</code>、埠 <code>14580</code>（預設即可）。</li>
+<li><b>設定 → 連線</b>，填入伺服器位址與埠 <code>14580</code>。</li>
 <li>填入 <b>Passcode</b>（用完整呼號產生，見 <a href="start.html#passcode">快速上手</a>）。</li>
 <li>點 <b>「儲存並套用」</b> —— 連線頁的改动不儲存不會生效。</li>
 <li>回首頁看鏈路狀態卡：變成「已連線」、收包計數開始增長。</li>
@@ -413,7 +413,7 @@ reception, raise the radius or stop following your position.</p></div></div>
 </ul>
 ''', '''
 <ol class="m-steps">
-<li><b>Settings → Connection</b>: leave the server at <code>rotate.aprs2.net</code>, port <code>14580</code>.</li>
+<li><b>Settings → Connection</b>: enter the server address and port <code>14580</code>.</li>
 <li>Enter your <b>Passcode</b> (generated for the full callsign, see <a href="start.html#passcode">Quick Start</a>).</li>
 <li>Press <b>“Save &amp; apply”</b> — connection edits do nothing until you save.</li>
 <li>Back on the home page the link card reads “connected” and the counter climbs.</li>

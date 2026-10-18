@@ -615,7 +615,9 @@ def main():
     for base, _ in BASES:
         s = read(base + '/settings.html')
         set_stats[base] = (s.count('<section class="chapter'), s.count('<tr><td><b>'))
-        chk('settings defaults present', 'rotate.aprs2.net' in s and '14580' in s)
+        # 默认值列真的填了东西就好：服务器地址现在留空，不能再拿具体地址当锚点
+        chk('settings defaults present',
+            'class="m-field">port<' in s and '14580' in s)
     uniq = set(set_stats.values())
     chk('settings tables aligned across languages',
         len(uniq) == 1 and next(iter(uniq))[0] == 16 and next(iter(uniq))[1] >= 150,

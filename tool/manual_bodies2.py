@@ -615,7 +615,7 @@ go back to <a href="stations.html">Stations</a>; nothing at all = link problem, 
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>症状</th><th>最可能的原因</th><th>动作</th></tr></thead><tbody>
 <tr><td>黄色「未验证」横幅</td><td>Passcode 空 / 错</td><td>设置 → 连接 → 填正确 Passcode → 保存并应用</td></tr>
-<tr><td>连不上服务器</td><td>网络 / 服务器地址 / 端口</td><td>核对 <code>rotate.aprs2.net:14580</code>；断线会自动 8→16→32→60s 重连，等一轮</td></tr>
+<tr><td>连不上服务器</td><td>网络 / 服务器地址 / 端口</td><td>核对填的服务器地址与端口；断线会自动 8→16→32→60s 重连，等一轮</td></tr>
 <tr><td>数据包页一条都没有</td><td>没勾数据来源 / 范围过滤太窄</td><td>设置 → 连接：勾 APRS-IS；范围半径调大 → 保存并应用</td></tr>
 <tr><td>收到但地图上看不到</td><td>列表筛选挡住了</td><td>台站页点「清除筛选」；核对状态/类型筛选</td></tr>
 <tr><td>自己位置不显示/乱跳</td><td>没定位权限 / 用了网络粗定位</td><td>给定位权限；设置 → 定位上报 → 定位模式选纯 GPS</td></tr>
@@ -631,7 +631,7 @@ go back to <a href="stations.html">Stations</a>; nothing at all = link problem, 
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>症狀</th><th>最可能的原因</th><th>動作</th></tr></thead><tbody>
 <tr><td>黃色「未驗證」橫幅</td><td>Passcode 空 / 錯</td><td>設定 → 連線 → 填正確 Passcode → 儲存並套用</td></tr>
-<tr><td>連不上伺服器</td><td>網路 / 伺服器位址 / 埠</td><td>核對 <code>rotate.aprs2.net:14580</code>；斷線會自動 8→16→32→60s 重連，等一輪</td></tr>
+<tr><td>連不上伺服器</td><td>網路 / 伺服器位址 / 埠</td><td>核對填的伺服器位址與埠；斷線會自動 8→16→32→60s 重連，等一輪</td></tr>
 <tr><td>封包頁一條都沒有</td><td>沒勾資料來源 / 範圍過濾太窄</td><td>設定 → 連線：勾 APRS-IS；範圍半徑調大 → 儲存並套用</td></tr>
 <tr><td>收到但地圖上看不見</td><td>列表篩選擋住了</td><td>臺站頁點「清除篩選」；核對狀態/類型篩選</td></tr>
 <tr><td>自己位置不顯示/亂跳</td><td>沒定位權限 / 用了網路粗定位</td><td>給定位權限；設定 → 定位上報 → 定位模式選純 GPS</td></tr>
@@ -647,7 +647,7 @@ go back to <a href="stations.html">Stations</a>; nothing at all = link problem, 
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>Symptom</th><th>Likely cause</th><th>Action</th></tr></thead><tbody>
 <tr><td>Yellow “unverified” banner</td><td>Passcode empty or wrong</td><td>Settings → Connection → correct it → Save &amp; apply</td></tr>
-<tr><td>Cannot reach the server</td><td>network / address / port</td><td>check <code>rotate.aprs2.net:14580</code>; reconnects run 8→16→32→60 s — wait one cycle</td></tr>
+<tr><td>Cannot reach the server</td><td>network / address / port</td><td>check the address and port you entered; reconnects run 8→16→32→60 s — wait one cycle</td></tr>
 <tr><td>Packets tab is empty</td><td>no source ticked / range too narrow</td><td>Settings → Connection: tick APRS-IS, raise the radius → Save &amp; apply</td></tr>
 <tr><td>Received but not on the map</td><td>list filter hiding it</td><td>Stations → clear filters; re-check status/type</td></tr>
 <tr><td>My position missing or jumping</td><td>no location permission / network fixes</td><td>grant permission; Settings → Beacon → GPS only</td></tr>

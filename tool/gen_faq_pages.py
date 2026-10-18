@@ -119,16 +119,13 @@ GROUPS = [
             '连接失败 / 频繁掉线？',
             '連線失敗 / 頻繁斷線？',
             'Connection fails or keeps dropping?',
-            '应用内置渐进式重连（8 → 16 → 32 → 60 秒）。若持续失败，请检查网络、'
-            '确认服务器地址（默认 <code>rotate.aprs2.net:14580</code>）与端口是否被拦截，'
-            '或在「连接设置」中更换服务器后点「重新连接」。',
-            '應用內建漸進式重連（8 → 16 → 32 → 60 秒）。若持續失敗，請檢查網路、'
-            '確認伺服器位址（預設 <code>rotate.aprs2.net:14580</code>）與埠是否被封鎖，'
-            '或在「連線設定」中更換伺服器後點「重新連線」。',
+            '应用内置渐进式重连（8 → 16 → 32 → 60 秒）。若持续失败，检查网络、服务器地址与端口是否被拦截，'
+            '或在「连接设置」换一台服务器后点「重新连接」。',
+            '應用內建漸進式重連（8 → 16 → 32 → 60 秒）。若持續失敗，檢查網路、伺服器位址與埠是否被封鎖，'
+            '或在「連線設定」換一台伺服器後點「重新連線」。',
             'The app reconnects with progressive backoff (8 → 16 → 32 → 60 s). If it keeps '
-            'failing, check your network, confirm the server (default '
-            '<code>rotate.aprs2.net:14580</code>) and port are not blocked, or switch servers '
-            'in Connection Settings and tap Reconnect.',
+            'failing, check your network and whether the server address and port are blocked, '
+            'or switch servers in Connection Settings and tap Reconnect.',
         ),
         (
             '支持哪些数据来源？我该怎么选？',

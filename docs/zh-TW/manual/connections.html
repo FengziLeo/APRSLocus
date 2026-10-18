@@ -172,7 +172,7 @@
 右側圓點標記的那條。同一個呼號從兩條鏈路發出去會造成重複封包。</p>
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>來源</th><th>鏈路</th><th>收</th><th>發</th></tr></thead><tbody>
-<tr><td><b>APRS-IS</b></td><td>網際網路 TCP，預設 <code>rotate.aprs2.net:14580</code></td><td>✓</td><td>✓</td></tr>
+<tr><td><b>APRS-IS</b></td><td>網際網路 TCP，伺服器位址自己填</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>TNC</b></td><td>藍牙 SPP / USB 序列埠（OTG），KISS 協定，接電臺</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>音訊</b></td><td>耳機孔接電臺，AFSK 1200（Bell 202）</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>PKWDWPL</b></td><td>藍牙/序列埠讀 Kenwood 的 <code>$PKWDWPL</code> 航點語句</td><td>✓</td><td><b>✗ 唯讀</b></td></tr>
@@ -184,7 +184,7 @@
   <section class="chapter reveal" id="aprsis">
     <h2 id="aprsis">接上 APRS-IS<a class="hdr-anchor" href="#aprsis" aria-label="本節永久連結" title="本節永久連結">#</a></h2>
 <ol class="m-steps">
-<li><b>設定 → 連線</b>，確認伺服器 <code>rotate.aprs2.net</code>、埠 <code>14580</code>（預設即可）。</li>
+<li><b>設定 → 連線</b>，填入伺服器位址與埠 <code>14580</code>。</li>
 <li>填入 <b>Passcode</b>（用完整呼號產生，見 <a href="start.html#passcode">快速上手</a>）。</li>
 <li>點 <b>「儲存並套用」</b> —— 連線頁的改动不儲存不會生效。</li>
 <li>回首頁看鏈路狀態卡：變成「已連線」、收包計數開始增長。</li>

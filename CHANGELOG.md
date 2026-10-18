@@ -1,5 +1,37 @@
 # 更新日志
 
+## [2.1.12] - 2026-10-18
+
+### 两台服务器各发一份，台站标出走的是哪条
+
+- **APRSNETCN SERVER 就是另一台 APRS-IS 服务器**。那一页的说明改成直说：基于
+  APRSNETCN SERVER 协议的服务器，地址填进连接设置，收发都走它；在这一页打开，
+  是让它与主链路同时在线，各收各的。
+- **第二条链路也发报文**。两条链路都在线时，发出去的每一帧两台服务器各收一份；
+  主链路指的就是同一台机器时只发一次。
+- **台站详情页标出来源**。呼号旁边一枚标签：APRS-IS、APRSNETCN、TNC、声卡、
+  PKWDWPL，服务器 24 小时台站接口补进来的也标 APRSNETCN。看的是最后一条报文
+  从哪条链路进来，跟着台站一起存，重启还在。
+
+---
+
+## [2.1.12] - 2026-10-18 (English)
+
+### Two servers, one copy each, and every station says which link it came from
+
+- **APRSNETCN SERVER is simply another APRS-IS server.** Its page now says so straight:
+  a server built on the APRSNETCN SERVER protocol, put its address in the connection
+  settings and it carries traffic both ways; switched on there, it runs alongside the main
+  link and each keeps its own feed.
+- **The second link sends too.** With both links online, every packet goes out once per
+  server; when the main link already points at the same machine it goes out once.
+- **The station detail page says where the station came from.** A badge next to the
+  callsign: APRS-IS, APRSNETCN, TNC, sound card, PKWDWPL, and APRSNETCN for stations the
+  24-hour station API brought in. It follows the last packet heard and is saved with the
+  station, so it survives a restart.
+
+---
+
 ## [2.1.11] - 2026-10-17
 
 ### 副链路自己一页，服务器地址可以自己填

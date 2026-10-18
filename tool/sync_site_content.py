@@ -419,6 +419,39 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.12', 'date': '2026-10-18',
+        'items': [
+            ('up',
+             T('APRSNETCN SERVER 那一页改成直说：一台基于 APRSNETCN SERVER 协议'
+               '的 APRS-IS 服务器，地址填进连接设置，收发都走它；在这一页打开，是让它'
+               '与主链路同时在线，各收各的。',
+               'APRSNETCN SERVER 那一頁改成直說：一臺基於 APRSNETCN SERVER 協定'
+               '的 APRS-IS 伺服器，位址填進連線設定，收發都走它；在這一頁打開，是讓它'
+               '與主鏈路同時在線，各收各的。',
+               'The APRSNETCN SERVER page says it straight: an APRS-IS server built on the '
+               'APRSNETCN SERVER protocol. Put its address in the connection settings and it '
+               'carries traffic both ways; switching it on here runs both links at once, each '
+               'with its own feed.')),
+            ('new',
+             T('两条链路都在线时，发出去的每一帧两台服务器各收一份，主链路指的是同一台'
+               '机器时只发一次。',
+               '兩條鏈路都在線時，送出去的每一幀兩臺伺服器各收一份，主鏈路指的是同一臺'
+               '機器時只送一次。',
+               'With both links online, every packet goes out once per server; when the main '
+               'link already points at the same machine it goes out once.')),
+            ('new',
+             T('台站详情页的呼号旁边加一枚来源标签：APRS-IS、APRSNETCN、TNC、声卡、'
+               'PKWDWPL，服务器 24 小时台站接口补进来的也标 APRSNETCN。它跟着台站一起存，'
+               '重启还在。',
+               '臺站詳情頁的呼號旁邊加一枚來源標籤：APRS-IS、APRSNETCN、TNC、音效卡、'
+               'PKWDWPL，伺服器 24 小時臺站介面補進來的也標 APRSNETCN。它跟著臺站一起存，'
+               '重啟還在。',
+               'The station detail page carries a source badge next to the callsign: APRS-IS, '
+               'APRSNETCN, TNC, sound card, PKWDWPL, and APRSNETCN for stations the 24-hour '
+               'station API brought in. It is saved with the station, so it survives a restart.')),
+        ],
+    },
+    {
         'ver': 'v2.1.11', 'date': '2026-10-17',
         'items': [
             ('up',

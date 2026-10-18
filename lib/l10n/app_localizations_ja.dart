@@ -9257,13 +9257,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
-  String get acnCardSubtitle => "メイン回線と同時に接続します。受信のみです。";
+  String get acnCardSubtitle => "APRSNET.CN が運用する APRS-IS サーバーです。送受信ともこちらで行えます。";
 
   @override
   String get acnLinkSwitch => "APRSNETCN にも同時接続";
 
   @override
-  String get acnLinkStatus => "副リンク";
+  String get acnLinkStatus => "2 本目の回線";
 
   @override
   String get acnLinkNote => "送信はメイン回線のみです。ここで受信した局はサーバー由来として表示され、ゲートウェイ転送は行いません。";
@@ -9299,7 +9299,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get sourceGroupRadio => "無線回線";
 
   @override
-  String get acnPageLead => "APRSNET.CN が設計した回線です。メイン回線と同時に接続し、受信のみ行います。";
+  String get acnPageLead => "APRSNET.CN が運用する APRS-IS サーバーで、プロトコルは APRS-IS と同じです。接続設定にアドレスを入れればメイン回線として送受信でき、ここで有効にすると 2 本同時に接続し、それぞれ受信します。";
 
   @override
   String get acnServerProto => "サーバー協定";

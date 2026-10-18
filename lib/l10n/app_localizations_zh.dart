@@ -9157,13 +9157,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
-  String get acnCardSubtitle => "与主链路同时在线，只收不发。";
+  String get acnCardSubtitle => "APRSNET.CN 自己架的 APRS-IS 服务器，收发都能走它。";
 
   @override
   String get acnLinkSwitch => "同时连接 APRSNETCN";
 
   @override
-  String get acnLinkStatus => "副链路";
+  String get acnLinkStatus => "第二条链路";
 
   @override
   String get acnLinkNote => "发报文只走主链路。这条链路收来的台站会标成来自服务器，也不做网关转递。";
@@ -9199,7 +9199,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sourceGroupRadio => "电台链路";
 
   @override
-  String get acnPageLead => "APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。";
+  String get acnPageLead => "APRSNET.CN 自己架的一台 APRS-IS 服务器，协议与 APRS-IS 一样。地址填进连接设置，收发都走它；在这里打开，是让两条链路同时在线，各收各的。";
 
   @override
   String get acnServerProto => "服务器协议";
@@ -18370,13 +18370,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
-  String get acnCardSubtitle => "與主鏈路同時在線，只收不發。";
+  String get acnCardSubtitle => "APRSNET.CN 自己架的 APRS-IS 伺服器，收發都能走它。";
 
   @override
   String get acnLinkSwitch => "同時連線 APRSNETCN";
 
   @override
-  String get acnLinkStatus => "副鏈路";
+  String get acnLinkStatus => "第二條鏈路";
 
   @override
   String get acnLinkNote => "發報文只走主鏈路。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。";
@@ -18412,7 +18412,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sourceGroupRadio => "電台鏈路";
 
   @override
-  String get acnPageLead => "APRSNET.CN 設計的一條鏈路。與主鏈路同時在線，只收不發。";
+  String get acnPageLead => "APRSNET.CN 自己架的一台 APRS-IS 伺服器，協定與 APRS-IS 一樣。位址填進連線設定，收發都走它；在這裡打開，是讓兩條鏈路同時在線，各收各的。";
 
   @override
   String get acnServerProto => "伺服器協定";

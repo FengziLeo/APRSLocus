@@ -9536,7 +9536,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get acnCardTitle => "APRSNETCN SERVER";
 
   @override
-  String get acnCardSubtitle => "Runs alongside the main link. Receive only.";
+  String get acnCardSubtitle => "APRSNET.CN's own APRS-IS server. It carries traffic both ways.";
 
   @override
   String get acnLinkSwitch => "Also connect to APRSNETCN";
@@ -9578,7 +9578,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceGroupRadio => "Radio links";
 
   @override
-  String get acnPageLead => "A link designed by APRSNET.CN. It runs alongside the main link and only receives.";
+  String get acnPageLead => "An APRS-IS server run by APRSNET.CN, same protocol. Put its address in the connection settings and it is your main link, sending included. Turn it on here and both links stay online, each with its own feed.";
 
   @override
   String get acnServerProto => "Server proto";

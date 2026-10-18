@@ -16671,7 +16671,7 @@ abstract class AppLocalizations {
   /// No description provided for @acnCardSubtitle.
   ///
   /// In zh, this message translates to:
-  /// **'与主链路同时在线，只收不发。'**
+  /// **'APRSNET.CN 自己架的 APRS-IS 服务器，收发都能走它。'**
   String get acnCardSubtitle;
 
   /// No description provided for @acnLinkSwitch.
@@ -16683,7 +16683,7 @@ abstract class AppLocalizations {
   /// No description provided for @acnLinkStatus.
   ///
   /// In zh, this message translates to:
-  /// **'副链路'**
+  /// **'第二条链路'**
   String get acnLinkStatus;
 
   /// No description provided for @acnLinkNote.
@@ -16755,7 +16755,7 @@ abstract class AppLocalizations {
   /// No description provided for @acnPageLead.
   ///
   /// In zh, this message translates to:
-  /// **'APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。'**
+  /// **'APRSNET.CN 自己架的一台 APRS-IS 服务器，协议与 APRS-IS 一样。地址填进连接设置，收发都走它；在这里打开，是让两条链路同时在线，各收各的。'**
   String get acnPageLead;
 
   /// No description provided for @acnServerProto.

@@ -4311,11 +4311,11 @@ class AppState extends ChangeNotifier {
   /// 正在拉 24 小时台站。设置页的按钮据此置灰，不会连点两次。
   bool get acnSyncing => _acnSyncing;
 
-  /// APRSNETCN 的第二条链路：**只收不发**。
+  /// APRSNETCN 的第二条链路。
   ///
-  /// 它与主链路（`aprs`）是两个独立连接、各收各的：主链路发报文，副链路只把
-  /// netcn 那边的台站并进列表。发送永远走 `aprs` —— 一句话不能同时从两个服务
-  /// 器发出去，否则对端会收到两帧一样的。
+  /// 它本身是一台完整的 APRS-IS 服务器（同一套登录行、同一个 passcode，收发都
+  /// 行）：地址填进连接设置就是主链路。当第二条链路用时只收 —— 发送始终走
+  /// `aprs`，一句话不能同时从两台服务器发出去，否则对端会收到两帧一样的。
   final AprsConnector acnLink = createAprs();
 
   /// 是否同时连 APRSNETCN（设置页的开关）。默认关：不是所有人都用这台服务器。
@@ -6030,7 +6030,7 @@ class AppState extends ChangeNotifier {
     if (ok) {
       _acnAttempt = 0;
       _acnRetryAt = null;
-      _log(LogLevel.info, 'APRSNETCN', '副链路已连接（只收不发）');
+      _log(LogLevel.info, 'APRSNETCN', '第二条链路已连接');
       // 24 小时台站不在连上时拉：那要再发一次 HTTP 请求，还要把账号口令再发
       // 一遍，等用户点了设置页的「立即同步」才做这件事。
     } else {

@@ -2363,7 +2363,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     final srcLabel = names.isEmpty
         ? 'APRS-IS'
         : (names.length == 1
-            ? '${names.first}${mark(0)}'
+            ? names.first
             : names
                 .asMap()
                 .entries

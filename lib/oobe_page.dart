@@ -32,6 +32,10 @@ class _OobePageState extends State<OobePage> {
   late final TextEditingController _port;
   late final TextEditingController _pass;
   String _symbol = '>';
+  // 第 7 步选的是哪条互联网链路：APRS-IS 还是 APRSNETCN SERVER。
+  // 两条是等价的（都是一条 TCP 登录），所以这里是一个并列的二选一，
+  // 不是「主链路 + 备用」。
+  String _link = AppState.srcAprsIs;
   int _ssid = 0;
   // 界面语言：'' = 跟随系统；'zh' 中文；'en' English
   String _lang = '';
@@ -160,19 +164,57 @@ class _OobePageState extends State<OobePage> {
     _goTo(target);
   }
 
+  /// 换一条互联网链路：三个输入框跟着换成那条链路已保存的值。
+  ///
+  /// 首次运行时 APRS-IS 的地址是空的 —— 软件不预设连到哪台服务器（用户协议
+  /// 2.4）；APRSNETCN 那一台是本项目的服务器，地址与设置页同一个默认值，
+  /// 用户可以改掉。
+  void _pickLink(String link) {
+    setState(() => _link = link);
+    final st = widget.state;
+    final isAcn = link == AppState.srcAcn;
+    _server.text = isAcn ? st.acnServer : (st.oobeDone ? st.aprs.server : '');
+    _port.text = isAcn
+        ? '${st.acnPort}'
+        : (st.oobeDone ? '${st.aprs.port}' : '');
+    _pass.text = isAcn
+        ? st.acnPasscode
+        : (st.oobeDone ? st.aprs.passcode : '');
+  }
+
   Future<void> _finish() async {
     final st = widget.state;
+    final acnLink = _link == AppState.srcAcn;
     // 服务器**留空就是不连接**：本软件不预置、也不推荐任何服务器地址（用户协议 2.4）。
     // 以前这里会把空值悄悄填成公共服务器并立刻连接 —— 那是"软件自己决定连到哪里"，
     // 与"默认不连接任何服务器"的声明冲突。
-    st.aprs.server = _server.text.trim();
-    st.aprs.port = int.tryParse(_port.text) ?? 14580;
-    st.aprs.passcode = _pass.text.trim().isEmpty ? '-1' : _pass.text.trim();
+    final server = _server.text.trim();
+    final port = int.tryParse(_port.text.trim()) ?? 14580;
+    final pass = _pass.text.trim().isEmpty
+        ? (acnLink ? '' : '-1')
+        : _pass.text.trim();
+    if (acnLink) {
+      // APRSNETCN 的 passcode 留空就沿用 APRS-IS 那条链路的（与设置页同一口径）
+      st.acnServer = server;
+      st.acnPort = port;
+      st.acnPasscode = pass;
+    } else {
+      st.aprs.server = server;
+      st.aprs.port = port;
+      st.aprs.passcode = pass;
+    }
     st.persist();
     // 先进主页，连接放到后台进行（主页底部横幅显示连接状态）
     st.completeOobe();
     // 只有用户**自己填了**服务器才连接；留空则保持纯本地（不碰任何网络服务器）。
-    if (st.aprs.server.isNotEmpty) st.toggleConnect();
+    if (server.isEmpty) return;
+    if (acnLink) {
+      // 选了 APRSNETCN 就意味着这条是互联网链路：先把没填地址的 APRS-IS 关掉，
+      // 否则「连接」会被「没配服务器」那一拦挡下来（[connectBlockedNoServer]）。
+      await st.toggleSource(AppState.srcAcn, true);
+      await st.toggleSource(AppState.srcAprsIs, false);
+    }
+    st.toggleConnect();
   }
 
   void _toast(String msg) {
@@ -1034,6 +1076,31 @@ class _OobePageState extends State<OobePage> {
             style: ts(12, c: C.slate, h: 1.6),
           ),
           SizedBox(height: 24),
+          // 两条互联网链路二选一：都是「一条 TCP 登录」，没有主备之分。
+          Row(
+            children: [
+              Expanded(
+                child: _linkCard(
+                  title: S.of(context).dataSourceAprsIs,
+                  desc: S.of(context).dataSourceAprsIsDesc,
+                  icon: Icons.cloud_rounded,
+                  on: _link == AppState.srcAprsIs,
+                  onTap: () => _pickLink(AppState.srcAprsIs),
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _linkCard(
+                  title: S.of(context).acnCardTitle,
+                  desc: S.of(context).acnCardSubtitle,
+                  icon: Icons.hub_rounded,
+                  on: _link == AppState.srcAcn,
+                  onTap: () => _pickLink(AppState.srcAcn),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
           // 提示里**不出现任何具体服务器地址**（不提供、不推荐：见用户协议 2.4）
           _field(S.of(context).server, _server, ''),
           SizedBox(height: 10),
@@ -1073,6 +1140,67 @@ class _OobePageState extends State<OobePage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// 第 7 步的二选一卡片（与筛选页那一组选中卡同一个观感）。
+  Widget _linkCard({
+    required String title,
+    required String desc,
+    required IconData icon,
+    required bool on,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: on ? C.blueBg : C.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: on ? C.blue : C.border,
+            width: on ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 16, color: on ? C.blue : C.grey),
+                SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: ts(
+                      12.5,
+                      w: FontWeight.w700,
+                      c: on ? C.blue : C.ink,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(
+                  on
+                      ? Icons.radio_button_checked_rounded
+                      : Icons.radio_button_off_rounded,
+                  size: 15,
+                  color: on ? C.blue : C.greyLight,
+                ),
+              ],
+            ),
+            SizedBox(height: 4),
+            Text(
+              desc,
+              style: ts(10.5, c: C.slate, h: 1.35),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }

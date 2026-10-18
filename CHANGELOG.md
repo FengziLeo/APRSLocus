@@ -1,5 +1,31 @@
 # 更新日志
 
+## [2.1.18] - 2026-10-18
+
+### 通知显示样式
+
+- **显示页里能选常驻通知的样式**：普通常驻通知，或者申请 Android 16 的实时更新。
+- 选了实时更新，状态栏那一小条里会显示距下次上报的倒计时；提不上去（系统
+  低于 16、系统没允许、通知不满足条件）就自动退回普通通知，不会少一条通知。
+- 小米、Redmi、POCO 上顺带注入焦点通知参数，系统不认就是普通通知。
+
+---
+
+## [2.1.18] - 2026-10-18 (English)
+
+### Notification style
+
+- **The display page now picks the style of the ongoing notification**: a normal
+  ongoing notification, or Android 16 live updates.
+- With live updates the status bar pill shows the countdown to the next beacon. Where
+  the system lacks it, the app is not allowed, or the notification does not qualify, it
+  falls back to the normal ongoing notification. One notification either way.
+- On Xiaomi, Redmi and POCO devices the focus-notification parameters are also injected;
+  if the system ignores them, it is a normal notification.
+
+---
+
+
 ## [2.1.17] - 2026-10-18
 
 ### 发射来源分两类

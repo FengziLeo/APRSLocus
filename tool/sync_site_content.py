@@ -419,7 +419,23 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
-        'ver': 'v2.1.17', 'date': '2026-10-18',
+        'ver': 'v2.1.18', 'date': '2026-10-18',
+        'items': [
+            ('up',
+             T('显示页里能选常驻通知的样式：普通常驻通知，或者申请 Android 16 的实时'
+               '更新。选了它，状态栏那一小条里显示距下次上报的倒计时；提不上去就自动'
+               '退回普通通知。',
+               '顯示頁裡能選常駐通知的樣式：普通常駐通知，或者申請 Android 16 的即時'
+               '更新。選了它，狀態列那一小條裡顯示距下次上報的倒數；提不上去就自動'
+               '退回普通通知。',
+               'The display page now picks the style of the ongoing notification: a normal '
+               'ongoing notification, or Android 16 live updates. Live updates show the '
+               'countdown to the next beacon in the status bar pill, and fall back to the '
+               'normal notification where the system cannot promote it.')),
+        ],
+    },
+    {
+        'ver': 'v2.1.17' , 'date': '2026-10-18',
         'items': [
             ('up',
              T('发射来源分成两条：位置与状态报文选一条链路，消息选另一条，两条选同一条也'

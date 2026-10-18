@@ -624,14 +624,20 @@ class SettingsNavRow extends StatelessWidget {
   }
 }
 
-/// 一级页上的链路入口（一台服务器一行）。
+/// 一级页上的链路入口（一条链路 / 一台服务器一行）。
 ///
-/// 与 [SettingsNavRow] 的区别：这一行自带开关，能直接开关整条链路，
-/// 字与图标底座也更大 —— 用户在「设置 → 服务器」一级把它读作「一台服务器」，
-/// 而不是一条设置项。状态行是「通不通 + 地址」，副标题说里面能改什么。
+/// 与 [SettingsNavRow] 的区别：这一行自带开关与发射圆点，本身就能开关这条链路、
+/// 指定由它来发，字与图标底座也更大 —— 用户在「设置 → 服务器」一级把它读作
+/// 「一台服务器」，在设备页把它读作「一条链路」，而不是一条设置项。
+///
+/// 三段文字各说一件事：名称、状态行（通不通 + 地址，空字符串就整行不画）、
+/// 副标题（这条链路是什么 / 在哪儿配置）。平台不支持时 [enabled] 为 false：
+/// 开关换成一把锁，副标题把原因写出来。
 class SettingsLinkEntry extends StatelessWidget {
   final String title;
   final String subtitle;
+
+  /// 状态行：通不通 + 地址。空字符串表示这一行不需要状态（例如平台不支持）。
   final String status;
   final bool up;
   final bool on;
@@ -639,6 +645,14 @@ class SettingsLinkEntry extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
+
+  /// 平台不支持：整行置灰、开关换成锁，点不进去
+  final bool enabled;
+
+  /// 发射圆点：非 null 才画，值表示「现在是不是它发」
+  final bool? tx;
+  final VoidCallback? onTx;
+
   const SettingsLinkEntry({
     super.key,
     required this.title,
@@ -650,12 +664,15 @@ class SettingsLinkEntry extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.onTap,
+    this.enabled = true,
+    this.tx,
+    this.onTx,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       child: Container(
         padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
         decoration: BoxDecoration(
@@ -665,10 +682,12 @@ class SettingsLinkEntry extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: on ? 0.14 : 0.06),
+              color: color.withValues(alpha: !enabled ? 0.05 : (on ? 0.14 : 0.06)),
               borderRadius: BorderRadius.circular(11),
             ),
-            child: Icon(icon, size: 20, color: on ? color : C.greyLight),
+            child: Icon(icon,
+                size: 20,
+                color: !enabled ? C.greyLight : (on ? color : C.grey)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -677,45 +696,81 @@ class SettingsLinkEntry extends StatelessWidget {
               children: [
                 Text(title,
                     style: ts(13,
-                        c: on ? C.slate : C.grey, w: FontWeight.w700),
+                        c: !enabled
+                            ? C.greyLight
+                            : (on ? C.slate : C.grey),
+                        w: FontWeight.w700),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 3),
-                Row(children: [
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: up ? C.green : C.greyLight,
-                      shape: BoxShape.circle,
+                if (status.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Row(children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: up ? C.green : C.greyLight,
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: Text(status,
-                        style: ts(10.5, c: up ? C.green : C.grey),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
-                  ),
-                ]),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Text(status,
+                          style: ts(10.5, c: up ? C.green : C.grey),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                  ]),
+                ],
                 const SizedBox(height: 2),
                 Text(subtitle,
-                    style: ts(10, c: C.greyLight),
-                    maxLines: 1,
+                    style: ts(10, c: enabled ? C.greyLight : C.orange),
+                    maxLines: enabled ? 1 : 2,
                     overflow: TextOverflow.ellipsis),
               ],
             ),
           ),
+          if (tx != null) ...[
+            const SizedBox(width: 6),
+            GestureDetector(
+              onTap: onTx,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      tx!
+                          ? Icons.radio_button_checked_rounded
+                          : Icons.radio_button_unchecked_rounded,
+                      size: 18,
+                      color: tx! ? C.orange : C.greyLight,
+                    ),
+                    if (tx!)
+                      Text(S.of(context).dataSourceTxBadge,
+                          style: ts(9, c: C.orange, w: FontWeight.w700)),
+                  ],
+                ),
+              ),
+            ),
+          ],
           const SizedBox(width: 6),
-          Switch(
-            value: on,
-            onChanged: onToggle,
-            activeThumbColor: color,
-            activeTrackColor: color.withValues(alpha: 0.25),
-            inactiveThumbColor: C.grey,
-            inactiveTrackColor: C.greyBg,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
+          if (!enabled)
+            Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: Icon(Icons.lock_outline, size: 16, color: C.greyLight),
+            )
+          else
+            Switch(
+              value: on,
+              onChanged: onToggle,
+              activeThumbColor: color,
+              activeTrackColor: color.withValues(alpha: 0.25),
+              inactiveThumbColor: C.grey,
+              inactiveTrackColor: C.greyBg,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
           Icon(Icons.chevron_right_rounded, size: 18, color: C.greyLight),
         ]),
       ),

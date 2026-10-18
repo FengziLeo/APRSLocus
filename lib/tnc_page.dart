@@ -446,6 +446,12 @@ class DataSourceCard extends StatelessWidget {
     );
   }
 
+  /// 一条报文链路一行：名称、通不通、在这条链路上能开什么。
+  ///
+  /// 形状与「设置 → 服务器」一级那两个入口一致（[SettingsLinkEntry]）：
+  /// 左边图标、中间三段文字、右边发射圆点 + 开关 + 箭头。原来的复选框和
+  /// 那颗 tune 小按钮都换掉了 —— 复选框与开关做的是同一件事，而 tune 图标
+  /// 的可点区域只有 15 px，手指按到边上没反应。
   Widget _tile(
     BuildContext context, {
     required String key,
@@ -465,157 +471,25 @@ class DataSourceCard extends StatelessWidget {
     final s = S.of(context);
     final isEnabled = enabled ?? state.enabledSources.contains(key);
     final isUp = up ?? state.isUp(key);
-    // 只读来源（PKWDWPL）永远不是发射来源，圆点也不显示 ——
+    // 只读来源（PKWDWPL）永远不是发射来源，圆点也不画 ——
     // 否则用户会以为「选上它就能发」。
     final isTxActive = isTx ?? (canTx && state.dataSource == key);
-    // 最后一条不允许取消勾选：全关掉应用就什么都不收，而界面没有任何提示
-    final canToggleOff = state.enabledSources.length > 1 || !isEnabled;
-    // 平台不支持：整行置灰、不可点，副标题换成「为什么不可用」——
-    // 让用户一眼看出不是坏了，而是本平台根本没有这条链路。
-    final sub = disabled ? (disabledReason ?? desc) : desc;
-    return InkWell(
-      onTap: disabled
-          ? null
-          : () => onToggle != null
-              ? onToggle(!isEnabled)
-              : state.toggleSource(key, !isEnabled),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: disabled
-              ? Colors.transparent
-              : (isEnabled
-                  ? C.blue.withValues(alpha: 0.04)
-                  : Colors.transparent),
-          border: Border(bottom: BorderSide(color: C.border, width: 0.4)),
-        ),
-        child: Row(children: [
-          // 勾选状态：这是「是否启用这条链路」，不是「选中它去发射」
-          Icon(
-            disabled
-                ? Icons.block
-                : (isEnabled
-                    ? Icons.check_box_rounded
-                    : Icons.check_box_outline_blank_rounded),
-            size: 19,
-            color: disabled
-                ? C.greyLight
-                : (isEnabled ? C.blue : C.greyLight),
-          ),
-          const SizedBox(width: 10),
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: disabled
-                  ? C.greyBg
-                  : (isEnabled ? C.blue.withValues(alpha: 0.12) : C.greyBg),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon,
-                size: 17,
-                color: disabled ? C.greyLight : (isEnabled ? C.blue : C.grey)),
-          ),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(children: [
-                  Flexible(
-                    child: Text(title,
-                        style: ts(13,
-                            w: FontWeight.w700,
-                            c: disabled
-                                ? C.greyLight
-                                : (isEnabled ? C.blue : C.grey)),
-                        overflow: TextOverflow.ellipsis),
-                  ),
-                  if (!disabled && isEnabled) ...[
-                    const SizedBox(width: 6),
-                    // 每条链路的真实连通状态：多选时这是最需要一眼看到的信息
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: isUp ? C.green : C.greyLight,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(isUp ? s.connected : s.disconnected,
-                        style: ts(10, c: isUp ? C.green : C.grey)),
-                  ],
-                ]),
-                const SizedBox(height: 2),
-                Text(sub,
-                    style: ts(11, c: disabled ? C.orange : C.grey),
-                    maxLines: disabled ? 2 : 1,
-                    overflow: TextOverflow.ellipsis),
-              ],
-            ),
-          ),
-          // 配置专属子页入口按钮
-          if (!disabled && onConfigure != null)
-            GestureDetector(
-              onTap: onConfigure,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Tooltip(
-                  message: '进入配置面板',
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: isEnabled
-                          ? C.blue.withValues(alpha: 0.1)
-                          : C.greyBg,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Icon(Icons.tune_rounded,
-                        size: 15,
-                        color: isEnabled ? C.blue : C.grey),
-                  ),
-                ),
-              ),
-            ),
-          // 平台不支持：用一把锁替代发射标记，明确「本平台不可用」
-          if (disabled)
-            Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: Icon(Icons.lock_outline,
-                  size: 16, color: C.greyLight),
-            )
-          // 发射来源标记：只有启用的**可发射**链路才有资格
-          else if (isEnabled && canTx)
-            GestureDetector(
-              onTap: isTxActive
-                  ? null
-                  : (onSetTx ?? () => state.setTxSource(key)),
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 6),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      isTxActive
-                          ? Icons.radio_button_checked_rounded
-                          : Icons.radio_button_unchecked_rounded,
-                      size: 18,
-                      color: isTxActive ? C.orange : C.greyLight,
-                    ),
-                    if (isTxActive)
-                      Text(s.dataSourceTxBadge,
-                          style: ts(9, c: C.orange, w: FontWeight.w700)),
-                    if (!isTxActive && !canToggleOff)
-                      const SizedBox(height: 0),
-                  ],
-                ),
-              ),
-            ),
-        ]),
-      ),
+    return SettingsLinkEntry(
+      title: title,
+      // 平台不支持时把原因写在这里，状态行就不画了
+      subtitle: disabled ? (disabledReason ?? desc) : desc,
+      status: disabled ? '' : (isUp ? s.connected : s.disconnected),
+      up: isUp,
+      on: isEnabled,
+      enabled: !disabled,
+      onToggle: onToggle ?? (v) => state.toggleSource(key, v),
+      icon: icon,
+      color: C.blue,
+      tx: (!disabled && canTx) ? isTxActive : null,
+      onTx: isTxActive ? null : (onSetTx ?? () => state.setTxSource(key)),
+      onTap: () {
+        if (onConfigure != null) onConfigure();
+      },
     );
   }
 }

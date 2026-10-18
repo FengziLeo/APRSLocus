@@ -1,5 +1,62 @@
 # 更新日志
 
+## [2.1.17] - 2026-10-18
+
+### 发射来源分两类
+
+- **位置与状态报文一条链路，消息另一条**。常见用法是位置走射频、消息走网络，
+  现在可以分开选；两条选同一条也照样工作。
+- 快捷面板每行两颗圆点，一颗定位图标是位置与状态报文，一颗气泡图标是消息。
+  链路自己的设置页上是两行带文字的勾选。
+- 消息按**自己那条**链路的通断判断发没发出去，另一条在线也不顶替。
+
+### 过滤规则共用
+
+- **APRSNETCN 不再有自己的半径与呼号**，两条链路用「服务器」页上同一套过滤
+  规则；改完过滤，两条在线的链路都会用新规则重连。
+- 群呼号改用 `b/` 前缀，APRS-IS 与 APRSNETCN SERVER 都认。
+
+### 台站面板
+
+- **台站备注与状态报文**从呼号下面挪出来，单独一张卡，一种报文一行。
+
+### 快捷面板
+
+- APRS-IS 那一行点进去就是它自己的设置页，与 APRSNETCN 同一口径。
+
+---
+
+## [2.1.17] - 2026-10-18 (English)
+
+### Two transmit sources
+
+- **Position and status packets pick one link, messages pick another.** The usual
+  setup is position over radio, messages over the network; picking the same link for
+  both still works.
+- Each row in the quick panel carries two dots: the pin icon is position and status,
+  the bubble icon is messages. A link's own settings page has the same two choices as
+  labelled rows.
+- A message is judged sent by **its own** link; the other link being online never takes
+  over.
+
+### One set of filters
+
+- **APRSNETCN no longer has its own radius and callsigns.** Both links follow the filter
+  on the Servers page, and both reconnect with the new rule once it changes.
+- Group callsigns now use the `b/` prefix, which both APRS-IS and the APRSNETCN SERVER
+  accept.
+
+### Station panel
+
+- **Station comment and status packet** moved out of the line under the callsign into
+  their own card, one packet kind per row.
+
+### Quick panel
+
+- Tapping the APRS-IS row opens its own settings page, the same as APRSNETCN.
+
+---
+
 ## [2.1.16] - 2026-10-18
 
 ### 服务器页

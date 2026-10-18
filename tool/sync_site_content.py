@@ -419,6 +419,31 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.17', 'date': '2026-10-18',
+        'items': [
+            ('up',
+             T('发射来源分成两条：位置与状态报文选一条链路，消息选另一条，两条选同一条也'
+               '照样工作。消息按自己那条链路的通断判断发没发出去。',
+               '發射來源分成兩條：位置與狀態報文選一條鏈路，訊息選另一條，兩條選同一條也'
+               '照樣工作。訊息按自己那條鏈路的通斷判斷發沒發出去。',
+               'Transmit now has two sources: one link for position and status packets, another '
+               'for messages. Picking the same link for both still works, and a message is judged '
+               'sent by its own link.')),
+            ('up',
+             T('APRSNETCN 不再有自己的半径与呼号，两条链路共用服务器页上的同一套过滤规则。',
+               'APRSNETCN 不再有自己的半徑與呼號，兩條鏈路共用伺服器頁上的同一套篩選規則。',
+               'APRSNETCN no longer keeps its own radius and callsigns; both links follow the '
+               'filter on the Servers page.')),
+            ('fix',
+             T('台站备注与状态报文单独一张卡，一种报文一行。快捷面板里 APRS-IS 那一行点得'
+               '进去它自己的设置页。',
+               '臺站備註與狀態報文單獨一張卡，一種報文一行。快捷面板裡 APRS-IS 那一行點得'
+               '進去它自己的設定頁。',
+               'The station note and the status packet now sit in a card of their own, one packet '
+               'kind per row, and the APRS-IS row in the quick panel opens its settings page.')),
+        ],
+    },
+    {
         'ver': 'v2.1.16', 'date': '2026-10-18',
         'items': [
             ('up',

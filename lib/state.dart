@@ -5298,9 +5298,14 @@ class AppState extends ChangeNotifier {
       // 台站“有效状态”翻转（如超 5 分钟变离线、移动→静止）时才推进版本并通知，
       // 否则不触发任何页面重建；无翻转只刷新秒级 UI（tick）。
       if (_bumpStatusVersionIfChanged()) _notify();
-      // 实时更新模式下通知内容跟着秒走：选了它，通知就是用户一直盯着的那一块，
-      // 十几秒才刷一次会看着像卡住。内容真没变的重发由去重挡掉。
-      if (notifStyle == 'live') _updateNotification();
+      // 实时更新里选了「发射倒计时」时，胶囊那行文字得跟着秒走。
+      // 只在倒计时期间每秒重发，其余情况仍然靠事件触发（没必要每秒开销）。
+      if (notifStyle == 'live' &&
+          notifLiveText == 'beacon' &&
+          (beaconPhase == BeaconPhase.counting ||
+              beaconPhase == BeaconPhase.coarseForced)) {
+        _updateNotification();
+      }
       _checkStationAchievement();
       // 碰撞/摔倒（issue #26）：它**不能**只挂在定位回调上 —— 事件可能在没开定位、
       // 或定位很慢（静止后系统常常不再给点）的时候发生，而那正是这个功能要管的场景。

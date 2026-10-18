@@ -200,6 +200,12 @@ class LocationService : Service() {
         /// 的条件，不开就一直是今天这种普通常驻通知。
         @Volatile private var liveUpdates = false
 
+        /// 提升过的通知在这台机器上被抹过：不再试提升（见 verifyStillPosted）。
+        @Volatile private var promoBroken = false
+
+        /// 给诊断用：这台机器是不是已经把提升关了。
+        fun promoBrokenByRom(): Boolean = promoBroken
+
         fun setBtActiveStatic(active: Boolean) {
             if (btActive == active) return
             btActive = active
@@ -226,6 +232,8 @@ class LocationService : Service() {
         fun setLiveUpdatesStatic(on: Boolean) {
             if (liveUpdates == on) return
             liveUpdates = on
+            // 用户重新打开时再给提升一次机会：上次可能是这台机器一时的状态。
+            if (on) promoBroken = false
             instance?.let { it.republish() }
         }
 
@@ -354,14 +362,31 @@ class LocationService : Service() {
                 .build()
         }
         if (!declareForeground(notification)) {
-            // 权限被收回（用户在系统设置里把定位关掉）：带 location 类型的
-            // 前台服务声明拿不到权限，服务无论如何也撑不起来。不崩溃、不装死：
-            // 结束自己并把原因报给 Dart，由界面去提示「缺哪项权限」。
-            LocationBus.emit(mapOf("status" to "定位权限已关闭，后台定位无法启动"))
-            stopSelf()
-            return START_NOT_STICKY
+            // 带提升的版本被系统挡下时，不能把它当成「定位权限被收回」：
+            // 关掉提升再试一次，还不行才按权限处理。
+            var ok = false
+            if (currentPromoMode() != PROMO_PLAIN) {
+                promoBroken = true
+                val plain = try {
+                    buildNotification("APRSlocus 运行中")
+                } catch (_: Throwable) {
+                    null
+                }
+                if (plain != null) ok = declareForeground(plain)
+            }
+            if (!ok) {
+                // 权限被收回（用户在系统设置里把定位关掉）：带 location 类型的
+                // 前台服务声明拿不到权限，服务无论如何也撑不起来。不崩溃、不装死：
+                // 结束自己并把原因报给 Dart，由界面去提示「缺哪项权限」。
+                LocationBus.emit(mapOf("status" to "定位权限已关闭，后台定位无法启动"))
+                stopSelf()
+                return START_NOT_STICKY
+            }
         }
         // 持锁防止 Doze 冻结 Dart 隔离区（保证保活/重连定时器运行）
+        // 提升版发出后也要回头确认一次（startForeground 这条路径与 notify 不同，
+        // 但被抹掉的后果一样：前台服务没有通知就活不下去）。
+        if (currentPromoMode() != PROMO_PLAIN) verifyStillPosted()
         try {
             val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
             wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "aprslocus:loc").apply {
@@ -488,27 +513,56 @@ class LocationService : Service() {
         // 提升姿势的判定本身也可能在这台机器上出错（反射、ROM 改过的方法）；
         // 出错就退回普通常驻通知。前台服务靠这条通知活着，它不能因为
         // 「想美一下」而消失。
-        val mode = if (liveUpdates) {
-            try {
-                promoMode(this)
-            } catch (_: Throwable) {
-                PROMO_PLAIN
-            }
-        } else {
+        val mode = currentPromoMode()
+        return ongoingNotification(this, text, short, mode, countdown)
+    }
+
+    /// 当前该用哪种提升姿势。
+    ///
+    /// `promoBroken` 是这台机器的实测结果：提升过的通知被系统抹掉过一次，
+    /// 那就不再试了（见 [verifyStillPosted]）。宁可没有胶囊，不能没有通知。
+    private fun currentPromoMode(): Int {
+        if (!liveUpdates || promoBroken) return PROMO_PLAIN
+        return try {
+            promoMode(this)
+        } catch (_: Throwable) {
             PROMO_PLAIN
         }
-        return ongoingNotification(this, text, short, mode, countdown)
+    }
+
+    /// 发完再看一眼：这条通知还在不在。
+    ///
+    /// Android 16 的「提升」不是纯装饰：部分 ROM（HyperOS）把提升过的通知
+    /// 从通知列表里抽走却没把胶囊画出来，用户看到的就是「通知没了」。
+    /// 前台服务不能赌这个，所以在发出提升版之后 1.5 秒回头确认；
+    /// 不见了就关掉提升、立刻按普通通知重发一条。
+    private fun verifyStillPosted() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (promoBroken) return@postDelayed
+            val nm = getSystemService(NotificationManager::class.java)
+            val alive = try {
+                nm.activeNotifications.any { it.id == NOTIFICATION_ID }
+            } catch (_: Throwable) {
+                true
+            }
+            if (!alive) {
+                promoBroken = true
+                republish()
+            }
+        }, 1500)
     }
 
     /// 用上一次的文本/胶囊/倒计时重建并发一次（换提升姿势、刷新前台服务类型时用）。
     private fun republish() {
         val nm = getSystemService(NotificationManager::class.java)
+        val mode = currentPromoMode()
         try {
             nm.notify(
                 NOTIFICATION_ID,
-                buildNotification(lastNotificationText, lastNotificationShort, lastCountdown)
+                ongoingNotification(this, lastNotificationText, lastNotificationShort, mode, lastCountdown)
             )
             markPosted()
+            if (mode != PROMO_PLAIN) verifyStillPosted()
         } catch (e: Throwable) {
             markFailed(e)
         }
@@ -520,9 +574,11 @@ class LocationService : Service() {
         lastNotificationShort = short
         lastCountdown = countdown
         val nm = getSystemService(NotificationManager::class.java)
+        val mode = currentPromoMode()
         try {
-            nm.notify(NOTIFICATION_ID, buildNotification(text, short, countdown))
+            nm.notify(NOTIFICATION_ID, ongoingNotification(this, text, short, mode, countdown))
             markPosted()
+            if (mode != PROMO_PLAIN) verifyStillPosted()
         } catch (e: Throwable) {
             // 建不出来就保持上一条：宁可文字旧，不能没有通知
             markFailed(e)
@@ -884,13 +940,6 @@ private fun applyPromo(
                 if (short.isNotEmpty()) b.setShortCriticalText(short)
             }
         }
-        // 倒计时交给系统走（chronometer），不靠自己每秒重发通知：
-        // 胶囊里那行超短文本是死的，重发跟不上秒，「距下次上报」就只能停在旧值上。
-        if (mode != PROMO_PLAIN && countdown > 0) {
-            b.setWhen(System.currentTimeMillis() + countdown * 1000)
-                .setUsesChronometer(true)
-                .setChronometerCountDown(true)
-        }
     } catch (_: Throwable) {
         // 放弃提升，通知照发
     }
@@ -1014,6 +1063,7 @@ fun diag(context: Context, liveText: String = ""): String {
         "default" -> "默认"
         else -> "未传来（$liveText）"
     })
+    lines.add("提升被系统抹过：" + (if (LocationService.promoBrokenByRom()) "是（已退回普通通知）" else "否"))
     lines.addAll(LocationService.lastNotifReport())
     return lines.joinToString("\n")
 }

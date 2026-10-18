@@ -490,7 +490,7 @@ class LocationService : Service() {
             .addAction(toggleAction)
             .addAction(exitAction)
             .let { builder ->
-                // 实时更新的那两个方法在 androidx 的 NotificationCompat 上（1.16 起），
+                // 实时更新的那两个方法在 androidx 的 NotificationCompat 上（1.17 起），
                 // 平台的 Notification.Builder 上没有 —— 真机诊断里
                 // setRequestPromotedOngoing / setShortCriticalText 都是「没有」。
                 if (liveUpdates) requestLiveUpdates(builder, short)
@@ -500,16 +500,19 @@ class LocationService : Service() {
             }
     }
 
-    /// 申请实时更新：androidX 兼容层（1.16 起）上那两个方法，有就调。
+    /// 申请实时更新：调用 androidx 兼容层上那两个方法。
     ///
-    /// 平台的 `Notification.Builder` 上没有它们 —— 真机诊断里
-    /// `setRequestPromotedOngoing` / `setShortCriticalText` 都是「没有」，
-    /// 而 `canPostPromotedNotifications` 是「允许」，说明入口在兼容层。
-    /// 反射拿不到就等于这个版本不支持，通知照普通通知发。
+    /// **直接调**，不走反射 —— release 包会经过 R8，没人引用的库方法会被裁掉，
+    /// 反射在那时就找不到它们了（2.1.20 里正是这样：诊断显示兼容层「没有」，
+    /// 而依赖确实是 androidx.core 1.17.0）。兼容层自己会处理老系统：低版本上
+    /// 这两个调用什么也不做。
     private fun requestLiveUpdates(builder: NotificationCompat.Builder, short: String) {
-        val asked = invokeBool(builder, "setRequestPromotedOngoing",
-            "setRequestPromotedOngoingNotification", "setPromotedOngoing")
-        if (asked && short.isNotEmpty()) invokeText(builder, "setShortCriticalText", short)
+        try {
+            builder.setRequestPromotedOngoing(true)
+            if (short.isNotEmpty()) builder.setShortCriticalText(short)
+        } catch (_: Throwable) {
+            // 老版本兼容层没有这两个方法时不至于让通知发不出去
+        }
     }
 
     /// 小米 / Redmi / POCO 的「焦点通知」（超级岛）。
@@ -542,48 +545,6 @@ class LocationService : Service() {
             false
         }
     }
-
-    /// 反射调「传 true 进去」的 Builder 方法（兼容层 / 平台层通用）。
-    private fun invokeBool(target: Any, vararg names: String): Boolean {
-        for (name in names) {
-            try {
-                val method = findMethod(target.javaClass, name,
-                    Boolean::class.javaObjectType)
-                if (method != null) {
-                    method.invoke(target, true)
-                    return true
-                }
-            } catch (_: Throwable) {
-            }
-        }
-        return false
-    }
-
-    /// 反射调「传一段文字进去」的 Builder 方法。
-    private fun invokeText(target: Any, name: String, text: String): Boolean {
-        return try {
-            val method = findMethod(target.javaClass, name, CharSequence::class.java)
-            method?.invoke(target, text)
-            method != null
-        } catch (_: Throwable) {
-            false
-        }
-    }
-
-    /// 在类及其父类里找方法（兼容 Builder 的方法可能声明在父类上）。
-    private fun findMethod(cls: Class<*>, name: String,
-                           arg: Class<*>): java.lang.reflect.Method? {
-        var current: Class<*>? = cls
-        while (current != null && current != Any::class.java) {
-            try {
-                return current.getMethod(name, arg)
-            } catch (_: Throwable) {
-                current = current.superclass
-            }
-        }
-        return null
-    }
-
 
     fun updateNotification(text: String, short: String = "") {
         // 记下来：刷新前台服务类型（音频采集开关）时要用同一份文本重新 startForeground

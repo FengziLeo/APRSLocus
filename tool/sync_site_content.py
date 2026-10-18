@@ -419,6 +419,19 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.21', 'date': '2026-10-18',
+        'items': [
+            ('fix',
+             T('实时更新接上了：上一版那两个方法走的是反射，release 包被 R8 裁掉就找不到，'
+               '现在直接调用。',
+               '即時更新接上了：上一版那兩個方法走的是反射，release 包被 R8 裁掉就找不到，'
+               '現在直接呼叫。',
+               'Live updates are hooked up: the previous build called the two methods through '
+               'reflection, which R8 stripped from the release build. They are called directly '
+               'now.')),
+        ],
+    },
+    {
         'ver': 'v2.1.20', 'date': '2026-10-18',
         'items': [
             ('fix',

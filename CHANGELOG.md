@@ -1,5 +1,27 @@
 # 更新日志
 
+## [2.1.21] - 2026-10-18
+
+### 实时更新真的接上了
+
+- 2.1.20 里那两个方法还是走反射调的，release 包经过 R8 时把没人引用的库方法裁掉了，
+  所以运行时候找不到。现在改成直接调用，R8 会把它当成真实用到的方法留下。
+- 顺带把只给反射用的那几个小函数删了。
+
+---
+
+## [2.1.21] - 2026-10-18 (English)
+
+### Live updates actually hooked up
+
+- In 2.1.20 the two methods were still called through reflection, and R8 strips library
+  members nothing references, so they were gone at runtime. They are called directly now,
+  which keeps them.
+- The little reflection helpers only used for that are gone.
+
+---
+
+
 ## [2.1.20] - 2026-10-18
 
 ### 实时更新修好了

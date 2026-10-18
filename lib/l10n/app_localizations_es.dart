@@ -9675,4 +9675,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get acnFilterCallsHint => "Indicativo, pulsa enter";
 
+  @override
+  String get txChannels => "Canales de emisión";
+
+  @override
+  String get txChannelsHint => "Cada enlace marcado envía una copia. Al menos uno queda activo.";
+
+  @override
+  String get txOneChannelMin => "Deja al menos un enlace de emisión";
+
 }

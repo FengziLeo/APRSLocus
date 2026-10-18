@@ -36,29 +36,25 @@ CLASSES = {
 
 # ── 要加的键：key → (zh, zh_TW, en, ja, es, id) ──
 KEYS = {
-    # ── 副链路（APRSNETCN SERVER）自己的筛选 ──
+    # ── 发射渠道：两条互联网链路各一个开关 ──
     #
-    # 主链路按连接设置页的范围与群呼号组装，副链路连的是 CNNET 那台服务器，
-    # 半径与呼号单独一套。
-    'acnFilterTitle': (
-        '筛选', '篩選', 'Filter', '絞り込み', 'Filtro', 'Filter'),
-    'acnFilterSubtitle': (
-        '半径内的台站，加上你列的呼号。',
-        '半徑內的臺站，加上你列的呼號。',
-        'Stations inside the radius, plus the calls you list.',
-        '半径内の局と、ここに並べたコールサイン。',
-        'Estaciones dentro del radio, más los indicativos que añadas.',
-        'Stasiun di dalam radius, ditambah panggilan yang kamu daftar.'),
-    'acnFilterRadius': (
-        '半径（公里）', '半徑（公里）', 'Radius (km)', '半径（km）',
-        'Radio (km)', 'Radius (km)'),
-    'acnFilterCalls': (
-        '再加上这些呼号', '再加上這些呼號', 'Also these calls', 'このコールサインも',
-        'También estos indicativos', 'Juga panggilan ini'),
-    'acnFilterCallsHint': (
-        '呼号，按回车加上', '呼號，按 Enter 加上', 'Callsign, press enter',
-        'コールサイン、Enter で追加', 'Indicativo, pulsa enter',
-        'Panggilan, tekan enter'),
+    # 在线与发射是两件事：两条链路可以同时在线，各自勾选是否发报文，
+    # 但至少留一条（全关等于这台机器不发）。
+    'txChannels': (
+        '发射渠道', '發射渠道', 'Transmit channels', '送信チャネル',
+        'Canales de emisión', 'Kanal transmisi'),
+    'txChannelsHint': (
+        '勾上的链路各发一份，至少留一条。',
+        '勾上的鏈路各發一份，至少留一條。',
+        'Every ticked link sends a copy. At least one stays on.',
+        'チェックした回線がそれぞれ 1 通ずつ送ります。少なくとも 1 つは残します。',
+        'Cada enlace marcado envía una copia. Al menos uno queda activo.',
+        'Setiap tautan yang dicentang mengirim satu salinan. Minimal satu tetap aktif.'),
+    'txOneChannelMin': (
+        '至少留一条发射链路', '至少留一條發射鏈路',
+        'Keep at least one transmit link', '送信回線は 1 つ以上残してください',
+        'Deja al menos un enlace de emisión',
+        'Sisakan setidaknya satu tautan transmisi'),
 }
 
 META = {

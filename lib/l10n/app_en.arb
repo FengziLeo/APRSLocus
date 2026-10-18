@@ -4203,5 +4203,8 @@
   "acnFilterSubtitle": "Stations inside the radius, plus the calls you list.",
   "acnFilterRadius": "Radius (km)",
   "acnFilterCalls": "Also these calls",
-  "acnFilterCallsHint": "Callsign, press enter"
+  "acnFilterCallsHint": "Callsign, press enter",
+  "txChannels": "Transmit channels",
+  "txChannelsHint": "Every ticked link sends a copy. At least one stays on.",
+  "txOneChannelMin": "Keep at least one transmit link"
 }

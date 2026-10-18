@@ -9616,4 +9616,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get acnFilterCallsHint => "Callsign, press enter";
 
+  @override
+  String get txChannels => "Transmit channels";
+
+  @override
+  String get txChannelsHint => "Every ticked link sends a copy. At least one stays on.";
+
+  @override
+  String get txOneChannelMin => "Keep at least one transmit link";
+
 }

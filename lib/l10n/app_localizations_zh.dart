@@ -9237,6 +9237,15 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get acnFilterCallsHint => "呼号，按回车加上";
 
+  @override
+  String get txChannels => "发射渠道";
+
+  @override
+  String get txChannelsHint => "勾上的链路各发一份，至少留一条。";
+
+  @override
+  String get txOneChannelMin => "至少留一条发射链路";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18470,5 +18479,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get acnFilterCallsHint => "呼號，按 Enter 加上";
+
+  @override
+  String get txChannels => "發射渠道";
+
+  @override
+  String get txChannelsHint => "勾上的鏈路各發一份，至少留一條。";
+
+  @override
+  String get txOneChannelMin => "至少留一條發射鏈路";
 
 }

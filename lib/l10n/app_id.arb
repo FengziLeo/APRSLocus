@@ -4203,5 +4203,8 @@
   "acnFilterSubtitle": "Stasiun di dalam radius, ditambah panggilan yang kamu daftar.",
   "acnFilterRadius": "Radius (km)",
   "acnFilterCalls": "Juga panggilan ini",
-  "acnFilterCallsHint": "Panggilan, tekan enter"
+  "acnFilterCallsHint": "Panggilan, tekan enter",
+  "txChannels": "Kanal transmisi",
+  "txChannelsHint": "Setiap tautan yang dicentang mengirim satu salinan. Minimal satu tetap aktif.",
+  "txOneChannelMin": "Sisakan setidaknya satu tautan transmisi"
 }

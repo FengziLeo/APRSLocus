@@ -4203,5 +4203,8 @@
   "acnFilterSubtitle": "Estaciones dentro del radio, más los indicativos que añadas.",
   "acnFilterRadius": "Radio (km)",
   "acnFilterCalls": "También estos indicativos",
-  "acnFilterCallsHint": "Indicativo, pulsa enter"
+  "acnFilterCallsHint": "Indicativo, pulsa enter",
+  "txChannels": "Canales de emisión",
+  "txChannelsHint": "Cada enlace marcado envía una copia. Al menos uno queda activo.",
+  "txOneChannelMin": "Deja al menos un enlace de emisión"
 }

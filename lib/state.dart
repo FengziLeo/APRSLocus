@@ -4102,6 +4102,8 @@ class AppState extends ChangeNotifier {
     acnOn = false;
     acnServer = kAcnServerHost;
     acnPort = kAcnServerPort;
+    txAprsIs = true;
+    txAcn = true;
     _acnConfWarned = false;
     acnAccount = '';
     acnPassword = '';
@@ -4364,6 +4366,13 @@ class AppState extends ChangeNotifier {
 
   /// 是否同时连 APRSNETCN（设置页的开关）。默认关：不是所有人都用这台服务器。
   bool acnOn = false;
+
+  /// 发射渠道：两条互联网链路各一个开关。
+  ///
+  /// 两条链路可以同时在线，但「发不发」是另一件事：两边各发一份，或者只从其中
+  /// 一条发。最后一个不允许关掉 —— 两条都不发等于没有发射链路。
+  bool txAprsIs = true;
+  bool txAcn = true;
 
   /// 副链路的服务器地址与端口。
   ///
@@ -4653,6 +4662,10 @@ class AppState extends ChangeNotifier {
       acnOn = p.getBool('acnOn') ?? acnOn;
       acnServer = p.getString('acnServer') ?? acnServer;
       acnPort = p.getInt('acnPort') ?? acnPort;
+      txAprsIs = p.getBool('txAprsIs') ?? txAprsIs;
+      txAcn = p.getBool('txAcn') ?? txAcn;
+      // 两条都关的配置不该存在，留着主链路
+      if (!txAprsIs && !txAcn) txAprsIs = true;
       acnAccount = p.getString('acnAccount') ??
           (aprs.server.trim() == kAcnServerHost ? aprs.account : '');
       acnPassword = p.getString('acnPassword') ??
@@ -4953,6 +4966,8 @@ class AppState extends ChangeNotifier {
     await p.setInt('acnPort', acnPort);
     await p.setString('acnAccount', acnAccount);
     await p.setString('acnPassword', acnPassword);
+    await p.setBool('txAprsIs', txAprsIs);
+    await p.setBool('txAcn', txAcn);
     await p.setInt('acnFilterRadius', acnFilterRadius);
     await p.setStringList('acnFilterCalls', acnFilterCalls);
     await p.setString('dataSource', dataSource);
@@ -6126,6 +6141,24 @@ class AppState extends ChangeNotifier {
     unawaited(_connectAcn());
   }
 
+  /// 开/关一条链路的发射。两条都关会被拒：那样整台机器就不发了，
+  /// 而界面看上去一切正常。
+  void setTxAprsIs(bool v) {
+    if (v == txAprsIs) return;
+    if (!v && !txAcn) return;
+    txAprsIs = v;
+    persist();
+    _notify();
+  }
+
+  void setTxAcn(bool v) {
+    if (v == txAcn) return;
+    if (!v && !txAprsIs) return;
+    txAcn = v;
+    persist();
+    _notify();
+  }
+
   /// 立刻把副链路重连一次（账号口令改过之后用）。
   ///
   /// 先断开再连，不走 [_scheduleAcnRetry] 的 8 秒等待：用户刚刚点的是
@@ -6430,17 +6463,23 @@ class AppState extends ChangeNotifier {
     _scheduleReconnectIfNeeded();
   }
 
-  /// 往 APRS-IS 发一行：主链路一份，APRSNETCN 的第二条链路在线时也发一份。
+  /// 往 APRS-IS 发一行：按「发射渠道」里勾上的链路发。
   ///
-  /// 两台服务器各收一份，哪边先收到都不影响对端。第二条链路没连上，或者主链路
-  /// 指的就是同一台机器（地址端口都一样），就只发主链路 —— 同一台服务器发两遍
-  /// 等于同一帧写两次 socket。
+  /// 两台服务器各收一份，哪边先收到都不影响对端。勾上的第二条链路没连上，
+  /// 或者主链路指的就是同一台机器（地址端口都一样），就只发主链路 —— 同一台
+  /// 服务器发两遍等于同一帧写两次 socket。
   bool _sendAprs(String raw) {
-    final ok = aprs.send(raw);
     final same =
         acnServer.trim() == aprs.server.trim() && acnPort == aprs.port;
-    if (acnConnected && acnLink.connected && !same) {
+    final toAcn = txAcn && acnConnected && acnLink.connected && !same;
+    var ok = false;
+    if (txAprsIs) ok = aprs.send(raw);
+    if (toAcn) {
       acnLink.send(raw);
+      ok = true;
+    }
+    if (!ok) {
+      _log(LogLevel.warn, '连接', '两条互联网链路都没有发出：${_trunc(raw)}');
     }
     return ok;
   }

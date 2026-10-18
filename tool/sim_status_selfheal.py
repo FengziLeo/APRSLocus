@@ -101,11 +101,12 @@ def _dart_marker_check():
         (state, '自愈无视门槛', 'if (!lost && DateTime.now().difference(_lastTx).inSeconds < 25) return;'),
         (state, '自愈补自定义帧', 'final re = _customStatusFrame();'),
         (state, '空文本清标记', '_customStatusLost = false;'),
-        (state, '补发成功清标记', '} else if (aprs.send(re)) {'),
-        (state, '保活记录失败', '_customStatusLost = !aprs.send(frame);'),
+        (state, '补发成功清标记', '} else if (_sendAprs(re)) {'),
+        (state, '保活记录失败', '_customStatusLost = !_sendAprs(frame);'),
         (state, '内置默认状态帧', 'String _defaultStatusFrame() =>'),
-        (state, '保活无自定义→默认帧', 'aprs.send(_defaultStatusFrame());'),
-        (state, '连接时记录失败', 'if (customFrame != null) _customStatusLost = !aprs.send(customFrame);'),
+        (state, '保活无自定义→默认帧', '_sendAprs(_defaultStatusFrame());'),
+        (state, '连接时记录失败', 'if (customFrame != null) _customStatusLost = !_sendAprs(customFrame);'),
+        (state, '两条链路各发一份', 'acnLink.send(raw);'),
     ]
     for src, label, frag in need:
         if frag not in src:

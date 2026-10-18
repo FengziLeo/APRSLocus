@@ -1045,7 +1045,12 @@ private fun promoModeName(m: Int): String = when (m) {
 /// 「支持实时更新」不是个是/否问题，是四五个方法的组合。
 ///
 /// 前几行是「方法在不在」，最后两行是「真造一条通知，系统认不认」—— 后者才算数。
-fun diag(context: Context, liveText: String = ""): String {
+fun diag(
+    context: Context,
+    liveText: String = "",
+    dartRunning: Boolean = false,
+    dartStatus: String = ""
+): String {
     val nm = context.getSystemService(NotificationManager::class.java)
     fun has(cls: Class<*>, name: String, vararg args: Class<*>): String =
         try {
@@ -1078,6 +1083,10 @@ fun diag(context: Context, liveText: String = ""): String {
         "hasPromotableCharacteristics"))
     lines.add("系统认的提升姿势：" + promoModeName(promoMode(context)))
     lines.add("前台服务：" + (if (LocationService.isRunning()) "在跑" else "没在跑"))
+    // Dart 那边的看法：它只知道自己发过启动请求，不知道原生有没有真的起来。
+    // 两边不一致（Dart 说跑着、原生说没跑）就是服务崩了或被系统挡了。
+    lines.add("Dart 侧认为在跑：" + (if (dartRunning) "是" else "否"))
+    if (dartStatus.isNotEmpty()) lines.add("Dart 侧状态文案：$dartStatus")
     // 通知到底在不在：这是「已提升」唯一可信的证据 —— 已提升时部分系统会把
     // 通知从通知列表里抽走、只留状态栏那一条，用户看起来就是「通知没了」。
     val active = try {

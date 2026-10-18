@@ -182,8 +182,13 @@ class MainActivity : FlutterActivity() {
                 }
                 "notifDiag" -> {
                     val liveText = call.argument<String>("liveText") ?: ""
-                    result.success(diag(this, liveText))
+                    val dartRunning = call.argument<Boolean>("dartRunning") ?: false
+                    val dartStatus = call.argument<String>("dartStatus") ?: ""
+                    result.success(diag(this, liveText, dartRunning, dartStatus))
                 }
+                // 服务到底在不在：Dart 那边只知道「启动调用发出去了」，
+                // 原生崩了/被系统挡下时它依然以为是跑着的。
+                "serviceAlive" -> result.success(LocationService.isRunning())
                 // 只改策略、不刷新文字：用户切了「实时更新」而服务没在跑，
                 // 靠文字刷新顺带设标志是丢的（没有 instance 就只写内存，也看不出）。
                 "setLiveUpdates" -> {

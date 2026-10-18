@@ -6971,6 +6971,10 @@ class AppState extends ChangeNotifier {
       _notify();
     } else {
       _log(LogLevel.info, '定位', '定位服务已启动');
+      // 「启动调用发出去了」不等于服务真的在跑：原生被系统挡下或崩掉时，
+      // Dart 这边拿到的仍然是成功。三秒后问一次原生，没起来就重试（有限次），
+      // 否则界面显示「定位中」而常驻通知一条都没有。
+      _verifyServiceUp();
       // 传感器与定位同生共死：没有定位就不需要判「在不在动」
       // 计步与碰撞检测都要这个监听器，所以**无论传感器辅助开没开**都要起：
       // motion 参数只决定加速度计/指南针那部分要不要注册（issue #23）。
@@ -6981,6 +6985,33 @@ class AppState extends ChangeNotifier {
       }));
     }
     return ok;
+  }
+
+  /// 服务起来后确认一下：三秒后问原生「你真的在跑吗」。
+  ///
+  /// 不在就重试启动（有限次）。前台服务没起来时，界面照样显示「定位中」，
+  /// 常驻通知却一条都没有 —— 这个组合最容易让人以为是通知坏了。
+  int _serviceUpRetry = 0;
+
+  void _verifyServiceUp() {
+    Future.delayed(const Duration(seconds: 3), () async {
+      if (_disposed || !loc.running) return;
+      if (await loc.serviceAlive()) {
+        _serviceUpRetry = 0;
+        return;
+      }
+      if (_serviceUpRetry >= 3) {
+        locStatus = '定位服务起不来';
+        _log(LogLevel.error, '定位', '前台服务三次都没起来');
+        _notify();
+        return;
+      }
+      _serviceUpRetry++;
+      _log(LogLevel.error, '定位', '前台服务没起来，第 $_serviceUpRetry 次重试');
+      locStatus = '定位服务重试 $_serviceUpRetry/3';
+      _notify();
+      await startTracking();
+    });
   }
 
   void stopTracking() {

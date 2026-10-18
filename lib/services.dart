@@ -370,13 +370,31 @@ class LocService {
 
   /// 通知能力自查（Android 专有）：这台机器支不支持实时更新 / 焦点通知，
   /// 到底缺哪一环。没这个平台就返回空串。
-  Future<String> notifDiag({String liveText = ''}) async {
+  Future<String> notifDiag(
+      {String liveText = '', bool dartRunning = false, String dartStatus = ''}) async {
     try {
-      final v = await _channel
-          .invokeMethod<String>('notifDiag', {'liveText': liveText});
+      final v = await _channel.invokeMethod<String>('notifDiag', {
+        'liveText': liveText,
+        'dartRunning': dartRunning,
+        'dartStatus': dartStatus,
+      });
       return v ?? '';
     } catch (_) {
       return '';
+    }
+  }
+
+  /// 原生那边前台服务真的在跑吗。
+  ///
+  /// [running] 只代表「启动调用发出去了」，服务被系统挡下或崩掉时它依然是
+  /// true。界面要的是这个问题的答案，所以单独问一次。
+  Future<bool> serviceAlive() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return false;
+    try {
+      final v = await _channel.invokeMethod<bool>('serviceAlive');
+      return v ?? false;
+    } catch (_) {
+      return false;
     }
   }
 

@@ -105,7 +105,8 @@ def _marker_check():
     need(state, '恢复出厂方法', 'Future<void> factoryReset()', 'lib/state.dart')
     need(state, '清空磁盘偏好', 'await p.clear();', 'lib/state.dart')
     need(state, '清呼号', "myCall = 'BV2AAA';", 'lib/state.dart')
-    need(state, '复位服务器', "aprs.server = 'rotate.aprs2.net';", 'lib/state.dart')
+    need(state, '复位服务器地址为空',
+         "aprs.server = '';", 'lib/state.dart')
     need(state, '复位主题包', 'ThemeController.instance.saveTo(p);', 'lib/state.dart')
     need(state, '复位成就内存态',
          'AchievementCenter.instance.resetToDefaults();', 'lib/state.dart')

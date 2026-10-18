@@ -24,10 +24,13 @@ const String kAcnHttpBase = 'http://8.138.199.11:8899';
 /// 界面里填的 APRS 地址 → HTTP 接口入口。
 ///
 /// 那台机器上 APRS 端口（14580）与 HTTP 端口（8899）是分开的两个设置，界面
-/// 只让人填 APRS 那一个，所以这里补上 8899。地址空着就退回默认入口。
+/// 只让人填 APRS 那一个，所以这里补上 8899。
+///
+/// 地址空着就返回空串：不拿 [kAcnHttpBase] 当兜底 —— 用户没填地址时，软件
+/// 不该自己去连一台服务器（调用方据此跳过 HTTP 请求）。
 String acnHttpBaseHost(String host) {
   final h = host.trim();
-  return h.isEmpty ? kAcnHttpBase : 'http://$h:8899';
+  return h.isEmpty ? '' : 'http://$h:8899';
 }
 
 /// 一台台站在服务器那侧的 24 小时概况（= 该呼号最后一次位置 + 收到几帧）。

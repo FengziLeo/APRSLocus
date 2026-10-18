@@ -4104,12 +4104,12 @@ class AppState extends ChangeNotifier {
     serverHistory.clear();
     labLandscape = false;
     sensorAssist = true;
-    aprs.server = 'rotate.aprs2.net';
+    aprs.server = '';
     aprs.port = 14580;
     aprs.passcode = '-1';
     aprs.account = '';
     aprs.password = '';
-    acnServer = kAcnServerHost;
+    acnServer = '';
     acnPort = kAcnServerPort;
     acnPasscode = '';
     _acnConfWarned = false;
@@ -4349,6 +4349,8 @@ class AppState extends ChangeNotifier {
   AcnInfo? acnInfo;
 
   Future<void> fetchAcnInfo() async {
+    // 地址没填就没有接口可问，不去猜一台服务器
+    if (acnServer.trim().isEmpty) return;
     try {
       final info = await acn.info();
       acnInfo = info;
@@ -4382,7 +4384,8 @@ class AppState extends ChangeNotifier {
   ///
   /// 默认值是预置的那一台，用户可以改成别的。协议是同一套，地址不该写死在
   /// 连接里：服务器换机器、走反代、或者自己搭一台试用，都只改这两格。
-  String acnServer = kAcnServerHost;
+  // 不给默认地址：地址由用户自己填（服务器页空了就显示「未配置」）。
+  String acnServer = '';
   int acnPort = kAcnServerPort;
 
   bool get acnConnected => isUp(srcAcn);
@@ -8836,6 +8839,12 @@ class AppState extends ChangeNotifier {
   /// 由连接那一层说。
   Future<AcnSyncResult> syncAcnStations() async {
     if (_acnSyncing) return acnLast ?? const AcnSyncResult(added: 0, total: 0);
+    if (acnServer.trim().isEmpty) {
+      final r = const AcnSyncResult(added: 0, total: 0, error: 'no-server');
+      acnLast = r;
+      _notify();
+      return r;
+    }
     final account = acnAccount.trim();
     final password = acnPassword;
     if (account.isEmpty || password.isEmpty) {

@@ -166,20 +166,21 @@ class _OobePageState extends State<OobePage> {
 
   /// 换一条互联网链路：三个输入框跟着换成那条链路已保存的值。
   ///
-  /// 首次运行时 APRS-IS 的地址是空的 —— 软件不预设连到哪台服务器（用户协议
-  /// 2.4）；APRSNETCN 那一台是本项目的服务器，地址与设置页同一个默认值，
-  /// 用户可以改掉。
+  /// 首次运行时地址一律是空的 —— 软件不预置、也不推荐连到哪台服务器（用户
+  /// 协议 2.4），两条链路都一样。重跑向导时才回填用户自己存过的值。
   void _pickLink(String link) {
     setState(() => _link = link);
     final st = widget.state;
     final isAcn = link == AppState.srcAcn;
-    _server.text = isAcn ? st.acnServer : (st.oobeDone ? st.aprs.server : '');
-    _port.text = isAcn
-        ? '${st.acnPort}'
-        : (st.oobeDone ? '${st.aprs.port}' : '');
-    _pass.text = isAcn
-        ? st.acnPasscode
-        : (st.oobeDone ? st.aprs.passcode : '');
+    _server.text = st.oobeDone
+        ? (isAcn ? st.acnServer : st.aprs.server)
+        : '';
+    _port.text = st.oobeDone
+        ? '${isAcn ? st.acnPort : st.aprs.port}'
+        : '';
+    _pass.text = st.oobeDone
+        ? (isAcn ? st.acnPasscode : st.aprs.passcode)
+        : '';
   }
 
   Future<void> _finish() async {

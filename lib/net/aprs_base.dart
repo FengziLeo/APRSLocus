@@ -1,7 +1,8 @@
 /// APRS-IS 连接器抽象
 abstract class AprsConnector {
   bool connected = false;
-  String server = 'rotate.aprs2.net';
+  // 不给任何默认服务器地址：软件不预置、也不推荐连到哪台服务器（用户协议 2.4）。
+  String server = '';
   int port = 14580;
   String? wsUrl;
   String callsign = 'BV2AAA';

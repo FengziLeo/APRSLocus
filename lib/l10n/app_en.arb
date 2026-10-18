@@ -4179,7 +4179,7 @@
   "acnCardSubtitle": "A server built on the APRSNETCN SERVER protocol. It carries traffic both ways.",
   "acnLinkSwitch": "Also connect to APRSNETCN",
   "acnLinkStatus": "Second link",
-  "acnLinkNote": "Sending stays on the main link. Stations heard here are marked as coming from the server and are never gatewayed.",
+  "acnLinkNote": "Sending goes out on both links, one copy each. Stations heard here are marked as coming from the server and are never gatewayed.",
   "acnAccountNote": "Account and password issued by the server. Leave both empty to receive on the passcode alone.",
   "packetSrcAcn": "APRSNETCN",
   "acnLoginTitle": "Login",

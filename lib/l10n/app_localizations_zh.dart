@@ -9166,7 +9166,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get acnLinkStatus => "第二条链路";
 
   @override
-  String get acnLinkNote => "发报文只走主链路。这条链路收来的台站会标成来自服务器，也不做网关转递。";
+  String get acnLinkNote => "发报文主链路和这条链路各发一份。这条链路收来的台站会标成来自服务器，也不做网关转递。";
 
   @override
   String get acnAccountNote => "服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。";
@@ -18379,7 +18379,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get acnLinkStatus => "第二條鏈路";
 
   @override
-  String get acnLinkNote => "發報文只走主鏈路。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。";
+  String get acnLinkNote => "發報文主鏈路和這條鏈路各發一份。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。";
 
   @override
   String get acnAccountNote => "伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。";

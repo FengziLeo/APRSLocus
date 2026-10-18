@@ -4314,8 +4314,8 @@ class AppState extends ChangeNotifier {
   /// APRSNETCN 的第二条链路。
   ///
   /// 它本身是一台完整的 APRS-IS 服务器（同一套登录行、同一个 passcode，收发都
-  /// 行）：地址填进连接设置就是主链路。当第二条链路用时只收 —— 发送始终走
-  /// `aprs`，一句话不能同时从两台服务器发出去，否则对端会收到两帧一样的。
+  /// 行）：地址填进连接设置就是主链路；当第二条链路用时，收的一份并进台站列表，
+  /// 发的报文两边各发一份（见 [_sendAprs]）。
   final AprsConnector acnLink = createAprs();
 
   /// 是否同时连 APRSNETCN（设置页的开关）。默认关：不是所有人都用这台服务器。
@@ -5195,7 +5195,7 @@ class AppState extends ChangeNotifier {
         final re = _customStatusFrame();
         if (re == null) {
           _customStatusLost = false; // 用户已清空文本，没什么可补的
-        } else if (aprs.send(re)) {
+        } else if (_sendAprs(re)) {
           _customStatusLost = false;
           _lastTx = DateTime.now();
           _updateNotification();
@@ -5217,10 +5217,10 @@ class AppState extends ChangeNotifier {
       if (frame != null) {
         // 写失败（socket 抖动/半开）就记下来：这帧没进链路。下个 tick 由上面的
         // 自愈分支重发，直到成功。
-        _customStatusLost = !aprs.send(frame);
+        _customStatusLost = !_sendAprs(frame);
       } else {
         // 没填自定义文本：发内置默认帧保活（与上线那帧同文，见 [_defaultStatusFrame]）。
-        aprs.send(_defaultStatusFrame());
+        _sendAprs(_defaultStatusFrame());
       }
       _lastTx = DateTime.now();
       _updateNotification(); // 定期刷新通知内容（台站数/收包数）
@@ -5474,7 +5474,7 @@ class AppState extends ChangeNotifier {
       twoWay: igateTwoWay,
     );
     if (out == null) return;
-    aprs.send(out);
+    _sendAprs(out);
     igateGated++;
     _lastTx = DateTime.now();
     if (_packetsGatedLog++ % 10 == 1) {
@@ -5994,7 +5994,7 @@ class AppState extends ChangeNotifier {
     };
   }
 
-  /// 连 APRSNETCN 副链路（只收不发）。
+  /// 连 APRSNETCN 的第二条链路。
   ///
   /// 副链路不需要账号口令：服务器在 compat 模式下只按 passcode 判定能否发，
   /// 收报文不需要验证。填了账号口令就随登录行发 `auth`，换一个 verified。
@@ -6119,7 +6119,7 @@ class AppState extends ChangeNotifier {
       _log(LogLevel.info, '连接', '已连接 · $myCall 在线 (过滤: $filterString)');
       _flushPendingTx();
       // 连接成功即发一次身份状态帧（APRS 惯例：上报在线/客户端标识）。
-      aprs.send(_defaultStatusFrame());
+      _sendAprs(_defaultStatusFrame());
       // 这是 CONNECT 帧唯一的自动发送点：保活帧只在没填自定义文本时才用它兜底。
       // 紧接着补一帧自定义状态（issue #31）：上面那帧会把 aprs.fi 上「台站状态」
       // 改写成 CONNECT 文本，不补就等于「一连上服务器，用户自己设的状态立刻被
@@ -6129,7 +6129,7 @@ class AppState extends ChangeNotifier {
       // 失败标记，交给 [_keepaliveTimer] 的自愈分支补发（射频模式没有保活，
       // 但射频也不发 CONNECT 帧，不存在这个覆盖问题）。
       final customFrame = _customStatusFrame();
-      if (customFrame != null) _customStatusLost = !aprs.send(customFrame);
+      if (customFrame != null) _customStatusLost = !_sendAprs(customFrame);
       // 24 小时台站是用户点了设置页的「立即同步」才会去拉的（见
       // [syncAcnStations]）：连上就发一次 HTTP 请求、带上账号口令，那种
       // 副作用得由用户自己按下去。拉回来的那份只在本地列表里**补空**，
@@ -6373,6 +6373,21 @@ class AppState extends ChangeNotifier {
     _scheduleReconnectIfNeeded();
   }
 
+  /// 往 APRS-IS 发一行：主链路一份，APRSNETCN 的第二条链路在线时也发一份。
+  ///
+  /// 两台服务器各收一份，哪边先收到都不影响对端。第二条链路没连上，或者主链路
+  /// 指的就是同一台机器（地址端口都一样），就只发主链路 —— 同一台服务器发两遍
+  /// 等于同一帧写两次 socket。
+  bool _sendAprs(String raw) {
+    final ok = aprs.send(raw);
+    final same =
+        acnServer.trim() == aprs.server.trim() && acnPort == aprs.port;
+    if (acnConnected && acnLink.connected && !same) {
+      acnLink.send(raw);
+    }
+    return ok;
+  }
+
   /// 统一发送入口：按当前数据来源路由到 APRS-IS / TNC / 音频。
   ///
   /// 所有发报路径都必须经过它 —— 否则 TNC 模式下会出现
@@ -6410,7 +6425,7 @@ class AppState extends ChangeNotifier {
       }
       return err;
     }
-    aprs.send(raw);
+    _sendAprs(raw);
     return null;
   }
 
@@ -6429,7 +6444,7 @@ class AppState extends ChangeNotifier {
       final err = audio.sendTnc2(raw);
       if (err != null) return err;
     } else {
-      aprs.send(raw);
+      _sendAprs(raw);
     }
     _lastTx = DateTime.now();
     _log(LogLevel.info, '测试', '已发出测试帧：${_trunc(raw)}');
@@ -7441,8 +7456,8 @@ class AppState extends ChangeNotifier {
     if (!fromAcn) _noteMainLine(line);
     // 网关转递必须在**解析之前**做：无论这条报文能否解析成台站/消息，
     // 只要它该被转递就得转递（很多报文类型本应用并不解析，但网关该转发）。
-    // 副链路（APRSNETCN）只收不发，也不做网关转递：同一条报文可能从两条链路
-    // 都收到，转两遍就是白占一次射频时隙。
+    // 第二条链路（APRSNETCN）收到的报文不做网关转递：同一条报文可能从两条
+    // 链路都收到，转两遍就是白占一次射频时隙。
     if (!fromAcn) {
       if (rf) {
         _gateRfToIs(line);

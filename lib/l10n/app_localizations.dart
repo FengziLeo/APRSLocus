@@ -16689,7 +16689,7 @@ abstract class AppLocalizations {
   /// No description provided for @acnLinkNote.
   ///
   /// In zh, this message translates to:
-  /// **'发报文只走主链路。这条链路收来的台站会标成来自服务器，也不做网关转递。'**
+  /// **'发报文主链路和这条链路各发一份。这条链路收来的台站会标成来自服务器，也不做网关转递。'**
   String get acnLinkNote;
 
   /// No description provided for @acnAccountNote.

@@ -4767,7 +4767,7 @@
   "acnCardSubtitle": "基於 APRSNETCN SERVER 協定的伺服器，收發都能走它。",
   "acnLinkSwitch": "同時連線 APRSNETCN",
   "acnLinkStatus": "第二條鏈路",
-  "acnLinkNote": "發報文只走主鏈路。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。",
+  "acnLinkNote": "發報文主鏈路和這條鏈路各發一份。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。",
   "acnAccountNote": "伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。",
   "packetSrcAcn": "APRSNETCN",
   "acnLoginTitle": "登入",

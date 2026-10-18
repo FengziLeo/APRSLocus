@@ -4913,5 +4913,6 @@
   "notifLiveTextCounts": "收发数",
   "notifLiveTextGrid": "网格",
   "notifLiveTextCourse": "朝向",
-  "notifLiveTextBeacon": "发射倒计时"
+  "notifLiveTextBeacon": "发射倒计时",
+  "notifLiveOff": "这一档暂时停用：在部分系统上它会把常驻通知弄没。现在按普通常驻通知发。"
 }

@@ -9719,4 +9719,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get notifLiveTextBeacon => "Hitung mundur beacon";
 
+  @override
+  String get notifLiveOff => "Sementara dimatikan: di sebagian sistem notifikasi permanen jadi hilang. Sekarang dikirim sebagai notifikasi biasa.";
+
 }

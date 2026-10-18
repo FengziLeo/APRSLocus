@@ -4234,5 +4234,6 @@
   "notifLiveTextCounts": "Kirim / terima",
   "notifLiveTextGrid": "Grid",
   "notifLiveTextCourse": "Arah",
-  "notifLiveTextBeacon": "Hitung mundur beacon"
+  "notifLiveTextBeacon": "Hitung mundur beacon",
+  "notifLiveOff": "Sementara dimatikan: di sebagian sistem notifikasi permanen jadi hilang. Sekarang dikirim sebagai notifikasi biasa."
 }

@@ -9768,4 +9768,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get notifLiveTextBeacon => "Cuenta atrás del beacon";
 
+  @override
+  String get notifLiveOff => "En pausa por ahora: en algunos sistemas hace desaparecer la notificación permanente. Se publica como notificación normal.";
+
 }

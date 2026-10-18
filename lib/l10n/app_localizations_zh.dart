@@ -9330,6 +9330,9 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get notifLiveTextBeacon => "发射倒计时";
 
+  @override
+  String get notifLiveOff => "这一档暂时停用：在部分系统上它会把常驻通知弄没。现在按普通常驻通知发。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18656,5 +18659,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get notifLiveTextBeacon => "發射倒數";
+
+  @override
+  String get notifLiveOff => "這一檔暫時停用：在部分系統上它會把常駐通知弄沒。現在按普通常駐通知發。";
 
 }

@@ -9430,4 +9430,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get notifLiveTextBeacon => "ビーコンまでのカウントダウン";
 
+  @override
+  String get notifLiveOff => "この項目は一時停止中です。一部の端末では常駐通知が消えてしまいます。今は通常の常駐通知として出します。";
+
 }

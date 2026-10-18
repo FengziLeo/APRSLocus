@@ -4234,5 +4234,6 @@
   "notifLiveTextCounts": "送受信数",
   "notifLiveTextGrid": "グリッド",
   "notifLiveTextCourse": "方位",
-  "notifLiveTextBeacon": "ビーコンまでのカウントダウン"
+  "notifLiveTextBeacon": "ビーコンまでのカウントダウン",
+  "notifLiveOff": "この項目は一時停止中です。一部の端末では常駐通知が消えてしまいます。今は通常の常駐通知として出します。"
 }

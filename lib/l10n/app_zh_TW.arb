@@ -4822,5 +4822,6 @@
   "notifLiveTextCounts": "收發數",
   "notifLiveTextGrid": "網格",
   "notifLiveTextCourse": "朝向",
-  "notifLiveTextBeacon": "發射倒數"
+  "notifLiveTextBeacon": "發射倒數",
+  "notifLiveOff": "這一檔暫時停用：在部分系統上它會把常駐通知弄沒。現在按普通常駐通知發。"
 }

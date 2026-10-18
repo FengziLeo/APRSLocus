@@ -522,6 +522,11 @@ class LocationService : Service() {
     /// `promoBroken` 是这台机器的实测结果：提升过的通知被系统抹掉过一次，
     /// 那就不再试了（见 [verifyStillPosted]）。宁可没有胶囊，不能没有通知。
     private fun currentPromoMode(): Int {
+        // 「提升」在 HyperOS 上试过两次，两次都让常驻通知从通知列表里没了。
+        // 前台服务通知是用户唯一能确认「后台还活着」的东西，不能拿它做实验，
+        // 所以先关死：整个提升链路还在（promoMode / applyPromo / 自愈都在），
+        // 把 PROMO_ENABLED 改回 true 就能重新启用。
+        if (!PROMO_ENABLED) return PROMO_PLAIN
         if (!liveUpdates || promoBroken) return PROMO_PLAIN
         return try {
             promoMode(this)
@@ -956,6 +961,12 @@ private fun applyPromo(
 /// 不提升：普通常驻通知（也是 [promoMode] 判不出来时的退路）。
 private const val PROMO_PLAIN = -1
 
+/// 提升总开关。
+///
+/// 关：Android 16 的「Live Updates」在 HyperOS 上实测会把常驻通知弄没。
+/// 整条提升链路都留着（探测、两种姿势、自愈），要重启只需改这里。
+private const val PROMO_ENABLED = false
+
 /// 带 `requestPromotedOngoing` 请求：Android 16 QPR1（SDK 36.1）起才有这个接口。
 private const val PROMO_REQUEST = 0
 
@@ -1072,6 +1083,24 @@ fun diag(context: Context, liveText: String = ""): String {
         else -> "未传来（$liveText）"
     })
     lines.add("提升被系统抹过：" + (if (LocationService.promoBrokenByRom()) "是（已退回普通通知）" else "否"))
+    // 通知能不能发出去的第一道门：应用通知开关与通道重要性。
+    // 被系统或用户关掉时 notify() 不报错，只是什么都没发生。
+    lines.add("应用通知开关：" + (if (nm.areNotificationsEnabled()) "开" else "关"))
+    val ch = try {
+        nm.getNotificationChannel(LocationService.CHANNEL_ID)
+    } catch (_: Throwable) {
+        null
+    }
+    lines.add("通知通道重要性：" + when (ch?.importance) {
+        0 -> "0（已关闭）"
+        1 -> "1（最底）"
+        2 -> "2（低）"
+        3 -> "3（默认）"
+        4 -> "4（高）"
+        5 -> "5（最高）"
+        null -> "查不到"
+        else -> ch.importance.toString()
+    })
     lines.addAll(LocationService.lastNotifReport())
     return lines.joinToString("\n")
 }

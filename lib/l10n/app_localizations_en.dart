@@ -9709,4 +9709,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notifLiveTextBeacon => "Beacon countdown";
 
+  @override
+  String get notifLiveOff => "Paused for now: on some systems it makes the ongoing notification disappear. It posts a normal one instead.";
+
 }

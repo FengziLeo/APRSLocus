@@ -4234,5 +4234,6 @@
   "notifLiveTextCounts": "Enviados / recibidos",
   "notifLiveTextGrid": "Cuadrícula",
   "notifLiveTextCourse": "Rumbo",
-  "notifLiveTextBeacon": "Cuenta atrás del beacon"
+  "notifLiveTextBeacon": "Cuenta atrás del beacon",
+  "notifLiveOff": "En pausa por ahora: en algunos sistemas hace desaparecer la notificación permanente. Se publica como notificación normal."
 }

@@ -4234,5 +4234,6 @@
   "notifLiveTextCounts": "Sent / received",
   "notifLiveTextGrid": "Grid",
   "notifLiveTextCourse": "Heading",
-  "notifLiveTextBeacon": "Beacon countdown"
+  "notifLiveTextBeacon": "Beacon countdown",
+  "notifLiveOff": "Paused for now: on some systems it makes the ongoing notification disappear. It posts a normal one instead."
 }

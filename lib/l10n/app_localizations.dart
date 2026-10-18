@@ -17019,6 +17019,12 @@ abstract class AppLocalizations {
   /// **'发射倒计时'**
   String get notifLiveTextBeacon;
 
+  /// No description provided for @notifLiveOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'这一档暂时停用：在部分系统上它会把常驻通知弄没。现在按普通常驻通知发。'**
+  String get notifLiveOff;
+
 }
 
 class _AppLocalizationsDelegate

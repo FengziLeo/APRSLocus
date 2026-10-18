@@ -3156,6 +3156,10 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
               _uiLayoutSelector(st),
               _notifStyleSelector(st),
               if (st.notifLiveUpdates) _notifLiveTextSelector(st),
+              // 提升这条链路目前是关掉的（见 LocationService.PROMO_ENABLED）：
+              // 选了这一档也只会发普通通知，先把话说在前面。
+              if (st.notifLiveUpdates)
+                SettingsHint(S.of(context).notifLiveOff, color: C.orange),
               _notifDiagRow(st),
               _languageSelector(st),
               _uiScaleSelector(st),

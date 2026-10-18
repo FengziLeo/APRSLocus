@@ -216,6 +216,9 @@ class LocationService : Service() {
         /// 给文件末尾的诊断函数读当前样式用（companion 里的私有字段外面看不见）。
         fun liveUpdatesOn(): Boolean = liveUpdates
 
+        /// 前台服务现在在不在跑（诊断用：通知没了的第一个分岔点）。
+        fun isRunning(): Boolean = instance != null
+
         fun setLiveUpdatesStatic(on: Boolean) {
             if (liveUpdates == on) return
             liveUpdates = on
@@ -313,7 +316,18 @@ class LocationService : Service() {
         intent?.getStringExtra(EXTRA_MODE)?.let {
             if (it == MODE_GPS || it == MODE_GPS_NETWORK || it == MODE_NETWORK || it == MODE_KEEPALIVE) mode = it
         }
-        val notification = buildNotification("APRSlocus 运行中")
+        val notification = try {
+            buildNotification("APRSlocus 运行中")
+        } catch (_: Throwable) {
+            // 兜底：建通知的任何一环出错（图标资源、提升请求、ROM 改过的
+            // 方法）都不能让前台服务起不来 —— 通知没了就是服务没了。
+            NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("APRSlocus")
+                .setContentText("APRSlocus 运行中")
+                .setSmallIcon(R.drawable.ic_stat_aprs)
+                .setOngoing(true)
+                .build()
+        }
         if (!declareForeground(notification)) {
             // 权限被收回（用户在系统设置里把定位关掉）：带 location 类型的
             // 前台服务声明拿不到权限，服务无论如何也撑不起来。不崩溃、不装死：
@@ -445,20 +459,33 @@ class LocationService : Service() {
         text: String,
         short: String = "",
         countdown: Long = 0
-    ): Notification =
-        ongoingNotification(
-            this, text, short,
-            if (liveUpdates) promoMode(this) else PROMO_PLAIN,
-            countdown
-        )
+    ): Notification {
+        // 提升姿势的判定本身也可能在这台机器上出错（反射、ROM 改过的方法）；
+        // 出错就退回普通常驻通知。前台服务靠这条通知活着，它不能因为
+        // 「想美一下」而消失。
+        val mode = if (liveUpdates) {
+            try {
+                promoMode(this)
+            } catch (_: Throwable) {
+                PROMO_PLAIN
+            }
+        } else {
+            PROMO_PLAIN
+        }
+        return ongoingNotification(this, text, short, mode, countdown)
+    }
 
     /// 用上一次的文本/胶囊/倒计时重建并发一次（换提升姿势、刷新前台服务类型时用）。
     private fun republish() {
         val nm = getSystemService(NotificationManager::class.java)
-        nm.notify(
-            NOTIFICATION_ID,
-            buildNotification(lastNotificationText, lastNotificationShort, lastCountdown)
-        )
+        try {
+            nm.notify(
+                NOTIFICATION_ID,
+                buildNotification(lastNotificationText, lastNotificationShort, lastCountdown)
+            )
+        } catch (_: Throwable) {
+            // 建不出来就保持上一条：宁可文字旧，不能没有通知
+        }
     }
 
     fun updateNotification(text: String, short: String = "", countdown: Long = 0) {
@@ -467,7 +494,11 @@ class LocationService : Service() {
         lastNotificationShort = short
         lastCountdown = countdown
         val nm = getSystemService(NotificationManager::class.java)
-        nm.notify(NOTIFICATION_ID, buildNotification(text, short, countdown))
+        try {
+            nm.notify(NOTIFICATION_ID, buildNotification(text, short, countdown))
+        } catch (_: Throwable) {
+            // 同上：保留上一条
+        }
     }
 
     /// 按当前模式重建 provider 监听（模式切换时调用）
@@ -788,25 +819,42 @@ private fun ongoingNotification(
         .setStyle(NotificationCompat.BigTextStyle().bigText(text))
         .addAction(toggleAction)
         .addAction(exitAction)
-    when (mode) {
-        PROMO_REQUEST -> {
-            builder.setRequestPromotedOngoing(true)
-            if (short.isNotEmpty()) builder.setShortCriticalText(short)
-        }
-        PROMO_COLORIZED -> {
-            builder.setColorized(true)
-            if (short.isNotEmpty()) builder.setShortCriticalText(short)
-        }
-    }
-    // 倒计时交给系统走（chronometer），不靠自己每秒重发通知：
-    // 胶囊里那行超短文本是死的，重发跟不上秒，「距下次上报」就只能停在旧值上。
-    if (mode != PROMO_PLAIN && countdown > 0) {
-        builder
-            .setWhen(System.currentTimeMillis() + countdown * 1000)
-            .setUsesChronometer(true)
-            .setChronometerCountDown(true)
-    }
+    applyPromo(builder, mode, short, countdown)
     return builder.build()
+}
+
+/// 把提升请求加到通知上。
+///
+/// **整段包在 try/catch 里**：这些只是「请系统考虑提升」，其中任一项在本机
+/// 不可用（老系统、ROM 改过、依赖被 R8 改写过）都只能让提升失效，
+/// 不能让通知本身发不出去 —— 通知是前台服务的命，丢一次服务就死了。
+private fun applyPromo(
+    b: NotificationCompat.Builder,
+    mode: Int,
+    short: String,
+    countdown: Long
+) {
+    try {
+        when (mode) {
+            PROMO_REQUEST -> {
+                b.setRequestPromotedOngoing(true)
+                if (short.isNotEmpty()) b.setShortCriticalText(short)
+            }
+            PROMO_COLORIZED -> {
+                b.setColorized(true)
+                if (short.isNotEmpty()) b.setShortCriticalText(short)
+            }
+        }
+        // 倒计时交给系统走（chronometer），不靠自己每秒重发通知：
+        // 胶囊里那行超短文本是死的，重发跟不上秒，「距下次上报」就只能停在旧值上。
+        if (mode != PROMO_PLAIN && countdown > 0) {
+            b.setWhen(System.currentTimeMillis() + countdown * 1000)
+                .setUsesChronometer(true)
+                .setChronometerCountDown(true)
+        }
+    } catch (_: Throwable) {
+        // 放弃提升，通知照发
+    }
 }
 
 /// 不提升：普通常驻通知（也是 [promoMode] 判不出来时的退路）。
@@ -834,7 +882,12 @@ private fun promoMode(ctx: Context): Int {
     if (cached != Int.MIN_VALUE) return cached
     var decided = PROMO_NONE
     for (m in intArrayOf(PROMO_REQUEST, PROMO_COLORIZED)) {
-        if (promotable(ongoingNotification(ctx, "诊断", "9s", m, 0))) {
+        val probe = try {
+            ongoingNotification(ctx, "诊断", "9s", m, 0)
+        } catch (_: Throwable) {
+            null
+        }
+        if (probe != null && promotable(probe)) {
             decided = m
             break
         }
@@ -895,6 +948,24 @@ fun diag(context: Context): String {
     lines.add("hasPromotableCharacteristics：" + has(Notification::class.java,
         "hasPromotableCharacteristics"))
     lines.add("系统认的提升姿势：" + promoModeName(promoMode(context)))
+    lines.add("前台服务：" + (if (LocationService.isRunning()) "在跑" else "没在跑"))
+    // 通知到底在不在：这是「已提升」唯一可信的证据 —— 已提升时部分系统会把
+    // 通知从通知列表里抽走、只留状态栏那一条，用户看起来就是「通知没了」。
+    val active = try {
+        nm?.activeNotifications
+    } catch (_: Throwable) {
+        null
+    }
+    val mine = active?.firstOrNull { it.id == LocationService.NOTIFICATION_ID }
+    lines.add("通知列表里这条：" + when {
+        active == null -> "查不到"
+        mine == null -> "没有"
+        else -> "在"
+    })
+    if (mine != null) {
+        val promoted = (mine.notification.flags and Notification.FLAG_PROMOTED_ONGOING) != 0
+        lines.add("系统标记：" + if (promoted) "已提升（实时更新）" else "普通常驻通知")
+    }
     lines.add("当前样式：" + (if (LocationService.liveUpdatesOn()) "实时更新" else "普通常驻通知"))
     return lines.joinToString("\n")
 }

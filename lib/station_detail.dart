@@ -170,17 +170,54 @@ class _StationDetailState extends State<StationDetail> {
   ///
   /// 标签是给「这是哪种报文」的，字号比正文小一档、灰一档，读的时候不会
   /// 抢正文；两行的正文颜色也不同（备注灰、状态紫），扫一眼就能分开。
+  /// 标签宽度固定，两行的正文从同一条竖线开始。
   Widget _noteLine(String label, Widget value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 1),
-          child: Text(label, style: ts(10, c: C.greyLight)),
+        SizedBox(
+          width: 62,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: Text(label, style: ts(10, c: C.greyLight)),
+          ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 8),
         Expanded(child: value),
       ],
+    );
+  }
+
+  /// 台站备注与状态报文：两种报文各占一行，整宽给足。
+  ///
+  /// 原来挤在呼号下面那一小列里，稍长一点的备注就折成四五行；现在按「设备
+  /// 识别」那张卡的形状单独成卡，一行说一种。
+  Widget? _textCard(BuildContext context, Station s) {
+    final note = (s.comment ?? '').trim();
+    final status = (s.statusText ?? '').trim();
+    if (note.isEmpty && status.isEmpty) return null;
+    return SoftCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (note.isNotEmpty)
+            _noteLine(
+              S.of(context).callComment,
+              StationNote(note, style: ts(12, c: C.slate)),
+            ),
+          if (note.isNotEmpty && status.isNotEmpty) const SizedBox(height: 8),
+          if (status.isNotEmpty)
+            _noteLine(
+              S.of(context).txPartStatus,
+              StationNote(
+                status,
+                style: ts(12, c: C.purple),
+                icon: Icons.campaign_rounded,
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -267,29 +304,6 @@ class _StationDetailState extends State<StationDetail> {
                                     localizedAprsSymbolName(context, s.symbol),
                                     style: ts(12, c: C.slate),
                                   ),
-                                  // 台站备注 = 位置包里的 comment，跟着坐标走，常见写频点。
-                                  // 单独一行、可换行不截断，且识别网址（与台站列表同一个组件）。
-                                  if ((s.comment ?? '').trim().isNotEmpty) ...[
-                                    SizedBox(height: 3),
-                                    _noteLine(
-                                      S.of(context).callComment,
-                                      StationNote((s.comment ?? '').trim(),
-                                          style: ts(12, c: C.slate)),
-                                    ),
-                                  ],
-                                  // 状态报文 = DTI `>` 的独立一帧，常写「Powered by …」。
-                                  // 与备注是两种报文，所以各占一行、各自写明是哪一种。
-                                  if ((s.statusText ?? '').trim().isNotEmpty) ...[
-                                    SizedBox(height: 3),
-                                    _noteLine(
-                                      S.of(context).txPartStatus,
-                                      StationNote(
-                                        s.statusText!.trim(),
-                                        style: ts(12, c: C.purple),
-                                        icon: Icons.campaign_rounded,
-                                      ),
-                                    ),
-                                  ],
                                 ],
                               ),
                             ),
@@ -645,6 +659,11 @@ class _StationDetailState extends State<StationDetail> {
                             ),
                           ],
                         ),
+                        // 台站备注 / 状态文本（两种报文各一行）
+                        if (_textCard(context, s) != null) ...[
+                          SizedBox(height: 14),
+                          _textCard(context, s)!,
+                        ],
                         // 设备识别信息（官方 tocalls 目的呼号识别）
                         if (_deviceCard(context, s) != null) ...[
                           SizedBox(height: 14),

@@ -304,6 +304,12 @@ jobs:
       - name: Test APRSNETCN station parsing
         run: flutter test test/aprsnetcn_test.dart
 
+      # 24 小时台站是分页拉的（用户报「每次同步只能 2000 人」）：接口一页给不完，
+      # 拿到不满一页才停。写成只请一次编译能过、analyze 也全绿，只会表现成
+      # 地图上少一大半人，所以用本地服务钉住翻页的 offset。
+      - name: Test APRSNETCN station paging
+        run: flutter test test/acn_stations_page_test.dart
+
       # 百度瓦片投影/编号数学：官方参考向量锁定（BD-09 坐标 + 多项式平面投影 +
       # 瓦片 y 朝北 + 每级瓦片数不是 2^z）。这些**编译能过、analyze 也全绿**，
       # 只有把标记画到与瓦片错开的位置才看得出来，所以钉在 CI。

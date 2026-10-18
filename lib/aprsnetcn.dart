@@ -223,7 +223,13 @@ class AcnClient {
     return parsed;
   }
 
-  /// 拉 24 小时台站。没 token 就先换一个；401 时换一次再重试。
+  /// 一次拉 24 小时台站，按页把整份拉完。
+  ///
+  /// 接口的 `limit` 有上限，服务器不会一次给完（现在一天下来两千多台），所以
+  /// 拿完一页就拿下一页，拿到不满一页为止。旧版写死 2000，超过的那部分人在地图
+  /// 上根本没有。
+  ///
+  /// 没 token 就先换一个；401 时换一次再重试。
   Future<List<AcnStation>> stations({
     required String account,
     required String password,
@@ -239,13 +245,39 @@ class AcnClient {
     return out;
   }
 
+  /// 一页多少台：服务器允许到 5000，这里取 2000 平衡单次响应和往返次数。
+  static const int _pageLimit = 2000;
+
+  /// 翻页上限。台站真多到这个数时宁可少拿，也不一直转下去。
+  static const int _maxPages = 20;
+
   Future<List<Object?>> _get(
     String account,
     String password,
     int hours,
   ) async {
+    final all = <Object?>[];
+    for (var page = 0; page < _maxPages; page++) {
+      final rows = await _getPage(account, password, hours, all.length);
+      all.addAll(rows);
+      if (rows.length < _pageLimit) break;
+    }
+    return all;
+  }
+
+  /// 取一页。401 换一次 token 再来，其余错误直接抛。
+  Future<List<Object?>> _getPage(
+    String account,
+    String password,
+    int hours,
+    int offset,
+  ) async {
     final uri = Uri.parse('$base/api/v1/stations').replace(
-      queryParameters: {'window': '${hours}h', 'limit': '2000'},
+      queryParameters: {
+        'window': '${hours}h',
+        'limit': '$_pageLimit',
+        'offset': '$offset',
+      },
     );
     Future<String> call() => httpSend(
           'GET',

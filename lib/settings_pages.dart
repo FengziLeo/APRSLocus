@@ -3488,7 +3488,7 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
   }
 
   Future<void> _showNotifDiag(AppState st) async {
-    final text = await st.loc.notifDiag();
+    final text = await st.loc.notifDiag(liveText: st.notifLiveText);
     if (!mounted) return;
     await showDialog<void>(
       context: context,

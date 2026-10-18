@@ -370,9 +370,10 @@ class LocService {
 
   /// 通知能力自查（Android 专有）：这台机器支不支持实时更新 / 焦点通知，
   /// 到底缺哪一环。没这个平台就返回空串。
-  Future<String> notifDiag() async {
+  Future<String> notifDiag({String liveText = ''}) async {
     try {
-      final v = await _channel.invokeMethod<String>('notifDiag');
+      final v = await _channel
+          .invokeMethod<String>('notifDiag', {'liveText': liveText});
       return v ?? '';
     } catch (_) {
       return '';

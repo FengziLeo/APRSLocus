@@ -181,7 +181,8 @@ class MainActivity : FlutterActivity() {
                     result.success(true)
                 }
                 "notifDiag" -> {
-                    result.success(diag(this))
+                    val liveText = call.argument<String>("liveText") ?: ""
+                    result.success(diag(this, liveText))
                 }
                 // 只改策略、不刷新文字：用户切了「实时更新」而服务没在跑，
                 // 靠文字刷新顺带设标志是丢的（没有 instance 就只写内存，也看不出）。

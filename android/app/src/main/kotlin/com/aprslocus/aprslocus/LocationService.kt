@@ -219,6 +219,10 @@ class LocationService : Service() {
         /// 前台服务现在在不在跑（诊断用：通知没了的第一个分岔点）。
         fun isRunning(): Boolean = instance != null
 
+        /// 上次发通知的样子（诊断用；服务没在跑时没有可读的）。
+        fun lastNotifReport(): List<String> = instance?.lastNotifLines()
+            ?: listOf("上次刷新：没有（服务没在跑）")
+
         fun setLiveUpdatesStatic(on: Boolean) {
             if (liveUpdates == on) return
             liveUpdates = on
@@ -249,6 +253,27 @@ class LocationService : Service() {
     /// 只剩文字会把胶囊、倒计时弄丢。
     private var lastNotificationShort = ""
     private var lastCountdown = 0L
+
+    /// 上一次发通知的结果。给诊断用：「更新很慢 / 不更新」到底是没发出，
+    /// 还是发出去了但内容对，靠猜是分不出来的。
+    @Volatile private var lastBuildOk = true
+    @Volatile private var lastBuildError = ""
+    @Volatile private var lastNotifyAt = 0L
+
+    /// 给诊断拼的几行：上次发的是什么、成败、多久之前。
+    fun lastNotifLines(): List<String> {
+        val ago = if (lastNotifyAt == 0L) {
+            "没有"
+        } else {
+            "${(System.currentTimeMillis() - lastNotifyAt) / 1000} 秒前"
+        }
+        return listOf(
+            "上次刷新：$ago",
+            "上次构建：" + if (lastBuildOk) "成功" else "失败（$lastBuildError）",
+            "上次胶囊文字：" + (if (lastNotificationShort.isEmpty()) "（空）" else lastNotificationShort),
+            "上次倒计时：${lastCountdown} 秒",
+        )
+    }
     private var locationManager: LocationManager? = null
     private var locationListener: LocationListener? = null
     private var wakeLock: PowerManager.WakeLock? = null
@@ -483,8 +508,9 @@ class LocationService : Service() {
                 NOTIFICATION_ID,
                 buildNotification(lastNotificationText, lastNotificationShort, lastCountdown)
             )
-        } catch (_: Throwable) {
-            // 建不出来就保持上一条：宁可文字旧，不能没有通知
+            markPosted()
+        } catch (e: Throwable) {
+            markFailed(e)
         }
     }
 
@@ -496,9 +522,22 @@ class LocationService : Service() {
         val nm = getSystemService(NotificationManager::class.java)
         try {
             nm.notify(NOTIFICATION_ID, buildNotification(text, short, countdown))
-        } catch (_: Throwable) {
-            // 同上：保留上一条
+            markPosted()
+        } catch (e: Throwable) {
+            // 建不出来就保持上一条：宁可文字旧，不能没有通知
+            markFailed(e)
         }
+    }
+
+    private fun markPosted() {
+        lastBuildOk = true
+        lastBuildError = ""
+        lastNotifyAt = System.currentTimeMillis()
+    }
+
+    private fun markFailed(e: Throwable) {
+        lastBuildOk = false
+        lastBuildError = e.javaClass.simpleName + ": " + (e.message ?: "")
     }
 
     /// 按当前模式重建 provider 监听（模式切换时调用）
@@ -916,7 +955,7 @@ private fun promoModeName(m: Int): String = when (m) {
 /// 「支持实时更新」不是个是/否问题，是四五个方法的组合。
 ///
 /// 前几行是「方法在不在」，最后两行是「真造一条通知，系统认不认」—— 后者才算数。
-fun diag(context: Context): String {
+fun diag(context: Context, liveText: String = ""): String {
     val nm = context.getSystemService(NotificationManager::class.java)
     fun has(cls: Class<*>, name: String, vararg args: Class<*>): String =
         try {
@@ -967,5 +1006,14 @@ fun diag(context: Context): String {
         lines.add("系统标记：" + if (promoted) "已提升（实时更新）" else "普通常驻通知")
     }
     lines.add("当前样式：" + (if (LocationService.liveUpdatesOn()) "实时更新" else "普通常驻通知"))
+    lines.add("设置里的文字选项：" + when (liveText) {
+        "counts" -> "收发数"
+        "grid" -> "网格"
+        "course" -> "朝向"
+        "beacon" -> "发射倒计时"
+        "default" -> "默认"
+        else -> "未传来（$liveText）"
+    })
+    lines.addAll(LocationService.lastNotifReport())
     return lines.joinToString("\n")
 }

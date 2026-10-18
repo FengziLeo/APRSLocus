@@ -522,24 +522,66 @@ class LocationService : Service() {
         }
     }
 
-    /// 把常驻通知提成 Android 16 的「实时更新」。
+    /// 把常驻通知提成 Android 16 的「实时更新」（Live Updates）。
     ///
-    /// 提不上去的情况全都原地退回普通通知（不抛异常、不影响前台服务）：
-    /// 系统低于 16、用户在系统设置里不允许这个应用发提升通知、通知本身不满足
-    /// 条件（`hasPromotableCharacteristics`）。Android 15 没有公开的
-    /// `setRequestPromotedOngoing`，那一代就只能停在普通常驻通知。
+    /// **全程走反射**：这套 API 在编译 SDK 里叫不叫这个名字、有没有，都不该让
+    /// 构建挂掉（踩过一次 `Unresolved reference 'setRequestPromotedOngoing'`）。
+    /// 反射拿不到就等于这台设备不支持，原样返回普通通知 —— 这正是要的回退。
     private fun promote(notif: Notification, short: String): Notification {
         if (Build.VERSION.SDK_INT < 36) return notif
         return try {
-            val nm = getSystemService(NotificationManager::class.java)
-            if (nm == null || !nm.canPostPromotedNotifications()) return notif
+            val nm = getSystemService(NotificationManager::class.java) ?: return notif
+            if (!noArgBool(NotificationManager::class.java, nm,
+                    "canPostPromotedNotifications")) return notif
             val builder = Notification.Builder.recoverBuilder(this, notif)
-            builder.setRequestPromotedOngoing(true)
-            if (short.isNotEmpty()) builder.setShortCriticalText(short)
+            if (!setBoolTrue(Notification.Builder::class.java, builder,
+                    "setRequestPromotedOngoing")) return notif
+            if (short.isNotEmpty()) {
+                try {
+                    Notification.Builder::class.java
+                        .getMethod("setShortCriticalText", CharSequence::class.java)
+                        .invoke(builder, short)
+                } catch (_: Throwable) {
+                    // 少了这一条就少一行胶囊文字，通知照发
+                }
+            }
             val promoted = builder.build()
-            if (promoted.hasPromotableCharacteristics()) promoted else notif
+            // 校验不了就当可以提：提不提由系统决定
+            if (!noArgBool(Notification::class.java, promoted,
+                    "hasPromotableCharacteristics") &&
+                hasMethod(Notification::class.java, "hasPromotableCharacteristics")
+            ) return notif
+            promoted
         } catch (_: Throwable) {
             notif
+        }
+    }
+
+    /// 反射调一个无参布尔方法；没有这个方法就返回 false。
+    private fun noArgBool(cls: Class<*>, target: Any, name: String): Boolean {
+        return try {
+            cls.getMethod(name).invoke(target) as? Boolean ?: false
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
+    /// 反射调一个「传 true 进去」的方法；方法不存在就算不支持。
+    private fun setBoolTrue(cls: Class<*>, target: Any, name: String): Boolean {
+        return try {
+            cls.getMethod(name, Boolean::class.javaPrimitiveType).invoke(target, true)
+            true
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
+    private fun hasMethod(cls: Class<*>, name: String): Boolean {
+        return try {
+            cls.getMethod(name)
+            true
+        } catch (_: Throwable) {
+            false
         }
     }
 

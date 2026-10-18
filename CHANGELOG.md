@@ -8,6 +8,8 @@
   现在可以分开选；两条选同一条也照样工作。
 - 快捷面板每行两颗圆点，一颗定位图标是位置与状态报文，一颗气泡图标是消息。
   链路自己的设置页上是两行带文字的勾选。
+- **位置与状态报文可以勾好多条链路同时发**，射频与网络各一份；最后一条取消不了。
+  消息仍是一条。
 - 消息按**自己那条**链路的通断判断发没发出去，另一条在线也不顶替。
 
 ### 过滤规则共用
@@ -36,6 +38,8 @@
 - Each row in the quick panel carries two dots: the pin icon is position and status,
   the bubble icon is messages. A link's own settings page has the same two choices as
   labelled rows.
+- **Position and status packets can tick several links and go out on all of them**, radio
+  and network at once; the last one cannot be unticked. Messages stay on one link.
 - A message is judged sent by **its own** link; the other link being online never takes
   over.
 

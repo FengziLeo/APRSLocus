@@ -2345,6 +2345,15 @@ class AppState extends ChangeNotifier {
   /// 且能发射的链路里选，谁都不顶替谁。
   String dataSourceMsg = 'aprsis';
 
+  /// 位置/状态报文要**同时**再发一遍的链路（不含 [dataSource] 本身）。
+  ///
+  /// 用户要求「位置也要能同时发」：射频与网络各发一份，两侧都看得到这个站。
+  /// 第一条仍然是 [dataSource]（许多判断靠它），这里只放额外的那些。
+  List<String> posTxExtra = <String>[];
+
+  /// 这条链路发不发位置/状态报文。
+  bool posTxHas(String src) => src == dataSource || posTxExtra.contains(src);
+
   /// 已启用的来源集合（至少一个；发射来源必须在此集合内）
   final Set<String> enabledSources = {srcAprsIs};
 
@@ -2435,14 +2444,16 @@ class AppState extends ChangeNotifier {
   bool get audioDeviceOn => audioOn && audio.config.source == AudioSource.device;
 
   /// IC-705 是否为当前发射来源
-  bool get isIcomLanTx => dataSource == srcAudio && audio.config.source == AudioSource.icomLan;
+  bool get isIcomLanTx =>
+      posTxHas(srcAudio) && audio.config.source == AudioSource.icomLan;
 
   /// 同一条 WLAN 电台链路，但指的是**消息**那条来源。
   bool get isIcomLanTxMsg =>
       dataSourceMsg == srcAudio && audio.config.source == AudioSource.icomLan;
 
   /// AFSK 系统声卡是否为当前发射来源
-  bool get isAudioDeviceTx => dataSource == srcAudio && audio.config.source == AudioSource.device;
+  bool get isAudioDeviceTx =>
+      posTxHas(srcAudio) && audio.config.source == AudioSource.device;
 
   /// 同上，消息那条来源。
   bool get isAudioDeviceTxMsg =>
@@ -2938,6 +2949,9 @@ class AppState extends ChangeNotifier {
         dataSourceMsg =
             enabledSources.firstWhere(canTransmit, orElse: () => dataSourceMsg);
       }
+      if (posTxExtra.contains(s0)) {
+        posTxExtra = [...posTxExtra]..remove(s0);
+      }
     }
     if (s0 == srcTnc || s0 == srcAudio) {
       // 射频链路的去重表与「听到过」列表都是**跨会话累积**的：换了设备、
@@ -3193,6 +3207,37 @@ class AppState extends ChangeNotifier {
     _notify();
     _updateNotification();
   }
+
+  /// 位置/状态报文的发射链路开关（可多选）。
+  ///
+  /// 至少要留一条：取消最后一条没有意义，也不会有任何报文发出去。
+  void togglePosTx(String src) {
+    final s0 = _normalizeSrc(src);
+    if (posTxHas(s0)) {
+      if (s0 == dataSource) {
+        // 取消的是主链路：把另一条顶上来；只剩它一条时不动。
+        if (posTxExtra.isEmpty) return;
+        dataSource = posTxExtra.removeAt(0);
+      } else {
+        posTxExtra = [...posTxExtra]..remove(s0);
+      }
+    } else {
+      if (!enabledSources.contains(s0) || !canTransmit(s0)) return;
+      posTxExtra = [...posTxExtra, s0];
+    }
+    _log(LogLevel.info, '连接',
+        '位置/状态报文发射链路：${posTxTargets.map(_sourceName).join(' + ')}');
+    persist();
+    _refreshConnected();
+    _notify();
+    _updateNotification();
+  }
+
+  /// 位置/状态报文实际要发的链路，第一条是 [dataSource]。
+  List<String> get posTxTargets => <String>[
+        dataSource,
+        ...posTxExtra.where((s) => s != dataSource),
+      ];
 
   /// 指定**消息**的发射来源（同样必须已启用、可发射）。
   void setTxMsgSource(String src) {
@@ -4143,6 +4188,7 @@ class AppState extends ChangeNotifier {
     acnLast = null;
     dataSource = srcAprsIs;
     dataSourceMsg = srcAprsIs;
+    posTxExtra = <String>[];
     enabledSources
       ..clear()
       ..add(srcAprsIs);
@@ -4739,6 +4785,13 @@ class AppState extends ChangeNotifier {
       if (!enabledSources.contains(dataSourceMsg)) {
         dataSourceMsg = dataSource;
       }
+      // 「同时发」的额外链路：只留还在启用、还能发射、且不是主链路的那几个。
+      posTxExtra = (p.getStringList('posTxExtra') ?? <String>[])
+          .map(_normalizeSrc)
+          .where((s) =>
+              s != dataSource && enabledSources.contains(s) && canTransmit(s))
+          .toSet()
+          .toList();
       igateEnabled = p.getBool('igateEnabled') ?? igateEnabled;
       igateTwoWay = p.getBool('igateTwoWay') ?? igateTwoWay;
       await tnc.load();
@@ -5008,6 +5061,7 @@ class AppState extends ChangeNotifier {
     await p.setString('acnPassword', acnPassword);
     await p.setString('dataSource', dataSource);
     await p.setString('dataSourceMsg', dataSourceMsg);
+    await p.setStringList('posTxExtra', posTxExtra);
     await p.setStringList('enabledSources', enabledSources.toList());
     // 老版本只认这一个开关（它没有 enabledSources）：照当前的启用状态同步
     // 写一份，免得磁盘上留着的旧 true 在下次启动时把已经关掉的链路又补回来。
@@ -6510,7 +6564,9 @@ class AppState extends ChangeNotifier {
   /// 这一条是**位置与状态报文**（信标、状态帧、测试帧、手打报文）。消息
   /// （私聊 / 群发 / 位置点 / ack）走 [_sendRawMsg]，两条来源可以不同。
   void _sendRaw(String raw) {
-    _sendVia(dataSource, raw);
+    for (final src in posTxTargets) {
+      _sendVia(src, raw);
+    }
   }
 
   /// 发一条**消息**：走用户给消息单独选的那条链路。

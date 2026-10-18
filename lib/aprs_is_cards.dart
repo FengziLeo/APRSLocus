@@ -127,8 +127,9 @@ class _AprsIsCardsState extends State<AprsIsCards> {
         SettingsTxPick(
           S.of(context).txKindPosition,
           icon: Icons.my_location_rounded,
-          checked: st.dataSource == AppState.srcAprsIs,
-          onTap: () => st.setTxSource(AppState.srcAprsIs),
+          multi: true,
+          checked: st.posTxHas(AppState.srcAprsIs),
+          onTap: () => st.togglePosTx(AppState.srcAprsIs),
         ),
         SettingsTxPick(
           S.of(context).messages,

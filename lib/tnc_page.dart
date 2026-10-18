@@ -485,8 +485,8 @@ class DataSourceCard extends StatelessWidget {
     final isUp = up ?? state.isUp(key);
     // 只读来源（PKWDWPL）永远不是发射来源，圆点也不画 ——
     // 否则用户会以为「选上它就能发」。
-    // 两类报文各一颗：位置与状态、消息，可以落在不同的链路上。
-    final posTx = isTx ?? (canTx && state.dataSource == key);
+    // 两类报文各一颗：位置与状态（可多选，同时发）、消息（单选）。
+    final posTx = isTx ?? (canTx && state.posTxHas(key));
     final msgTx = isTxMsg ?? (canTx && state.dataSourceMsg == key);
     return SettingsLinkEntry(
       title: title,
@@ -501,9 +501,9 @@ class DataSourceCard extends StatelessWidget {
       color: C.blue,
       txPos: (!disabled && canTx) ? posTx : null,
       txMsg: (!disabled && canTx) ? msgTx : null,
-      onTxPos: posTx ? null : (onSetTx ?? () => state.setTxSource(key)),
-      onTxMsg:
-          msgTx ? null : (onSetTxMsg ?? () => state.setTxMsgSource(key)),
+      onTxPos: () => state.togglePosTx(
+          key == 'icomlan' ? AppState.srcAudio : key),
+      onTxMsg: msgTx ? null : (onSetTxMsg ?? () => state.setTxMsgSource(key)),
       onTap: () {
         if (onConfigure != null) onConfigure();
       },

@@ -92,6 +92,33 @@ void main() {
     expect(b.dataSourceMsg, AppState.srcTnc, reason: '消息那条该记得');
   });
 
+  test('位置/状态报文可以同时发好几条：取消主链路时另一条顶上来', () async {
+    final st = await fresh();
+    await st.toggleSource(AppState.srcTnc, true);
+
+    st.togglePosTx(AppState.srcTnc);
+    expect(st.posTxHas(AppState.srcTnc), isTrue);
+    expect(st.posTxTargets,
+        [AppState.srcAprsIs, AppState.srcTnc],
+        reason: '两条都要发');
+
+    // 取消最后一条没有意义，不该把发射链路清空
+    st.togglePosTx(AppState.srcAprsIs);
+    expect(st.posTxTargets, [AppState.srcTnc]);
+    st.togglePosTx(AppState.srcTnc);
+    expect(st.posTxTargets, [AppState.srcTnc], reason: '不能一条都不剩');
+  });
+
+  test('同时发的那几条也落盘', () async {
+    final a = await fresh();
+    await a.toggleSource(AppState.srcTnc, true);
+    a.togglePosTx(AppState.srcTnc);
+    await a.persistNow();
+
+    final b = await fresh();
+    expect(b.posTxHas(AppState.srcTnc), isTrue);
+  });
+
   test('旧配置只有 dataSource：消息那条跟着它走', () async {
     SharedPreferences.setMockInitialValues({
       'dataSource': AppState.srcTnc,

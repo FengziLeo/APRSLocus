@@ -163,8 +163,9 @@ class _AcnCardsState extends State<AcnCards> {
         SettingsTxPick(
           S.of(context).txKindPosition,
           icon: Icons.my_location_rounded,
-          checked: st.dataSource == AppState.srcAcn,
-          onTap: () => st.setTxSource(AppState.srcAcn),
+          multi: true,
+          checked: st.posTxHas(AppState.srcAcn),
+          onTap: () => st.togglePosTx(AppState.srcAcn),
         ),
         SettingsTxPick(
           S.of(context).messages,

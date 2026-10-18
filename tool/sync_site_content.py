@@ -430,6 +430,11 @@ CL = [
                'for messages. Picking the same link for both still works, and a message is judged '
                'sent by its own link.')),
             ('up',
+             T('位置与状态报文可以勾好几条链路同时发，射频与网络各一份。',
+               '位置與狀態報文可以勾好幾條鏈路同時發，射頻與網路各一份。',
+               'Position and status packets can tick several links and go out on all of them, '
+               'radio and network at once.')),
+            ('up',
              T('APRSNETCN 不再有自己的半径与呼号，两条链路共用服务器页上的同一套过滤规则。',
                'APRSNETCN 不再有自己的半徑與呼號，兩條鏈路共用伺服器頁上的同一套篩選規則。',
                'APRSNETCN no longer keeps its own radius and callsigns; both links follow the '

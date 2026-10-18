@@ -205,7 +205,7 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
     ]) {
       if (!state.enabledSources.contains(src)) continue;
       final up = state.isUp(src);
-      final isTx = state.dataSource == src || state.dataSourceMsg == src;
+      final isTx = state.posTxHas(src) || state.dataSourceMsg == src;
       final isIcom = src == AppState.srcAudio &&
           state.audio.config.source == AudioSource.icomLan;
       final radioModel = state.audio.config.icomLan.model;

@@ -2349,13 +2349,13 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
       // 列出来只为与上一行**逐位对齐**（两个列表靠下标配对）。
       if (st.nmeaGpsOn) AppState.srcNmeaGps,
     ];
-    final txIdx = srcs.indexOf(st.dataSource);
-    final msgIdx = srcs.indexOf(st.dataSourceMsg);
-    // 两类报文的发射链路可能不是同一条：同一条时只写一个字，分开时各标各的。
+    // 位置那条可以同时落在好几条链路上：标在每一条上；消息只有一条，
+    // 而且位置也用它时不用再写一遍。
     String mark(int i) {
       final tags = <String>[
-        if (i == txIdx) S.of(context).dataSourceTxBadge,
-        if (i == msgIdx && msgIdx != txIdx) S.of(context).messages,
+        if (st.posTxHas(srcs[i])) S.of(context).dataSourceTxBadge,
+        if (srcs[i] == st.dataSourceMsg && !st.posTxHas(srcs[i]))
+          S.of(context).messages,
       ];
       return tags.isEmpty ? '' : '(${tags.join('·')})';
     }

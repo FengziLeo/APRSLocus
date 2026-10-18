@@ -518,6 +518,9 @@ class SettingsTxPick extends StatelessWidget {
 
   /// 行首图标：一眼分出这一行是位置/状态还是消息。
   final IconData? icon;
+
+  /// 多选：位置与状态报文可以选好几条链路（同时发）；消息只能选一条。
+  final bool multi;
   const SettingsTxPick(
     this.label, {
     super.key,
@@ -525,21 +528,26 @@ class SettingsTxPick extends StatelessWidget {
     required this.onTap,
     this.enabled = true,
     this.icon,
+    this.multi = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: enabled && !checked ? onTap : null,
+      onTap: enabled && (!checked || multi) ? onTap : null,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: C.border, width: 0.4))),
         child: Row(children: [
           Icon(
-            checked
-                ? Icons.radio_button_checked_rounded
-                : Icons.radio_button_unchecked_rounded,
+            multi
+                ? (checked
+                    ? Icons.check_box_rounded
+                    : Icons.check_box_outline_blank_rounded)
+                : (checked
+                    ? Icons.radio_button_checked_rounded
+                    : Icons.radio_button_unchecked_rounded),
             size: 18,
             color: !enabled ? C.greyLight : (checked ? C.orange : C.grey),
           ),
@@ -690,7 +698,8 @@ class SettingsLinkEntry extends StatelessWidget {
   ///
   /// 圆点分不出两类报文，所以在前面加一个 12 px 的图形（位置 / 消息），
   /// 与链路自己那一页上那两行的图标是同一个；完整说法在 tooltip 里。
-  Widget _txDot(IconData glyph, bool on, VoidCallback? onTap, String tip) {
+  Widget _txDot(IconData glyph, bool on, VoidCallback? onTap, String tip,
+      {bool boxed = false}) {
     return Tooltip(
       message: tip,
       child: GestureDetector(
@@ -702,9 +711,13 @@ class SettingsLinkEntry extends StatelessWidget {
             Icon(glyph, size: 12, color: on ? C.orange : C.greyLight),
             const SizedBox(width: 3),
             Icon(
-              on
-                  ? Icons.radio_button_checked_rounded
-                  : Icons.radio_button_unchecked_rounded,
+              boxed
+                  ? (on
+                      ? Icons.check_box_rounded
+                      : Icons.check_box_outline_blank_rounded)
+                  : (on
+                      ? Icons.radio_button_checked_rounded
+                      : Icons.radio_button_unchecked_rounded),
               size: 16,
               color: on ? C.orange : C.greyLight,
             ),
@@ -782,7 +795,8 @@ class SettingsLinkEntry extends StatelessWidget {
               children: [
                 if (txPos != null)
                   _txDot(Icons.my_location_rounded, txPos!, onTxPos,
-                      S.of(context).txKindPosition),
+                      S.of(context).txKindPosition,
+                      boxed: true),
                 if (txMsg != null)
                   _txDot(Icons.forum_rounded, txMsg!, onTxMsg,
                       S.of(context).messages),

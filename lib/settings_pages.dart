@@ -3155,6 +3155,7 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
               _uiMaterialSelector(st),
               _uiLayoutSelector(st),
               _notifStyleSelector(st),
+              if (st.notifLiveUpdates) _notifLiveTextSelector(st),
               _notifDiagRow(st),
               _languageSelector(st),
               _uiScaleSelector(st),
@@ -3427,6 +3428,34 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
             ),
         ],
       ),
+    );
+  }
+
+  /// 实时更新那一行显示什么。
+  ///
+  /// 只在选了实时更新时才有意义，所以跟着上面的选择出现/消失 —— 留着不动
+  /// 会让选了「普通常驻通知」的人以为下面这个下拉能改什么。
+  Widget _notifLiveTextSelector(AppState st) {
+    final l = S.of(context);
+    return SettingsChoice<String>(
+      l.notifLiveTextTitle,
+      value: st.notifLiveText,
+      options: const ['default', 'counts', 'grid', 'course', 'beacon'],
+      labelOf: (v) {
+        switch (v) {
+          case 'counts':
+            return l.notifLiveTextCounts;
+          case 'grid':
+            return l.notifLiveTextGrid;
+          case 'course':
+            return l.notifLiveTextCourse;
+          case 'beacon':
+            return l.notifLiveTextBeacon;
+          default:
+            return l.notifLiveTextDefault;
+        }
+      },
+      onChanged: st.setNotifLiveText,
     );
   }
 

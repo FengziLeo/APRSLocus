@@ -4816,5 +4816,11 @@
   "notifDiag": "通知診斷",
   "notifDiagDesc": "看這台手機支援不支援即時更新、焦點通知，缺哪一環。",
   "notifStyleFocus": "小米焦點通知",
-  "notifStyleFocusDesc": "小米、Redmi、POCO 上試小米的焦點通知（超級島）；沒有廠商許可時，照樣退回即時更新或普通通知。"
+  "notifStyleFocusDesc": "小米、Redmi、POCO 上試小米的焦點通知（超級島）；沒有廠商許可時，照樣退回即時更新或普通通知。",
+  "notifLiveTextTitle": "即時更新的文字",
+  "notifLiveTextDefault": "預設",
+  "notifLiveTextCounts": "收發數",
+  "notifLiveTextGrid": "網格",
+  "notifLiveTextCourse": "朝向",
+  "notifLiveTextBeacon": "發射倒數"
 }

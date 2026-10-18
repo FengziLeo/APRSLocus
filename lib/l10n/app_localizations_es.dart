@@ -9750,4 +9750,22 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get notifStyleFocusDesc => "En Xiaomi, Redmi y POCO prueba la notificación de foco (superisla). Sin permiso del fabricante vuelve a actualizaciones en vivo o a una notificación normal.";
 
+  @override
+  String get notifLiveTextTitle => "Texto de la actualización en vivo";
+
+  @override
+  String get notifLiveTextDefault => "Predeterminado";
+
+  @override
+  String get notifLiveTextCounts => "Enviados / recibidos";
+
+  @override
+  String get notifLiveTextGrid => "Cuadrícula";
+
+  @override
+  String get notifLiveTextCourse => "Rumbo";
+
+  @override
+  String get notifLiveTextBeacon => "Cuenta atrás del beacon";
+
 }

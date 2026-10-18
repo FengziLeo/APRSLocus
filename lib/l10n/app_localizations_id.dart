@@ -9701,4 +9701,22 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get notifStyleFocusDesc => "Di Xiaomi, Redmi, dan POCO mencoba notifikasi fokus (super island). Tanpa izin vendor, kembali ke pembaruan langsung atau notifikasi biasa.";
 
+  @override
+  String get notifLiveTextTitle => "Teks pembaruan langsung";
+
+  @override
+  String get notifLiveTextDefault => "Bawaan";
+
+  @override
+  String get notifLiveTextCounts => "Kirim / terima";
+
+  @override
+  String get notifLiveTextGrid => "Grid";
+
+  @override
+  String get notifLiveTextCourse => "Arah";
+
+  @override
+  String get notifLiveTextBeacon => "Hitung mundur beacon";
+
 }

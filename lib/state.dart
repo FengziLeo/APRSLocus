@@ -766,6 +766,32 @@ class AppState extends ChangeNotifier {
     _notify();
   }
 
+  /// 实时更新（状态栏那一小条 / 胶囊）里显示什么。
+  ///
+  /// * `default` 交给系统（不倒计时、不塞文字）；
+  /// * `counts`  当前链路的收发帧数（射频在用时用射频的，否则用 APRS-IS 的）；
+  /// * `grid`    自己的网格；
+  /// * `course`  朝向；
+  /// * `beacon`  距下次上报的倒计时（走系统 chronometer，不用反复重发）。
+  String notifLiveText = 'default';
+
+  static const _notifLiveTexts = <String>[
+    'default',
+    'counts',
+    'grid',
+    'course',
+    'beacon',
+  ];
+
+  void setNotifLiveText(String v) {
+    if (!_notifLiveTexts.contains(v)) return;
+    if (notifLiveText == v) return;
+    notifLiveText = v;
+    persist();
+    _updateNotification();
+    _notify();
+  }
+
   /// 地图页上报状态栏的样式（issue #21-2）。
   ///
   /// * true（默认）= **详细**：多一行判据（当前档位 / 还差多少秒·多少米 /
@@ -4134,6 +4160,7 @@ class AppState extends ChangeNotifier {
     beaconIncludeSteps = false;
     beaconIncludeSats = false;
     notifStyle = 'plain';
+    notifLiveText = 'default';
     _stepsBaseline = -1;
     _stepsDayKey = '';
     _stepsCarry = 0;
@@ -4635,6 +4662,9 @@ class AppState extends ChangeNotifier {
       // 只认两种值：早期版本存过 'focus'（小米焦点通知那一档已删）。
       // 不归一化的话它既不是 plain 也不是 live，用户选了实时更新也永远提不上去。
       notifStyle = p.getString('notifStyle') == 'live' ? 'live' : 'plain';
+      final liveText = p.getString('notifLiveText');
+      notifLiveText =
+          _notifLiveTexts.contains(liveText) ? liveText! : 'default';
       loc.setLiveUpdates(notifLiveUpdates);
       // 计步基线：跨重启必须留着，否则重启后「今日步数」会从 0 重新数
       _stepsBaseline = p.getInt('stepsBaseline') ?? _stepsBaseline;
@@ -5019,6 +5049,7 @@ class AppState extends ChangeNotifier {
     await p.setBool('beaconIncludeSteps', beaconIncludeSteps);
     await p.setBool('beaconIncludeSats', beaconIncludeSats);
     await p.setString('notifStyle', notifStyle);
+    await p.setString('notifLiveText', notifLiveText);
     await p.setInt('stepsBaseline', _stepsBaseline);
     await p.setString('stepsDayKey', _stepsDayKey);
     await p.setInt('stepsCarry', _stepsCarry);
@@ -10720,18 +10751,38 @@ class AppState extends ChangeNotifier {
         (!usingRf || (usingTnc ? tnc.config.rfBeacon : audio.config.rfBeacon))) {
       parts.add(l.notifBeacon(nextBeaconIn));
     }
-    // 实时更新的药丸里只放一行超短文本（建议 ≤7 字符）：倒计时是最想
-    // 一眼看到的值。但倒计时不能靠这行文本 —— 换一次要重发一次通知，
-    // 而我们重发的时机跟不上一秒一跳，胶囊会停在旧值上。所以倒计时
-    // 交给系统的 chronometer（[countdown]），这行文本只在「即将上报」
-    // 这种不变的状态上使用。
+    // 实时更新的胶囊里只放一行超短文本（建议 ≤7 字符），内容可选。
+    // 倒计时不能靠这行文本 —— 换一次要重发一次通知，而我们重发的时机
+    // 跟不上一秒一跳，胶囊会停在旧值上。所以倒计时交给系统的 chronometer
+    // （[countdown]），其余选项才用这行文本。
     var short = '';
     var countdown = 0;
-    if (beaconPhase == BeaconPhase.counting ||
-        beaconPhase == BeaconPhase.coarseForced) {
-      countdown = beaconSecondsLeft;
-    } else if (beaconPhase == BeaconPhase.imminent) {
-      short = l.beaconSoon;
+    final counting = beaconPhase == BeaconPhase.counting ||
+        beaconPhase == BeaconPhase.coarseForced;
+    switch (notifLiveText) {
+      case 'counts':
+        short = usingTnc
+            ? '${tnc.rxFrames}/${tnc.txFrames}'
+            : (usingAudio
+                ? '${audio.rxFrames}/${audio.txFrames}'
+                : (aprsIsOn ? '$packetsRx/$packetsTx' : ''));
+        break;
+      case 'grid':
+        short = myHasFix ? myGrid : '';
+        break;
+      case 'course':
+        final c = myCourse;
+        short = c == null ? '' : '${c.round()}°';
+        break;
+      case 'beacon':
+        if (counting) {
+          countdown = beaconSecondsLeft;
+        } else if (beaconPhase == BeaconPhase.imminent) {
+          short = l.beaconSoon;
+        }
+        break;
+      default:
+        break;
     }
     loc.updateNotification(parts.join(' · '),
         live: notifLiveUpdates, short: short, countdown: countdown);

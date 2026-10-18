@@ -9412,4 +9412,22 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get notifStyleFocusDesc => "Xiaomi・Redmi・POCO では Xiaomi の焦点通知（スーパーアイランド）を試します。ベンダー許可がないときはリアルタイム更新か通常通知に戻ります。";
 
+  @override
+  String get notifLiveTextTitle => "リアルタイム更新の文字";
+
+  @override
+  String get notifLiveTextDefault => "既定";
+
+  @override
+  String get notifLiveTextCounts => "送受信数";
+
+  @override
+  String get notifLiveTextGrid => "グリッド";
+
+  @override
+  String get notifLiveTextCourse => "方位";
+
+  @override
+  String get notifLiveTextBeacon => "ビーコンまでのカウントダウン";
+
 }

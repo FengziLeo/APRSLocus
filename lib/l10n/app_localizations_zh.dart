@@ -9312,6 +9312,24 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get notifStyleFocusDesc => "小米、Redmi、POCO 上试小米的焦点通知（超级岛）；没有厂商许可时，照样退回实时更新或普通通知。";
 
+  @override
+  String get notifLiveTextTitle => "实时更新的文字";
+
+  @override
+  String get notifLiveTextDefault => "默认";
+
+  @override
+  String get notifLiveTextCounts => "收发数";
+
+  @override
+  String get notifLiveTextGrid => "网格";
+
+  @override
+  String get notifLiveTextCourse => "朝向";
+
+  @override
+  String get notifLiveTextBeacon => "发射倒计时";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18620,5 +18638,23 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get notifStyleFocusDesc => "小米、Redmi、POCO 上試小米的焦點通知（超級島）；沒有廠商許可時，照樣退回即時更新或普通通知。";
+
+  @override
+  String get notifLiveTextTitle => "即時更新的文字";
+
+  @override
+  String get notifLiveTextDefault => "預設";
+
+  @override
+  String get notifLiveTextCounts => "收發數";
+
+  @override
+  String get notifLiveTextGrid => "網格";
+
+  @override
+  String get notifLiveTextCourse => "朝向";
+
+  @override
+  String get notifLiveTextBeacon => "發射倒數";
 
 }

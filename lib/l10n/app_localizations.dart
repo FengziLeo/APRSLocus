@@ -16983,6 +16983,42 @@ abstract class AppLocalizations {
   /// **'小米、Redmi、POCO 上试小米的焦点通知（超级岛）；没有厂商许可时，照样退回实时更新或普通通知。'**
   String get notifStyleFocusDesc;
 
+  /// No description provided for @notifLiveTextTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'实时更新的文字'**
+  String get notifLiveTextTitle;
+
+  /// No description provided for @notifLiveTextDefault.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认'**
+  String get notifLiveTextDefault;
+
+  /// No description provided for @notifLiveTextCounts.
+  ///
+  /// In zh, this message translates to:
+  /// **'收发数'**
+  String get notifLiveTextCounts;
+
+  /// No description provided for @notifLiveTextGrid.
+  ///
+  /// In zh, this message translates to:
+  /// **'网格'**
+  String get notifLiveTextGrid;
+
+  /// No description provided for @notifLiveTextCourse.
+  ///
+  /// In zh, this message translates to:
+  /// **'朝向'**
+  String get notifLiveTextCourse;
+
+  /// No description provided for @notifLiveTextBeacon.
+  ///
+  /// In zh, this message translates to:
+  /// **'发射倒计时'**
+  String get notifLiveTextBeacon;
+
 }
 
 class _AppLocalizationsDelegate

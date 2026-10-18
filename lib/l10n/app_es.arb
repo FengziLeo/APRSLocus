@@ -4228,5 +4228,11 @@
   "notifDiag": "Comprobación de notificaciones",
   "notifDiagDesc": "Muestra qué admite este teléfono para actualizaciones en vivo y notificaciones de foco.",
   "notifStyleFocus": "Notificación de foco de Xiaomi",
-  "notifStyleFocusDesc": "En Xiaomi, Redmi y POCO prueba la notificación de foco (superisla). Sin permiso del fabricante vuelve a actualizaciones en vivo o a una notificación normal."
+  "notifStyleFocusDesc": "En Xiaomi, Redmi y POCO prueba la notificación de foco (superisla). Sin permiso del fabricante vuelve a actualizaciones en vivo o a una notificación normal.",
+  "notifLiveTextTitle": "Texto de la actualización en vivo",
+  "notifLiveTextDefault": "Predeterminado",
+  "notifLiveTextCounts": "Enviados / recibidos",
+  "notifLiveTextGrid": "Cuadrícula",
+  "notifLiveTextCourse": "Rumbo",
+  "notifLiveTextBeacon": "Cuenta atrás del beacon"
 }

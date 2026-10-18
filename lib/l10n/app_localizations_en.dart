@@ -9691,4 +9691,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notifStyleFocusDesc => "On Xiaomi, Redmi and POCO, tries the Xiaomi focus notification (super island). Without vendor permission it falls back to live updates or a normal notification.";
 
+  @override
+  String get notifLiveTextTitle => "Live update text";
+
+  @override
+  String get notifLiveTextDefault => "Default";
+
+  @override
+  String get notifLiveTextCounts => "Sent / received";
+
+  @override
+  String get notifLiveTextGrid => "Grid";
+
+  @override
+  String get notifLiveTextCourse => "Heading";
+
+  @override
+  String get notifLiveTextBeacon => "Beacon countdown";
+
 }

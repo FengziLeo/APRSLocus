@@ -4228,5 +4228,11 @@
   "notifDiag": "Pemeriksaan notifikasi",
   "notifDiagDesc": "Menampilkan dukungan ponsel ini untuk pembaruan langsung dan notifikasi fokus.",
   "notifStyleFocus": "Notifikasi fokus Xiaomi",
-  "notifStyleFocusDesc": "Di Xiaomi, Redmi, dan POCO mencoba notifikasi fokus (super island). Tanpa izin vendor, kembali ke pembaruan langsung atau notifikasi biasa."
+  "notifStyleFocusDesc": "Di Xiaomi, Redmi, dan POCO mencoba notifikasi fokus (super island). Tanpa izin vendor, kembali ke pembaruan langsung atau notifikasi biasa.",
+  "notifLiveTextTitle": "Teks pembaruan langsung",
+  "notifLiveTextDefault": "Bawaan",
+  "notifLiveTextCounts": "Kirim / terima",
+  "notifLiveTextGrid": "Grid",
+  "notifLiveTextCourse": "Arah",
+  "notifLiveTextBeacon": "Hitung mundur beacon"
 }

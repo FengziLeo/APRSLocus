@@ -104,6 +104,7 @@ const List<BackupGroupSpec> kBackupGroups = [
     // 常驻通知要不要申请实时更新（Android 16 的 Live Updates）：通知显示偏好。
     // 常驻通知的显示样式（普通 / 实时更新）：通知显示偏好。
     'notifStyle',
+    'notifLiveText',
     'emergencyTel',
     // 里程附带（TRV/ODO）与累计总里程：属于「信标内容 + 累计数据」，
     // 换机后当然希望继续累计、按自己调的那样上报。

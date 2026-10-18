@@ -6624,7 +6624,10 @@ class AppState extends ChangeNotifier {
   /// （私聊 / 群发 / 位置点 / ack）走 [_sendRawMsg]，两条来源可以不同。
   void _sendRaw(String raw) {
     for (final src in posTxTargets) {
-      _sendVia(src, raw);
+      // **发射数就在这里数**：信标、状态帧、测试帧走的都是这条路。
+      // 以前只有发消息时 packetsTx++，于是胶囊里的「发射数」永远是 0 ——
+      // 用户看着实际发了报，数字却一动不动。
+      if (_sendVia(src, raw) == null) packetsTx++;
     }
   }
 
@@ -6675,7 +6678,7 @@ class AppState extends ChangeNotifier {
       }
       return null;
     }
-    _sendAprs(raw);
+    if (!_sendAprs(raw)) return 'send-failed';
     return null;
   }
 

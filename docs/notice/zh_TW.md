@@ -1,6 +1,4 @@
-# APRSNETCN OA · 本週六，向 BG7LZQ-3 發一條報文
-
-> ⚠️ **今天請勿更新**。新版本還在除錯，除錯完再裝。
+# ⚠️ 今天請勿更新 App，新版本正在除錯
 
 APRSNETCN OA 是 APRSNET.CN 發起的 APRS 報文簽到活動。按北京時間的週六算，一整天都能簽到。OA 是 On Air 的縮寫。
 

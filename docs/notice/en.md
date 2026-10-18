@@ -1,6 +1,4 @@
-# APRSNETCN OA · This Saturday, send a packet to BG7LZQ-3
-
-> ⚠️ **Do not update today.** The new version is still being debugged. Install it once that is done.
+# ⚠️ Do not update the App today, the new version is still being debugged
 
 APRSNETCN OA is an APRS message check-in run by APRSNET.CN. It lasts a whole Saturday, Beijing time. OA stands for On Air.
 

@@ -52,6 +52,16 @@ APRSNETCN OA 是 APRSNET.CN 发起的 APRS 报文签到活动。按北京时间�
 
 ---
 
+## 🆔 TOCALL 进了官方设备库
+
+APRSLocus 的 tocall 是 **APALOC**，现在进了官方的 TOCALL 设备库（aprs-deviceid）。
+
+厂商一栏写的是 Darion, BG7LZQ，型号 APRSLocus，类别 software。
+
+在官方 TOCALL 表里查 APALOC，就能找到它。
+
+---
+
 ## ✅ 清零通道已恢复
 
 Qingling（清零）渠道上误发的 2.2.0 已经下架，通道恢复正常。

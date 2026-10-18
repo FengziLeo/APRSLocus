@@ -52,6 +52,16 @@ The roster for the day is on the activity page. **[Open the activity page](https
 
 ---
 
+## 🆔 TOCALL in the official device library
+
+APRSLocus answers to the tocall **APALOC**, now listed in the official TOCALL device library (aprs-deviceid).
+
+The vendor field reads Darion, BG7LZQ, the model APRSLocus, the class software.
+
+Look up APALOC in the official TOCALL table and you will find it.
+
+---
+
 ## ✅ The Qingling channel is back
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.

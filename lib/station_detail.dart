@@ -258,32 +258,6 @@ class _StationDetailState extends State<StationDetail> {
                                       style: ts(12, c: C.slate),
                                     ),
                                   ],
-                                  // 独立状态报文（DTI `>`）：与上面那行「位置报文备注」
-                                  // 是两种报文，所以**分两行**显示、用紫色区分 ——
-                                  // 中继台常把「设备来源」（Powered by …）写在状态报文里，
-                                  // 而把「频点」写在位置备注里；混成一行就分不出哪个是哪个。
-                                  if (s.statusText != null &&
-                                      s.statusText!.isNotEmpty) ...[
-                                    SizedBox(height: 3),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Icon(
-                                          Icons.campaign_rounded,
-                                          size: 13,
-                                          color: C.purple,
-                                        ),
-                                        SizedBox(width: 5),
-                                        Expanded(
-                                          child: Text(
-                                            s.statusText!,
-                                            style: ts(11, c: C.purple),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
                                 ],
                               ),
                             ),
@@ -380,6 +354,50 @@ class _StationDetailState extends State<StationDetail> {
                             ),
                           ],
                         ),
+                        // 独立状态报文（DTI `>`）：这是**另一帧**报文，与呼号那列里的
+                        // 台站备注不是一回事。位置备注跟着位置包走，通常写频点；
+                        // 状态报文自己单独一帧，中继台常把「Powered by …」写在这里。
+                        // 所以它不进那列、也不与备注并排，单独占一块并写明标签，
+                        // 一眼就能分清哪句是哪种报文。
+                        if ((s.statusText ?? '').trim().isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(12, 9, 12, 10),
+                            decoration: BoxDecoration(
+                              color: C.purple.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: C.purple.withValues(alpha: 0.22),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(children: [
+                                  Icon(
+                                    Icons.campaign_rounded,
+                                    size: 13,
+                                    color: C.purple,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    S.of(context).txPartStatus,
+                                    style: ts(
+                                      10,
+                                      c: C.purple,
+                                      w: FontWeight.w700,
+                                    ),
+                                  ),
+                                ]),
+                                const SizedBox(height: 3),
+                                Text(
+                                  s.statusText!.trim(),
+                                  style: ts(12, c: C.purple),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                         // 发送消息（详情面板最常用操作，置于头部之后，避免沉到页面底部）
                         Row(
                           children: [

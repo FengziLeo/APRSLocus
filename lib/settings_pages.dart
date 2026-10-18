@@ -2300,6 +2300,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           on: st.aprsIsOn,
           onToggle: (v) => st.toggleSource(AppState.srcAprsIs, v),
           icon: Icons.cloud_rounded,
+          color: C.purple,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => AprsIsServerPage(state: st)),
           ),
@@ -2316,6 +2317,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
             on: st.acnOn,
             onToggle: st.setAcnOn,
             icon: Icons.hub_rounded,
+            color: C.purple,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => AcnLinkPage(state: st)),
             ),
@@ -2671,7 +2673,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
         SettingsSwitch(S.of(context).filterCenterFollows, value: st.filterFollow, color: C.cyan,
             onChanged: (v) {
           st.filterFollow = v;
-          _checkConfigDirty();
         }),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -2831,7 +2832,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
                   _filterLng.text = st.filterLng.toStringAsFixed(4);
                 }
                 _filterRadius.text = '${st.filterRadius}';
-                _checkConfigDirty();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(S.of(context)

@@ -16800,6 +16800,36 @@ abstract class AppLocalizations {
   /// **'地址与账号'**
   String get acnOpenSettings;
 
+  /// No description provided for @acnFilterTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'筛选'**
+  String get acnFilterTitle;
+
+  /// No description provided for @acnFilterSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'半径内的台站，加上你列的呼号。'**
+  String get acnFilterSubtitle;
+
+  /// No description provided for @acnFilterRadius.
+  ///
+  /// In zh, this message translates to:
+  /// **'半径（公里）'**
+  String get acnFilterRadius;
+
+  /// No description provided for @acnFilterCalls.
+  ///
+  /// In zh, this message translates to:
+  /// **'再加上这些呼号'**
+  String get acnFilterCalls;
+
+  /// No description provided for @acnFilterCallsHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'呼号，按回车加上'**
+  String get acnFilterCallsHint;
+
 }
 
 class _AppLocalizationsDelegate

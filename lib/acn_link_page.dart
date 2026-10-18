@@ -30,6 +30,8 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
   late final TextEditingController _port;
   late final TextEditingController _account;
   late final TextEditingController _password;
+  late final TextEditingController _radius;
+  final TextEditingController _callInput = TextEditingController();
   bool _passwordHidden = true;
 
   /// 保存进页面时的值：只用来判断「改过了、要重连」，不参与连接
@@ -37,6 +39,8 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
   late final int _origPort;
   late final String _origAccount;
   late final String _origPassword;
+  late final int _origRadius;
+  late final List<String> _origCalls;
   bool _dirty = false;
 
   AppState get st => widget.state;
@@ -48,10 +52,13 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
     _port = TextEditingController(text: '${st.acnPort}');
     _account = TextEditingController(text: st.acnAccount);
     _password = TextEditingController(text: st.acnPassword);
+    _radius = TextEditingController(text: '${st.acnFilterRadius}');
     _origServer = st.acnServer;
     _origPort = st.acnPort;
     _origAccount = st.acnAccount;
     _origPassword = st.acnPassword;
+    _origRadius = st.acnFilterRadius;
+    _origCalls = List<String>.from(st.acnFilterCalls);
     // 服务器自己公布的那几条，不用账号也能取：地址写错只是这张卡空着。
     unawaited(st.fetchAcnInfo());
   }
@@ -62,6 +69,8 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
     _port.dispose();
     _account.dispose();
     _password.dispose();
+    _radius.dispose();
+    _callInput.dispose();
     super.dispose();
   }
 
@@ -71,10 +80,20 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
     final dirty = st.acnServer != _origServer ||
         st.acnPort != _origPort ||
         st.acnAccount != _origAccount ||
-        st.acnPassword != _origPassword;
+        st.acnPassword != _origPassword ||
+        st.acnFilterRadius != _origRadius ||
+        !_sameCalls(st.acnFilterCalls, _origCalls);
     if (dirty == _dirty) return;
     if (dirty) st.persist();
     setState(() => _dirty = dirty);
+  }
+
+  static bool _sameCalls(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   Future<void> _reconnect() async {
@@ -95,6 +114,8 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
         color: C.purple,
         body: Column(children: [
           _linkCard(s),
+          const SizedBox(height: 16),
+          _filterCard(s),
           if (st.acnInfo != null) ...[
             const SizedBox(height: 16),
             _serverCard(s, st.acnInfo!),
@@ -267,6 +288,101 @@ class _AcnLinkPageState extends State<AcnLinkPage> {
         ),
       ]),
     );
+  }
+
+  /// ② 副链路自己的筛选：半径 + 呼号。
+  ///
+  /// 和主链路分开：主链路按「连接设置」页上的范围与群呼号组装，这条链路连的
+  /// 是 CNNET 那台服务器，只关心半径内的人和名单里的呼号。呼号走 `b/`
+  /// 过滤器，改完点上面的「重新连接」生效。
+  Widget _filterCard(S s) {
+    return SettingsSectionCard(
+      title: s.acnFilterTitle,
+      subtitle: s.acnFilterSubtitle,
+      icon: Icons.filter_alt_rounded,
+      color: C.purple,
+      children: [
+        SettingsInput(s.acnFilterRadius, _radius,
+            onChanged: (v) {
+          final n = int.tryParse(v.trim());
+          if (n != null && n > 0) st.setAcnFilterRadius(n);
+          _touched();
+        }),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: C.border, width: 0.4)),
+          ),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(s.acnFilterCalls, style: ts(12, c: C.slate)),
+            if (st.acnFilterCalls.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  for (final c in st.acnFilterCalls) _callChip(c),
+                ],
+              ),
+            ],
+            const SizedBox(height: 8),
+            TextField(
+              controller: _callInput,
+              autocorrect: false,
+              textCapitalization: TextCapitalization.characters,
+              style: ts(13, w: FontWeight.w600),
+              onSubmitted: _addCall,
+              decoration: InputDecoration(
+                hintText: s.acnFilterCallsHint,
+                hintStyle: ts(13, c: C.greyLight),
+                isDense: true,
+                filled: true,
+                fillColor: C.bgSoft,
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.add_rounded, size: 18, color: C.purple),
+                  onPressed: () => _addCall(_callInput.text),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ]),
+        ),
+      ],
+    );
+  }
+
+  Widget _callChip(String call) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 2, 2, 2),
+      decoration: BoxDecoration(
+        color: C.purple.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Text(call, style: ts(12, w: FontWeight.w700, c: C.purple)),
+        IconButton(
+          icon: const Icon(Icons.close_rounded),
+          iconSize: 13,
+          color: C.purple,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+          onPressed: () {
+            st.removeAcnFilterCall(call);
+            _touched();
+          },
+        ),
+      ]),
+    );
+  }
+
+  void _addCall(String raw) {
+    st.addAcnFilterCall(raw);
+    _callInput.clear();
+    _touched();
   }
 
   /// ② 服务器自己公布的策略：`/api/v1/version` 上那几条，不带账号也能看。

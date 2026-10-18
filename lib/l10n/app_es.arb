@@ -4198,5 +4198,10 @@
   "acnOpenMap": "Mapa de estaciones",
   "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}},
   "channelsSubtitle": "Los dos servidores pueden estar en línea a la vez; cada uno recibe su copia.",
-  "acnOpenSettings": "Dirección y cuenta"
+  "acnOpenSettings": "Dirección y cuenta",
+  "acnFilterTitle": "Filtro",
+  "acnFilterSubtitle": "Estaciones dentro del radio, más los indicativos que añadas.",
+  "acnFilterRadius": "Radio (km)",
+  "acnFilterCalls": "También estos indicativos",
+  "acnFilterCallsHint": "Indicativo, pulsa enter"
 }

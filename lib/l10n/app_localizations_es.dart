@@ -9660,4 +9660,19 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get acnOpenSettings => "Dirección y cuenta";
 
+  @override
+  String get acnFilterTitle => "Filtro";
+
+  @override
+  String get acnFilterSubtitle => "Estaciones dentro del radio, más los indicativos que añadas.";
+
+  @override
+  String get acnFilterRadius => "Radio (km)";
+
+  @override
+  String get acnFilterCalls => "También estos indicativos";
+
+  @override
+  String get acnFilterCallsHint => "Indicativo, pulsa enter";
+
 }

@@ -1809,6 +1809,48 @@ class AppState extends ChangeNotifier {
     return f;
   }
 
+  /// 副链路的过滤字符串：同一个中心点，半径与呼号单独一套。
+  ///
+  /// 呼号用 `b/`（呼号列表），不用主链路那种 `~呼号`：APRSNETCN 服务器只认
+  /// r a b m t p d f s u q 这几个前缀，一条认不出来**整条过滤器作废**（退回
+  /// 全收），主链路那边的写法搬过来反而会把副链路变成不过滤。
+  String get acnFilterString {
+    var f = 'r/${filterLat.toStringAsFixed(2)}/${filterLng.toStringAsFixed(2)}/'
+        '$acnFilterRadius';
+    final calls = acnFilterCalls
+        .map((c) => c.trim().toUpperCase())
+        .where((c) => c.isNotEmpty)
+        .toList();
+    if (calls.isNotEmpty) f += ' b/${calls.join('/')}';
+    return f;
+  }
+
+  /// 改副链路的接收半径（公里）。落盘，断开时下次连上才生效。
+  void setAcnFilterRadius(int km) {
+    final v = km < 10 ? 10 : (km > 20000 ? 20000 : km);
+    if (v == acnFilterRadius) return;
+    acnFilterRadius = v;
+    persist();
+    _notify();
+  }
+
+  /// 往副链路的呼号列表里加一个（去重、补全大写），最多 8 个。
+  void addAcnFilterCall(String call) {
+    final c = call.trim().toUpperCase();
+    if (c.isEmpty || acnFilterCalls.contains(c)) return;
+    if (acnFilterCalls.length >= 8) return;
+    acnFilterCalls = [...acnFilterCalls, c];
+    persist();
+    _notify();
+  }
+
+  void removeAcnFilterCall(String call) {
+    if (!acnFilterCalls.contains(call)) return;
+    acnFilterCalls = [...acnFilterCalls]..remove(call);
+    persist();
+    _notify();
+  }
+
   /// 业余无线电呼号国家/地区前缀表（呼号首位前缀 → 国家）
   static const Map<String, List<String>> countryCallPrefixes = {
     'CN': ['B'],
@@ -4063,6 +4105,8 @@ class AppState extends ChangeNotifier {
     _acnConfWarned = false;
     acnAccount = '';
     acnPassword = '';
+    acnFilterRadius = 1000;
+    acnFilterCalls = <String>[];
     acnConnected = false;
     acnLogin = null;
     _acnRetryAt = null;
@@ -4343,6 +4387,13 @@ class AppState extends ChangeNotifier {
   String acnAccount = '';
   String acnPassword = '';
 
+  /// 副链路自己的过滤器：半径（公里）与额外收的呼号。
+  ///
+  /// 主链路按设置页上的范围与群呼号组装（[filterString]），副链路连的是
+  /// CNNET 那台服务器，关心的是活动里的人：半径可以另调，呼号可以单独列。
+  int acnFilterRadius = 1000;
+  List<String> acnFilterCalls = <String>[];
+
   /// 副链路的登录结果：null = 还没收到服务器的 logresp；'' = 已验证；
   /// 其他 = 服务器自己说的原因（`unverified` / `auth-failed` / `auth-required`）。
   ///
@@ -4606,6 +4657,9 @@ class AppState extends ChangeNotifier {
           (aprs.server.trim() == kAcnServerHost ? aprs.account : '');
       acnPassword = p.getString('acnPassword') ??
           (aprs.server.trim() == kAcnServerHost ? aprs.password : '');
+      acnFilterRadius = p.getInt('acnFilterRadius') ?? acnFilterRadius;
+      acnFilterCalls =
+          p.getStringList('acnFilterCalls') ?? acnFilterCalls;
       dataSource = p.getString('dataSource') ?? dataSource;
       // 容错：非法/旧值一律回落 APRS-IS，避免多来源判断失配。
       // pkwdwpl 是**只读**来源，即使旧配置里存了它也不能当发射来源。
@@ -4899,6 +4953,8 @@ class AppState extends ChangeNotifier {
     await p.setInt('acnPort', acnPort);
     await p.setString('acnAccount', acnAccount);
     await p.setString('acnPassword', acnPassword);
+    await p.setInt('acnFilterRadius', acnFilterRadius);
+    await p.setStringList('acnFilterCalls', acnFilterCalls);
     await p.setString('dataSource', dataSource);
     await p.setStringList('enabledSources', enabledSources.toList());
     await p.setBool('igateEnabled', igateEnabled);
@@ -6024,7 +6080,7 @@ class AppState extends ChangeNotifier {
     acnLink.passcode = aprs.passcode;
     acnLink.account = acnAccount.trim();
     acnLink.password = acnPassword;
-    acnLink.filter = filterString;
+    acnLink.filter = acnFilterString;
     final ok = await acnLink.connect();
     _acnConnecting = false;
     acnConnected = ok;

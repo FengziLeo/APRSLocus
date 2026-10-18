@@ -4198,5 +4198,10 @@
   "acnOpenMap": "Station map",
   "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}},
   "channelsSubtitle": "Both servers can stay online at once; each one collects its own copy.",
-  "acnOpenSettings": "Address and account"
+  "acnOpenSettings": "Address and account",
+  "acnFilterTitle": "Filter",
+  "acnFilterSubtitle": "Stations inside the radius, plus the calls you list.",
+  "acnFilterRadius": "Radius (km)",
+  "acnFilterCalls": "Also these calls",
+  "acnFilterCallsHint": "Callsign, press enter"
 }

@@ -9322,4 +9322,19 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get acnOpenSettings => "アドレスとアカウント";
 
+  @override
+  String get acnFilterTitle => "絞り込み";
+
+  @override
+  String get acnFilterSubtitle => "半径内の局と、ここに並べたコールサイン。";
+
+  @override
+  String get acnFilterRadius => "半径（km）";
+
+  @override
+  String get acnFilterCalls => "このコールサインも";
+
+  @override
+  String get acnFilterCallsHint => "コールサイン、Enter で追加";
+
 }

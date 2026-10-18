@@ -4198,5 +4198,10 @@
   "acnOpenMap": "Peta stasiun",
   "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}},
   "channelsSubtitle": "Kedua server bisa tersambung bersamaan; masing-masing menerima salinannya.",
-  "acnOpenSettings": "Alamat dan akun"
+  "acnOpenSettings": "Alamat dan akun",
+  "acnFilterTitle": "Filter",
+  "acnFilterSubtitle": "Stasiun di dalam radius, ditambah panggilan yang kamu daftar.",
+  "acnFilterRadius": "Radius (km)",
+  "acnFilterCalls": "Juga panggilan ini",
+  "acnFilterCallsHint": "Panggilan, tekan enter"
 }

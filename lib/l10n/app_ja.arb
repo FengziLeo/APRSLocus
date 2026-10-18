@@ -4198,5 +4198,10 @@
   "acnOpenMap": "局の地図",
   "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}},
   "channelsSubtitle": "2 台のサーバーを同時に接続できます。受信はそれぞれで行います。",
-  "acnOpenSettings": "アドレスとアカウント"
+  "acnOpenSettings": "アドレスとアカウント",
+  "acnFilterTitle": "絞り込み",
+  "acnFilterSubtitle": "半径内の局と、ここに並べたコールサイン。",
+  "acnFilterRadius": "半径（km）",
+  "acnFilterCalls": "このコールサインも",
+  "acnFilterCallsHint": "コールサイン、Enter で追加"
 }

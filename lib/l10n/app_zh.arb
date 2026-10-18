@@ -4877,5 +4877,10 @@
   "acnOpenMap": "台站地图",
   "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}},
   "channelsSubtitle": "两台服务器可以同时在线，报文两边各收一份。",
-  "acnOpenSettings": "地址与账号"
+  "acnOpenSettings": "地址与账号",
+  "acnFilterTitle": "筛选",
+  "acnFilterSubtitle": "半径内的台站，加上你列的呼号。",
+  "acnFilterRadius": "半径（公里）",
+  "acnFilterCalls": "再加上这些呼号",
+  "acnFilterCallsHint": "呼号，按回车加上"
 }

@@ -9601,4 +9601,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get acnOpenSettings => "Address and account";
 
+  @override
+  String get acnFilterTitle => "Filter";
+
+  @override
+  String get acnFilterSubtitle => "Stations inside the radius, plus the calls you list.";
+
+  @override
+  String get acnFilterRadius => "Radius (km)";
+
+  @override
+  String get acnFilterCalls => "Also these calls";
+
+  @override
+  String get acnFilterCallsHint => "Callsign, press enter";
+
 }

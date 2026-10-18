@@ -4786,5 +4786,10 @@
   "acnOpenMap": "臺站地圖",
   "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}},
   "channelsSubtitle": "兩臺伺服器可以同時在線，報文兩邊各收一份。",
-  "acnOpenSettings": "位址與帳號"
+  "acnOpenSettings": "位址與帳號",
+  "acnFilterTitle": "篩選",
+  "acnFilterSubtitle": "半徑內的臺站，加上你列的呼號。",
+  "acnFilterRadius": "半徑（公里）",
+  "acnFilterCalls": "再加上這些呼號",
+  "acnFilterCallsHint": "呼號，按 Enter 加上"
 }

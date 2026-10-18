@@ -9611,4 +9611,19 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get acnOpenSettings => "Alamat dan akun";
 
+  @override
+  String get acnFilterTitle => "Filter";
+
+  @override
+  String get acnFilterSubtitle => "Stasiun di dalam radius, ditambah panggilan yang kamu daftar.";
+
+  @override
+  String get acnFilterRadius => "Radius (km)";
+
+  @override
+  String get acnFilterCalls => "Juga panggilan ini";
+
+  @override
+  String get acnFilterCallsHint => "Panggilan, tekan enter";
+
 }

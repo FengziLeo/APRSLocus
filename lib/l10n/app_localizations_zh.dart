@@ -9222,6 +9222,21 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get acnOpenSettings => "地址与账号";
 
+  @override
+  String get acnFilterTitle => "筛选";
+
+  @override
+  String get acnFilterSubtitle => "半径内的台站，加上你列的呼号。";
+
+  @override
+  String get acnFilterRadius => "半径（公里）";
+
+  @override
+  String get acnFilterCalls => "再加上这些呼号";
+
+  @override
+  String get acnFilterCallsHint => "呼号，按回车加上";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18440,5 +18455,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get acnOpenSettings => "位址與帳號";
+
+  @override
+  String get acnFilterTitle => "篩選";
+
+  @override
+  String get acnFilterSubtitle => "半徑內的臺站，加上你列的呼號。";
+
+  @override
+  String get acnFilterRadius => "半徑（公里）";
+
+  @override
+  String get acnFilterCalls => "再加上這些呼號";
+
+  @override
+  String get acnFilterCallsHint => "呼號，按 Enter 加上";
 
 }

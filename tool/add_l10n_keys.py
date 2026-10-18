@@ -36,20 +36,29 @@ CLASSES = {
 
 # ── 要加的键：key → (zh, zh_TW, en, ja, es, id) ──
 KEYS = {
-    # ── 连接设置页的「互联网链路」一段 ──
+    # ── 副链路（APRSNETCN SERVER）自己的筛选 ──
     #
-    # 两条 TCP 登录（APRS-IS 与 APRSNETCN SERVER）并排放在连接设置页，
-    # 参数仍各归各的页：这里只管开关、状态与入口。
-    'channelsSubtitle': (
-        '两台服务器可以同时在线，报文两边各收一份。',
-        '兩臺伺服器可以同時在線，報文兩邊各收一份。',
-        'Both servers can stay online at once; each one collects its own copy.',
-        '2 台のサーバーを同時に接続できます。受信はそれぞれで行います。',
-        'Los dos servidores pueden estar en línea a la vez; cada uno recibe su copia.',
-        'Kedua server bisa tersambung bersamaan; masing-masing menerima salinannya.'),
-    'acnOpenSettings': (
-        '地址与账号', '位址與帳號', 'Address and account', 'アドレスとアカウント',
-        'Dirección y cuenta', 'Alamat dan akun'),
+    # 主链路按连接设置页的范围与群呼号组装，副链路连的是 CNNET 那台服务器，
+    # 半径与呼号单独一套。
+    'acnFilterTitle': (
+        '筛选', '篩選', 'Filter', '絞り込み', 'Filtro', 'Filter'),
+    'acnFilterSubtitle': (
+        '半径内的台站，加上你列的呼号。',
+        '半徑內的臺站，加上你列的呼號。',
+        'Stations inside the radius, plus the calls you list.',
+        '半径内の局と、ここに並べたコールサイン。',
+        'Estaciones dentro del radio, más los indicativos que añadas.',
+        'Stasiun di dalam radius, ditambah panggilan yang kamu daftar.'),
+    'acnFilterRadius': (
+        '半径（公里）', '半徑（公里）', 'Radius (km)', '半径（km）',
+        'Radio (km)', 'Radius (km)'),
+    'acnFilterCalls': (
+        '再加上这些呼号', '再加上這些呼號', 'Also these calls', 'このコールサインも',
+        'También estos indicativos', 'Juga panggilan ini'),
+    'acnFilterCallsHint': (
+        '呼号，按回车加上', '呼號，按 Enter 加上', 'Callsign, press enter',
+        'コールサイン、Enter で追加', 'Indicativo, pulsa enter',
+        'Panggilan, tekan enter'),
 }
 
 META = {

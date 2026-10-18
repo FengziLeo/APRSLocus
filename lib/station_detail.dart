@@ -166,6 +166,24 @@ class _StationDetailState extends State<StationDetail> {
     ),
   );
 
+  /// 一行「标签 + 内容」：台站备注与状态报文各用它排一行。
+  ///
+  /// 标签是给「这是哪种报文」的，字号比正文小一档、灰一档，读的时候不会
+  /// 抢正文；两行的正文颜色也不同（备注灰、状态紫），扫一眼就能分开。
+  Widget _noteLine(String label, Widget value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 1),
+          child: Text(label, style: ts(10, c: C.greyLight)),
+        ),
+        const SizedBox(width: 6),
+        Expanded(child: value),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = widget.station;
@@ -249,13 +267,27 @@ class _StationDetailState extends State<StationDetail> {
                                     localizedAprsSymbolName(context, s.symbol),
                                     style: ts(12, c: C.slate),
                                   ),
-                                  // 位置报文备注：**单独一行、可换行不截断**，且识别网址。
-                                  // 与台站列表保持一致的展示（列表那边见 stations_page）。
+                                  // 台站备注 = 位置包里的 comment，跟着坐标走，常见写频点。
+                                  // 单独一行、可换行不截断，且识别网址（与台站列表同一个组件）。
                                   if ((s.comment ?? '').trim().isNotEmpty) ...[
-                                    SizedBox(height: 2),
-                                    StationNote(
-                                      (s.comment ?? '').trim(),
-                                      style: ts(12, c: C.slate),
+                                    SizedBox(height: 3),
+                                    _noteLine(
+                                      S.of(context).callComment,
+                                      StationNote((s.comment ?? '').trim(),
+                                          style: ts(12, c: C.slate)),
+                                    ),
+                                  ],
+                                  // 状态报文 = DTI `>` 的独立一帧，常写「Powered by …」。
+                                  // 与备注是两种报文，所以各占一行、各自写明是哪一种。
+                                  if ((s.statusText ?? '').trim().isNotEmpty) ...[
+                                    SizedBox(height: 3),
+                                    _noteLine(
+                                      S.of(context).txPartStatus,
+                                      StationNote(
+                                        s.statusText!.trim(),
+                                        style: ts(12, c: C.purple),
+                                        icon: Icons.campaign_rounded,
+                                      ),
                                     ),
                                   ],
                                 ],
@@ -354,50 +386,6 @@ class _StationDetailState extends State<StationDetail> {
                             ),
                           ],
                         ),
-                        // 独立状态报文（DTI `>`）：这是**另一帧**报文，与呼号那列里的
-                        // 台站备注不是一回事。位置备注跟着位置包走，通常写频点；
-                        // 状态报文自己单独一帧，中继台常把「Powered by …」写在这里。
-                        // 所以它不进那列、也不与备注并排，单独占一块并写明标签，
-                        // 一眼就能分清哪句是哪种报文。
-                        if ((s.statusText ?? '').trim().isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.fromLTRB(12, 9, 12, 10),
-                            decoration: BoxDecoration(
-                              color: C.purple.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: C.purple.withValues(alpha: 0.22),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(children: [
-                                  Icon(
-                                    Icons.campaign_rounded,
-                                    size: 13,
-                                    color: C.purple,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    S.of(context).txPartStatus,
-                                    style: ts(
-                                      10,
-                                      c: C.purple,
-                                      w: FontWeight.w700,
-                                    ),
-                                  ),
-                                ]),
-                                const SizedBox(height: 3),
-                                Text(
-                                  s.statusText!.trim(),
-                                  style: ts(12, c: C.purple),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
                         // 发送消息（详情面板最常用操作，置于头部之后，避免沉到页面底部）
                         Row(
                           children: [

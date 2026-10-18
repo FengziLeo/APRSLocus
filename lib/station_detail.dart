@@ -166,6 +166,71 @@ class _StationDetailState extends State<StationDetail> {
     ),
   );
 
+  /// 备注与状态报文：整块放在头部下面。
+  ///
+  /// 上一版把这两行塞在头部图标右侧：图标 56px、操作菜单、关闭按钮一行摆完，
+  /// 中间那列只剩两百来像素，稍长的备注（中继频点 / 天气 / 活动）就折成五六行，
+  /// 把呼号和符号名挤没。现在两行各占一整行，与下面的指标同宽。
+  ///
+  /// 两种报文仍然分开：位置包的备注（灰）与独立状态报文（紫）是两帧不同的包，
+  /// 中继台常把频点写在备注里、把设备来源写在状态报文里。
+  Widget _noteCard(Station s) {
+    final note = (s.comment ?? '').trim();
+    final status = (s.statusText ?? '').trim();
+    if (note.isEmpty && status.isEmpty) return const SizedBox.shrink();
+    final l = S.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 12),
+        SoftCard(
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (note.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.sticky_note_2_rounded, size: 13, color: C.slate),
+                    const SizedBox(width: 6),
+                    Text(
+                      l.callComment,
+                      style: ts(10, c: C.slate, w: FontWeight.w700),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                StationNote(note, style: ts(12, c: C.slate)),
+              ],
+              if (note.isNotEmpty && status.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 9),
+                  child: Divider(
+                    height: 1,
+                    color: C.border.withValues(alpha: 0.6),
+                  ),
+                ),
+              if (status.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Icon(Icons.campaign_rounded, size: 13, color: C.purple),
+                    const SizedBox(width: 6),
+                    Text(
+                      l.boxActStatus,
+                      style: ts(10, c: C.purple, w: FontWeight.w700),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(status, style: ts(12, c: C.purple)),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = widget.station;
@@ -249,41 +314,6 @@ class _StationDetailState extends State<StationDetail> {
                                     localizedAprsSymbolName(context, s.symbol),
                                     style: ts(12, c: C.slate),
                                   ),
-                                  // 位置报文备注：**单独一行、可换行不截断**，且识别网址。
-                                  // 与台站列表保持一致的展示（列表那边见 stations_page）。
-                                  if ((s.comment ?? '').trim().isNotEmpty) ...[
-                                    SizedBox(height: 2),
-                                    StationNote(
-                                      (s.comment ?? '').trim(),
-                                      style: ts(12, c: C.slate),
-                                    ),
-                                  ],
-                                  // 独立状态报文（DTI `>`）：与上面那行「位置报文备注」
-                                  // 是两种报文，所以**分两行**显示、用紫色区分 ——
-                                  // 中继台常把「设备来源」（Powered by …）写在状态报文里，
-                                  // 而把「频点」写在位置备注里；混成一行就分不出哪个是哪个。
-                                  if (s.statusText != null &&
-                                      s.statusText!.isNotEmpty) ...[
-                                    SizedBox(height: 3),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Icon(
-                                          Icons.campaign_rounded,
-                                          size: 13,
-                                          color: C.purple,
-                                        ),
-                                        SizedBox(width: 5),
-                                        Expanded(
-                                          child: Text(
-                                            s.statusText!,
-                                            style: ts(11, c: C.purple),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
                                 ],
                               ),
                             ),
@@ -437,6 +467,8 @@ class _StationDetailState extends State<StationDetail> {
                             ),
                           ],
                         ),
+                        // 备注与状态报文：整块放在头部下面（原先挤在图标右侧那一窄列）
+                        _noteCard(s),
                         // 台站荣誉徽章（该呼号在荣誉墙名单中时展示）
                         _honorRow(s.call),
                         // 黄岩岛彩蛋：命中 BS7H 时在标准面板里追加「介绍 + 历史由来」网页卡

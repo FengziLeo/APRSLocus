@@ -4765,9 +4765,9 @@
   "stationSource": "來源",
   "acnCardTitle": "APRSNETCN SERVER",
   "acnCardSubtitle": "基於 APRSNETCN SERVER 協定的伺服器，收發都能走它。",
-  "acnLinkSwitch": "同時連線 APRSNETCN",
+  "acnLinkSwitch": "APRSNETCN",
   "acnLinkStatus": "連線狀態",
-  "acnLinkNote": "報文從「發送渠道」選中的那條發。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。",
+  "acnLinkNote": "報文從你在鏈路卡片上勾選的那條發。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。",
   "acnAccountNote": "伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。",
   "packetSrcAcn": "APRSNETCN",
   "acnLoginTitle": "登入",
@@ -4798,5 +4798,7 @@
   "translateProviderBiliDesc": "免金鑰，免費。B 站公開的翻譯模型，公共介面不保證一直可用。",
   "translateBiliUrl": "介面位址",
   "translateBiliModel": "模型",
-  "translateBiliTip": "公共介面可能限流。自己部署時把位址和模型換成自己的。"
+  "translateBiliTip": "公共介面可能限流。自己部署時把位址和模型換成自己的。",
+  "txSourcePick": "用這條鏈路發送",
+  "acnPasscodeHint": "留空就用 APRS-IS 那條鏈路的 passcode"
 }

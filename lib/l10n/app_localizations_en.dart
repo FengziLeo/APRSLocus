@@ -9539,13 +9539,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get acnCardSubtitle => "A server built on the APRSNETCN SERVER protocol. It carries traffic both ways.";
 
   @override
-  String get acnLinkSwitch => "Also connect to APRSNETCN";
+  String get acnLinkSwitch => "APRSNETCN";
 
   @override
   String get acnLinkStatus => "Second link";
 
   @override
-  String get acnLinkNote => "Messages go out on the link picked under Send channel. Stations heard here are marked as coming from the server and are never gatewayed.";
+  String get acnLinkNote => "Messages go out on the link you ticked on its card. Stations heard here are marked as coming from the server and are never gatewayed.";
 
   @override
   String get acnAccountNote => "Account and password issued by the server. Leave both empty to receive on the passcode alone.";
@@ -9636,5 +9636,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get translateBiliTip => "The public endpoint may rate-limit. Point the address and model at your own deployment if you run one.";
+
+  @override
+  String get txSourcePick => "Send on this link";
+
+  @override
+  String get acnPasscodeHint => "Leave it empty to use the APRS-IS link's passcode";
 
 }

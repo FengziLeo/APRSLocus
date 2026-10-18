@@ -2273,22 +2273,19 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           icon: Icons.wifi_rounded,
           color: C.purple,
           body: Column(children: [
-            // ⓪ 两条互联网链路：APRS-IS 与 APRSNETCN SERVER 各一张自己的卡。
-            //    用户：「netcn 是等价 is」—— 两条都是「一条 TCP 登录」（自己的
-            //    地址、账号、过滤器），不是主链路旁边挂的一个开关，所以形状也一致。
+            // ⓪ 两条互联网链路，一张卡一条：APRS-IS、APRSNETCN SERVER。
+            //    用户：「netcn 是等价 is」—— 两条都是「一条 TCP 登录」，各有自己的
+            //    地址、端口、凭证、过滤器，也各自能当发射链路。所以这里的形状是
+            //    「链路卡 + 筛选卡」× 2，谁也不挂在谁下面。
             _connectionCard(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             _filterCard(),
-            const SizedBox(height: 16),
-            _storageCard(),
             if (tcpLinkPlatformSupported) ...[
               const SizedBox(height: 16),
               AcnCards(state: st),
             ],
             const SizedBox(height: 16),
-            // 报文从哪条链路发出：两条都在线时只走选中的那条，同一条消息不会
-            // 在两台服务器上各出现一次。
-            _txChannelCard(),
+            _storageCard(),
             const SizedBox(height: 16),
             // ① 指路：电台那几条（TNC / WLAN 电台 / 声卡 / PKWDWPL）仍在
             //    「设置 → 设备」里启用（用户反馈三处重复「感觉乱套了」，
@@ -2317,33 +2314,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     });
   }
 
-  /// 报文从哪条链路发出：两条都在线时二选一。
-  ///
-  /// 在线与发射是两件事：两条链路可以同时在线、各收各的，但报文只从选中的
-  /// 那条走 —— 两条一起发，同一条消息会在两台服务器上各出现一次。
-  Widget _txChannelCard() {
-    final s = S.of(context);
-    return SettingsSectionCard(
-      title: s.txChannel,
-      subtitle: s.txChannelHint,
-      icon: Icons.send_rounded,
-      color: C.cyan,
-      children: [
-        SettingsChoice<String>(
-          s.sourceGroupInternet,
-          value: st.txChannel,
-          options: [
-            AppState.txChanAprsIs,
-            if (tcpLinkPlatformSupported) AppState.txChanAcn,
-          ],
-          labelOf: (v) =>
-              v == AppState.txChanAcn ? s.acnCardTitle : s.dataSourceAprsIs,
-          onChanged: st.setTxChannel,
-        ),
-      ],
-    );
-  }
-
   /// APRS-IS 连接卡片。
   /// 原先拆成「服务器（连接状态）」+「服务器配置」两张卡，标题都指向服务器、
   /// 语义重复；现合并为一张：连接状态 → 服务器参数 → 配置变更提示。
@@ -2362,11 +2332,9 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           color: C.purple,
           onChanged: (v) => st.toggleSource(AppState.srcAprsIs, v),
         ),
-        _connBanner(),
-        Divider(height: 1, color: C.border),
         SettingsRow2(S.of(context).connection,
-            localizedConnectionInfo(context, st.connInfo)),
-        Divider(height: 1, color: C.border),
+            localizedConnectionInfo(context, st.connInfo),
+            valueColor: st.isUp(AppState.srcAprsIs) ? C.green : C.grey),
         _serverInput(),
         SettingsInput(S.of(context).port, _port,
             onChanged: (v) {
@@ -2375,6 +2343,11 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
           _checkConfigDirty();
         }),
         _passcodeInput(),
+        SettingsTxPick(
+          S.of(context).txSourcePick,
+          checked: st.dataSource == AppState.srcAprsIs,
+          onTap: () => st.setTxSource(AppState.srcAprsIs),
+        ),
         SettingsInput(S.of(context).wsUrlOptional, _ws,
             onChanged: (v) {
           st.aprs.wsUrl = v.trim().isEmpty ? null : v.trim();
@@ -2553,6 +2526,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     // 让用户以为另一条没在工作），并标出发射是哪条。
     final names = <String>[
       if (st.aprsIsOn) 'APRS-IS',
+      if (st.acnOn) S.of(context).acnCardTitle,
       if (st.tncOn) S.of(context).dataSourceTnc,
       if (st.icomLanOn) S.of(context).icomLanTitle,
       if (st.audioDeviceOn) S.of(context).dataSourceAudio,
@@ -2561,6 +2535,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
     ];
     final txIdx = [
       if (st.aprsIsOn) AppState.srcAprsIs,
+      if (st.acnOn) AppState.srcAcn,
       if (st.tncOn) AppState.srcTnc,
       if (st.icomLanOn) AppState.srcAudio,
       if (st.audioDeviceOn) AppState.srcAudio,

@@ -173,10 +173,10 @@ const List<BackupGroupSpec> kBackupGroups = [
     // 名单账号口令（APRSNETCN 这类服务器才用得上）：和 passcode 同属「连这台
     // 服务器要带的东西」，换机后重敲一遍最容易出错，所以一并进备份。
     'aprsAccount', 'aprsPassword',
-    // 副链路（APRSNETCN）自己的账号口令与开关：它和主链路是两条连接，
-    // 换机后两个服务器都得重新填，所以一起进备份。
-    'acnAccount', 'acnPassword', 'acnOn', 'acnServer', 'acnPort',
-    'acnFilterRadius', 'acnFilterCalls', 'txChannel',
+    // APRSNETCN 那条互联网链路自己的账号口令与开关：它和 APRS-IS 是两条
+    // 并列的连接，换机后两个服务器都得重新填，所以一起进备份。
+    'acnAccount', 'acnPassword', 'acnPasscode', 'acnOn', 'acnServer', 'acnPort',
+    'acnFilterRadius', 'acnFilterCalls',
     'igateEnabled', 'igateTwoWay',
     'myLat', 'myLng',
     // 链路配置（TNC / 声卡 TNC / PKWDWPL / 小盒子 / 外接 GPS）与各自上次选的设备。

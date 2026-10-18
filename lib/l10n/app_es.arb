@@ -4177,9 +4177,9 @@
   "stationSource": "Origen",
   "acnCardTitle": "APRSNETCN SERVER",
   "acnCardSubtitle": "Servidor basado en el protocolo APRSNETCN SERVER. Lleva tráfico en los dos sentidos.",
-  "acnLinkSwitch": "Conectar también a APRSNETCN",
+  "acnLinkSwitch": "APRSNETCN",
   "acnLinkStatus": "Estado del enlace",
-  "acnLinkNote": "Los mensajes salen por el enlace elegido en Canal de envío. Las estaciones recibidas aquí se marcan como del servidor y no se reenvían.",
+  "acnLinkNote": "Los mensajes salen por el enlace marcado en su tarjeta. Las estaciones recibidas aquí se marcan como del servidor y no se reenvían.",
   "acnAccountNote": "Cuenta y contraseña que emite el servidor. Si se dejan vacías, se recibe solo con el passcode.",
   "packetSrcAcn": "APRSNETCN",
   "acnLoginTitle": "Acceso",
@@ -4210,5 +4210,7 @@
   "translateProviderBiliDesc": "Sin clave y gratis. Modelo público de traducción de Bilibili; sin garantía de disponibilidad.",
   "translateBiliUrl": "Endpoint",
   "translateBiliModel": "Modelo",
-  "translateBiliTip": "El punto público puede limitar el uso. Si tienes tu propio despliegue, pon ahí la dirección y el modelo."
+  "translateBiliTip": "El punto público puede limitar el uso. Si tienes tu propio despliegue, pon ahí la dirección y el modelo.",
+  "txSourcePick": "Enviar por este enlace",
+  "acnPasscodeHint": "Déjalo vacío para usar el passcode del enlace APRS-IS"
 }

@@ -9260,13 +9260,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get acnCardSubtitle => "APRSNETCN SERVER プロトコルに基づくサーバーです。送受信ともこちらで行えます。";
 
   @override
-  String get acnLinkSwitch => "APRSNETCN にも同時接続";
+  String get acnLinkSwitch => "APRSNETCN";
 
   @override
   String get acnLinkStatus => "2 本目の回線";
 
   @override
-  String get acnLinkNote => "送信は「送信チャネル」で選んだ回線から行います。ここで受信した局はサーバー由来として表示され、ゲートウェイ転送は行いません。";
+  String get acnLinkNote => "送信は各回線のカードで選んだ回線から行います。ここで受信した局はサーバー由来として表示され、ゲートウェイ転送は行いません。";
 
   @override
   String get acnAccountNote => "サーバーがホワイトリストの局に発行するアカウントとパスワードです。空欄なら passcode のみで受信します。";
@@ -9357,5 +9357,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get translateBiliTip => "公共の窓口は制限がかかる場合があります。自前で立てる場合はアドレスとモデルを差し替えてください。";
+
+  @override
+  String get txSourcePick => "この回線で送信";
+
+  @override
+  String get acnPasscodeHint => "空欄なら APRS-IS 側の passcode を使います";
 
 }

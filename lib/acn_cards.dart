@@ -32,6 +32,7 @@ class AcnCards extends StatefulWidget {
 class _AcnCardsState extends State<AcnCards> {
   late final TextEditingController _server;
   late final TextEditingController _port;
+  late final TextEditingController _passcode;
   late final TextEditingController _account;
   late final TextEditingController _password;
   late final TextEditingController _radius;
@@ -41,6 +42,7 @@ class _AcnCardsState extends State<AcnCards> {
   /// 保存进页面时的值：只用来判断「改过了、要重连」，不参与连接
   late final String _origServer;
   late final int _origPort;
+  late final String _origPasscode;
   late final String _origAccount;
   late final String _origPassword;
   late final int _origRadius;
@@ -54,11 +56,13 @@ class _AcnCardsState extends State<AcnCards> {
     super.initState();
     _server = TextEditingController(text: st.acnServer);
     _port = TextEditingController(text: '${st.acnPort}');
+    _passcode = TextEditingController(text: st.acnPasscode);
     _account = TextEditingController(text: st.acnAccount);
     _password = TextEditingController(text: st.acnPassword);
     _radius = TextEditingController(text: '${st.acnFilterRadius}');
     _origServer = st.acnServer;
     _origPort = st.acnPort;
+    _origPasscode = st.acnPasscode;
     _origAccount = st.acnAccount;
     _origPassword = st.acnPassword;
     _origRadius = st.acnFilterRadius;
@@ -71,6 +75,7 @@ class _AcnCardsState extends State<AcnCards> {
   void dispose() {
     _server.dispose();
     _port.dispose();
+    _passcode.dispose();
     _account.dispose();
     _password.dispose();
     _radius.dispose();
@@ -83,6 +88,7 @@ class _AcnCardsState extends State<AcnCards> {
   void _touched() {
     final dirty = st.acnServer != _origServer ||
         st.acnPort != _origPort ||
+        st.acnPasscode != _origPasscode ||
         st.acnAccount != _origAccount ||
         st.acnPassword != _origPassword ||
         st.acnFilterRadius != _origRadius ||
@@ -165,7 +171,20 @@ class _AcnCardsState extends State<AcnCards> {
           if (n != null && n > 0 && n <= 65535) st.acnPort = n;
           _touched();
         }),
+        SettingsInput(s.passcode, _passcode,
+            hint: s.acnPasscodeHint,
+            onChanged: (v) {
+          st.acnPasscode = v.trim();
+          _touched();
+        }),
         _accountInputs(s),
+        // 与 APRS-IS 那张卡同一行：勾上就是这条链路发。没连上也能先选好，
+        // 连上就按这个发；另一条不会顶上来。
+        SettingsTxPick(
+          s.txSourcePick,
+          checked: st.dataSource == AppState.srcAcn,
+          onTap: () => st.setTxSource(AppState.srcAcn),
+        ),
         if (_dirty) _reconnectRow(s),
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),

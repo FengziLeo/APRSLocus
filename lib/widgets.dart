@@ -407,6 +407,9 @@ class SourceBadge extends StatelessWidget {
     } else if (v == AppState.srcPkwdwpl) {
       label = 'PKWDWPL';
       c = C.orange;
+    } else if (v == AppState.srcAcn) {
+      label = s.packetSrcAcn;
+      c = C.cyan;
     } else if (v == AppState.srcAprsIs) {
       label = s.dataSourceAprsIs;
       c = C.blue;

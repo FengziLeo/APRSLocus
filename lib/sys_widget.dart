@@ -37,9 +37,9 @@ const int _cOff = 0xFF94A3B8; // 未启用
 /// 一条链路在组件上的展示（名字 + 状态文案 + 状态色）
 typedef SysLinkTile = ({String name, String state, int color});
 
-/// 四条链路的展示数据。
+/// 每条链路的展示数据。
 ///
-/// 顺序是**固定的**（APRS-IS / TNC / 音频 / PKWDWPL），不按状态排序 ——
+/// 顺序是**固定的**（APRS-IS / APRSNETCN / TNC / 音频 / PKWDWPL），不按状态排序 ——
 /// 位置固定用户才能「一眼扫到那条我想看的」；按状态排序会让每次刷新后
 /// 位置都变，反而更难读。
 List<SysLinkTile> sysLinkTiles(AppState st, AppLocalizations s) {
@@ -57,6 +57,7 @@ List<SysLinkTile> sysLinkTiles(AppState st, AppLocalizations s) {
 
   return [
     one(AppState.srcAprsIs, 'APRS-IS'),
+    one(AppState.srcAcn, 'APRSNETCN'),
     one(AppState.srcTnc, 'TNC'),
     one(AppState.srcAudio,
         st.icomLanOn ? st.audio.config.icomLan.model.id : s.sysLinkAudio),

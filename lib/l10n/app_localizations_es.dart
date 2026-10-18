@@ -9598,13 +9598,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get acnCardSubtitle => "Servidor basado en el protocolo APRSNETCN SERVER. Lleva tráfico en los dos sentidos.";
 
   @override
-  String get acnLinkSwitch => "Conectar también a APRSNETCN";
+  String get acnLinkSwitch => "APRSNETCN";
 
   @override
   String get acnLinkStatus => "Segundo enlace";
 
   @override
-  String get acnLinkNote => "Los mensajes salen por el enlace elegido en Canal de envío. Las estaciones recibidas aquí se marcan como del servidor y no se reenvían.";
+  String get acnLinkNote => "Los mensajes salen por el enlace marcado en su tarjeta. Las estaciones recibidas aquí se marcan como del servidor y no se reenvían.";
 
   @override
   String get acnAccountNote => "Cuenta y contraseña que emite el servidor. Si se dejan vacías, se recibe solo con el passcode.";
@@ -9695,5 +9695,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get translateBiliTip => "El punto público puede limitar el uso. Si tienes tu propio despliegue, pon ahí la dirección y el modelo.";
+
+  @override
+  String get txSourcePick => "Enviar por este enlace";
+
+  @override
+  String get acnPasscodeHint => "Déjalo vacío para usar el passcode del enlace APRS-IS";
 
 }

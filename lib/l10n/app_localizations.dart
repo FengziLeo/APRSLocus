@@ -16875,6 +16875,18 @@ abstract class AppLocalizations {
   /// **'公共接口可能限流。自己部署时把地址和模型换成自己的。'**
   String get translateBiliTip;
 
+  /// No description provided for @txSourcePick.
+  ///
+  /// In zh, this message translates to:
+  /// **'用这条链路发送'**
+  String get txSourcePick;
+
+  /// No description provided for @acnPasscodeHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'留空就用 APRS-IS 那条链路的 passcode'**
+  String get acnPasscodeHint;
+
 }
 
 class _AppLocalizationsDelegate

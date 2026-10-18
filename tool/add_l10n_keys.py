@@ -54,6 +54,17 @@ KEYS = {
         '接口地址', '介面位址', 'Endpoint', 'エンドポイント', 'Endpoint', 'Endpoint'),
     'translateBiliModel': (
         '模型', '模型', 'Model', 'モデル', 'Modelo', 'Model'),
+    # ── 两条互联网链路：每张卡上一个「用这条链路发送」 ──
+    'acnPasscodeHint': (
+        '留空就用 APRS-IS 那条链路的 passcode',
+        '留空就用 APRS-IS 那條鏈路的 passcode',
+        "Leave it empty to use the APRS-IS link's passcode",
+        '空欄なら APRS-IS 側の passcode を使います',
+        'Déjalo vacío para usar el passcode del enlace APRS-IS',
+        'Kosongkan untuk memakai passcode tautan APRS-IS'),
+    'txSourcePick': (
+        '用这条链路发送', '用這條鏈路發送', 'Send on this link',
+        'この回線で送信', 'Enviar por este enlace', 'Kirim lewat tautan ini'),
     'translateBiliTip': (
         '公共接口可能限流。自己部署时把地址和模型换成自己的。',
         '公共介面可能限流。自己部署時把位址和模型換成自己的。',

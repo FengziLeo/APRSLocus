@@ -9549,13 +9549,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get acnCardSubtitle => "Server berbasis protokol APRSNETCN SERVER. Bisa mengirim dan menerima.";
 
   @override
-  String get acnLinkSwitch => "Hubungkan juga ke APRSNETCN";
+  String get acnLinkSwitch => "APRSNETCN";
 
   @override
   String get acnLinkStatus => "Tautan kedua";
 
   @override
-  String get acnLinkNote => "Pesan dikirim lewat tautan yang dipilih di Kanal kirim. Stasiun yang diterima di sini ditandai berasal dari server dan tidak diteruskan.";
+  String get acnLinkNote => "Pesan dikirim lewat tautan yang ditandai di kartunya. Stasiun yang diterima di sini ditandai berasal dari server dan tidak diteruskan.";
 
   @override
   String get acnAccountNote => "Akun dan kata sandi dari server. Kosongkan keduanya untuk menerima dengan passcode saja.";
@@ -9646,5 +9646,11 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get translateBiliTip => "Endpoint publik bisa membatasi permintaan. Kalau kamu punya deployment sendiri, isi alamat dan model itu.";
+
+  @override
+  String get txSourcePick => "Kirim lewat tautan ini";
+
+  @override
+  String get acnPasscodeHint => "Kosongkan untuk memakai passcode tautan APRS-IS";
 
 }

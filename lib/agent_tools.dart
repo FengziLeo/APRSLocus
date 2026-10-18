@@ -313,7 +313,8 @@ final List<AgentToolSpec> kAgentTools = [
   const AgentToolSpec(
     name: 'set_connection_source',
     description:
-        'Enable or disable a link source (aprsis, tnc, audio, pkwdwpl, spp); call '
+        'Enable or disable a link source (aprsis, acn, tnc, audio, pkwdwpl, '
+        'spp); call '
         '"connect" to actually bring links up.',
     mutating: true,
     parameters: {
@@ -321,7 +322,7 @@ final List<AgentToolSpec> kAgentTools = [
       'properties': {
         'source': {
           'type': 'string',
-          'description': 'aprsis, tnc, audio, pkwdwpl or spp.',
+          'description': 'aprsis, acn, tnc, audio, pkwdwpl or spp.',
         },
         'enabled': {
           'type': 'boolean',
@@ -1090,12 +1091,14 @@ Future<AgentToolOutcome> executeAgentTool(
           'user_disconnected': st.userDisconnected,
           'server': st.aprs.server,
           'port': st.aprs.port,
-          // 第二条链路不是可选的数据来源（它只是往同一个网络里多发一份），
-          // 所以不进下面的 sources，只报它开没开、连没连上。
+          // APRSNETCN 与 APRS-IS 并列：它同样是可选的数据来源与发射链路，
+          // 所以跟其它来源一起列出来。
           'acn_on': st.acnOn,
           'acn_connected': st.acnConnected,
+          'tx_source': st.dataSource,
           'sources': {
             'aprsis': st.aprsIsOn,
+            'acn': st.acnOn,
             'tnc': st.tncOn,
             'audio': st.audioOn,
             'pkwdwpl': st.pkwdwplOn,
@@ -2024,7 +2027,7 @@ Future<AgentToolOutcome> executeAgentTool(
         final src = _val(args, 'source').trim().toLowerCase();
         final on = _asBool(args['enabled']);
         if (on == null) return _err('"enabled" must be true or false.');
-        const valid = {'aprsis', 'tnc', 'audio', 'pkwdwpl', 'spp'};
+        const valid = {'aprsis', 'acn', 'tnc', 'audio', 'pkwdwpl', 'spp'};
         if (!valid.contains(src)) {
           return _err('source must be one of ${valid.join(', ')}.');
         }

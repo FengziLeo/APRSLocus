@@ -4177,9 +4177,9 @@
   "stationSource": "ソース",
   "acnCardTitle": "APRSNETCN SERVER",
   "acnCardSubtitle": "APRSNETCN SERVER プロトコルに基づくサーバーです。送受信ともこちらで行えます。",
-  "acnLinkSwitch": "APRSNETCN にも同時接続",
+  "acnLinkSwitch": "APRSNETCN",
   "acnLinkStatus": "回線の状態",
-  "acnLinkNote": "送信は「送信チャネル」で選んだ回線から行います。ここで受信した局はサーバー由来として表示され、ゲートウェイ転送は行いません。",
+  "acnLinkNote": "送信は各回線のカードで選んだ回線から行います。ここで受信した局はサーバー由来として表示され、ゲートウェイ転送は行いません。",
   "acnAccountNote": "サーバーがホワイトリストの局に発行するアカウントとパスワードです。空欄なら passcode のみで受信します。",
   "packetSrcAcn": "APRSNETCN",
   "acnLoginTitle": "ログイン",
@@ -4210,5 +4210,7 @@
   "translateProviderBiliDesc": "キー不要で無料。Bilibili が公開している翻訳モデル。公共の窓口なので可用性は保証されません。",
   "translateBiliUrl": "エンドポイント",
   "translateBiliModel": "モデル",
-  "translateBiliTip": "公共の窓口は制限がかかる場合があります。自前で立てる場合はアドレスとモデルを差し替えてください。"
+  "translateBiliTip": "公共の窓口は制限がかかる場合があります。自前で立てる場合はアドレスとモデルを差し替えてください。",
+  "txSourcePick": "この回線で送信",
+  "acnPasscodeHint": "空欄なら APRS-IS 側の passcode を使います"
 }

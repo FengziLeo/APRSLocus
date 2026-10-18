@@ -505,8 +505,58 @@ class SettingsRow2 extends StatelessWidget {
   }
 }
 
-/// 可点击的设置行（进入子页面）
+/// 「用这条链路发送」单选行。
 ///
+/// 两条互联网链路各一张卡，这一行让每张卡都能把发送切到自己：
+/// 勾选就是这条链路发，不勾就是别人发。没连上的链路照样可以先选好，
+/// 连上就按这个发出 —— 与射频链路那张卡的圆点同一套语义。
+class SettingsTxPick extends StatelessWidget {
+  final String label;
+  final bool checked;
+  final bool enabled;
+  final VoidCallback onTap;
+  const SettingsTxPick(
+    this.label, {
+    super.key,
+    required this.checked,
+    required this.onTap,
+    this.enabled = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: enabled && !checked ? onTap : null,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: C.border, width: 0.4))),
+        child: Row(children: [
+          Icon(
+            checked
+                ? Icons.radio_button_checked_rounded
+                : Icons.radio_button_unchecked_rounded,
+            size: 18,
+            color: !enabled ? C.greyLight : (checked ? C.orange : C.grey),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: ts(12, c: enabled ? C.slate : C.greyLight),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          if (checked)
+            Text(S.of(context).dataSourceTxBadge,
+                style: ts(10, c: C.orange, w: FontWeight.w700)),
+        ]),
+      ),
+    );
+  }
+}
+
+/// 可点击的设置行（进入子页面）
 /// 与 [SettingsRow2] 的区别：这里带图标与副标题、且整行可点，
 /// 用于「离线地图」这类需要交代清楚「点进去能干什么」的入口 ——
 /// 只写一个名词的入口，用户得点进去才知道里面是什么。

@@ -9160,13 +9160,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get acnCardSubtitle => "基于 APRSNETCN SERVER 协议的服务器，收发都能走它。";
 
   @override
-  String get acnLinkSwitch => "同时连接 APRSNETCN";
+  String get acnLinkSwitch => "APRSNETCN";
 
   @override
   String get acnLinkStatus => "第二条链路";
 
   @override
-  String get acnLinkNote => "报文从「发送渠道」选中的那条发。这条链路收来的台站会标成来自服务器，也不做网关转递。";
+  String get acnLinkNote => "报文从你在链路卡片上勾选的那条发。这条链路收来的台站会标成来自服务器，也不做网关转递。";
 
   @override
   String get acnAccountNote => "服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。";
@@ -9257,6 +9257,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get translateBiliTip => "公共接口可能限流。自己部署时把地址和模型换成自己的。";
+
+  @override
+  String get txSourcePick => "用这条链路发送";
+
+  @override
+  String get acnPasscodeHint => "留空就用 APRS-IS 那条链路的 passcode";
 
 }
 
@@ -18415,13 +18421,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get acnCardSubtitle => "基於 APRSNETCN SERVER 協定的伺服器，收發都能走它。";
 
   @override
-  String get acnLinkSwitch => "同時連線 APRSNETCN";
+  String get acnLinkSwitch => "APRSNETCN";
 
   @override
   String get acnLinkStatus => "第二條鏈路";
 
   @override
-  String get acnLinkNote => "報文從「發送渠道」選中的那條發。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。";
+  String get acnLinkNote => "報文從你在鏈路卡片上勾選的那條發。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。";
 
   @override
   String get acnAccountNote => "伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。";
@@ -18512,5 +18518,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get translateBiliTip => "公共介面可能限流。自己部署時把位址和模型換成自己的。";
+
+  @override
+  String get txSourcePick => "用這條鏈路發送";
+
+  @override
+  String get acnPasscodeHint => "留空就用 APRS-IS 那條鏈路的 passcode";
 
 }

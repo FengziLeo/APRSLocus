@@ -197,6 +197,7 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
     final rows = <Widget>[];
     for (final src in [
       AppState.srcAprsIs,
+      AppState.srcAcn,
       AppState.srcTnc,
       AppState.srcAudio,
       AppState.srcPkwdwpl,
@@ -208,17 +209,18 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
       final isIcom = src == AppState.srcAudio &&
           state.audio.config.source == AudioSource.icomLan;
       final radioModel = state.audio.config.icomLan.model;
-      final name = src == AppState.srcAprsIs
-          ? s.dataSourceAprsIs
-          : (src == AppState.srcTnc
-              ? s.dataSourceTnc
-              : (src == AppState.srcAudio
-                  ? (isIcom ? 'WLAN 电台（${radioModel.id}）' : s.dataSourceAudio)
-                  : (src == AppState.srcPkwdwpl
-                      ? s.dataSourcePkwdwpl
-                      : s.dataSourceNmeaGps)));
+      final name = switch (src) {
+        AppState.srcAprsIs => s.dataSourceAprsIs,
+        AppState.srcAcn => s.acnCardTitle,
+        AppState.srcTnc => s.dataSourceTnc,
+        AppState.srcAudio =>
+          isIcom ? 'WLAN 电台（${radioModel.id}）' : s.dataSourceAudio,
+        AppState.srcPkwdwpl => s.dataSourcePkwdwpl,
+        _ => s.dataSourceNmeaGps,
+      };
       final detail = switch (src) {
         AppState.srcAprsIs => '${state.aprs.server}:${state.aprs.port}',
+        AppState.srcAcn => '${state.acnServer}:${state.acnPort}',
         AppState.srcTnc => state.tnc.device?.label ?? s.tncNotBound,
         AppState.srcPkwdwpl =>
           state.pkwdwpl.device?.label ?? s.tncNotBound,
@@ -232,6 +234,7 @@ class _DeviceOverviewPageState extends State<DeviceOverviewPage> {
       };
       final stats = switch (src) {
         AppState.srcAprsIs => s.notifRx('${state.packetsRx}'),
+        AppState.srcAcn => s.notifRx('${state.acnRx}'),
         AppState.srcTnc => s.tncStats(
             '${state.tnc.rxFrames}', '${state.tnc.txFrames}'),
         AppState.srcPkwdwpl => s.pkwdwplStats('${state.pkwdwpl.rxFrames}'),

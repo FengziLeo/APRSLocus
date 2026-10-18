@@ -124,13 +124,12 @@ class DataSourceCard extends StatelessWidget {
         if (tcpLinkPlatformSupported)
           _tile(
             context,
-            key: 'acn',
+            key: AppState.srcAcn,
             title: s.acnCardTitle,
             desc: s.acnCardSubtitle,
             icon: Icons.hub_rounded,
             enabled: state.acnOn,
             up: state.acnConnected,
-            canTx: false,
             onToggle: (on) => state.setAcnOn(on),
             onConfigure: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => AcnLinkPage(state: state)),

@@ -77,9 +77,8 @@ object NotifHelper {
             .setContentTitle(title)
             .setContentText(text)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setLargeIcon(android.graphics.BitmapFactory.decodeResource(
-                context.resources, R.mipmap.ic_launcher))
+            .setSmallIcon(R.drawable.ic_stat_aprs)
+            .setLargeIcon(notifLargeIcon(context))
             .setContentIntent(pi)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_MAX)
@@ -118,9 +117,8 @@ object NotifHelper {
             .setContentTitle("📻 $from")
             .setContentText(text)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setLargeIcon(android.graphics.BitmapFactory.decodeResource(
-                context.resources, R.mipmap.ic_launcher))
+            .setSmallIcon(R.drawable.ic_stat_aprs)
+            .setLargeIcon(notifLargeIcon(context))
             .setContentIntent(pi)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -710,6 +708,25 @@ class LocationService : Service() {
     }
 }
 
+/// 通知的大图标：启动图标裁成圆形后的那份（drawable-nodpi/ic_notif_large.png）。
+///
+/// 为什么不直接用 `R.mipmap.ic_launcher`：它是整块深蓝底、四角还带半透明黑，
+/// 当大图标贴进通知面板就是一个发脏的黑方块。裁圆后剩下的就是 APP 自己那张脸。
+/// 解码结果缓存一份 —— 通知刷得很密，每 15 秒都要重建。
+private var notifLargeCache: android.graphics.Bitmap? = null
+
+private fun notifLargeIcon(ctx: Context): android.graphics.Bitmap {
+    notifLargeCache?.let { return it }
+    val b = try {
+        android.graphics.BitmapFactory.decodeResource(
+            ctx.resources, R.drawable.ic_notif_large)
+    } catch (_: Throwable) {
+        null
+    } ?: android.graphics.Bitmap.createBitmap(1, 1, android.graphics.Bitmap.Config.ARGB_8888)
+    notifLargeCache = b
+    return b
+}
+
 /// 常驻通知的唯一构造点。
 ///
 /// 服务发通知、诊断量能力都用它：诊断如果自己另拼一条，测的就不是真正出去的那条。
@@ -755,11 +772,10 @@ private fun ongoingNotification(
     val builder = NotificationCompat.Builder(ctx, LocationService.CHANNEL_ID)
         .setContentTitle("APRSlocus")
         .setContentText(text)
-        // 小图标用 APP 自己的单色剪影（状态栏与实时更新的胶囊只看它），
-        // 大图标用启动图标，展开时就是 APP 的脸。
-        .setSmallIcon(R.mipmap.ic_launcher)
-        .setLargeIcon(android.graphics.BitmapFactory.decodeResource(
-            ctx.resources, R.mipmap.ic_launcher))
+        // 小图标用单色剪影（状态栏与实时更新的胶囊只看它）；大图标用启动图标的圆形版
+        // —— 启动图是整块深蓝底、四角还带半透明黑，原样贴进通知面板就是个发脏的方块。
+        .setSmallIcon(R.drawable.ic_stat_aprs)
+        .setLargeIcon(notifLargeIcon(ctx))
         .setContentIntent(pendingIntent)
         .setOngoing(true)
         .setSilent(true)

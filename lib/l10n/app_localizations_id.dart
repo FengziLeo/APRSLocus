@@ -9627,12 +9627,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get acnFilterCallsHint => "Panggilan, tekan enter";
 
   @override
-  String get txChannels => "Kanal transmisi";
+  String get txChannel => "Kanal kirim";
 
   @override
-  String get txChannelsHint => "Setiap tautan yang dicentang mengirim satu salinan. Minimal satu tetap aktif.";
-
-  @override
-  String get txOneChannelMin => "Sisakan setidaknya satu tautan transmisi";
+  String get txChannelHint => "Paket hanya dikirim lewat tautan ini.";
 
 }

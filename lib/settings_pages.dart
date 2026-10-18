@@ -2379,50 +2379,25 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
             ),
           ),
         ],
-        // 发射渠道：在线与发射是两件事。两条都勾就是各发一份，只勾一条就
-        // 只从它发（最后一条不允许取消，见 AppState.setTxAprsIs）。
-        Container(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
-          alignment: Alignment.centerLeft,
-          child: Text(s.txChannels, style: ts(12, c: C.slate)),
+        // 在线与发射是两件事：两条链路都可以在线，报文只从选中的那条走。
+        // 用户「发消息只选一种渠道」：两条一起发，同一条消息会在两台服务器
+        // 各出现一次。
+        SettingsChoice<String>(
+          s.txChannel,
+          value: st.txChannel,
+          options: [
+            AppState.txChanAprsIs,
+            if (tcpLinkPlatformSupported) AppState.txChanAcn,
+          ],
+          labelOf: (v) =>
+              v == AppState.txChanAcn ? s.acnCardTitle : s.dataSourceAprsIs,
+          onChanged: st.setTxChannel,
         ),
-        SettingsSwitch(s.dataSourceAprsIs,
-            value: st.txAprsIs,
-            color: C.purple,
-            onChanged: (v) {
-          if (!v && !st.txAcn) {
-            _toastLastChannel();
-            return;
-          }
-          st.setTxAprsIs(v);
-        }),
-        if (tcpLinkPlatformSupported)
-          SettingsSwitch(s.acnCardTitle,
-              value: st.txAcn,
-              color: C.purple,
-              onChanged: (v) {
-            if (!v && !st.txAprsIs) {
-              _toastLastChannel();
-              return;
-            }
-            st.setTxAcn(v);
-          }),
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 4, 14, 12),
-          child: Text(s.txChannelsHint, style: ts(10, c: C.grey)),
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+          child: Text(s.txChannelHint, style: ts(10, c: C.grey)),
         ),
       ],
-    );
-  }
-
-  /// 两条发射渠道都取消时给一句实在话：开关会在原处弹回去，不说清楚会
-  /// 以为它没反应。
-  void _toastLastChannel() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(S.of(context).txOneChannelMin),
-        behavior: SnackBarBehavior.floating,
-      ),
     );
   }
 

@@ -9338,12 +9338,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get acnFilterCallsHint => "コールサイン、Enter で追加";
 
   @override
-  String get txChannels => "送信チャネル";
+  String get txChannel => "送信経路";
 
   @override
-  String get txChannelsHint => "チェックした回線がそれぞれ 1 通ずつ送ります。少なくとも 1 つは残します。";
-
-  @override
-  String get txOneChannelMin => "送信回線は 1 つ以上残してください";
+  String get txChannelHint => "パケットはこの 1 回線だけから送ります。";
 
 }

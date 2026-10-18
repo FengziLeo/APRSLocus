@@ -36,25 +36,19 @@ CLASSES = {
 
 # ── 要加的键：key → (zh, zh_TW, en, ja, es, id) ──
 KEYS = {
-    # ── 发射渠道：两条互联网链路各一个开关 ──
+    # ── 发送渠道：两条互联网链路只选一条 ──
     #
-    # 在线与发射是两件事：两条链路可以同时在线，各自勾选是否发报文，
-    # 但至少留一条（全关等于这台机器不发）。
-    'txChannels': (
-        '发射渠道', '發射渠道', 'Transmit channels', '送信チャネル',
-        'Canales de emisión', 'Kanal transmisi'),
-    'txChannelsHint': (
-        '勾上的链路各发一份，至少留一条。',
-        '勾上的鏈路各發一份，至少留一條。',
-        'Every ticked link sends a copy. At least one stays on.',
-        'チェックした回線がそれぞれ 1 通ずつ送ります。少なくとも 1 つは残します。',
-        'Cada enlace marcado envía una copia. Al menos uno queda activo.',
-        'Setiap tautan yang dicentang mengirim satu salinan. Minimal satu tetap aktif.'),
-    'txOneChannelMin': (
-        '至少留一条发射链路', '至少留一條發射鏈路',
-        'Keep at least one transmit link', '送信回線は 1 つ以上残してください',
-        'Deja al menos un enlace de emisión',
-        'Sisakan setidaknya satu tautan transmisi'),
+    # 在线与发射是两件事：两条链路可以同时在线，报文只从选中的那条走。
+    'txChannel': (
+        '发送渠道', '發送渠道', 'Send channel', '送信経路',
+        'Canal de envío', 'Kanal kirim'),
+    'txChannelHint': (
+        '报文只从这一条发。',
+        '報文只從這一條發。',
+        'Packets go out on this link only.',
+        'パケットはこの 1 回線だけから送ります。',
+        'Los paquetes salen solo por este enlace.',
+        'Paket hanya dikirim lewat tautan ini.'),
 }
 
 META = {

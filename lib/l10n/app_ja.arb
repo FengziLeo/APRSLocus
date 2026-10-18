@@ -4204,7 +4204,6 @@
   "acnFilterRadius": "半径（km）",
   "acnFilterCalls": "このコールサインも",
   "acnFilterCallsHint": "コールサイン、Enter で追加",
-  "txChannels": "送信チャネル",
-  "txChannelsHint": "チェックした回線がそれぞれ 1 通ずつ送ります。少なくとも 1 つは残します。",
-  "txOneChannelMin": "送信回線は 1 つ以上残してください"
+  "txChannel": "送信経路",
+  "txChannelHint": "パケットはこの 1 回線だけから送ります。"
 }

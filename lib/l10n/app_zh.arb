@@ -4883,7 +4883,6 @@
   "acnFilterRadius": "半径（公里）",
   "acnFilterCalls": "再加上这些呼号",
   "acnFilterCallsHint": "呼号，按回车加上",
-  "txChannels": "发射渠道",
-  "txChannelsHint": "勾上的链路各发一份，至少留一条。",
-  "txOneChannelMin": "至少留一条发射链路"
+  "txChannel": "发送渠道",
+  "txChannelHint": "报文只从这一条发。"
 }

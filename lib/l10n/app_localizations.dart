@@ -16830,23 +16830,20 @@ abstract class AppLocalizations {
   /// **'呼号，按回车加上'**
   String get acnFilterCallsHint;
 
-  /// No description provided for @txChannels.
-  ///
-  /// In zh, this message translates to:
-  /// **'发射渠道'**
-  String get txChannels;
 
-  /// No description provided for @txChannelsHint.
-  ///
-  /// In zh, this message translates to:
-  /// **'勾上的链路各发一份，至少留一条。'**
-  String get txChannelsHint;
 
-  /// No description provided for @txOneChannelMin.
+
+  /// No description provided for @txChannel.
   ///
   /// In zh, this message translates to:
-  /// **'至少留一条发射链路'**
-  String get txOneChannelMin;
+  /// **'发送渠道'**
+  String get txChannel;
+
+  /// No description provided for @txChannelHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'报文只从这一条发。'**
+  String get txChannelHint;
 
 }
 

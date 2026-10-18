@@ -4204,7 +4204,6 @@
   "acnFilterRadius": "Radius (km)",
   "acnFilterCalls": "Juga panggilan ini",
   "acnFilterCallsHint": "Panggilan, tekan enter",
-  "txChannels": "Kanal transmisi",
-  "txChannelsHint": "Setiap tautan yang dicentang mengirim satu salinan. Minimal satu tetap aktif.",
-  "txOneChannelMin": "Sisakan setidaknya satu tautan transmisi"
+  "txChannel": "Kanal kirim",
+  "txChannelHint": "Paket hanya dikirim lewat tautan ini."
 }

@@ -180,6 +180,9 @@ class MainActivity : FlutterActivity() {
                     LocationService.setModeStatic(mode)
                     result.success(true)
                 }
+                "notifDiag" -> {
+                    result.success(diag(this))
+                }
                 "updateNotification" -> {
                     val text = call.argument<String>("text") ?: "APRSlocus 运行中"
                     val short = call.argument<String>("short") ?: ""

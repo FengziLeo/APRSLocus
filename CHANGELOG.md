@@ -1,5 +1,29 @@
 # 更新日志
 
+## [2.1.19] - 2026-10-18
+
+### 通知
+
+- **显示页多一个「通知诊断」**：把本机的系统版本、机型、实时更新与焦点通知
+  相关的那几个系统方法有没有、允不允许，一次列出来，可以复制。
+- 实时更新不再被「能力查询」一票否决：以前那个查询方法本身也可能不存在，
+  缺它就把所有设备都挡住了。现在只要求设置提升的方法存在，提不提由系统决定。
+
+---
+
+## [2.1.19] - 2026-10-18 (English)
+
+### Notifications
+
+- **The display page has a notification check**: it lists the system version, the model,
+  and which of the live-update and focus-notification system methods exist and are
+  allowed. The result can be copied.
+- Live updates no longer depend on the capability query, which itself may be missing and
+  used to block every device. Only the request call has to exist; the system decides.
+
+---
+
+
 ## [2.1.18] - 2026-10-18
 
 ### 通知显示样式

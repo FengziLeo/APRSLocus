@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'theme.dart';
 import 'state.dart';
 import 'models.dart';
@@ -3154,6 +3155,7 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
               _uiMaterialSelector(st),
               _uiLayoutSelector(st),
               _notifStyleSelector(st),
+              _notifDiagRow(st),
               _languageSelector(st),
               _uiScaleSelector(st),
               SettingsRow2(S.of(context).unit, S.of(context).metricUnits),
@@ -3423,6 +3425,62 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  /// 通知诊断：把「这台设备到底支持什么」摆出来。
+  ///
+  /// 实时更新不是一个是/否开关，是四五个系统方法的组合；提不上去时用户只能
+  /// 看到「没反应」，所以给一个能直接读、能复制的自查结果。
+  Widget _notifDiagRow(AppState st) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+      child: Row(children: [
+        Expanded(
+          child: Text(S.of(context).notifDiagDesc,
+              style: ts(10, c: C.grey, h: 1.3)),
+        ),
+        const SizedBox(width: 8),
+        TextButton.icon(
+          onPressed: () => _showNotifDiag(st),
+          icon: const Icon(Icons.bug_report_rounded, size: 15, color: C.blue),
+          label: Text(S.of(context).notifDiag,
+              style: ts(11, w: FontWeight.w700, c: C.blue)),
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Future<void> _showNotifDiag(AppState st) async {
+    final text = await st.loc.notifDiag();
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(ctx).notifDiag),
+        content: SelectableText(
+          text.isEmpty ? S.of(ctx).iosFeatureUnsupported : text,
+          style: mono(11),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: text));
+              Navigator.of(ctx).pop();
+            },
+            child: Text(S.of(ctx).copy),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(S.of(ctx).close),
+          ),
         ],
       ),
     );

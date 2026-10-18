@@ -4812,5 +4812,7 @@
   "notifStyleTitle": "通知顯示樣式",
   "notifStylePlain": "普通常駐通知",
   "notifStylePlainDesc": "通知列裡一條常駐通知，展開看全部文字。",
-  "notifStyleLive": "即時更新"
+  "notifStyleLive": "即時更新",
+  "notifDiag": "通知診斷",
+  "notifDiagDesc": "看這台手機支援不支援即時更新、焦點通知，缺哪一環。"
 }

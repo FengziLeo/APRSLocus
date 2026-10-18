@@ -4224,5 +4224,7 @@
   "notifStyleTitle": "通知の表示スタイル",
   "notifStylePlain": "通常の常駐通知",
   "notifStylePlainDesc": "通知領域に常駐通知が 1 件。開くと全文が読めます。",
-  "notifStyleLive": "リアルタイム更新"
+  "notifStyleLive": "リアルタイム更新",
+  "notifDiag": "通知の診断",
+  "notifDiagDesc": "この端末がリアルタイム更新・焦点通知に対応しているかを見ます。"
 }

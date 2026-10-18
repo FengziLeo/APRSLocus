@@ -4224,5 +4224,7 @@
   "notifStyleTitle": "Notification style",
   "notifStylePlain": "Normal ongoing notification",
   "notifStylePlainDesc": "One ongoing notification in the shade; expand it to read everything.",
-  "notifStyleLive": "Live updates"
+  "notifStyleLive": "Live updates",
+  "notifDiag": "Notification check",
+  "notifDiagDesc": "Shows what this phone supports for live updates and focus notifications."
 }

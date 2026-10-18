@@ -9689,4 +9689,10 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get notifStyleLive => "Pembaruan langsung";
 
+  @override
+  String get notifDiag => "Pemeriksaan notifikasi";
+
+  @override
+  String get notifDiagDesc => "Menampilkan dukungan ponsel ini untuk pembaruan langsung dan notifikasi fokus.";
+
 }

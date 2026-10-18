@@ -419,7 +419,20 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
-        'ver': 'v2.1.18', 'date': '2026-10-18',
+        'ver': 'v2.1.19', 'date': '2026-10-18',
+        'items': [
+            ('fix',
+             T('显示页多一个「通知诊断」，把本机支持到什么程度列成几行，可以复制。'
+               '实时更新不再被缺一个能力查询就整体挡住。',
+               '顯示頁多一個「通知診斷」，把本機支援到什麼程度列成幾行，可以複製。'
+               '即時更新不再被缺一個能力查詢就整體擋住。',
+               'The display page can now list what this phone supports for notifications, '
+               'with copy, and live updates no longer depend on a capability query that may '
+               'be missing.')),
+        ],
+    },
+    {
+        'ver': 'v2.1.18' , 'date': '2026-10-18',
         'items': [
             ('up',
              T('显示页里能选常驻通知的样式：普通常驻通知，或者申请 Android 16 的实时'

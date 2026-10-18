@@ -9679,4 +9679,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notifStyleLive => "Live updates";
 
+  @override
+  String get notifDiag => "Notification check";
+
+  @override
+  String get notifDiagDesc => "Shows what this phone supports for live updates and focus notifications.";
+
 }

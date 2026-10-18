@@ -4903,5 +4903,7 @@
   "notifStyleTitle": "通知显示样式",
   "notifStylePlain": "普通常驻通知",
   "notifStylePlainDesc": "通知栏里一条常驻通知，展开看全部文字。",
-  "notifStyleLive": "实时更新"
+  "notifStyleLive": "实时更新",
+  "notifDiag": "通知诊断",
+  "notifDiagDesc": "看这台手机支持不支持实时更新、焦点通知，缺哪一环。"
 }

@@ -9300,6 +9300,12 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get notifStyleLive => "实时更新";
 
+  @override
+  String get notifDiag => "通知诊断";
+
+  @override
+  String get notifDiagDesc => "看这台手机支持不支持实时更新、焦点通知，缺哪一环。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18596,5 +18602,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get notifStyleLive => "即時更新";
+
+  @override
+  String get notifDiag => "通知診斷";
+
+  @override
+  String get notifDiagDesc => "看這台手機支援不支援即時更新、焦點通知，缺哪一環。";
 
 }

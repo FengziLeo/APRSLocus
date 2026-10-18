@@ -4224,5 +4224,7 @@
   "notifStyleTitle": "Gaya notifikasi",
   "notifStylePlain": "Notifikasi tetap biasa",
   "notifStylePlainDesc": "Satu notifikasi tetap di panel; buka untuk membaca semuanya.",
-  "notifStyleLive": "Pembaruan langsung"
+  "notifStyleLive": "Pembaruan langsung",
+  "notifDiag": "Pemeriksaan notifikasi",
+  "notifDiagDesc": "Menampilkan dukungan ponsel ini untuk pembaruan langsung dan notifikasi fokus."
 }

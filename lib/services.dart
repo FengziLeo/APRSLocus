@@ -353,6 +353,17 @@ class LocService {
     } catch (_) {}
   }
 
+  /// 通知能力自查（Android 专有）：这台机器支不支持实时更新 / 焦点通知，
+  /// 到底缺哪一环。没这个平台就返回空串。
+  Future<String> notifDiag() async {
+    try {
+      final v = await _channel.invokeMethod<String>('notifDiag');
+      return v ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   /// 收到 APRS 消息时发系统通知
   Future<void> showMessageNotification(String from, String text) async {
     try {

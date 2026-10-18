@@ -9738,4 +9738,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get notifStyleLive => "Actualizaciones en vivo";
 
+  @override
+  String get notifDiag => "Comprobación de notificaciones";
+
+  @override
+  String get notifDiagDesc => "Muestra qué admite este teléfono para actualizaciones en vivo y notificaciones de foco.";
+
 }

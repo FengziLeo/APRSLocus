@@ -9400,4 +9400,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get notifStyleLive => "リアルタイム更新";
 
+  @override
+  String get notifDiag => "通知の診断";
+
+  @override
+  String get notifDiagDesc => "この端末がリアルタイム更新・焦点通知に対応しているかを見ます。";
+
 }

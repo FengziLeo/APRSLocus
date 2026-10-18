@@ -4224,5 +4224,7 @@
   "notifStyleTitle": "Estilo de notificación",
   "notifStylePlain": "Notificación permanente normal",
   "notifStylePlainDesc": "Una notificación permanente en la barra; al expandirla se lee todo.",
-  "notifStyleLive": "Actualizaciones en vivo"
+  "notifStyleLive": "Actualizaciones en vivo",
+  "notifDiag": "Comprobación de notificaciones",
+  "notifDiagDesc": "Muestra qué admite este teléfono para actualizaciones en vivo y notificaciones de foco."
 }

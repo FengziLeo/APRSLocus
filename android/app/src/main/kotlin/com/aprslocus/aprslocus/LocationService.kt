@@ -211,6 +211,9 @@ class LocationService : Service() {
 
         /// 实时更新（Android 16 的 Live Updates）开关：用户在设置里选的。
         /// 换开关时立刻重发一次通知，否则要等到下一次文字变化才生效。
+        /// 给文件末尾的诊断函数读当前样式用（companion 里的私有字段外面看不见）。
+        fun liveUpdatesOn(): Boolean = liveUpdates
+
         fun setLiveUpdatesStatic(on: Boolean) {
             if (liveUpdates == on) return
             liveUpdates = on
@@ -526,16 +529,23 @@ class LocationService : Service() {
     ///
     /// **全程走反射**：这套 API 在编译 SDK 里叫不叫这个名字、有没有，都不该让
     /// 构建挂掉（踩过一次 `Unresolved reference 'setRequestPromotedOngoing'`）。
-    /// 反射拿不到就等于这台设备不支持，原样返回普通通知 —— 这正是要的回退。
+    ///
+    /// 也不拿 `canPostPromotedNotifications` 当门闩：那个方法本身也可能不存在，
+    /// 一票否决就把所有设备都挡住了。这里只要求「设置提升的那个方法存在」，
+    /// 之后提不提由系统决定；一条都没有就原样返回普通通知。
     private fun promote(notif: Notification, short: String): Notification {
-        if (Build.VERSION.SDK_INT < 36) return notif
         return try {
-            val nm = getSystemService(NotificationManager::class.java) ?: return notif
-            if (!noArgBool(NotificationManager::class.java, nm,
-                    "canPostPromotedNotifications")) return notif
             val builder = Notification.Builder.recoverBuilder(this, notif)
-            if (!setBoolTrue(Notification.Builder::class.java, builder,
-                    "setRequestPromotedOngoing")) return notif
+            val names = listOf("setRequestPromotedOngoing",
+                "setRequestPromotedOngoingNotification", "setPromotedOngoing")
+            var called = false
+            for (name in names) {
+                if (setBoolTrue(Notification.Builder::class.java, builder, name)) {
+                    called = true
+                    break
+                }
+            }
+            if (!called) return notif
             if (short.isNotEmpty()) {
                 try {
                     Notification.Builder::class.java
@@ -545,17 +555,12 @@ class LocationService : Service() {
                     // 少了这一条就少一行胶囊文字，通知照发
                 }
             }
-            val promoted = builder.build()
-            // 校验不了就当可以提：提不提由系统决定
-            if (!noArgBool(Notification::class.java, promoted,
-                    "hasPromotableCharacteristics") &&
-                hasMethod(Notification::class.java, "hasPromotableCharacteristics")
-            ) return notif
-            promoted
+            builder.build()
         } catch (_: Throwable) {
             notif
         }
     }
+
 
     /// 反射调一个无参布尔方法；没有这个方法就返回 false。
     private fun noArgBool(cls: Class<*>, target: Any, name: String): Boolean {
@@ -829,3 +834,57 @@ class LocationService : Service() {
         stopGnssStatusMonitor()
     }
 }
+
+    /// 通知相关的自查结果：本机支持到什么程度。用户点了「通知诊断」才看。
+    ///
+    /// 为什么做成一行行文字：这台机器上到底缺哪一环，只能由设备自己说 ——
+    /// 「支持实时更新」不是个是/否问题，是四五个方法的组合。
+    fun diag(context: Context): String {
+        val nm = context.getSystemService(NotificationManager::class.java)
+        fun has(cls: Class<*>, name: String, vararg args: Class<*>): String =
+            try {
+                cls.getMethod(name, *args)
+                "有"
+            } catch (_: Throwable) {
+                "没有"
+            }
+        fun bool(obj: Any?, name: String): String {
+            if (obj == null) return "未知"
+            return try {
+                val v = obj.javaClass.getMethod(name).invoke(obj)
+                if (v == true) "允许" else "不允许"
+            } catch (_: Throwable) {
+                "没有这个方法"
+            }
+        }
+        val lines = mutableListOf<String>()
+        lines.add("系统：Android ${Build.VERSION.RELEASE}（SDK ${Build.VERSION.SDK_INT}）")
+        lines.add("机型：${Build.MANUFACTURER} ${Build.BRAND} ${Build.MODEL}")
+        lines.add("canPostPromotedNotifications：" + bool(nm, "canPostPromotedNotifications"))
+        lines.add("setRequestPromotedOngoing：" + has(Notification.Builder::class.java,
+            "setRequestPromotedOngoing", Boolean::class.javaPrimitiveType))
+        lines.add("setShortCriticalText：" + has(Notification.Builder::class.java,
+            "setShortCriticalText", CharSequence::class.java))
+        lines.add("hasPromotableCharacteristics：" + has(Notification::class.java,
+            "hasPromotableCharacteristics"))
+        lines.add("小米焦点 canShowFocus：" + xiaomiFocus(context))
+        lines.add("当前样式：" + (if (LocationService.liveUpdatesOn()) "实时更新" else "普通常驻通知"))
+        return lines.joinToString("\n")
+    }
+
+    /// 小米的焦点通知（超级岛）允不允许发。
+    private fun xiaomiFocus(context: Context): String {
+        val maker = (Build.MANUFACTURER + " " + Build.BRAND).lowercase()
+        if (!maker.contains("xiaomi") && !maker.contains("redmi") &&
+            !maker.contains("poco")
+        ) return "不是小米设备"
+        return try {
+            val uri = android.net.Uri.parse(
+                "content://miui.statusbar.notification.public")
+            val extras = Bundle().apply { putString("package", context.packageName) }
+            val result = context.contentResolver.call(uri, "canShowFocus", null, extras)
+            if (result?.getBoolean("canShowFocus") == true) "允许" else "不允许"
+        } catch (_: Throwable) {
+            "查不到"
+        }
+    }

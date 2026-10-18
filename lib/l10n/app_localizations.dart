@@ -16959,6 +16959,18 @@ abstract class AppLocalizations {
   /// **'实时更新'**
   String get notifStyleLive;
 
+  /// No description provided for @notifDiag.
+  ///
+  /// In zh, this message translates to:
+  /// **'通知诊断'**
+  String get notifDiag;
+
+  /// No description provided for @notifDiagDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'看这台手机支持不支持实时更新、焦点通知，缺哪一环。'**
+  String get notifDiagDesc;
+
 }
 
 class _AppLocalizationsDelegate

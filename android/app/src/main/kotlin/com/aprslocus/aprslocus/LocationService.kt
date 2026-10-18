@@ -526,10 +526,10 @@ class LocationService : Service() {
     /// `promoBroken` 是这台机器的实测结果：提升过的通知被系统抹掉过一次，
     /// 那就不再试了（见 [verifyStillPosted]）。宁可没有胶囊，不能没有通知。
     private fun currentPromoMode(): Int {
-        // 「提升」在 HyperOS 上试过两次，两次都让常驻通知从通知列表里没了。
-        // 前台服务通知是用户唯一能确认「后台还活着」的东西，不能拿它做实验，
-        // 所以先关死：整个提升链路还在（promoMode / applyPromo / 自愈都在），
-        // 把 PROMO_ENABLED 改回 true 就能重新启用。
+        // 提升曾经在 HyperOS 上让常驻通知从列表里消失过，后来查明是前台服务
+        // 根本没起来（通知也就没人发），不是提升本身。现在服务有看门狗、
+        // 发完还有 1.5 秒自检，所以重新开着；哪天真被系统抹掉，
+        // verifyStillPosted 会把 promoBroken 置上并退回普通通知。
         if (!PROMO_ENABLED) return PROMO_PLAIN
         if (!liveUpdates || promoBroken) return PROMO_PLAIN
         return try {
@@ -985,9 +985,9 @@ private const val PROMO_PLAIN = -1
 
 /// 提升总开关。
 ///
-/// 关：Android 16 的「Live Updates」在 HyperOS 上实测会把常驻通知弄没。
-/// 整条提升链路都留着（探测、两种姿势、自愈），要重启只需改这里。
-private const val PROMO_ENABLED = false
+/// 开：Android 16 的「Live Updates」是这条通知该有的样子（胶囊/特殊通知）。
+/// 出问题时的退路是 [promoBroken] 与 [verifyStillPosted]，不是这个开关。
+private const val PROMO_ENABLED = true
 
 /// 带 `requestPromotedOngoing` 请求：Android 16 QPR1（SDK 36.1）起才有这个接口。
 private const val PROMO_REQUEST = 0
@@ -1082,6 +1082,8 @@ fun diag(
     lines.add("hasPromotableCharacteristics：" + has(Notification::class.java,
         "hasPromotableCharacteristics"))
     lines.add("系统认的提升姿势：" + promoModeName(promoMode(context)))
+    // 开关关着时，上面那行说「系统认」也没用：通知压根没带提升请求。
+    lines.add("提升开关：" + (if (PROMO_ENABLED) "开" else "关"))
     lines.add("前台服务：" + (if (LocationService.isRunning()) "在跑" else "没在跑"))
     // Dart 那边的看法：它只知道自己发过启动请求，不知道原生有没有真的起来。
     // 两边不一致（Dart 说跑着、原生说没跑）就是服务崩了或被系统挡了。

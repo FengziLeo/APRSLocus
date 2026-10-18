@@ -3445,7 +3445,7 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
         const SizedBox(width: 8),
         TextButton.icon(
           onPressed: () => _showNotifDiag(st),
-          icon: const Icon(Icons.bug_report_rounded, size: 15, color: C.blue),
+          icon: Icon(Icons.bug_report_rounded, size: 15, color: C.blue),
           label: Text(S.of(context).notifDiag,
               style: ts(11, w: FontWeight.w700, c: C.blue)),
           style: TextButton.styleFrom(

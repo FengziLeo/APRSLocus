@@ -8206,7 +8206,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get sourceMovedHint =>
-      'Untuk mengaktifkan/mengganti sumber data (tautan), buka Setelan → Perangkat';
+      'Tautan radio (TNC, radio WLAN, audio) diaktifkan di Setelan → Perangkat';
 
   @override
   String get posSourcePrecedence =>
@@ -9604,5 +9604,11 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get acnOpenMap => "Peta stasiun";
+
+  @override
+  String get channelsSubtitle => "Kedua server bisa tersambung bersamaan; masing-masing menerima salinannya.";
+
+  @override
+  String get acnOpenSettings => "Alamat dan akun";
 
 }

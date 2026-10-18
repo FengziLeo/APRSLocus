@@ -16788,6 +16788,18 @@ abstract class AppLocalizations {
   /// **'台站地图'**
   String get acnOpenMap;
 
+  /// No description provided for @channelsSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'两台服务器可以同时在线，报文两边各收一份。'**
+  String get channelsSubtitle;
+
+  /// No description provided for @acnOpenSettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'地址与账号'**
+  String get acnOpenSettings;
+
 }
 
 class _AppLocalizationsDelegate

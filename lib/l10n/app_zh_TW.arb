@@ -4077,7 +4077,7 @@
   },
   "garminShareNoLink": "分享的內容裡沒有找到佳明 LiveTrack 連結",
   "hrFromGarmin": "心率來自佳明 LiveTrack（手錶）",
-  "sourceMovedHint": "要啟用 / 切換資料來源（鏈路），請到「設定 → 裝置」",
+  "sourceMovedHint": "電台鏈路（TNC、WLAN 電台、音效卡）在「設定 → 裝置」裡啟用",
   "posSourcePrecedence": "同時可用時的優先順序：模擬/手動位置 › 外接 GPS 模組 › 佳明（手錶有即時資料時）› 手機 GPS",
   "posSourceUsing": "目前使用：{src}",
   "posSrcSim": "模擬/手動位置",
@@ -4784,5 +4784,7 @@
   "acnDefaultFilter": "預設訂閱",
   "acnAllPackets": "全部報文",
   "acnOpenMap": "臺站地圖",
-  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}}
+  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}},
+  "channelsSubtitle": "兩臺伺服器可以同時在線，報文兩邊各收一份。",
+  "acnOpenSettings": "位址與帳號"
 }

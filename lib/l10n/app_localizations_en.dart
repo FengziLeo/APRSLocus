@@ -8200,7 +8200,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourceMovedHint =>
-      'To enable or switch data sources (links), go to Settings → Devices';
+      'Radio links (TNC, WLAN radio, audio) are enabled in Settings → Devices';
 
   @override
   String get posSourcePrecedence =>
@@ -9594,5 +9594,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get acnOpenMap => "Station map";
+
+  @override
+  String get channelsSubtitle => "Both servers can stay online at once; each one collects its own copy.";
+
+  @override
+  String get acnOpenSettings => "Address and account";
 
 }

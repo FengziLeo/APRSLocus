@@ -8253,7 +8253,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get sourceMovedHint =>
-      'Para activar o cambiar fuentes de datos (enlaces), ve a Ajustes → Dispositivos';
+      'Los enlaces de radio (TNC, radio WLAN, audio) se activan en Ajustes → Dispositivos';
 
   @override
   String get posSourcePrecedence =>
@@ -9653,5 +9653,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get acnOpenMap => "Mapa de estaciones";
+
+  @override
+  String get channelsSubtitle => "Los dos servidores pueden estar en línea a la vez; cada uno recibe su copia.";
+
+  @override
+  String get acnOpenSettings => "Dirección y cuenta";
 
 }

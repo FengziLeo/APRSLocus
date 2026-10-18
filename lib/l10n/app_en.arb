@@ -3489,7 +3489,7 @@
   },
   "garminShareNoLink": "No Garmin LiveTrack link found in what was shared",
   "hrFromGarmin": "Heart rate from Garmin LiveTrack (watch)",
-  "sourceMovedHint": "To enable or switch data sources (links), go to Settings → Devices",
+  "sourceMovedHint": "Radio links (TNC, WLAN radio, audio) are enabled in Settings → Devices",
   "posSourcePrecedence": "Priority when several are available: simulated/manual › external GPS module › Garmin (while the watch has live data) › phone GPS",
   "posSourceUsing": "In use now: {src}",
   "posSrcSim": "simulated/manual",
@@ -4196,5 +4196,7 @@
   "acnDefaultFilter": "Default feed",
   "acnAllPackets": "All packets",
   "acnOpenMap": "Station map",
-  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}}
+  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}},
+  "channelsSubtitle": "Both servers can stay online at once; each one collects its own copy.",
+  "acnOpenSettings": "Address and account"
 }

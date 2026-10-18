@@ -3489,7 +3489,7 @@
   },
   "garminShareNoLink": "Tidak ada tautan Garmin LiveTrack di konten yang dibagikan",
   "hrFromGarmin": "Detak jantung dari Garmin LiveTrack (jam)",
-  "sourceMovedHint": "Untuk mengaktifkan/mengganti sumber data (tautan), buka Setelan → Perangkat",
+  "sourceMovedHint": "Tautan radio (TNC, radio WLAN, audio) diaktifkan di Setelan → Perangkat",
   "posSourcePrecedence": "Prioritas bila beberapa tersedia: simulasi/manual › modul GPS eksternal › Garmin (selama jam punya data langsung) › GPS ponsel",
   "posSourceUsing": "Sedang dipakai: {src}",
   "posSrcSim": "simulasi/manual",
@@ -4196,5 +4196,7 @@
   "acnDefaultFilter": "Langganan bawaan",
   "acnAllPackets": "Semua paket",
   "acnOpenMap": "Peta stasiun",
-  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}}
+  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}},
+  "channelsSubtitle": "Kedua server bisa tersambung bersamaan; masing-masing menerima salinannya.",
+  "acnOpenSettings": "Alamat dan akun"
 }

@@ -7945,7 +7945,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get hrFromGarmin => '心拍は Garmin LiveTrack（ウォッチ）から';
 
   @override
-  String get sourceMovedHint => 'データソース（リンク）の有効化・切り替えは「設定 → デバイス」で行います';
+  String get sourceMovedHint => '無線リンク（TNC・WLAN 無線機・オーディオ）は「設定 → デバイス」で有効にします';
 
   @override
   String get posSourcePrecedence =>
@@ -9315,5 +9315,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get acnOpenMap => "局の地図";
+
+  @override
+  String get channelsSubtitle => "2 台のサーバーを同時に接続できます。受信はそれぞれで行います。";
+
+  @override
+  String get acnOpenSettings => "アドレスとアカウント";
 
 }

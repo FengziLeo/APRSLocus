@@ -7849,7 +7849,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get hrFromGarmin => '心率来自佳明 LiveTrack（手表）';
 
   @override
-  String get sourceMovedHint => '要启用 / 切换数据来源（链路），请到「设置 → 设备」';
+  String get sourceMovedHint => '电台链路（TNC、WLAN 电台、声卡）在「设置 → 设备」里启用';
 
   @override
   String get posSourcePrecedence => '同时可用时的优先级：模拟/手动位置 › 外接 GPS 模块 › 佳明（手表有实时数据时）› 手机 GPS';
@@ -9215,6 +9215,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get acnOpenMap => "台站地图";
+
+  @override
+  String get channelsSubtitle => "两台服务器可以同时在线，报文两边各收一份。";
+
+  @override
+  String get acnOpenSettings => "地址与账号";
 
 }
 
@@ -17062,7 +17068,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get hrFromGarmin => '心率來自佳明 LiveTrack（手錶）';
 
   @override
-  String get sourceMovedHint => '要啟用 / 切換資料來源（鏈路），請到「設定 → 裝置」';
+  String get sourceMovedHint => '電台鏈路（TNC、WLAN 電台、音效卡）在「設定 → 裝置」裡啟用';
 
   @override
   String get posSourcePrecedence => '同時可用時的優先順序：模擬/手動位置 › 外接 GPS 模組 › 佳明（手錶有即時資料時）› 手機 GPS';
@@ -18428,5 +18434,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get acnOpenMap => "臺站地圖";
+
+  @override
+  String get channelsSubtitle => "兩臺伺服器可以同時在線，報文兩邊各收一份。";
+
+  @override
+  String get acnOpenSettings => "位址與帳號";
 
 }

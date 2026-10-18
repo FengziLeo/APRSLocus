@@ -3489,7 +3489,7 @@
   },
   "garminShareNoLink": "No se encontró ningún enlace de Garmin LiveTrack",
   "hrFromGarmin": "Pulso desde Garmin LiveTrack (reloj)",
-  "sourceMovedHint": "Para activar o cambiar fuentes de datos (enlaces), ve a Ajustes → Dispositivos",
+  "sourceMovedHint": "Los enlaces de radio (TNC, radio WLAN, audio) se activan en Ajustes → Dispositivos",
   "posSourcePrecedence": "Prioridad cuando hay varias fuentes: simulada/manual › módulo GPS externo › Garmin (mientras el reloj tenga datos en vivo) › GPS del teléfono",
   "posSourceUsing": "En uso ahora: {src}",
   "posSrcSim": "simulada/manual",
@@ -4196,5 +4196,7 @@
   "acnDefaultFilter": "Suscripción por defecto",
   "acnAllPackets": "Todos los paquetes",
   "acnOpenMap": "Mapa de estaciones",
-  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}}
+  "@acnServerRetention": {"placeholders": {"hours": {"type": "String"}}},
+  "channelsSubtitle": "Los dos servidores pueden estar en línea a la vez; cada uno recibe su copia.",
+  "acnOpenSettings": "Dirección y cuenta"
 }

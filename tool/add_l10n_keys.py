@@ -36,116 +36,20 @@ CLASSES = {
 
 # ── 要加的键：key → (zh, zh_TW, en, ja, es, id) ──
 KEYS = {
-    # ── 副链路（APRSNETCN）卡片 ──
+    # ── 连接设置页的「互联网链路」一段 ──
     #
-    # 独立于主连接卡：这条连接只收不发，与主链路同时在线。三个标签各自说清
-    # 一件事（这条链路是什么 / 开关 / 当前状态），说明文字放在卡片底部。
-    'acnCardTitle': (
-        'APRSNETCN SERVER', 'APRSNETCN SERVER', 'APRSNETCN SERVER',
-        'APRSNETCN SERVER', 'APRSNETCN SERVER', 'APRSNETCN SERVER'),
-    'acnCardSubtitle': (
-        '与主链路同时在线，只收不发。',
-        '與主鏈路同時在線，只收不發。',
-        'Runs alongside the main link. Receive only.',
-        'メイン回線と同時に接続します。受信のみです。',
-        'Funciona junto al enlace principal. Solo recibe.',
-        'Berjalan bersama tautan utama. Hanya menerima.'),
-    'acnLinkSwitch': (
-        '同时连接 APRSNETCN', '同時連線 APRSNETCN',
-        'Also connect to APRSNETCN', 'APRSNETCN にも同時接続',
-        'Conectar también a APRSNETCN', 'Hubungkan juga ke APRSNETCN'),
-    'acnLinkStatus': (
-        '副链路', '副鏈路', 'Second link', '副リンク',
-        'Enlace secundario', 'Tautan kedua'),
-    'acnLinkNote': (
-        '发报文只走主链路。这条链路收来的台站会标成来自服务器，也不做网关转递。',
-        '發報文只走主鏈路。這條鏈路收來的台站會標成來自伺服器，也不做閘道轉遞。',
-        'Sending stays on the main link. Stations heard here are marked as '
-            'coming from the server and are never gatewayed.',
-        '送信はメイン回線のみです。ここで受信した局はサーバー由来として表示され、'
-            'ゲートウェイ転送は行いません。',
-        'El envío va solo por el enlace principal. Las estaciones recibidas '
-            'aquí se marcan como del servidor y no se reenvían.',
-        'Pengiriman tetap di tautan utama. Stasiun yang diterima di sini '
-            'ditandai berasal dari server dan tidak diteruskan.'),
-    # 副链路的登录结果（服务器回的 logresp / not authorized）
-    'acnLoginTitle': (
-        '登录', '登入', 'Login', 'ログイン', 'Acceso', 'Masuk'),
-    'acnLoginOk': (
-        '已验证', '已驗證', 'Verified', '検証済み', 'Verificado',
-        'Terverifikasi'),
-    'acnLoginRejected': (
-        '账号或口令不对', '帳號或密碼不對', 'Account or password wrong',
-        'アカウントかパスワードが違います',
-        'Cuenta o contraseña incorrectos', 'Akun atau kata sandi salah'),
-    # 数据包页的来源标签：服务器名，不翻译（六语言同一个词）。
-    'packetSrcAcn': (
-        'APRSNETCN', 'APRSNETCN', 'APRSNETCN', 'APRSNETCN', 'APRSNETCN',
-        'APRSNETCN'),
-    'acnAccountNote': (
-        '服务器发给白名单呼号的账号口令。留空就只按 passcode 收报文。',
-        '伺服器發給白名單呼號的帳號密碼。留空就只按 passcode 收報文。',
-        'Account and password issued by the server. Leave both empty to '
-            'receive on the passcode alone.',
-        'サーバーがホワイトリストの局に発行するアカウントとパスワードです。'
-            '空欄なら passcode のみで受信します。',
-        'Cuenta y contraseña que emite el servidor. Si se dejan vacías, se '
-            'recibe solo con el passcode.',
-        'Akun dan kata sandi dari server. Kosongkan keduanya untuk menerima '
-            'dengan passcode saja.'),
-    # 24 小时台站只在用户点按钮时拉，所以按钮只有这两句
-    'acnSyncNow': (
-        '立即同步', '立即同步', 'Sync now', '今すぐ同期', 'Sincronizar ahora',
-        'Sinkron sekarang'),
-    'acnSyncing': (
-        '同步中…', '同步中…', 'Syncing…', '同期中…', 'Sincronizando…',
-        'Menyinkronkan…'),
-    # 24 小时台站为什么要点按钮：说明放在按钮左边那一行
-    'acnSyncHint': (
-        '按下按钮才拉，连上链路不会自己拉。',
-        '按下按鈕才拉，連上鏈路不會自己拉。',
-        'Pulled only when you press the button, never on connect.',
-        'ボタンを押したときだけ取得します。接続しても取得しません。',
-        'Solo se descarga al pulsar el botón. Conectar no descarga nada.',
-        'Hanya diambil saat tombol ditekan, tidak saat terhubung.'),
-    # 数据来源的分组标题：互联网链路（APRS-IS / APRSNETCN SERVER）/ 电台链路
-    'sourceGroupInternet': (
-        '互联网链接', '網際網路連結', 'Internet links', 'インターネット回線',
-        'Enlaces de internet', 'Tautan internet'),
-    'sourceGroupRadio': (
-        '电台链路', '電台鏈路', 'Radio links', '無線回線',
-        'Enlaces de radio', 'Tautan radio'),
-    # 副链路设置页的导语：这条链路是谁设计的
-    'acnPageLead': (
-        'APRSNET.CN 设计的一条链路。与主链路同时在线，只收不发。',
-        'APRSNET.CN 設計的一條鏈路。與主鏈路同時在線，只收不發。',
-        'A link designed by APRSNET.CN. It runs alongside the main link and '
-            'only receives.',
-        'APRSNET.CN が設計した回線です。メイン回線と同時に接続し、受信のみ行います。',
-        'Un enlace diseñado por APRSNET.CN. Funciona junto al enlace principal '
-            'y solo recibe.',
-        'Tautan yang dirancang APRSNET.CN. Berjalan bersama tautan utama dan '
-            'hanya menerima.'),
-
-    # ── 服务器自己公布的那几条（副链路页面的「服务器」卡）──
-    #
-    # 草案要求服务器写明自己实际采用的策略。客户端照它报的原样显示，不猜。
-    'acnServerProto': (
-        '服务器协议', '伺服器協定', 'Server proto',
-        'サーバー協定', 'Protocolo del servidor', 'Protokol server'),
-    'acnServerRetention': (
-        '位置保留 {hours} 小时', '位置保留 {hours} 小時',
-        'Positions kept {hours} h', '位置は {hours} 時間保持',
-        'Posiciones {hours} h', 'Posisi disimpan {hours} jam'),
-    'acnDefaultFilter': (
-        '默认订阅', '預設訂閱', 'Default feed', '既定の購読',
-        'Suscripción por defecto', 'Langganan bawaan'),
-    'acnAllPackets': (
-        '全部报文', '全部報文', 'All packets', 'すべてのパケット',
-        'Todos los paquetes', 'Semua paket'),
-    'acnOpenMap': (
-        '台站地图', '臺站地圖', 'Station map', '局の地図',
-        'Mapa de estaciones', 'Peta stasiun'),
+    # 两条 TCP 登录（APRS-IS 与 APRSNETCN SERVER）并排放在连接设置页，
+    # 参数仍各归各的页：这里只管开关、状态与入口。
+    'channelsSubtitle': (
+        '两台服务器可以同时在线，报文两边各收一份。',
+        '兩臺伺服器可以同時在線，報文兩邊各收一份。',
+        'Both servers can stay online at once; each one collects its own copy.',
+        '2 台のサーバーを同時に接続できます。受信はそれぞれで行います。',
+        'Los dos servidores pueden estar en línea a la vez; cada uno recibe su copia.',
+        'Kedua server bisa tersambung bersamaan; masing-masing menerima salinannya.'),
+    'acnOpenSettings': (
+        '地址与账号', '位址與帳號', 'Address and account', 'アドレスとアカウント',
+        'Dirección y cuenta', 'Alamat dan akun'),
 }
 
 META = {

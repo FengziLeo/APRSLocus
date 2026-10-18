@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'settings_widgets.dart';
 import 'acn_link_page.dart';
+import 'aprs_is_cards.dart';
 import 'audio_page.dart';
 import 'ext_gps_device_page.dart';
 import 'garmin_page.dart';
@@ -119,6 +120,11 @@ class DataSourceCard extends StatelessWidget {
           title: s.dataSourceAprsIs,
           desc: s.dataSourceAprsIsDesc,
           icon: Icons.cloud_rounded,
+          // 与下面 APRSNETCN 那一行同一个口径：点整行进它自己的设置页。
+          // 少了这一句，整行看着能点、点下去什么都不发生。
+          onConfigure: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => AprsIsServerPage(state: state)),
+          ),
         ),
         // 第二条链路只有裸 TCP，Web 上没有（与连接设置卡同一个口径）
         if (tcpLinkPlatformSupported)

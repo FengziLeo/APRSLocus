@@ -380,6 +380,53 @@ class StatusBadge extends StatelessWidget {
   }
 }
 
+/// 这台台站是从哪条链路听来的：APRS-IS / APRSNETCN / TNC / 声卡。
+///
+/// 同一台站可能从两条链路都收到，台站上只留最后一条的来源；`remote`（24 小时
+/// 台站接口补进来的）也算 APRSNETCN 那一档 —— 那时我们根本没收到过它。
+class SourceBadge extends StatelessWidget {
+  final String? via;
+  final bool remote;
+  const SourceBadge(this.via, {super.key, this.remote = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final v = via;
+    final String label;
+    final Color c;
+    if (v == AppState.srcAcn || (v == null && remote)) {
+      label = s.packetSrcAcn;
+      c = C.cyan;
+    } else if (v == AppState.srcTnc) {
+      label = s.dataSourceTnc;
+      c = C.orange;
+    } else if (v == AppState.srcAudio) {
+      label = s.dataSourceAudio;
+      c = C.orange;
+    } else if (v == AppState.srcPkwdwpl) {
+      label = 'PKWDWPL';
+      c = C.orange;
+    } else if (v == AppState.srcAprsIs) {
+      label = s.dataSourceAprsIs;
+      c = C.blue;
+    } else {
+      return const SizedBox.shrink();
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: c.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: ts(9, c: c, w: FontWeight.w700, ls: 0.5),
+      ),
+    );
+  }
+}
+
 /// APRS symbol badge (icon in tinted box)
 class SymbolBadge extends StatelessWidget {
   final Station station;

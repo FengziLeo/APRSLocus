@@ -69,6 +69,13 @@ class Station {
   ///   * 详情页标出来源，用户才知道「这个我没收到过」；
   ///   * 本地一旦真的收到同呼号报文，仍由 [_upsertStation] 正常更新它。
   bool remote;
+
+  /// 最后一条报文从哪条链路进来，取 AppState 的 `src*` 常量：
+  /// `aprsis` / `acn` / `tnc` / `audio` / `pkwdwpl`。
+  ///
+  /// 与 [remote] 是两件事：`remote` 是「我们根本没收到，是 24 小时台站接口
+  /// 补进来的」，这里记的是收到它的那条链路。旧数据里没有这一项，为 null。
+  String? heardVia;
   /// 速度/高度遥测历史（内存态，与 track 一致不持久化）
   List<TelemetryPt> telemetry;
 
@@ -96,6 +103,7 @@ class Station {
     this.favorite = false,
     this.manual = false,
     this.remote = false,
+    this.heardVia,
   });
 
   String get lastSeen {

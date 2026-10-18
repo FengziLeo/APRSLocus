@@ -5820,6 +5820,7 @@ class AppState extends ChangeNotifier {
       raw: fix.raw,
       path: 'PKWDWPL',
       toCall: 'PKWDWPL',
+      via: srcPkwdwpl,
     );
     _pushPacket(Packet(
       fix.raw,
@@ -7617,6 +7618,9 @@ class AppState extends ChangeNotifier {
             path: path.isEmpty ? null : path,
             toCall: toCall,
             fromServer: fromAcn,
+            // 链路是那条，来源就是那条：主链路 aprsis、第二条 acn、
+            // 电台链路 tnc / audio（`source` 本来就是这几项）。
+            via: fromAcn ? srcAcn : source,
           );
           info =
               '${p.lat.toStringAsFixed(4)}, ${p.lng.toStringAsFixed(4)}'
@@ -8213,7 +8217,11 @@ class AppState extends ChangeNotifier {
   /// **自己**的位置防抖（`SelfFixFilter`）与精度显示仍保留 —— 那才是每天看得见的东西。
   /// 若将来想重做这一层，请先回答“它能省下多少帧”再动手。
   void _upsertStation(String call, ParsedPos p,
-      {String? raw, String? path, String? toCall, bool fromServer = false}) {
+      {String? raw,
+      String? path,
+      String? toCall,
+      bool fromServer = false,
+      String? via}) {
     // 本地屏蔽：被屏蔽的台站不上图、不进台站列表（原始数据包仍落在 packets 里，
     // 数据包页照常可见）。这是**展示层**过滤，不是接收闸门。
     if (isStationIgnored(call)) return;
@@ -8323,6 +8331,8 @@ class AppState extends ChangeNotifier {
       // 「来源 APRSNETCN」该收起来。
       // fromServer 为真时这一行的事实仍来自服务器（副链路），标记要留着。
       s.remote = fromServer;
+      // 这一帧是从哪条链路进来的：详情页那枚标签读它。
+      if (via != null) s.heardVia = via;
       // 记录修改前的“地图相关”字段，用于判断是否推进台站版本
       final oldStatus = s.status;
       final oldSym = s.symbol;
@@ -8413,6 +8423,7 @@ class AppState extends ChangeNotifier {
           path: path,
           toCall: toCall,
           remote: fromServer,
+          heardVia: via,
         ),
       );
       _stationsDirty = true;
@@ -8794,6 +8805,7 @@ class AppState extends ChangeNotifier {
               'favorite': s.favorite,
               'manual': s.manual,
               if (s.remote) 'remote': true,
+              if (s.heardVia != null) 'via': s.heardVia,
               if (s.path != null) 'path': s.path,
               if (s.toCall != null && s.toCall!.isNotEmpty) 'toCall': s.toCall,
               if (s.fmo != null) 'fmo': s.fmo,
@@ -8820,6 +8832,8 @@ class AppState extends ChangeNotifier {
           stations[idx].favorite = m['favorite'] as bool? ?? false;
           stations[idx].manual = m['manual'] as bool? ?? false;
           stations[idx].remote = m['remote'] as bool? ?? false;
+          stations[idx].heardVia =
+              m['via'] as String? ?? stations[idx].heardVia;
           stations[idx].path = m['path'] as String?;
           final savedToCall = m['toCall'] as String?;
           if (savedToCall != null && savedToCall.isNotEmpty) {
@@ -8861,6 +8875,7 @@ class AppState extends ChangeNotifier {
               favorite: favorite,
               manual: manual,
               remote: m['remote'] as bool? ?? false,
+              heardVia: m['via'] as String?,
               path: m['path'] as String?,
               toCall: (m['toCall'] as String?)?.isNotEmpty == true
                   ? m['toCall'] as String?

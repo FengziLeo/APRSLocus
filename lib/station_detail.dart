@@ -221,7 +221,11 @@ class _StationDetailState extends State<StationDetail> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 4,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
                                     children: [
                                       Text(
                                         s.call,
@@ -231,10 +235,13 @@ class _StationDetailState extends State<StationDetail> {
                                           ls: -0.4,
                                         ),
                                       ),
-                                      SizedBox(width: 10),
                                       // 用 effectiveStatus：超过 5 分钟未上报即显示离线，
                                       // 避免标签一直停留在「在线」
                                       StatusBadge(s.effectiveStatus),
+                                      // 从哪条链路听来的：主链路、第二条链路、
+                                      // 电台接线，一台台站只留最后一条。
+                                      SourceBadge(s.heardVia,
+                                          remote: s.remote),
                                     ],
                                   ),
                                   SizedBox(height: 3),
@@ -750,16 +757,6 @@ class _StationDetailState extends State<StationDetail> {
                                 '${s.symbol}  ${localizedAprsSymbolName(context, s.symbol)}',
                                 icon: Icons.tag_rounded,
                               ),
-                              // 来源：只有「本地没收到、由 APRSNETCN 的 24 小时
-                              // 接口并进来的」台站才多这一行，否则整行不占位置。
-                              if (s.remote) ...[
-                                SizedBox(height: 8),
-                                KV(
-                                  S.of(context).stationSource,
-                                  'APRSNETCN',
-                                  icon: Icons.cloud_download_rounded,
-                                ),
-                              ],
                             ],
                           ),
                         ),

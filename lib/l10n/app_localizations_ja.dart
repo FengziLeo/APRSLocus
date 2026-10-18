@@ -9433,4 +9433,28 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get notifLiveOff => "この項目は一時停止中です。一部の端末では常駐通知が消えてしまいます。今は通常の常駐通知として出します。";
 
+  @override
+  String get notifLiveTextMsgs => "未読メッセージ";
+
+  @override
+  String get notifLiveTextNear => "近くの局";
+
+  @override
+  String get notifLiveTextSpeed => "速度";
+
+  @override
+  String get notifLiveTextAlt => "高度";
+
+  @override
+  String get notifLiveTextHr => "心拍数";
+
+  @override
+  String get notifLiveTextBatt => "バッテリー";
+
+  @override
+  String get notifLiveTextTrip => "今回の走行距離";
+
+  @override
+  String notifLiveNearShort(String n) => "$n 局";
+
 }

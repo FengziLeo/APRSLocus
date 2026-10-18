@@ -17025,6 +17025,54 @@ abstract class AppLocalizations {
   /// **'这一档暂时停用：在部分系统上它会把常驻通知弄没。现在按普通常驻通知发。'**
   String get notifLiveOff;
 
+  /// No description provided for @notifLiveTextMsgs.
+  ///
+  /// In zh, this message translates to:
+  /// **'未读消息'**
+  String get notifLiveTextMsgs;
+
+  /// No description provided for @notifLiveTextNear.
+  ///
+  /// In zh, this message translates to:
+  /// **'附近台站'**
+  String get notifLiveTextNear;
+
+  /// No description provided for @notifLiveTextSpeed.
+  ///
+  /// In zh, this message translates to:
+  /// **'速度'**
+  String get notifLiveTextSpeed;
+
+  /// No description provided for @notifLiveTextAlt.
+  ///
+  /// In zh, this message translates to:
+  /// **'高度'**
+  String get notifLiveTextAlt;
+
+  /// No description provided for @notifLiveTextHr.
+  ///
+  /// In zh, this message translates to:
+  /// **'心率'**
+  String get notifLiveTextHr;
+
+  /// No description provided for @notifLiveTextBatt.
+  ///
+  /// In zh, this message translates to:
+  /// **'电量'**
+  String get notifLiveTextBatt;
+
+  /// No description provided for @notifLiveTextTrip.
+  ///
+  /// In zh, this message translates to:
+  /// **'本次里程'**
+  String get notifLiveTextTrip;
+
+  /// No description provided for @notifLiveNearShort.
+  ///
+  /// In zh, this message translates to:
+  /// **'{n} 台'**
+  String notifLiveNearShort(String n);
+
 }
 
 class _AppLocalizationsDelegate

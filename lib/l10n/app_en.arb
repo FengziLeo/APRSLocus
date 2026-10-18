@@ -4235,5 +4235,14 @@
   "notifLiveTextGrid": "Grid",
   "notifLiveTextCourse": "Heading",
   "notifLiveTextBeacon": "Beacon countdown",
-  "notifLiveOff": "Paused for now: on some systems it makes the ongoing notification disappear. It posts a normal one instead."
+  "notifLiveOff": "Paused for now: on some systems it makes the ongoing notification disappear. It posts a normal one instead.",
+  "notifLiveTextMsgs": "Unread messages",
+  "notifLiveTextNear": "Nearby stations",
+  "notifLiveTextSpeed": "Speed",
+  "notifLiveTextAlt": "Altitude",
+  "notifLiveTextHr": "Heart rate",
+  "notifLiveTextBatt": "Battery",
+  "notifLiveTextTrip": "Trip distance",
+  "notifLiveNearShort": "{n} stn",
+  "@notifLiveNearShort": {"placeholders": {"n": {"type": "String"}}}
 }

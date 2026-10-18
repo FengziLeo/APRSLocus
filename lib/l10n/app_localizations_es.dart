@@ -9771,4 +9771,28 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get notifLiveOff => "En pausa por ahora: en algunos sistemas hace desaparecer la notificación permanente. Se publica como notificación normal.";
 
+  @override
+  String get notifLiveTextMsgs => "Mensajes sin leer";
+
+  @override
+  String get notifLiveTextNear => "Estaciones cercanas";
+
+  @override
+  String get notifLiveTextSpeed => "Velocidad";
+
+  @override
+  String get notifLiveTextAlt => "Altitud";
+
+  @override
+  String get notifLiveTextHr => "Frecuencia cardíaca";
+
+  @override
+  String get notifLiveTextBatt => "Batería";
+
+  @override
+  String get notifLiveTextTrip => "Distancia del viaje";
+
+  @override
+  String notifLiveNearShort(String n) => "$n est";
+
 }

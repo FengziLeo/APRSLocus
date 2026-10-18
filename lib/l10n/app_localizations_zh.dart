@@ -9333,6 +9333,30 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get notifLiveOff => "这一档暂时停用：在部分系统上它会把常驻通知弄没。现在按普通常驻通知发。";
 
+  @override
+  String get notifLiveTextMsgs => "未读消息";
+
+  @override
+  String get notifLiveTextNear => "附近台站";
+
+  @override
+  String get notifLiveTextSpeed => "速度";
+
+  @override
+  String get notifLiveTextAlt => "高度";
+
+  @override
+  String get notifLiveTextHr => "心率";
+
+  @override
+  String get notifLiveTextBatt => "电量";
+
+  @override
+  String get notifLiveTextTrip => "本次里程";
+
+  @override
+  String notifLiveNearShort(String n) => "$n 台";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18662,5 +18686,29 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get notifLiveOff => "這一檔暫時停用：在部分系統上它會把常駐通知弄沒。現在按普通常駐通知發。";
+
+  @override
+  String get notifLiveTextMsgs => "未讀訊息";
+
+  @override
+  String get notifLiveTextNear => "附近臺站";
+
+  @override
+  String get notifLiveTextSpeed => "速度";
+
+  @override
+  String get notifLiveTextAlt => "高度";
+
+  @override
+  String get notifLiveTextHr => "心率";
+
+  @override
+  String get notifLiveTextBatt => "電量";
+
+  @override
+  String get notifLiveTextTrip => "本次里程";
+
+  @override
+  String notifLiveNearShort(String n) => "$n 臺";
 
 }

@@ -4914,5 +4914,14 @@
   "notifLiveTextGrid": "网格",
   "notifLiveTextCourse": "朝向",
   "notifLiveTextBeacon": "发射倒计时",
-  "notifLiveOff": "这一档暂时停用：在部分系统上它会把常驻通知弄没。现在按普通常驻通知发。"
+  "notifLiveOff": "这一档暂时停用：在部分系统上它会把常驻通知弄没。现在按普通常驻通知发。",
+  "notifLiveTextMsgs": "未读消息",
+  "notifLiveTextNear": "附近台站",
+  "notifLiveTextSpeed": "速度",
+  "notifLiveTextAlt": "高度",
+  "notifLiveTextHr": "心率",
+  "notifLiveTextBatt": "电量",
+  "notifLiveTextTrip": "本次里程",
+  "notifLiveNearShort": "{n} 台",
+  "@notifLiveNearShort": {"placeholders": {"n": {"type": "String"}}}
 }

@@ -4235,5 +4235,14 @@
   "notifLiveTextGrid": "Cuadrícula",
   "notifLiveTextCourse": "Rumbo",
   "notifLiveTextBeacon": "Cuenta atrás del beacon",
-  "notifLiveOff": "En pausa por ahora: en algunos sistemas hace desaparecer la notificación permanente. Se publica como notificación normal."
+  "notifLiveOff": "En pausa por ahora: en algunos sistemas hace desaparecer la notificación permanente. Se publica como notificación normal.",
+  "notifLiveTextMsgs": "Mensajes sin leer",
+  "notifLiveTextNear": "Estaciones cercanas",
+  "notifLiveTextSpeed": "Velocidad",
+  "notifLiveTextAlt": "Altitud",
+  "notifLiveTextHr": "Frecuencia cardíaca",
+  "notifLiveTextBatt": "Batería",
+  "notifLiveTextTrip": "Distancia del viaje",
+  "notifLiveNearShort": "{n} est",
+  "@notifLiveNearShort": {"placeholders": {"n": {"type": "String"}}}
 }

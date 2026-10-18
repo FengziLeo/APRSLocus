@@ -3156,10 +3156,6 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
               _uiLayoutSelector(st),
               _notifStyleSelector(st),
               if (st.notifLiveUpdates) _notifLiveTextSelector(st),
-              // 提升这条链路目前是关掉的（见 LocationService.PROMO_ENABLED）：
-              // 选了这一档也只会发普通通知，先把话说在前面。
-              if (st.notifLiveUpdates)
-                SettingsHint(S.of(context).notifLiveOff, color: C.orange),
               _notifDiagRow(st),
               _languageSelector(st),
               _uiScaleSelector(st),
@@ -3444,15 +3440,42 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
     return SettingsChoice<String>(
       l.notifLiveTextTitle,
       value: st.notifLiveText,
-      options: const ['default', 'counts', 'grid', 'course', 'beacon'],
+      options: const [
+        'default',
+        'counts',
+        'msgs',
+        'near',
+        'grid',
+        'course',
+        'speed',
+        'alt',
+        'hr',
+        'batt',
+        'trip',
+        'beacon',
+      ],
       labelOf: (v) {
         switch (v) {
           case 'counts':
             return l.notifLiveTextCounts;
+          case 'msgs':
+            return l.notifLiveTextMsgs;
+          case 'near':
+            return l.notifLiveTextNear;
           case 'grid':
             return l.notifLiveTextGrid;
           case 'course':
             return l.notifLiveTextCourse;
+          case 'speed':
+            return l.notifLiveTextSpeed;
+          case 'alt':
+            return l.notifLiveTextAlt;
+          case 'hr':
+            return l.notifLiveTextHr;
+          case 'batt':
+            return l.notifLiveTextBatt;
+          case 'trip':
+            return l.notifLiveTextTrip;
           case 'beacon':
             return l.notifLiveTextBeacon;
           default:

@@ -4823,5 +4823,14 @@
   "notifLiveTextGrid": "網格",
   "notifLiveTextCourse": "朝向",
   "notifLiveTextBeacon": "發射倒數",
-  "notifLiveOff": "這一檔暫時停用：在部分系統上它會把常駐通知弄沒。現在按普通常駐通知發。"
+  "notifLiveOff": "這一檔暫時停用：在部分系統上它會把常駐通知弄沒。現在按普通常駐通知發。",
+  "notifLiveTextMsgs": "未讀訊息",
+  "notifLiveTextNear": "附近臺站",
+  "notifLiveTextSpeed": "速度",
+  "notifLiveTextAlt": "高度",
+  "notifLiveTextHr": "心率",
+  "notifLiveTextBatt": "電量",
+  "notifLiveTextTrip": "本次里程",
+  "notifLiveNearShort": "{n} 臺",
+  "@notifLiveNearShort": {"placeholders": {"n": {"type": "String"}}}
 }

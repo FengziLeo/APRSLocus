@@ -4235,5 +4235,14 @@
   "notifLiveTextGrid": "グリッド",
   "notifLiveTextCourse": "方位",
   "notifLiveTextBeacon": "ビーコンまでのカウントダウン",
-  "notifLiveOff": "この項目は一時停止中です。一部の端末では常駐通知が消えてしまいます。今は通常の常駐通知として出します。"
+  "notifLiveOff": "この項目は一時停止中です。一部の端末では常駐通知が消えてしまいます。今は通常の常駐通知として出します。",
+  "notifLiveTextMsgs": "未読メッセージ",
+  "notifLiveTextNear": "近くの局",
+  "notifLiveTextSpeed": "速度",
+  "notifLiveTextAlt": "高度",
+  "notifLiveTextHr": "心拍数",
+  "notifLiveTextBatt": "バッテリー",
+  "notifLiveTextTrip": "今回の走行距離",
+  "notifLiveNearShort": "{n} 局",
+  "@notifLiveNearShort": {"placeholders": {"n": {"type": "String"}}}
 }

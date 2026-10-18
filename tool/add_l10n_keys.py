@@ -72,9 +72,33 @@ KEYS = {
         '公共の窓口は制限がかかる場合があります。自前で立てる場合はアドレスとモデルを差し替えてください。',
         'El punto público puede limitar el uso. Si tienes tu propio despliegue, pon ahí la dirección y el modelo.',
         'Endpoint publik bisa membatasi permintaan. Kalau kamu punya deployment sendiri, isi alamat dan model itu.'),
+    # ── 实时更新胶囊里可选的读数（多出来的那几档） ──
+    #
+    # 胶囊只有一行 ≤7 字符，所以标签只写「显示的是什么数」，单位写在下面对。
+    'notifLiveTextMsgs': (
+        '未读消息', '未讀訊息', 'Unread messages', '未読メッセージ',
+        'Mensajes sin leer', 'Pesan belum dibaca'),
+    'notifLiveTextNear': (
+        '附近台站', '附近臺站', 'Nearby stations', '近くの局',
+        'Estaciones cercanas', 'Stasiun sekitar'),
+    'notifLiveTextSpeed': (
+        '速度', '速度', 'Speed', '速度', 'Velocidad', 'Kecepatan'),
+    'notifLiveTextAlt': (
+        '高度', '高度', 'Altitude', '高度', 'Altitud', 'Ketinggian'),
+    'notifLiveTextHr': (
+        '心率', '心率', 'Heart rate', '心拍数', 'Frecuencia cardíaca', 'Detak jantung'),
+    'notifLiveTextBatt': (
+        '电量', '電量', 'Battery', 'バッテリー', 'Batería', 'Baterai'),
+    'notifLiveTextTrip': (
+        '本次里程', '本次里程', 'Trip distance', '今回の走行距離',
+        'Distancia del viaje', 'Jarak perjalanan'),
+    # 附近台站那个数是**带单位**的（台/局/est…），单位只能跟着语言走
+    'notifLiveNearShort': (
+        '{n} 台', '{n} 臺', '{n} stn', '{n} 局', '{n} est', '{n} stn'),
 }
 
 META = {
+    'notifLiveNearShort': '{"placeholders": {"n": {"type": "String"}}}',
     'acnServerRetention': '{"placeholders": {"hours": {"type": "String"}}}',
     'acnSyncDone': '{"placeholders": {"total": {"type": "String"}, "added": {"type": "String"}}}',
     'gpxExported': '{"placeholders": {"days": {"type": "String"}, "points": {"type": "String"}}}',

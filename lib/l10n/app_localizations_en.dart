@@ -9712,4 +9712,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notifLiveOff => "Paused for now: on some systems it makes the ongoing notification disappear. It posts a normal one instead.";
 
+  @override
+  String get notifLiveTextMsgs => "Unread messages";
+
+  @override
+  String get notifLiveTextNear => "Nearby stations";
+
+  @override
+  String get notifLiveTextSpeed => "Speed";
+
+  @override
+  String get notifLiveTextAlt => "Altitude";
+
+  @override
+  String get notifLiveTextHr => "Heart rate";
+
+  @override
+  String get notifLiveTextBatt => "Battery";
+
+  @override
+  String get notifLiveTextTrip => "Trip distance";
+
+  @override
+  String notifLiveNearShort(String n) => "$n stn";
+
 }

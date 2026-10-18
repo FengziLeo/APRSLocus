@@ -768,18 +768,35 @@ class AppState extends ChangeNotifier {
 
   /// 实时更新（状态栏那一小条 / 胶囊）里显示什么。
   ///
+  /// 每一项都必须压进**一行 ≤7 字符**：胶囊只有那么宽，多写的会在中段
+  /// 省略，读数就废了。
+  ///
   /// * `default` 交给系统（不倒计时、不塞文字）；
   /// * `counts`  当前链路的收发帧数（射频在用时用射频的，否则用 APRS-IS 的）；
+  /// * `msgs`    未读消息数；
+  /// * `near`    附近台站数（半径沿用「服务器」页那个距离筛选）；
   /// * `grid`    自己的网格；
   /// * `course`  朝向；
+  /// * `speed`   速度；
+  /// * `alt`     海拔；
+  /// * `hr`      心率（读数超过 5 分钟就当没有）；
+  /// * `batt`    手机电量；
+  /// * `trip`    本次里程；
   /// * `beacon`  距下次上报的倒计时（走系统 chronometer，不用反复重发）。
   String notifLiveText = 'default';
 
   static const _notifLiveTexts = <String>[
     'default',
     'counts',
+    'msgs',
+    'near',
     'grid',
     'course',
+    'speed',
+    'alt',
+    'hr',
+    'batt',
+    'trip',
     'beacon',
   ];
 
@@ -1076,6 +1093,9 @@ class AppState extends ChangeNotifier {
   /// 碰撞检测的轮询节拍（见 tick）
   int _crashPollTick = 0;
 
+  /// 胶囊里那些「非秒级」读数的刷新节拍（见 1 秒 tick）。
+  int _notifPollTick = 0;
+
   /// 首次采样时把序号对齐，避免把「进应用之前发生的事」当成新事件。
   bool _crashSeqInited = false;
 
@@ -1254,6 +1274,21 @@ class AppState extends ChangeNotifier {
     return out.length > limit ? out.sublist(0, limit) : out;
   }
 
+  /// [radiusKm] 内有多少台站（[nearbyStations] 的**计数版**）。
+  ///
+  /// 与 [nearbyStations] 同一套排除规则（不算自己），只是不排序、不截断 ——
+  /// 胶囊要的是「周围有几个人」，不是那五个名字。
+  int nearbyStationCount(double radiusKm) {
+    if (!myHasFix || myLat == null || myLng == null) return 0;
+    final lat = myLat!, lng = myLng!;
+    var n = 0;
+    for (final s in stations) {
+      if (s.call == myFullCall) continue;
+      if (s.distKm(lat, lng) <= radiusKm) n++;
+    }
+    return n;
+  }
+
   /// 读一次手机电量（**自节流**：默认 30 秒内不重复读）。
   ///
   /// 30 秒是刻意的：电量是"分钟级"的量，读得太勤只是在耗电（每次都是一趟平台通道），
@@ -1266,8 +1301,13 @@ class AppState extends ChangeNotifier {
       return;
     }
     _batteryAt = now;
-    // 没人用这个数就别读：信标不带电量、盒子链路也没开 → 跳过这趟平台通道
-    if (!beaconIncludeBattery && !box.config.enabled) return;
+    // 没人用这个数就别读：信标不带电量、盒子链路也没开、胶囊也没在显示它
+    // → 跳过这趟平台通道
+    if (!beaconIncludeBattery &&
+        !box.config.enabled &&
+        notifLiveText != 'batt') {
+      return;
+    }
     try {
       final v = await loc.getBatteryLevel();
       if (v >= 0) _battery = v;
@@ -5309,6 +5349,25 @@ class AppState extends ChangeNotifier {
           beaconSecondsLeft > 0 &&
           beaconSecondsLeft % 5 == 0) {
         _updateNotification();
+      }
+      // 其余读数（速度 / 海拔 / 心率 / 电量 / 里程 / 未读 / 附近台站）都不是
+      // 秒级量，5 秒一次就够。真正的出口是 LocService 的按内容去重：值没变时
+      // 那次调用根本不会发通知，所以这里多调几次不构成「反复弹」。
+      if (++_notifPollTick >= 5) {
+        _notifPollTick = 0;
+        if (notifLiveUpdates &&
+            notifLiveText != 'default' &&
+            notifLiveText != 'beacon') {
+          if (notifLiveText == 'batt') {
+            // 电量是**异步读**的：先读，读到再刷，否则这一刷永远比读数早一步，
+            // 胶囊总是落后一个节拍（30 秒）。
+            unawaited(_refreshBattery().then((_) {
+              if (!_disposed) _updateNotification();
+            }));
+          } else {
+            _updateNotification();
+          }
+        }
       }
       _checkStationAchievement();
       // 碰撞/摔倒（issue #26）：它**不能**只挂在定位回调上 —— 事件可能在没开定位、
@@ -10812,12 +10871,48 @@ class AppState extends ChangeNotifier {
                 ? '${audio.rxFrames}/${audio.txFrames}'
                 : (aprsIsOn ? '$packetsRx/$packetsTx' : ''));
         break;
+      case 'msgs':
+        // 未读才是「有事发生」的那个数：已读的条数一直在涨，看它没意义。
+        short = '✉$unreadMessages';
+        break;
+      case 'near':
+        // 没定位就没有「附近」：写 0 会被读成「周围一个人都没有」，而真的没有
+        // 定位时胶囊应当说「--」，不是空着退回标题（空短文本 = 系统显示 App 名，
+        // 看起来像没在刷新）。
+        short = (myHasFix && myLat != null && myLng != null)
+            ? l.notifLiveNearShort(
+                '${nearbyStationCount(filterRadius.toDouble())}')
+            : l.notifLiveNearShort('--');
+        break;
+      case 'speed':
+        final sp = mySpeed;
+        short = sp == null ? '--km/h' : '${sp.round()}km/h';
+        break;
+      case 'alt':
+        final al = myAlt;
+        short = al == null ? '--m' : '${al.round()}m';
+        break;
+      case 'hr':
+        final bp = myHr;
+        final hat = myHrAt;
+        final hrFresh = bp != null &&
+            bp > 0 &&
+            hat != null &&
+            DateTime.now().difference(hat).inMinutes < 5;
+        short = hrFresh ? '❤$bp' : '❤--';
+        break;
+      case 'batt':
+        short = _battery >= 0 ? '$_battery%' : '--';
+        break;
+      case 'trip':
+        short = '${tripMileageKm.toStringAsFixed(1)}km';
+        break;
       case 'grid':
-        short = myHasFix ? myGrid : '';
+        short = myHasFix ? myGrid : '--';
         break;
       case 'course':
         final c = myCourse;
-        short = c == null ? '' : '${c.round()}°';
+        short = c == null ? '--°' : '${c.round()}°';
         break;
       case 'beacon':
         if (counting) {

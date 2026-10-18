@@ -9722,4 +9722,28 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get notifLiveOff => "Sementara dimatikan: di sebagian sistem notifikasi permanen jadi hilang. Sekarang dikirim sebagai notifikasi biasa.";
 
+  @override
+  String get notifLiveTextMsgs => "Pesan belum dibaca";
+
+  @override
+  String get notifLiveTextNear => "Stasiun sekitar";
+
+  @override
+  String get notifLiveTextSpeed => "Kecepatan";
+
+  @override
+  String get notifLiveTextAlt => "Ketinggian";
+
+  @override
+  String get notifLiveTextHr => "Detak jantung";
+
+  @override
+  String get notifLiveTextBatt => "Baterai";
+
+  @override
+  String get notifLiveTextTrip => "Jarak perjalanan";
+
+  @override
+  String notifLiveNearShort(String n) => "$n stn";
+
 }

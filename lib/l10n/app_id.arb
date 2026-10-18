@@ -4235,5 +4235,14 @@
   "notifLiveTextGrid": "Grid",
   "notifLiveTextCourse": "Arah",
   "notifLiveTextBeacon": "Hitung mundur beacon",
-  "notifLiveOff": "Sementara dimatikan: di sebagian sistem notifikasi permanen jadi hilang. Sekarang dikirim sebagai notifikasi biasa."
+  "notifLiveOff": "Sementara dimatikan: di sebagian sistem notifikasi permanen jadi hilang. Sekarang dikirim sebagai notifikasi biasa.",
+  "notifLiveTextMsgs": "Pesan belum dibaca",
+  "notifLiveTextNear": "Stasiun sekitar",
+  "notifLiveTextSpeed": "Kecepatan",
+  "notifLiveTextAlt": "Ketinggian",
+  "notifLiveTextHr": "Detak jantung",
+  "notifLiveTextBatt": "Baterai",
+  "notifLiveTextTrip": "Jarak perjalanan",
+  "notifLiveNearShort": "{n} stn",
+  "@notifLiveNearShort": {"placeholders": {"n": {"type": "String"}}}
 }

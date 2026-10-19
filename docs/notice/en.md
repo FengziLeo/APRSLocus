@@ -55,11 +55,11 @@ The roster for the day is on the activity page. **[Open the activity page](https
 
 ---
 
-## 🔔 What is new: 2.1.22
+## 🔔 What is new: 2.1.23
 
-- The notification's small and large icons are the app's logo now, and the live-update pill shows it too. Message notifications and the life-safety alarm use it as well.
-- Address, port, passcode and WebSocket URL on the APRS-IS page are written to preferences as you edit them, so they no longer come back empty.
-- Notification style is back to two options: a normal ongoing notification, or live updates. The Xiaomi focus option needed a vendor whitelist, so it is gone.
+- The locate button in the top bar opens the device quick panel, where APRS-IS, APRSNETCN SERVER and the radio links switch on one screen. The classic layout's top bar carries the same entry.
+- Message bubbles fade in and rise a touch, settling in 220 ms. Each bubble plays once, so scrolling back through a thread replays nothing.
+- Long-press the beacon bar on the map page to open the station identity panel. Callsign, SSID and comment save as you edit them.
 
 ---
 
@@ -77,9 +77,9 @@ Look up APALOC in the official TOCALL table and you will find it.
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-Checking for updates now returns the latest stable version, 2.1.22. If you installed 2.2.0, uninstall it first, then install 2.1.22.
+Checking for updates now returns the latest stable version, 2.1.23. If you installed 2.2.0, uninstall it first, then install 2.1.23.
 
-**[Download 2.1.22](https://github.com/dariondong/APRSLocus/releases/download/v2.1.22/APRSLocus_2.1.22.apk)**
+**[Download 2.1.23](https://github.com/dariondong/APRSLocus/releases/download/v2.1.23/APRSLocus_2.1.23.apk)**
 
 ---
 

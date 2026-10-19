@@ -18,6 +18,7 @@ import 'theme.dart';
 import 'theme_icons.dart';
 import 'theme_store.dart';
 import 'theme_text.dart';
+import 'tnc_page.dart';
 import 'weather.dart';
 import 'widgets.dart';
 
@@ -1312,7 +1313,7 @@ class _HomeShell2State extends State<HomeShell2>
     // 两个理由：一是台站页**自己就有搜索框**，外壳这个对它是重复的
     // （StationsPage._query 优先用本页那一个，外壳的只在它为空时才起作用）；
     // 二是「一整条浮在地图上的浅色横条」本身就压视觉重量。
-    // 现在只留右上角一簇悬浮胶囊：连接状态 + 定位。
+    // 现在只留右上角一簇悬浮胶囊：连接状态 + 快捷面板。
     // 包成**一只实心胶囊**：去掉搜索条之后这几个小块原本各自 12% 透明直接压在
     // 瓦片上，既读不清也不整。这里刻意**不套** MaterialSurface —— 这一簇面积远
     // 这一簇是「小浮层」，本来就不该模糊（见 material.dart），套了只是白加一层；
@@ -1349,7 +1350,7 @@ class _HomeShell2State extends State<HomeShell2>
           // 漏掉了 —— 结果 2.0 里只能进连接设置页才能连/断。补回来。
           _connBtn(st),
           const SizedBox(width: 6),
-          _locateBtn(st),
+          _quickPanelBtn(st),
         ],
         ),
         ),
@@ -1523,24 +1524,18 @@ class _HomeShell2State extends State<HomeShell2>
     );
   }
 
-  /// 定位按钮：回到地图并居中到我
+  /// 快捷面板按钮：呼出「数据来源」面板（APRS-IS / APRSNETCN / TNC / 音频…
+  /// 一屏切换，面板里每一行还能点进它自己的设置页）。
   ///
-  /// 2.0 里地图始终在，所以从任何一页点它都能直接落回地图 —— 不必先切页。
-  Widget _locateBtn(AppState st) {
-    return _iconBtn(Icons.my_location_rounded, C.blue, () {
-      if (_tab != 0) _select(0);
-      final me = st.myStation;
-      if (me != null) {
-        st.focusOnMap(me);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(S.of(context).noFixYet),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    });
+  /// 这一颗原来是「定位」（回到地图并居中到我）。用户要求把它换掉：定位在
+  /// 地图页右侧工具列里本来就有一颗，而换链路是更高频的动作 —— 原来得先进
+  /// 设置、进设备页、再滚到数据来源卡片。
+  Widget _quickPanelBtn(AppState st) {
+    return _iconBtn(
+      Icons.devices_other_rounded,
+      C.blue,
+      () => showLinkSheet(context, st),
+    );
   }
 
   /// 连接状态胶囊 + 当前链路来源。

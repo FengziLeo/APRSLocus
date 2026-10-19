@@ -47,6 +47,12 @@ class _MessagesPageState extends State<MessagesPage> {
 
   final Set<String> _watched = {};
 
+  /// 已经播过出现动画的消息（以消息对象身份记账）。
+  ///
+  /// 列表是 reverse 的，滚动时元素回收又重建，不记账的话往回滑一下整屏
+  /// 气泡会集体再飘一次 —— 那个不是「出现」，是随手指节拍。
+  final Set<int> _shownBubbles = <int>{};
+
   void _onTransChanged() {
     if (mounted) setState(() {});
   }
@@ -2439,7 +2445,26 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
+  /// 聊天气泡 + 出现动画。
+  ///
+  /// 动画只在某条消息**第一次**出现时播一遍（见 [_shownBubbles]）；
+  /// 已经出现过的直接给原样，滚动来回不会重播。
   Widget _bubble(AprsMsg m, {String? groupSender, VoidCallback? onSenderTap}) {
+    final id = identityHashCode(m);
+    return _BubbleAppear(
+      // 必须带 key：列表按下标复用元素，新消息插在最前面时如果不带 key，
+      // 它会接手上一条已经播完的动画状态，于是「新消息没有动画」。
+      key: ValueKey<int>(id),
+      play: _shownBubbles.add(id),
+      child: _bubbleBody(m, groupSender: groupSender, onSenderTap: onSenderTap),
+    );
+  }
+
+  Widget _bubbleBody(
+    AprsMsg m, {
+    String? groupSender,
+    VoidCallback? onSenderTap,
+  }) {
     final mine = m.sent;
     // 位置点消息：可点气泡（跳主地图聚焦该坐标）。它不是系统消息，所以要在
     // 系统消息分支之前单独处理 —— 否则会走普通文字气泡，用户只看到一个「位置点」。
@@ -5002,5 +5027,68 @@ class _MessagesPageState extends State<MessagesPage> {
     });
     // 保持输入焦点：回车/发送后继续打字
     _inputFocus.requestFocus();
+  }
+}
+
+/// 气泡出现动画：淡入 + 轻微上浮 + 从 96% 放大回 100%。
+///
+/// 只做这一个动作，没有弹跳、没有回弹曲线 —— 聊天里每来一条消息就弹一下，
+/// 看久了是噪音。`play == false` 时连控制器都不建，历史消息逐像素原样。
+class _BubbleAppear extends StatefulWidget {
+  final bool play;
+  final Widget child;
+  const _BubbleAppear({super.key, required this.play, required this.child});
+
+  @override
+  State<_BubbleAppear> createState() => _BubbleAppearState();
+}
+
+class _BubbleAppearState extends State<_BubbleAppear>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _c;
+  late final Animation<double> _t;
+  late final Animation<Offset> _slide;
+  late final Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.play) {
+      final c = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 220),
+      );
+      _c = c;
+      _t = CurvedAnimation(parent: c, curve: Curves.easeOutCubic);
+      // 0.10 是「自下往上挪一丁点」：按气泡自身高度算，长消息不会飘一大段。
+      _slide = Tween<Offset>(
+        begin: const Offset(0, 0.10),
+        end: Offset.zero,
+      ).animate(_t);
+      _scale = Tween<double>(begin: 0.96, end: 1).animate(_t);
+      c.forward();
+    } else {
+      _t = const AlwaysStoppedAnimation<double>(1);
+      _slide = const AlwaysStoppedAnimation<Offset>(Offset.zero);
+      _scale = const AlwaysStoppedAnimation<double>(1);
+    }
+  }
+
+  @override
+  void dispose() {
+    _c?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_c == null) return widget.child;
+    return FadeTransition(
+      opacity: _t,
+      child: SlideTransition(
+        position: _slide,
+        child: ScaleTransition(scale: _scale, child: widget.child),
+      ),
+    );
   }
 }

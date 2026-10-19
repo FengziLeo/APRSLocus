@@ -1,5 +1,51 @@
 # 更新日志
 
+## [2.1.23] - 2026-10-19
+
+### 设备快捷面板两个入口
+
+- **顶栏点一下就能换链路**：新版外壳（2.0）右上角原来那颗「定位」换成设备快捷面板，
+  1.0 顶栏也加了一颗同样的入口。面板里就是数据来源那一张，APRS-IS、APRSNETCN SERVER、
+  TNC、音频、PKWDWPL 一屏切换，每一行还能点进它自己的设置页。
+- 定位没丢，地图页右侧工具列那颗还在。
+
+### 聊天气泡出现动画
+
+- **来一条消息气泡淡入，往上挪一点点，从 96% 放大回原尺寸**，220 毫秒。
+- 同一条消息只播一次，往回翻记录不会重播。
+
+### 长按上报状态条改电台身份
+
+- **地图页那条「距下次上报」横杠，长按弹出电台身份面板**：呼号、SSID、默认徽章、
+  台站备注，改完即存，不用离开地图。
+- 面板和设置里的电台身份是同一张卡，高级设置与发射按钮留在设置页里。
+
+---
+
+## [2.1.23] - 2026-10-19 (English)
+
+### Two new entries to the device quick panel
+
+- **One tap in the top bar switches links.** The 2.0 shell's last top-bar button is now the
+  device quick panel instead of locate, and the 1.0 top bar gained the same button. The panel is
+  the data-source card: APRS-IS, APRSNETCN SERVER, TNC, audio and PKWDWPL on one sheet, and each
+  row still opens its own settings page.
+- Locate is untouched: the map page's right toolbar keeps it.
+
+### Chat bubbles animate in
+
+- **A new bubble fades in, rises a little and scales from 96% to full size** in 220 ms.
+- Each message animates once; scrolling back through the history does not replay it.
+
+### Long-press the beacon bar to edit your identity
+
+- **Long-press the "next beacon" bar on the map page to get the station identity panel**:
+  callsign, SSID, default badge and station note, saved as you type, without leaving the map.
+- It is the same card as in the settings page; the advanced fields and the transmit button stay
+  in settings.
+
+---
+
 ## [2.1.22] - 2026-10-18
 
 ### 通知图标

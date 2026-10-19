@@ -419,6 +419,26 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.23', 'date': '2026-10-19',
+        'items': [
+            ('new',
+             T('顶栏点一下就呼出设备快捷面板，两条互联网链路与各路电台一屏切换。新版外壳那颗'
+               '定位换成了它，经典布局的顶栏也加了一颗。',
+               '頂欄點一下就呼出裝置快面板，兩條網際網路鏈路與各路電台一屏切換。新版外殼那顆'
+               '定位換成了它，經典佈局的頂欄也加了一顆。',
+               'One tap in the top bar opens the device quick panel: both internet links and every '
+               'radio link on one sheet. It replaces the locate button in the 2.0 shell, and the '
+               'classic layout\'s top bar has one too.')),
+            ('new',
+             T('聊天气泡淡入着出现，往上挪一点点再落稳，同一条只播一次。长按地图页的上报'
+               '状态条直接弹出电台身份面板，呼号与备注改完即存。',
+               '聊天氣泡淡入著出現，往上挪一點點再落定，同一條只播一次。長按地圖頁的上報'
+               '狀態條直接彈出電台身份面板，呼號與備註改完即存。',
+               'Chat bubbles fade in with a small rise, once per message. Long-press the beacon '
+               'bar on the map page to get the station identity panel, saved as you type.')),
+        ],
+    },
+    {
         'ver': 'v2.1.22', 'date': '2026-10-18',
         'items': [
             ('up',

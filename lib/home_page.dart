@@ -10,6 +10,7 @@ import 'widgets.dart';
 import 'theme_store.dart';
 import 'theme_text.dart';
 import 'theme_icons.dart';
+import 'tnc_page.dart';
 import 'map_page.dart';
 import 'notice_banner.dart';
 import 'stations_page.dart';
@@ -799,9 +800,37 @@ class _HomePageState extends State<HomePage> {
                     C.greenBg,
                   ),
                 ],
+                const SizedBox(width: 8),
+                // 设备快捷面板：APRS-IS / APRSNETCN / TNC / 音频一屏切换。
+                // 与 2.0 顶栏那颗同一个入口、同一个面板（[showLinkSheet]）。
+                _quickPanelBtn(),
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+
+  /// 设备快捷面板入口：与 2.0 外壳顶栏那颗同一份实现（[showLinkSheet]）。
+  ///
+  /// 换链路是高频动作，而它原来藏在设置 → 设备 → 数据来源卡片里。
+  Widget _quickPanelBtn() {
+    return Tooltip(
+      message: S.of(context).dataSourceTitle,
+      child: ClickCursor(
+        child: GestureDetector(
+          onTap: () => showLinkSheet(context, widget.state),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: C.blue.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.devices_other_rounded, size: 18, color: C.blue),
+          ),
         ),
       ),
     );

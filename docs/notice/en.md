@@ -55,6 +55,18 @@ The roster for the day is on the activity page. **[Open the activity page](https
 
 ---
 
+## 🙏 An apology
+
+During today's maintenance, users in some regions hit login errors, and a batch of callsigns was temporarily banned so the app would not open.
+
+Both are cleared now. If you are stuck on the block page, tap "Check again" and you are back in. Otherwise the app picks it up the next time you start it. No reinstall needed.
+
+The fault was ours. Sorry for the trouble.
+
+73!
+
+---
+
 ## 🔔 What is new: 2.1.23
 
 - The locate button in the top bar opens the device quick panel, where APRS-IS, APRSNETCN SERVER and the radio links switch on one screen. The classic layout's top bar carries the same entry.

@@ -7,6 +7,7 @@ import 'theme.dart';
 import 'guide.dart';
 import 'models.dart';
 import 'pos_quality.dart';
+import 'settings_pages.dart';
 import 'state.dart';
 import 'widgets.dart';
 import 'station_detail.dart';
@@ -2871,6 +2872,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     return ClickCursor(
       child: GestureDetector(
         onTap: _showMyPanel,
+        // 长按呼出「电台身份」编辑面板（呼号 / SSID / 台站备注）。
+        // 这条横杠就是「现在这一发会发出什么」的读数牌，改呼号/备注正对着它；
+        // 为此要进设置 → 电台页太绕。
+        onLongPress: () => showStationIdentitySheet(context, st),
         child: MaterialSurface(
           radius: 12,
           blurSigma: C.chipBlur,

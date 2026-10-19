@@ -39,7 +39,25 @@ class StationSettingsPage extends StatefulWidget {
   State<StationSettingsPage> createState() => _StationSettingsPageState();
 }
 
-class _StationSettingsPageState extends State<StationSettingsPage> {
+/// ─── 电台身份卡片 ───
+///
+/// 呼号 / SSID / 默认徽章 / 台站备注，外加（设置页那一张才有的）高级设置与
+/// 「发射」按钮。单独成一块是因为它有两个入口：设置 → 电台里那一张，以及
+/// 地图页长按「上报状态条」呼出的编辑面板（[showStationIdentitySheet]）。
+/// 两处各写一遍的话，同一个字段迟早出现两套说法。
+class StationIdentityCard extends StatefulWidget {
+  final AppState state;
+
+  /// true = 设置页里那一张（含高级设置与发射按钮）；
+  /// false = 快捷编辑面板，只留身份字段。
+  final bool full;
+  const StationIdentityCard({super.key, required this.state, this.full = true});
+
+  @override
+  State<StationIdentityCard> createState() => _StationIdentityCardState();
+}
+
+class _StationIdentityCardState extends State<StationIdentityCard> {
   late final TextEditingController _call;
   late final TextEditingController _comment;
   late final TextEditingController _status;
@@ -257,38 +275,35 @@ class _StationSettingsPageState extends State<StationSettingsPage> {
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: st,
-      builder: (context, _) => SettingsPageShell(
-        title: S.of(context).stationSettings2,
-        subtitle: S.of(context).stationSettingsDetail,
-        icon: Icons.person_rounded,
+      builder: (context, _) => SettingsSectionCard(
+        title: S.of(context).stationIdentity,
+        subtitle: S.of(context).settingsStationIdentitySubtitle,
+        icon: Icons.badge_rounded,
         color: C.blue,
-        body: Column(children: [
-        SettingsSectionCard(
-          title: S.of(context).stationIdentity,
-          subtitle: S.of(context).settingsStationIdentitySubtitle,
-          icon: Icons.badge_rounded,
-          color: C.blue,
-          children: [
-            SettingsInput(S.of(context).callsign, _call,
-                tip: S.of(context).aprsCallsignHint,
-                onChanged: (v) {
-              if (v.trim().isNotEmpty) {
-                st.myCall = v.trim().toUpperCase();
-                st.persist();
-              }
-            }),
-            _ssidRow(),
-            _defaultBadgeRow(),
-            SettingsInput(S.of(context).callComment, _comment,
-                tip: S.of(context).callCommentHint,
-                // 这一行**默认就是空的**（v1.6.80 起备注默认清空），而它又是
-                // 自由文本 —— 用户反馈「都不知道那里是可以输入的」正是指这一行。
-                // 所以给它一句比通用提示更直白的占位文案。
-                hint: S.of(context).callCommentEmpty,
-                onChanged: (v) {
-              st.myComment = v.trim();
+        children: [
+          SettingsInput(S.of(context).callsign, _call,
+              tip: S.of(context).aprsCallsignHint,
+              onChanged: (v) {
+            if (v.trim().isNotEmpty) {
+              st.myCall = v.trim().toUpperCase();
               st.persist();
-            }),
+            }
+          }),
+          _ssidRow(),
+          _defaultBadgeRow(),
+          SettingsInput(S.of(context).callComment, _comment,
+              tip: S.of(context).callCommentHint,
+              // 这一行**默认就是空的**（v1.6.80 起备注默认清空），而它又是
+              // 自由文本 —— 用户反馈「都不知道那里是可以输入的」正是指这一行。
+              // 所以给它一句比通用提示更直白的占位文案。
+              hint: S.of(context).callCommentEmpty,
+              onChanged: (v) {
+            st.myComment = v.trim();
+            st.persist();
+          }),
+          // 高级设置与「发射」只在设置页那一张里出现：
+          // 快捷面板是用来改呼号/备注的，不是发射台。
+          if (widget.full) ...[
             // ── 高级设置（默认折叠）──
             //
             // 为什么折叠：这些项（高度覆盖 / PHG 三项 / 状态报文）平时根本不改，
@@ -317,24 +332,10 @@ class _StationSettingsPageState extends State<StationSettingsPage> {
               ),
             ),
           ],
-        ),
-        SizedBox(height: 16),
-        SettingsSectionCard(
-          title: S.of(context).displayInfo,
-          subtitle: S.of(context).settingsDisplayInfoSubtitle,
-          icon: Icons.info_outline_rounded,
-          color: C.purple,
-          children: [
-            _symbolPicker(),
-            SettingsRow2(S.of(context).grid, st.myGrid),
-            SettingsRow2(S.of(context).myLocation, st.myPosStr),
-          ],
-        ),
-      ]),
+        ],
       ),
     );
   }
-
   Widget _ssidRow() {
     return GestureDetector(
       onTap: () => _pickSsid(context),
@@ -542,6 +543,42 @@ class _StationSettingsPageState extends State<StationSettingsPage> {
             ]),
           ),
         ),
+      ),
+    );
+  }
+
+}
+
+/// ─── 电台设置页 ───
+///
+/// 这一页只剩两件东西：身份卡（[StationIdentityCard]）与展示信息。
+class _StationSettingsPageState extends State<StationSettingsPage> {
+  AppState get st => widget.state;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: st,
+      builder: (context, _) => SettingsPageShell(
+        title: S.of(context).stationSettings2,
+        subtitle: S.of(context).stationSettingsDetail,
+        icon: Icons.person_rounded,
+        color: C.blue,
+        body: Column(children: [
+          StationIdentityCard(state: st),
+          SizedBox(height: 16),
+          SettingsSectionCard(
+            title: S.of(context).displayInfo,
+            subtitle: S.of(context).settingsDisplayInfoSubtitle,
+            icon: Icons.info_outline_rounded,
+            color: C.purple,
+            children: [
+              _symbolPicker(),
+              SettingsRow2(S.of(context).grid, st.myGrid),
+              SettingsRow2(S.of(context).myLocation, st.myPosStr),
+            ],
+          ),
+        ]),
       ),
     );
   }
@@ -5064,3 +5101,57 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
   }
 }
 
+
+/// 呼出「电台身份」编辑面板（地图页长按上报状态条）。
+///
+/// 搬进来的就是设置页那张卡片（[StationIdentityCard] 的 `full: false` 那份），
+/// 改完即存，不用离开地图。高级设置与「发射」留在设置页里 —— 面板是用来改
+/// 呼号 / SSID / 备注的，不是发射台。
+Future<void> showStationIdentitySheet(BuildContext context, AppState state) {
+  return showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (ctx) => MaterialSurface(
+      radius: 24,
+      topOnly: true,
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(ctx).size.height * 0.82,
+        ),
+        decoration: BoxDecoration(
+          color: C.sheetFill,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        // 键盘弹起时整块抬高，否则呼号/备注那一行会被输入法盖住。
+        padding: EdgeInsets.fromLTRB(
+          16,
+          10,
+          16,
+          12 + MediaQuery.of(ctx).viewInsets.bottom,
+        ),
+        child: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: C.greyLight,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                StationIdentityCard(state: state, full: false),
+                const SizedBox(height: 6),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}

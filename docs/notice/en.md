@@ -50,6 +50,14 @@ Thank you for your support and understanding.
 
 2026.10.19
 
+## 🚩 Report a violation
+
+If you find a violating callsign or violating content, send it in with this form and help the team keep the network in order.
+
+The form is anonymous.
+
+[APRSLocus violation report form](https://ccncqe00x1e4.feishu.cn/share/base/form/shrcn3W4dM6sf47QOfMuYT2kb6b)
+
 ---
 
 ## 📡 APRSNETCN OA · #261024 Half a Cat Bed

@@ -50,6 +50,12 @@ APRS 是一个自由的环境，任何人都可以发送任何消息，经过无
 
 2026.10.19
 
+## 🚩 违规举报
+
+如发现违规呼号或违规内容，可以提交举报表单，协助开发团队管理。匿名填写。
+
+[APRSLocus 用户违规举报表单](https://ccncqe00x1e4.feishu.cn/share/base/form/shrcn3W4dM6sf47QOfMuYT2kb6b)
+
 ---
 
 ## 📡 APRSNETCN OA · #261024 半间猫窝

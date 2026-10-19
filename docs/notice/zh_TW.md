@@ -50,6 +50,12 @@ APRS 是一個自由的環境，任何人都可以發送任何訊息，經過無
 
 2026.10.19
 
+## 🚩 違規舉報
+
+如發現違規呼號或違規內容，可以提交舉報表單，協助開發團隊管理。匿名填寫。
+
+[APRSLocus 使用者違規舉報表單](https://ccncqe00x1e4.feishu.cn/share/base/form/shrcn3W4dM6sf47QOfMuYT2kb6b)
+
 ---
 
 ## 📡 APRSNETCN OA · #261024 半間貓窩

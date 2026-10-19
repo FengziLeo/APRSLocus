@@ -63,22 +63,22 @@ PAGES = [
 # ⚠ 换一期公告时这里必须一起改，否则会出现「正文是新的、标题还是上一期」。
 HEAD = {
     'zh': {
-        'kicker': '📡 APRSNETCN OA · #261024 半间猫窝',
-        'title': '本周六，向 BH6RIZ-6 发一条报文',
-        'en': 'APALOC in the official TOCALL library',
-        'sub': '本轮由 APRSNETCN 与 CATHAM 半间猫窝共同承办。北京时间 10 月 24 日 00:00 到 23:59，把报文发给轮值呼号 BH6RIZ-6，收到 ACK 就算签到，网络和射频都算。',
+        'kicker': '💌 一封信',
+        'title': '送给 APRSLocus 用户的一封信',
+        'en': 'A letter to APRSLocus users',
+        'sub': '写给大家的一封长信，关于这个项目从哪里来、边界在哪里，以及接下来的一段休息。',
     },
     'zh_TW': {
-        'kicker': '📡 APRSNETCN OA · #261024 半間貓窩',
-        'title': '本週六，向 BH6RIZ-6 發一條報文',
-        'en': 'APALOC in the official TOCALL library',
-        'sub': '本輪由 APRSNETCN 與 CATHAM 半間貓窩共同承辦。北京時間 10 月 24 日 00:00 到 23:59，把報文發給輪值呼號 BH6RIZ-6，收到 ACK 就算簽到，網路和射頻都算。',
+        'kicker': '💌 一封信',
+        'title': '送給 APRSLocus 使用者的一封信',
+        'en': 'A letter to APRSLocus users',
+        'sub': '寫給大家的一封長信，關於這個專案從哪裡來、邊界在哪裡，以及接下來的一段休息。',
     },
     'en': {
-        'kicker': '📡 APRSNETCN OA · #261024 Half a Cat Bed',
-        'title': 'This Saturday, send a packet to BH6RIZ-6',
-        'en': 'APALOC in the official TOCALL library',
-        'sub': 'Round #261024 is co-hosted by APRSNETCN and CATHAM 半间猫窝. On 24 October, 00:00 to 23:59 Beijing time, send a message to the duty callsign BH6RIZ-6; an ACK puts you on the roster. Network and RF both count.',
+        'kicker': '💌 A letter',
+        'title': 'A letter to APRSLocus users',
+        'en': '73 from BG7LZQ',
+        'sub': 'A long letter to everyone about where this project came from, where its boundaries are, and the rest ahead.',
     },
 }
 

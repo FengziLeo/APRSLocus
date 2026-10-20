@@ -1026,6 +1026,47 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
 
   AppState get st => widget.state;
 
+  /// 改「打开软件时」的档位：先把后果说清楚再落盘。
+  ///
+  /// 回到「不做操作」不用确认 —— 那只是少做一件事；往后开（自动连接 /
+  /// 自动上报）要用户点一下确认，因为它改变的是以后每次开机的行为，
+  /// 而「开机就发位置」没人替他决定。
+  Future<void> _pickAutoStart(int v) async {
+    if (v == st.autoStartMode) return;
+    if (v == 0) {
+      st.setAutoStartMode(0);
+      return;
+    }
+    final s = S.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Row(children: [
+          Icon(Icons.power_settings_new_rounded, color: C.green, size: 22),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(s.autoStartAskTitle, style: ts(16, w: FontWeight.w700)),
+          ),
+        ]),
+        content: Text(v == 2 ? s.autoStartAskReport : s.autoStartAskConnect,
+            style: ts(13, h: 1.7)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(s.autoStartAskCancel, style: ts(13, c: C.blue)),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(s.autoStartAskOk, style: ts(13)),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || ok != true) return;
+    st.setAutoStartMode(v);
+  }
+
   /// 选「纯网络定位时用的符号」（issue #21-6）。
   ///
   /// 与「我的符号」那张卡共用同一张符号表（`_symCategories`），但**多一项**
@@ -1479,6 +1520,26 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
             // 这个开关在主界面（地图）也有一键入口，且带「立即上报」。见
             // widgets.ReportActions。
             SettingsHint(S.of(context).autoReportEntryHint),
+            // ── 打开软件时：不做 / 自动连接 / 自动上报 ──
+            //
+            // 默认「不做操作」：开机就连网、就发位置是替用户做决定，所以由他自己
+            // 选，换档前还把后果摆到眼前（[_pickAutoStart] 的确认框）。
+            SettingsChoice<int>(
+              S.of(context).autoStartTitle,
+              value: st.autoStartMode,
+              options: const [0, 1, 2],
+              labelOf: (v) => switch (v) {
+                1 => S.of(context).autoStartConnect,
+                2 => S.of(context).autoStartReport,
+                _ => S.of(context).autoStartNone,
+              },
+              onChanged: (v) => unawaited(_pickAutoStart(v)),
+            ),
+            SettingsHint(switch (st.autoStartMode) {
+              1 => S.of(context).autoStartConnectHint,
+              2 => S.of(context).autoStartReportHint,
+              _ => S.of(context).autoStartNoneHint,
+            }),
             // 上报状态栏样式：经典（单行）/ 详细（多一行判据，每秒刷新）。
             // 放在信标这一节里：它描述的就是「信标什么时候会发」。（issue #21-2）
             Padding(

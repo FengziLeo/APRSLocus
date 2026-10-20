@@ -4269,5 +4269,17 @@
   "consentLogClearHint": "ログだけを消します。すでに与えた同意は変わりません。",
   "consentLogCleared": "同意ログを消去しました",
   "consentActGrant": "同意",
-  "consentActRevoke": "撤回"
+  "consentActRevoke": "撤回",
+  "autoStartTitle": "アプリを開いたとき",
+  "autoStartNone": "何もしない",
+  "autoStartConnect": "自動接続",
+  "autoStartReport": "自動送信",
+  "autoStartNoneHint": "アプリを開いても何もしません。",
+  "autoStartConnectHint": "アプリを開くとサーバーに自動で接続します。送信は自分で押す必要があります。",
+  "autoStartReportHint": "アプリを開くとサーバーに自動で接続し、そのまま位置の送信を始めます。",
+  "autoStartAskTitle": "オンにしますか",
+  "autoStartAskConnect": "これからアプリを開くたびにサーバーへ自動で接続します。",
+  "autoStartAskReport": "これからアプリを開くたびにサーバーへ自動で接続し、位置の送信を始めます。",
+  "autoStartAskOk": "オンにする",
+  "autoStartAskCancel": "キャンセル"
 }

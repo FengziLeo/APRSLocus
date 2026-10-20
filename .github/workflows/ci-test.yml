@@ -263,6 +263,12 @@ jobs:
       - name: Test manual report confirmation
         run: flutter test test/report_confirm_test.dart
 
+      # 「打开软件时」三档（2026-10-20）：默认不做操作、自动连接不放行上报、
+      # 自动上报要过单独同意。错了同样编译能过、analyze 全绿，只会表现成
+      # 「一开机就把位置发出去」—— 那是替用户做决定，所以钉在 CI。
+      - name: Test auto start on launch
+        run: flutter test test/auto_start_test.dart
+
       # 上传/发射的「单独同意」（用户协议 V2.0 附件一）：三个功能项分别记、
       # 签完才能开、撤回即停、日志可单独清。这几条错了**编译能过、analyze 也全绿**，
       # 只会表现成「签了没用」或「撤回了还在发」——后者是拿协议当装饰，

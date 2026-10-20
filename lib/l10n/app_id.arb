@@ -4269,5 +4269,17 @@
   "consentLogClearHint": "Hanya menghapus log. Persetujuan yang sudah diberikan tidak berubah.",
   "consentLogCleared": "Log dihapus",
   "consentActGrant": "setuju",
-  "consentActRevoke": "dicabut"
+  "consentActRevoke": "dicabut",
+  "autoStartTitle": "Saat aplikasi dibuka",
+  "autoStartNone": "Tidak melakukan apa-apa",
+  "autoStartConnect": "Sambung otomatis",
+  "autoStartReport": "Kirim otomatis",
+  "autoStartNoneHint": "Tidak ada yang terjadi saat aplikasi dibuka.",
+  "autoStartConnectHint": "Aplikasi tersambung ke server saat dibuka. Pengiriman tetap menunggu ketukanmu.",
+  "autoStartReportHint": "Aplikasi tersambung ke server dan langsung mulai mengirim posisi.",
+  "autoStartAskTitle": "Aktifkan?",
+  "autoStartAskConnect": "Mulai sekarang aplikasi tersambung ke server setiap kali dibuka.",
+  "autoStartAskReport": "Mulai sekarang aplikasi tersambung ke server dan mulai mengirim posisi setiap kali dibuka.",
+  "autoStartAskOk": "Aktifkan",
+  "autoStartAskCancel": "Batal"
 }

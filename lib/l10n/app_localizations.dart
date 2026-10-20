@@ -17223,6 +17223,78 @@ abstract class AppLocalizations {
   /// **'撤回'**
   String get consentActRevoke;
 
+  /// No description provided for @autoStartTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开软件时'**
+  String get autoStartTitle;
+
+  /// No description provided for @autoStartNone.
+  ///
+  /// In zh, this message translates to:
+  /// **'不做操作'**
+  String get autoStartNone;
+
+  /// No description provided for @autoStartConnect.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动连接'**
+  String get autoStartConnect;
+
+  /// No description provided for @autoStartReport.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动上报'**
+  String get autoStartReport;
+
+  /// No description provided for @autoStartNoneHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开软件后什么都不做。'**
+  String get autoStartNoneHint;
+
+  /// No description provided for @autoStartConnectHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开软件后自动连上服务器，上报仍然要你自己点。'**
+  String get autoStartConnectHint;
+
+  /// No description provided for @autoStartReportHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开软件后自动连上服务器，并直接开始上报位置。'**
+  String get autoStartReportHint;
+
+  /// No description provided for @autoStartAskTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'要开启吗'**
+  String get autoStartAskTitle;
+
+  /// No description provided for @autoStartAskConnect.
+  ///
+  /// In zh, this message translates to:
+  /// **'以后每次打开软件都会自动连接服务器。'**
+  String get autoStartAskConnect;
+
+  /// No description provided for @autoStartAskReport.
+  ///
+  /// In zh, this message translates to:
+  /// **'以后每次打开软件都会自动连接服务器，并开始上报位置。'**
+  String get autoStartAskReport;
+
+  /// No description provided for @autoStartAskOk.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启'**
+  String get autoStartAskOk;
+
+  /// No description provided for @autoStartAskCancel.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消'**
+  String get autoStartAskCancel;
+
 }
 
 class _AppLocalizationsDelegate

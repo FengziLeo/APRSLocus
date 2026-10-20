@@ -4269,5 +4269,17 @@
   "consentLogClearHint": "Solo borra el registro. Los consentimientos ya dados no cambian.",
   "consentLogCleared": "Registro borrado",
   "consentActGrant": "aceptado",
-  "consentActRevoke": "retirado"
+  "consentActRevoke": "retirado",
+  "autoStartTitle": "Al abrir la app",
+  "autoStartNone": "No hacer nada",
+  "autoStartConnect": "Conexión automática",
+  "autoStartReport": "Reporte automático",
+  "autoStartNoneHint": "Al abrir la app no pasa nada.",
+  "autoStartConnectHint": "Al abrir la app se conecta al servidor. El reporte sigue esperando tu toque.",
+  "autoStartReportHint": "Al abrir la app se conecta al servidor y empieza a reportar la posición.",
+  "autoStartAskTitle": "¿Activarlo?",
+  "autoStartAskConnect": "Desde ahora la app se conecta al servidor cada vez que la abres.",
+  "autoStartAskReport": "Desde ahora la app se conecta al servidor y empieza a reportar cada vez que la abres.",
+  "autoStartAskOk": "Activar",
+  "autoStartAskCancel": "Cancelar"
 }

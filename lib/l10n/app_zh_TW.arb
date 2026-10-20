@@ -4857,5 +4857,17 @@
   "consentLogClearHint": "只清日誌，已經作出的同意不受影響。",
   "consentLogCleared": "同意日誌已清除",
   "consentActGrant": "同意",
-  "consentActRevoke": "撤回"
+  "consentActRevoke": "撤回",
+  "autoStartTitle": "打開軟體時",
+  "autoStartNone": "不做操作",
+  "autoStartConnect": "自動連線",
+  "autoStartReport": "自動上報",
+  "autoStartNoneHint": "打開軟體後什麼都不做。",
+  "autoStartConnectHint": "打開軟體後自動連上伺服器，上報仍然要你自己點。",
+  "autoStartReportHint": "打開軟體後自動連上伺服器，並直接開始上報位置。",
+  "autoStartAskTitle": "要開啟嗎",
+  "autoStartAskConnect": "以後每次打開軟體都會自動連線伺服器。",
+  "autoStartAskReport": "以後每次打開軟體都會自動連線伺服器，並開始上報位置。",
+  "autoStartAskOk": "開啟",
+  "autoStartAskCancel": "取消"
 }

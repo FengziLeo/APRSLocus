@@ -9532,4 +9532,40 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get consentActRevoke => "撤回";
 
+  @override
+  String get autoStartTitle => "アプリを開いたとき";
+
+  @override
+  String get autoStartNone => "何もしない";
+
+  @override
+  String get autoStartConnect => "自動接続";
+
+  @override
+  String get autoStartReport => "自動送信";
+
+  @override
+  String get autoStartNoneHint => "アプリを開いても何もしません。";
+
+  @override
+  String get autoStartConnectHint => "アプリを開くとサーバーに自動で接続します。送信は自分で押す必要があります。";
+
+  @override
+  String get autoStartReportHint => "アプリを開くとサーバーに自動で接続し、そのまま位置の送信を始めます。";
+
+  @override
+  String get autoStartAskTitle => "オンにしますか";
+
+  @override
+  String get autoStartAskConnect => "これからアプリを開くたびにサーバーへ自動で接続します。";
+
+  @override
+  String get autoStartAskReport => "これからアプリを開くたびにサーバーへ自動で接続し、位置の送信を始めます。";
+
+  @override
+  String get autoStartAskOk => "オンにする";
+
+  @override
+  String get autoStartAskCancel => "キャンセル";
+
 }

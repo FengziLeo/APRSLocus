@@ -9432,6 +9432,42 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get consentActRevoke => "撤回";
 
+  @override
+  String get autoStartTitle => "打开软件时";
+
+  @override
+  String get autoStartNone => "不做操作";
+
+  @override
+  String get autoStartConnect => "自动连接";
+
+  @override
+  String get autoStartReport => "自动上报";
+
+  @override
+  String get autoStartNoneHint => "打开软件后什么都不做。";
+
+  @override
+  String get autoStartConnectHint => "打开软件后自动连上服务器，上报仍然要你自己点。";
+
+  @override
+  String get autoStartReportHint => "打开软件后自动连上服务器，并直接开始上报位置。";
+
+  @override
+  String get autoStartAskTitle => "要开启吗";
+
+  @override
+  String get autoStartAskConnect => "以后每次打开软件都会自动连接服务器。";
+
+  @override
+  String get autoStartAskReport => "以后每次打开软件都会自动连接服务器，并开始上报位置。";
+
+  @override
+  String get autoStartAskOk => "开启";
+
+  @override
+  String get autoStartAskCancel => "取消";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18860,5 +18896,41 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get consentActRevoke => "撤回";
+
+  @override
+  String get autoStartTitle => "打開軟體時";
+
+  @override
+  String get autoStartNone => "不做操作";
+
+  @override
+  String get autoStartConnect => "自動連線";
+
+  @override
+  String get autoStartReport => "自動上報";
+
+  @override
+  String get autoStartNoneHint => "打開軟體後什麼都不做。";
+
+  @override
+  String get autoStartConnectHint => "打開軟體後自動連上伺服器，上報仍然要你自己點。";
+
+  @override
+  String get autoStartReportHint => "打開軟體後自動連上伺服器，並直接開始上報位置。";
+
+  @override
+  String get autoStartAskTitle => "要開啟嗎";
+
+  @override
+  String get autoStartAskConnect => "以後每次打開軟體都會自動連線伺服器。";
+
+  @override
+  String get autoStartAskReport => "以後每次打開軟體都會自動連線伺服器，並開始上報位置。";
+
+  @override
+  String get autoStartAskOk => "開啟";
+
+  @override
+  String get autoStartAskCancel => "取消";
 
 }

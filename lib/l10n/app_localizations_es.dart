@@ -9870,4 +9870,40 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get consentActRevoke => "retirado";
 
+  @override
+  String get autoStartTitle => "Al abrir la app";
+
+  @override
+  String get autoStartNone => "No hacer nada";
+
+  @override
+  String get autoStartConnect => "Conexión automática";
+
+  @override
+  String get autoStartReport => "Reporte automático";
+
+  @override
+  String get autoStartNoneHint => "Al abrir la app no pasa nada.";
+
+  @override
+  String get autoStartConnectHint => "Al abrir la app se conecta al servidor. El reporte sigue esperando tu toque.";
+
+  @override
+  String get autoStartReportHint => "Al abrir la app se conecta al servidor y empieza a reportar la posición.";
+
+  @override
+  String get autoStartAskTitle => "¿Activarlo?";
+
+  @override
+  String get autoStartAskConnect => "Desde ahora la app se conecta al servidor cada vez que la abres.";
+
+  @override
+  String get autoStartAskReport => "Desde ahora la app se conecta al servidor y empieza a reportar cada vez que la abres.";
+
+  @override
+  String get autoStartAskOk => "Activar";
+
+  @override
+  String get autoStartAskCancel => "Cancelar";
+
 }

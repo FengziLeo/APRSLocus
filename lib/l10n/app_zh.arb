@@ -4948,5 +4948,17 @@
   "consentLogClearHint": "只清日志，已经作出的同意不受影响。",
   "consentLogCleared": "同意日志已清除",
   "consentActGrant": "同意",
-  "consentActRevoke": "撤回"
+  "consentActRevoke": "撤回",
+  "autoStartTitle": "打开软件时",
+  "autoStartNone": "不做操作",
+  "autoStartConnect": "自动连接",
+  "autoStartReport": "自动上报",
+  "autoStartNoneHint": "打开软件后什么都不做。",
+  "autoStartConnectHint": "打开软件后自动连上服务器，上报仍然要你自己点。",
+  "autoStartReportHint": "打开软件后自动连上服务器，并直接开始上报位置。",
+  "autoStartAskTitle": "要开启吗",
+  "autoStartAskConnect": "以后每次打开软件都会自动连接服务器。",
+  "autoStartAskReport": "以后每次打开软件都会自动连接服务器，并开始上报位置。",
+  "autoStartAskOk": "开启",
+  "autoStartAskCancel": "取消"
 }

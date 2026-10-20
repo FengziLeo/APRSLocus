@@ -9811,4 +9811,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get consentActRevoke => "withdrawn";
 
+  @override
+  String get autoStartTitle => "When I open the app";
+
+  @override
+  String get autoStartNone => "Do nothing";
+
+  @override
+  String get autoStartConnect => "Auto connect";
+
+  @override
+  String get autoStartReport => "Auto report";
+
+  @override
+  String get autoStartNoneHint => "Nothing happens when you open the app.";
+
+  @override
+  String get autoStartConnectHint => "The app connects to the server when you open it. Reporting still waits for your tap.";
+
+  @override
+  String get autoStartReportHint => "The app connects to the server and starts reporting the position right away.";
+
+  @override
+  String get autoStartAskTitle => "Turn it on?";
+
+  @override
+  String get autoStartAskConnect => "From now on the app connects to the server every time you open it.";
+
+  @override
+  String get autoStartAskReport => "From now on the app connects to the server and starts reporting every time you open it.";
+
+  @override
+  String get autoStartAskOk => "Turn on";
+
+  @override
+  String get autoStartAskCancel => "Cancel";
+
 }

@@ -4269,5 +4269,17 @@
   "consentLogClearHint": "This clears the log only. Consents you already gave stay in place.",
   "consentLogCleared": "Consent log cleared",
   "consentActGrant": "agreed",
-  "consentActRevoke": "withdrawn"
+  "consentActRevoke": "withdrawn",
+  "autoStartTitle": "When I open the app",
+  "autoStartNone": "Do nothing",
+  "autoStartConnect": "Auto connect",
+  "autoStartReport": "Auto report",
+  "autoStartNoneHint": "Nothing happens when you open the app.",
+  "autoStartConnectHint": "The app connects to the server when you open it. Reporting still waits for your tap.",
+  "autoStartReportHint": "The app connects to the server and starts reporting the position right away.",
+  "autoStartAskTitle": "Turn it on?",
+  "autoStartAskConnect": "From now on the app connects to the server every time you open it.",
+  "autoStartAskReport": "From now on the app connects to the server and starts reporting every time you open it.",
+  "autoStartAskOk": "Turn on",
+  "autoStartAskCancel": "Cancel"
 }

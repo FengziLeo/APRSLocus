@@ -685,6 +685,45 @@ class AppState extends ChangeNotifier {
     _notify();
   }
 
+  /// ── 打开软件时自动做什么 ──
+  ///
+  /// 0 = 不做操作（默认）、1 = 自动连接服务器、2 = 自动连接并直接进入上报。
+  ///
+  /// 默认 0：一开机就联网、就发位置属于**替用户做决定**，必须他自己选。
+  /// 界面在打开它之前先把后果说清楚（见上报设置页的确认框）。
+  int autoStartMode = 0;
+
+  /// 改「打开软件时」的档位（非法值夹回 0..2）。提示与确认框由界面承担。
+  void setAutoStartMode(int v) {
+    final n = v.clamp(0, 2);
+    if (n == autoStartMode) return;
+    autoStartMode = n;
+    persist();
+    _notify();
+  }
+
+  /// 启动后按 [autoStartMode] 自动起步。构造器延时调用；测试也能直接调。
+  Future<void> autoStartOnLaunch() async {
+    final mode = autoStartMode;
+    if (mode <= 0 || _disposed) return;
+    // 首次引导还没走完时不动：那时地址都还没填，替他连一次毫无意义。
+    if (!oobeDone) return;
+    // 已经连着（开机前就在后台连着，或用户先手动连了）就不重复连。
+    if (!anyLinkUp) {
+      await toggleConnect();
+      if (_disposed) return;
+    }
+    if (mode >= 2) startReportingAuto();
+  }
+
+  /// 直接进入上报流程：先过单独同意，再把自动上报打开并放行本次连接。
+  void startReportingAuto() {
+    if (_disposed) return;
+    if (!ensureConsent(beaconConsentScopes, then: startReportingAuto)) return;
+    if (!beaconEnabled) setBeaconEnabled(true);
+    beginReporting();
+  }
+
   // 信标上报内容选项
   bool beaconIncludeSpeed = true; // 速度
   bool beaconIncludeCourse = true; // 方位角
@@ -4338,6 +4377,7 @@ class AppState extends ChangeNotifier {
     beaconIncludeTotalMileage = false;
     totalMileageKm = 0;
     beaconForceCoarse = false;
+    autoStartMode = 0;
     bleHrId = '';
     bleHrName = '';
     bleHr.deviceId = '';
@@ -4853,6 +4893,8 @@ class AppState extends ChangeNotifier {
       totalMileageKm = p.getDouble('totalMileageKm') ?? totalMileageKm;
       beaconForceCoarse =
           p.getBool('beaconForceCoarse') ?? beaconForceCoarse;
+      // 打开软件时自动做什么：认不出的值（改坏 / 旧版不写这一项）回到「不做操作」
+      autoStartMode = (p.getInt('autoStartMode') ?? autoStartMode).clamp(0, 2);
       bleHrId = p.getString('bleHrId') ?? bleHrId;
       bleHrName = p.getString('bleHrName') ?? bleHrName;
       // 只恢复「记住的是哪台」，不自动连（权限/设备不在身边时静默失败更困惑）
@@ -5229,6 +5271,7 @@ class AppState extends ChangeNotifier {
     await p.setBool('beaconIncludeTotalMileage', beaconIncludeTotalMileage);
     await p.setDouble('totalMileageKm', totalMileageKm);
     await p.setBool('beaconForceCoarse', beaconForceCoarse);
+    await p.setInt('autoStartMode', autoStartMode);
     await p.setString('bleHrId', bleHrId);
     await p.setString('bleHrName', bleHrName);
     await p.setString('garminUrl', garminUrl);
@@ -5668,6 +5711,13 @@ class AppState extends ChangeNotifier {
         await Future.delayed(const Duration(seconds: 1));
       }
       _updateNotification();
+    });
+    // 启动后按用户设置自动起步（见 [autoStartMode]）：默认「不做操作」，
+    // 用户开过才会真的走到连接 / 上报。比上面那块晚 300ms，免得两条路同时
+    // 去推连接状态与前台服务。
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (_disposed) return;
+      unawaited(autoStartOnLaunch());
     });
   }
 

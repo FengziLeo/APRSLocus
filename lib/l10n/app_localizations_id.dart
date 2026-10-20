@@ -9821,4 +9821,40 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get consentActRevoke => "dicabut";
 
+  @override
+  String get autoStartTitle => "Saat aplikasi dibuka";
+
+  @override
+  String get autoStartNone => "Tidak melakukan apa-apa";
+
+  @override
+  String get autoStartConnect => "Sambung otomatis";
+
+  @override
+  String get autoStartReport => "Kirim otomatis";
+
+  @override
+  String get autoStartNoneHint => "Tidak ada yang terjadi saat aplikasi dibuka.";
+
+  @override
+  String get autoStartConnectHint => "Aplikasi tersambung ke server saat dibuka. Pengiriman tetap menunggu ketukanmu.";
+
+  @override
+  String get autoStartReportHint => "Aplikasi tersambung ke server dan langsung mulai mengirim posisi.";
+
+  @override
+  String get autoStartAskTitle => "Aktifkan?";
+
+  @override
+  String get autoStartAskConnect => "Mulai sekarang aplikasi tersambung ke server setiap kali dibuka.";
+
+  @override
+  String get autoStartAskReport => "Mulai sekarang aplikasi tersambung ke server dan mulai mengirim posisi setiap kali dibuka.";
+
+  @override
+  String get autoStartAskOk => "Aktifkan";
+
+  @override
+  String get autoStartAskCancel => "Batal";
+
 }

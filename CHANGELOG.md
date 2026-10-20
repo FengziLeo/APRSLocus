@@ -1,5 +1,27 @@
 # 更新日志
 
+## [2.1.26] - 2026-10-20
+
+### 版本太旧时先更新
+
+- **低于官网要求的最低版本时，软件只显示更新页**，返回键直接退出应用。
+- 最低版本从 aprslocus.theez.top 读取。拉不到、文件坏了、下限没填，一律放行。
+- 更新到下限以上之后，闸门自己消失，不用再点任何按钮。
+
+---
+
+## [2.1.26] - 2026-10-20 (English)
+
+### Update first when this build is too old
+
+- **When your version is below the minimum the official site asks for, the app shows only the
+  update page**; the back key quits the app.
+- The minimum is read from aprslocus.theez.top. Failing to fetch it, a broken file, or an empty
+  floor all let you through.
+- Once you are on the floor or above, the gate disappears on its own; there is nothing to tap.
+
+---
+
 ## [2.1.25] - 2026-10-20
 
 ### 地图双击放大

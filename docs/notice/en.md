@@ -133,11 +133,10 @@ The fault was ours. Sorry for the trouble.
 
 ---
 
-## 🔔 What is new: 2.1.25
+## 🔔 What is new: 2.1.26
 
-- Double-tapping the map zooms in one level around the point you tapped, with the same animation as the "+" button.
-- Beacon settings gained a "When I open the app" row with three choices: do nothing, connect to the server, or go straight into reporting. The default is do nothing, and switching asks for confirmation first.
-- With auto-report off, tapping the pending-confirmation button sends one beacon instead of turning auto-report on along the way.
+- Below the minimum version the official site asks for, the app shows only the update page and the back key quits.
+- The minimum is read from the official site. Failing to fetch it, a broken file, or an empty floor all let you through.
 
 ---
 
@@ -155,9 +154,9 @@ Look up APALOC in the official TOCALL table and you will find it.
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-Checking for updates now returns the latest stable version, 2.1.25. If you installed 2.2.0, uninstall it first, then install 2.1.25.
+Checking for updates now returns the latest stable version, 2.1.26. If you installed 2.2.0, uninstall it first, then install 2.1.26.
 
-**[Download 2.1.25](https://github.com/dariondong/APRSLocus/releases/download/v2.1.25/APRSLocus_2.1.25.apk)**
+**[Download 2.1.26](https://github.com/dariondong/APRSLocus/releases/download/v2.1.26/APRSLocus_2.1.26.apk)**
 
 ---
 

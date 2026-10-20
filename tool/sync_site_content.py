@@ -419,6 +419,18 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.26', 'date': '2026-10-20',
+        'items': [
+            ('new',
+             T('低于官网要求的最低版本时，软件只显示更新页，返回键直接退出应用。'
+               '更新到下限以上之后闸门自己消失。',
+               '低於官網要求的最低版本時，軟體只顯示更新頁，返回鍵直接結束應用程式。'
+               '更新到下限以上之後閘門自己消失。',
+               'Below the minimum version the official site asks for, the app shows only the '
+               'update page and the back key quits. Above it the gate disappears on its own.')),
+        ],
+    },
+    {
         'ver': 'v2.1.25', 'date': '2026-10-20',
         'items': [
             ('new',

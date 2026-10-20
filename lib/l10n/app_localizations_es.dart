@@ -9795,4 +9795,79 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String notifLiveNearShort(String n) => "$n est";
 
+  @override
+  String get consentTitle => "Consentimiento separado para subir y transmitir";
+
+  @override
+  String get consentLead => "Antes de activar cualquier función de subida o envío, confirma estos tres puntos.";
+
+  @override
+  String get consentNatureTitle => "Qué son los datos";
+
+  @override
+  String get consentNatureBody => "Lo que vas a subir contiene trayectos de desplazamiento, que son datos personales sensibles según la ley china de protección de la información personal.";
+
+  @override
+  String get consentNeedTitle => "Por qué es necesario";
+
+  @override
+  String get consentNeedBody => "APRS funciona enviando tu posición a una red pública. No hay forma de lograr lo mismo sin subirla.";
+
+  @override
+  String get consentImpactTitle => "Impacto en tus derechos";
+
+  @override
+  String get consentImpactBody => "Los datos que entran en APRS-IS los guardan servidores de terceros, y algunos servidores públicos conservan las posiciones 180 días o más. Una vez que los datos están en una red pública no se pueden retirar ni borrar.";
+
+  @override
+  String get consentAgree => "Acepto";
+
+  @override
+  String get consentScopeInternet => "Subida de balizas a APRS-IS";
+
+  @override
+  String get consentScopeRf => "Envío de balizas por radio";
+
+  @override
+  String get consentScopeIgate => "Reenvío con iGate";
+
+  @override
+  String get consentAccept => "Aceptar y activar";
+
+  @override
+  String get consentCancel => "Ahora no";
+
+  @override
+  String get consentPickOne => "Marca al menos una función.";
+
+  @override
+  String get consentPickAgree => "Marca primero \"Acepto\".";
+
+  @override
+  String get consentSection => "Consentimiento separado";
+
+  @override
+  String get consentSectionHint => "Si desactivas una, esa función deja de enviar datos nuevos de inmediato. Lo ya enviado no se puede recuperar.";
+
+  @override
+  String get consentLogTitle => "Registro de consentimiento";
+
+  @override
+  String get consentLogEmpty => "Todavía no hay registros.";
+
+  @override
+  String get consentLogClear => "Borrar el registro";
+
+  @override
+  String get consentLogClearHint => "Solo borra el registro. Los consentimientos ya dados no cambian.";
+
+  @override
+  String get consentLogCleared => "Registro borrado";
+
+  @override
+  String get consentActGrant => "aceptado";
+
+  @override
+  String get consentActRevoke => "retirado";
+
 }

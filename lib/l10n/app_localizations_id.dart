@@ -9746,4 +9746,79 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String notifLiveNearShort(String n) => "$n stn";
 
+  @override
+  String get consentTitle => "Persetujuan terpisah untuk unggah dan kirim";
+
+  @override
+  String get consentLead => "Sebelum mengaktifkan unggah atau kirim, konfirmasikan tiga hal berikut.";
+
+  @override
+  String get consentNatureTitle => "Sifat data";
+
+  @override
+  String get consentNatureBody => "Yang akan kamu unggah memuat jejak perjalanan, yang termasuk data pribadi sensitif menurut UU Perlindungan Informasi Pribadi Tiongkok.";
+
+  @override
+  String get consentNeedTitle => "Mengapa perlu";
+
+  @override
+  String get consentNeedBody => "APRS bekerja dengan mengirim posisi ke jaringan publik. Tidak ada cara lain yang memberi fungsi sama tanpa mengunggah.";
+
+  @override
+  String get consentImpactTitle => "Dampak pada hakmu";
+
+  @override
+  String get consentImpactBody => "Data yang masuk APRS-IS disimpan server pihak ketiga, dan sebagian server publik menyimpan posisi 180 hari atau lebih. Setelah masuk jaringan publik, data tidak bisa ditarik atau dihapus.";
+
+  @override
+  String get consentAgree => "Saya setuju";
+
+  @override
+  String get consentScopeInternet => "Unggah beacon APRS-IS";
+
+  @override
+  String get consentScopeRf => "Kirim beacon lewat radio";
+
+  @override
+  String get consentScopeIgate => "Penerusan iGate";
+
+  @override
+  String get consentAccept => "Setuju dan aktifkan";
+
+  @override
+  String get consentCancel => "Jangan dulu";
+
+  @override
+  String get consentPickOne => "Centang minimal satu fitur.";
+
+  @override
+  String get consentPickAgree => "Centang \"Saya setuju\" dulu.";
+
+  @override
+  String get consentSection => "Persetujuan terpisah";
+
+  @override
+  String get consentSectionHint => "Matikan satu, fitur itu langsung berhenti mengirim data baru. Data yang sudah terkirim tidak bisa ditarik.";
+
+  @override
+  String get consentLogTitle => "Log persetujuan";
+
+  @override
+  String get consentLogEmpty => "Belum ada catatan.";
+
+  @override
+  String get consentLogClear => "Hapus log";
+
+  @override
+  String get consentLogClearHint => "Hanya menghapus log. Persetujuan yang sudah diberikan tidak berubah.";
+
+  @override
+  String get consentLogCleared => "Log dihapus";
+
+  @override
+  String get consentActGrant => "setuju";
+
+  @override
+  String get consentActRevoke => "dicabut";
+
 }

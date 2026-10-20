@@ -9736,4 +9736,79 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String notifLiveNearShort(String n) => "$n stn";
 
+  @override
+  String get consentTitle => "Separate consent for upload and transmit";
+
+  @override
+  String get consentLead => "Before you turn on any upload or transmit feature, confirm these three points.";
+
+  @override
+  String get consentNatureTitle => "What the data is";
+
+  @override
+  String get consentNatureBody => "What you are about to upload contains movement tracks, which are sensitive personal information under China's Personal Information Protection Law.";
+
+  @override
+  String get consentNeedTitle => "Why it is necessary";
+
+  @override
+  String get consentNeedBody => "APRS works by sending your position to a public network. No alternative gives the same function without uploading.";
+
+  @override
+  String get consentImpactTitle => "Impact on your rights";
+
+  @override
+  String get consentImpactBody => "Data entering APRS-IS is stored by third-party servers, and some public servers keep positions for 180 days or longer. Once data is on a public network it cannot be withdrawn or deleted.";
+
+  @override
+  String get consentAgree => "I agree";
+
+  @override
+  String get consentScopeInternet => "APRS-IS beacon upload";
+
+  @override
+  String get consentScopeRf => "RF beacon transmit";
+
+  @override
+  String get consentScopeIgate => "iGate forwarding";
+
+  @override
+  String get consentAccept => "Agree and turn on";
+
+  @override
+  String get consentCancel => "Not now";
+
+  @override
+  String get consentPickOne => "Tick at least one feature.";
+
+  @override
+  String get consentPickAgree => "Tick \"I agree\" first.";
+
+  @override
+  String get consentSection => "Separate consent";
+
+  @override
+  String get consentSectionHint => "Turn one off and that feature stops sending new data at once. Data already sent cannot be taken back.";
+
+  @override
+  String get consentLogTitle => "Consent log";
+
+  @override
+  String get consentLogEmpty => "No entries yet.";
+
+  @override
+  String get consentLogClear => "Clear the log";
+
+  @override
+  String get consentLogClearHint => "This clears the log only. Consents you already gave stay in place.";
+
+  @override
+  String get consentLogCleared => "Consent log cleared";
+
+  @override
+  String get consentActGrant => "agreed";
+
+  @override
+  String get consentActRevoke => "withdrawn";
+
 }

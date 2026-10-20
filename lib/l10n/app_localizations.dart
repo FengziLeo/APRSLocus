@@ -17073,6 +17073,156 @@ abstract class AppLocalizations {
   /// **'{n} 台'**
   String notifLiveNearShort(String n);
 
+  /// No description provided for @consentTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'上传与发射的单独同意'**
+  String get consentTitle;
+
+  /// No description provided for @consentLead.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启上传或发射之前，先单独确认下面三件事。'**
+  String get consentLead;
+
+  /// No description provided for @consentNatureTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'信息性质'**
+  String get consentNatureTitle;
+
+  /// No description provided for @consentNatureBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'你即将上传的内容包含行踪轨迹，属于《个人信息保护法》下的敏感个人信息。'**
+  String get consentNatureBody;
+
+  /// No description provided for @consentNeedTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'必要性'**
+  String get consentNeedTitle;
+
+  /// No description provided for @consentNeedBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'APRS 功能依赖把位置发到公开网络，不存在不上传就能实现同等功能的替代方式。'**
+  String get consentNeedBody;
+
+  /// No description provided for @consentImpactTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'对个人权益的影响'**
+  String get consentImpactTitle;
+
+  /// No description provided for @consentImpactBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'数据进入 APRS-IS 后由第三方服务器存储，部分公开服务器对位置的留存可达 180 天或更久。数据一旦进入公开网络，无法撤回，也无法删除。'**
+  String get consentImpactBody;
+
+  /// No description provided for @consentAgree.
+  ///
+  /// In zh, this message translates to:
+  /// **'我同意'**
+  String get consentAgree;
+
+  /// No description provided for @consentScopeInternet.
+  ///
+  /// In zh, this message translates to:
+  /// **'APRS-IS 信标上传'**
+  String get consentScopeInternet;
+
+  /// No description provided for @consentScopeRf.
+  ///
+  /// In zh, this message translates to:
+  /// **'射频信标发射'**
+  String get consentScopeRf;
+
+  /// No description provided for @consentScopeIgate.
+  ///
+  /// In zh, this message translates to:
+  /// **'iGate 转发'**
+  String get consentScopeIgate;
+
+  /// No description provided for @consentAccept.
+  ///
+  /// In zh, this message translates to:
+  /// **'同意并开启'**
+  String get consentAccept;
+
+  /// No description provided for @consentCancel.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂不开启'**
+  String get consentCancel;
+
+  /// No description provided for @consentPickOne.
+  ///
+  /// In zh, this message translates to:
+  /// **'至少勾选一项要开启的功能。'**
+  String get consentPickOne;
+
+  /// No description provided for @consentPickAgree.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先勾选「我同意」。'**
+  String get consentPickAgree;
+
+  /// No description provided for @consentSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'单独同意'**
+  String get consentSection;
+
+  /// No description provided for @consentSectionHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'关掉一项，对应的功能立刻停止发送新的数据。已经发出去的数据收不回来。'**
+  String get consentSectionHint;
+
+  /// No description provided for @consentLogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'同意日志'**
+  String get consentLogTitle;
+
+  /// No description provided for @consentLogEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'还没有记录。'**
+  String get consentLogEmpty;
+
+  /// No description provided for @consentLogClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除同意日志'**
+  String get consentLogClear;
+
+  /// No description provided for @consentLogClearHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'只清日志，已经作出的同意不受影响。'**
+  String get consentLogClearHint;
+
+  /// No description provided for @consentLogCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'同意日志已清除'**
+  String get consentLogCleared;
+
+  /// No description provided for @consentActGrant.
+  ///
+  /// In zh, this message translates to:
+  /// **'同意'**
+  String get consentActGrant;
+
+  /// No description provided for @consentActRevoke.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤回'**
+  String get consentActRevoke;
+
 }
 
 class _AppLocalizationsDelegate

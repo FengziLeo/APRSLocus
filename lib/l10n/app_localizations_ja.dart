@@ -9457,4 +9457,79 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String notifLiveNearShort(String n) => "$n 局";
 
+  @override
+  String get consentTitle => "アップロードと送信の個別同意";
+
+  @override
+  String get consentLead => "アップロードや送信を有効にする前に、次の三点を個別に確認してください。";
+
+  @override
+  String get consentNatureTitle => "情報の性質";
+
+  @override
+  String get consentNatureBody => "これから送信する内容には行動履歴が含まれ、中国の個人情報保護法における機微な個人情報にあたります。";
+
+  @override
+  String get consentNeedTitle => "なぜ必要か";
+
+  @override
+  String get consentNeedBody => "APRS は位置を公開ネットワークへ送ることで機能します。送らずに同じ機能を実現する代替手段はありません。";
+
+  @override
+  String get consentImpactTitle => "個人の権利への影響";
+
+  @override
+  String get consentImpactBody => "APRS-IS に入ったデータは第三者のサーバーに保存され、公開サーバーによっては位置を 180 日以上保持します。公開ネットワークに入ったデータは取り消しも削除もできません。";
+
+  @override
+  String get consentAgree => "同意する";
+
+  @override
+  String get consentScopeInternet => "APRS-IS ビーコンのアップロード";
+
+  @override
+  String get consentScopeRf => "無線でのビーコン送信";
+
+  @override
+  String get consentScopeIgate => "iGate 転送";
+
+  @override
+  String get consentAccept => "同意して有効にする";
+
+  @override
+  String get consentCancel => "今は有効にしない";
+
+  @override
+  String get consentPickOne => "有効にする機能を一つ以上選んでください。";
+
+  @override
+  String get consentPickAgree => "先に「同意する」にチェックしてください。";
+
+  @override
+  String get consentSection => "個別同意";
+
+  @override
+  String get consentSectionHint => "一つを切ると、その機能はすぐに新しいデータを送らなくなります。送信済みのデータは取り消せません。";
+
+  @override
+  String get consentLogTitle => "同意ログ";
+
+  @override
+  String get consentLogEmpty => "まだ記録がありません。";
+
+  @override
+  String get consentLogClear => "同意ログを消去";
+
+  @override
+  String get consentLogClearHint => "ログだけを消します。すでに与えた同意は変わりません。";
+
+  @override
+  String get consentLogCleared => "同意ログを消去しました";
+
+  @override
+  String get consentActGrant => "同意";
+
+  @override
+  String get consentActRevoke => "撤回";
+
 }

@@ -9357,6 +9357,81 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String notifLiveNearShort(String n) => "$n 台";
 
+  @override
+  String get consentTitle => "上传与发射的单独同意";
+
+  @override
+  String get consentLead => "开启上传或发射之前，先单独确认下面三件事。";
+
+  @override
+  String get consentNatureTitle => "信息性质";
+
+  @override
+  String get consentNatureBody => "你即将上传的内容包含行踪轨迹，属于《个人信息保护法》下的敏感个人信息。";
+
+  @override
+  String get consentNeedTitle => "必要性";
+
+  @override
+  String get consentNeedBody => "APRS 功能依赖把位置发到公开网络，不存在不上传就能实现同等功能的替代方式。";
+
+  @override
+  String get consentImpactTitle => "对个人权益的影响";
+
+  @override
+  String get consentImpactBody => "数据进入 APRS-IS 后由第三方服务器存储，部分公开服务器对位置的留存可达 180 天或更久。数据一旦进入公开网络，无法撤回，也无法删除。";
+
+  @override
+  String get consentAgree => "我同意";
+
+  @override
+  String get consentScopeInternet => "APRS-IS 信标上传";
+
+  @override
+  String get consentScopeRf => "射频信标发射";
+
+  @override
+  String get consentScopeIgate => "iGate 转发";
+
+  @override
+  String get consentAccept => "同意并开启";
+
+  @override
+  String get consentCancel => "暂不开启";
+
+  @override
+  String get consentPickOne => "至少勾选一项要开启的功能。";
+
+  @override
+  String get consentPickAgree => "请先勾选「我同意」。";
+
+  @override
+  String get consentSection => "单独同意";
+
+  @override
+  String get consentSectionHint => "关掉一项，对应的功能立刻停止发送新的数据。已经发出去的数据收不回来。";
+
+  @override
+  String get consentLogTitle => "同意日志";
+
+  @override
+  String get consentLogEmpty => "还没有记录。";
+
+  @override
+  String get consentLogClear => "清除同意日志";
+
+  @override
+  String get consentLogClearHint => "只清日志，已经作出的同意不受影响。";
+
+  @override
+  String get consentLogCleared => "同意日志已清除";
+
+  @override
+  String get consentActGrant => "同意";
+
+  @override
+  String get consentActRevoke => "撤回";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18710,5 +18785,80 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String notifLiveNearShort(String n) => "$n 臺";
+
+  @override
+  String get consentTitle => "上傳與發射的單獨同意";
+
+  @override
+  String get consentLead => "開啟上傳或發射之前，先單獨確認下面三件事。";
+
+  @override
+  String get consentNatureTitle => "信息性質";
+
+  @override
+  String get consentNatureBody => "你即將上傳的內容包含行蹤軌跡，屬於《個人信息保護法》下的敏感個人信息。";
+
+  @override
+  String get consentNeedTitle => "必要性";
+
+  @override
+  String get consentNeedBody => "APRS 功能依賴把位置發到公開網路，不存在不上傳就能實現同等功能的替代方式。";
+
+  @override
+  String get consentImpactTitle => "對個人權益的影響";
+
+  @override
+  String get consentImpactBody => "數據進入 APRS-IS 後由第三方伺服器存儲，部分公開伺服器對位置的留存可達 180 天或更久。數據一旦進入公開網路，無法撤回，也無法刪除。";
+
+  @override
+  String get consentAgree => "我同意";
+
+  @override
+  String get consentScopeInternet => "APRS-IS 信標上傳";
+
+  @override
+  String get consentScopeRf => "射頻信標發射";
+
+  @override
+  String get consentScopeIgate => "iGate 轉發";
+
+  @override
+  String get consentAccept => "同意並開啟";
+
+  @override
+  String get consentCancel => "暫不開啟";
+
+  @override
+  String get consentPickOne => "至少勾選一項要開啟的功能。";
+
+  @override
+  String get consentPickAgree => "請先勾選「我同意」。";
+
+  @override
+  String get consentSection => "單獨同意";
+
+  @override
+  String get consentSectionHint => "關掉一項，對應的功能立刻停止發送新的數據。已經發出去的數據收不回來。";
+
+  @override
+  String get consentLogTitle => "同意日誌";
+
+  @override
+  String get consentLogEmpty => "還沒有記錄。";
+
+  @override
+  String get consentLogClear => "清除同意日誌";
+
+  @override
+  String get consentLogClearHint => "只清日誌，已經作出的同意不受影響。";
+
+  @override
+  String get consentLogCleared => "同意日誌已清除";
+
+  @override
+  String get consentActGrant => "同意";
+
+  @override
+  String get consentActRevoke => "撤回";
 
 }

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人信息保护影响评估报告 — APRSlocus</title>
+<meta name="description" content="APRSlocus 个人信息保护影响评估（PIA）报告（V1.0）：评估范围与角色划分、处理的个人信息、对外传输与公开范围、风险等级、安全保障措施与评估结论。">
+<meta name="theme-color" content="#0a0e12">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="APRSlocus">
+<meta property="og:title" content="个人信息保护影响评估报告 — APRSlocus">
+<meta property="og:description" content="APRSlocus 个人信息保护影响评估（PIA）报告（V1.0）。">
+<meta property="og:url" content="https://aprslocus.theez.top/pia.html">
+<meta property="og:image" content="https://aprslocus.theez.top/assets/logo.png">
+<meta property="og:image:width" content="192">
+<meta property="og:image:height" content="192">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://aprslocus.theez.top/pia.html">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/theme.css?v=1">
+<script>
+/* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）。
+   必须在首帧前执行，否则会闪一下亮底（token 的键在 <html data-theme> 上）。 */
+(function () {
+  try {
+    var t = localStorage.getItem('theme');
+    if (t !== 'dark' && t !== 'light') t = 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
+  } catch (e) {}
+})();
+</script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {   color: var(--text); line-height: 1.9; min-height: 100vh; }
+  .topbar { background: var(--surface-1);border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+  .topbar-inner { max-width: 880px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-weight: 800; font-size: 15px; }
+  .brand img { width: 30px; height: 30px; border-radius: 8px; }
+  .lang { font-size: 13px; display: flex; gap: 6px; align-items: center; }
+  .lang a { text-decoration: none; color: var(--cyan); font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--halo-cool); }
+  .lang a:hover { background: var(--surface-2); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+  .card { background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px 32px; box-shadow: var(--shadow); }
+  h1 { font-size: 24px; margin-bottom: 4px; }
+  .sub { font-size: 13px; color: var(--text-dim); margin-bottom: 22px; }
+  h2 { font-size: 17px; margin: 28px 0 8px; }
+  p { font-size: 14px; margin: 8px 0; }
+  ul, ol { font-size: 14px; padding-left: 22px; margin: 8px 0; }
+  li { margin: 5px 0; }
+  .rk { width: 100%; border-collapse: collapse; margin: 12px 0 4px; font-size: 13px; }
+  .rk th, .rk td { border-bottom: 1px solid var(--line); padding: 8px 8px; text-align: left; vertical-align: top; }
+  .rk th { color: var(--text-dim); font-weight: 600; }
+  .rk td:last-child { white-space: nowrap; font-weight: 700; }
+  .rk td:nth-child(2), .rk td:nth-child(3) { white-space: nowrap; }
+  .foot { max-width: 860px; margin: 24px auto 0; padding: 0 20px 40px; text-align: center; font-size: 12px; color: var(--text-dim); }
+  .foot a { color: var(--text-dim); text-decoration: none; }
+  .foot a:hover { color: var(--cyan); }
+  @media (max-width: 640px){ .card{ padding: 22px 18px; } h1{ font-size: 20px; } p, ul, ol{ font-size: 13px; } .rk{ font-size: 12px; } .rk th, .rk td{ padding: 6px 5px; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="./">
+      <img src="assets/logo.png" alt="APRSlocus">
+      <span>APRSlocus · 隐私影响评估</span>
+    </a>
+    <div class="lang">
+      <a href="./">首页</a>
+      <a href="terms.html">用户协议</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切换深色模式" title="切换深色模式" data-label-dark="切换浅色模式" data-label-light="切换深色模式"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="tic-sun" d="M12 6.6a5.4 5.4 0 1 0 0 10.8 5.4 5.4 0 0 0 0-10.8zM12 1.6v2.4M12 20v2.4M4.6 12H2.2M21.8 12h-2.4M6.75 6.75 5.05 5.05M18.95 18.95l-1.7-1.7M17.25 6.75l1.7-1.7M5.05 18.95l1.7-1.7"/><path class="tic-moon" d="M20.2 14.6A8.6 8.6 0 0 1 9.4 3.8a8.6 8.6 0 1 0 10.8 10.8z"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="card">
+    <h1>个人信息保护影响评估报告</h1>
+    <p class="sub">报告版本 V1.0 · 2026 年 10 月 20 日 · 适用于 APRSlocus 2.1.25 及之后版本 · 本报告以中文撰写</p>
+
+    <h2>一、评估目的与依据</h2>
+    <p>本报告评估 APRSlocus 在用户设备上处理个人信息的行为，以及软件主动发起的对外传输。</p>
+    <p>依据《中华人民共和国个人信息保护法》第五十五条与第五十六条，处理敏感个人信息、向境外提供个人信息之前，应当开展个人信息保护影响评估，并记录处理情况。</p>
+    <p>本项目属于上述情形。位置信标构成行踪轨迹，属于敏感个人信息。心率属于健康信息，也在敏感个人信息范围内。使用公共 APRS-IS 服务器时，数据大多落在境外主机。</p>
+    <p>评估方法参照《信息安全技术 个人信息安全影响评估指南》（GB/T 39335-2020），按处理活动的合法性、必要性、对个人权益的影响逐项分析。</p>
+
+    <h2>二、评估范围与角色划分</h2>
+    <p>评估对象是 APRSlocus 客户端 2.1.25 与官方站点 aprslocus.theez.top。软件以 GPL-3.0 开源发布，本报告描述的每一项处理都能在源码里核对。</p>
+    <p>APRSlocus 是纯客户端。它不运营 APRS 服务器，也不提供上传、中转或存储服务。角色需要分开看。</p>
+    <ul>
+      <li>开发团队看不到你的信标。你发出的 APRS 数据直接到你填写的服务器。</li>
+      <li>你是发起人。连哪台服务器、什么时候发射，由你自己决定。</li>
+      <li>服务器运营者是独立一方。你选择的 APRS-IS 服务器、APRSNETCN 服务器、射频网络，本报告不评估它们如何处理数据。</li>
+      <li>开发团队直接处理的信息只有三类。访问官方站点时的 IP 地址，由 GitHub Pages 与 CDN 记录。你通过举报表单主动提交的内容。GitHub 仓库上的交互记录。</li>
+    </ul>
+
+    <h2>三、处理的个人信息</h2>
+    <p>下列信息都在设备本地处理。标注「对外」的会离开设备。</p>
+    <ul>
+      <li><b>呼号与 SSID</b>。对外。由你填写，作为台站标识。</li>
+      <li><b>位置</b>。对外。经纬度、精度、速度、航向、海拔。来源为手机定位、网络定位或外接 GPS 模块。</li>
+      <li><b>时间</b>。信标与消息的时间戳。</li>
+      <li><b>台站符号、备注、状态报文</b>。对外。备注与状态报文都是你自己写的文字。</li>
+      <li><b>心率</b>。来自蓝牙心率带或佳明设备。开关默认打开，没有读数时不发。接上设备并读到数值时，以 HR= 附在信标备注里。</li>
+      <li><b>电量、步数、卫星数、里程</b>。电量默认随信标发送。步数、卫星数、里程默认关闭。</li>
+      <li><b>APRS 消息</b>。对外。收件人与沿途服务器都能看到。</li>
+      <li><b>通讯录与台站备注</b>。本地。呼号与你自己写的备注。</li>
+      <li><b>连接配置</b>。本地。服务器地址与端口、Passcode、账号与口令、已配对设备的名称或地址。</li>
+      <li><b>智能体配置与对话</b>。本地。接口地址、密钥、模型、对话历史、长期记忆、定时任务。使用智能体时，对话内容与工具取到的数据会发给你自己填写的模型服务商。</li>
+      <li><b>紧急联系电话</b>。本地。默认 120，可改成家人号码。只在心率告警或摔倒提醒时用于拨号，拨号由你按下。</li>
+      <li><b>同意日志</b>。本地。同意时间、同意的功能项、告知文本的版本。单独存放，清除业务数据不会带走它。</li>
+      <li><b>轨迹历史与 GPX</b>。本地。导出之后以文件形式离开软件。</li>
+    </ul>
+
+    <h2>四、处理目的与必要性</h2>
+    <ul>
+      <li>位置是 APRS 的功能本体。把位置发到公开网络，才有 APRS 的意义。不存在不上传就得到同等功能的办法。</li>
+      <li>呼号是台站标识。没有呼号的信标在协议层没有意义。</li>
+      <li>心率、步数、电量、里程属于附加字段。它们不参与 APRS 协议的核心功能，全部可以关闭。</li>
+      <li>账号与口令只用于登录你自己填写的服务器。软件不预置任何服务器地址。</li>
+      <li>软件不做用户画像，不做推荐，不投放广告，没有分析 SDK，没有崩溃上报 SDK。</li>
+    </ul>
+
+    <h2>五、对外传输与公开范围</h2>
+    <p>下面每一项都只在对应功能被使用时发生。</p>
+    <ul>
+      <li><b>APRS-IS 或 APRSNETCN 服务器</b>。发送呼号、位置、速度与航向、备注、消息。开关默认关闭，首次开启要单独同意。</li>
+      <li><b>地图瓦片</b>。打开地图时向所选地图服务商请求瓦片，对方会看到 IP 与请求范围。</li>
+      <li><b>更新检查</b>。启动时向 GitHub 与镜像站查询最新版本，只带当前版本号。</li>
+      <li><b>官方站点静态文件</b>。公告、黑名单、成员名单、荣誉名单从 aprslocus.theez.top 下载。只读，请求里不带呼号与位置。</li>
+      <li><b>TOCALL 设备库</b>。安装包自带一份。你手动刷新时从 GitHub 与 jsDelivr 取最新表。</li>
+      <li><b>IP 定位</b>。你选择网络定位且系统没有可用定位时，依次尝试 ipwho.is、ipapi.co 等免费接口取城市级坐标，对方会看到 IP。</li>
+      <li><b>天气</b>。开启天气后把位置发给和风天气。</li>
+      <li><b>翻译</b>。你点翻译时把待译文本发给所选翻译接口。</li>
+      <li><b>佳明 LiveTrack</b>。你添加分享链接后才拉取或分享位置。</li>
+      <li><b>智能体</b>。你发消息时把对话内容与工具取到的数据发给你填写的模型服务商。</li>
+    </ul>
+    <p>APRS 的公开性需要单独说。数据以明文发送，任何人可以接收。APRS-IS 上的第三方存档可能保留 180 天以上。发出去的数据无法撤回，也无法删除。</p>
+
+    <h2>六、对个人权益的影响与风险</h2>
+    <p>风险等级由影响程度与发生可能性合成。</p>
+    <table class="rk">
+      <thead>
+        <tr><th>风险</th><th>影响</th><th>可能性</th><th>等级</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>位置被长期聚合，推断住址与作息</td><td>高</td><td>中高</td><td>高</td></tr>
+        <tr><td>心率被公开，推断健康状态</td><td>高</td><td>低</td><td>中</td></tr>
+        <tr><td>数据落到境外服务器</td><td>中</td><td>高</td><td>中</td></tr>
+        <tr><td>手机丢失或他人共用，本机轨迹与口令被读</td><td>中</td><td>中</td><td>中</td></tr>
+        <tr><td>智能体把位置与对话发给模型服务商</td><td>中</td><td>中</td><td>中</td></tr>
+        <tr><td>未成年人误用，或未取得监护人同意</td><td>中</td><td>低</td><td>中</td></tr>
+        <tr><td>IP 地址被上述第三方记录</td><td>低</td><td>高</td><td>低</td></tr>
+      </tbody>
+    </table>
+    <p>第一条风险最高。它来自 APRS 的公开设计，不是软件的缺陷。软件能做的是让你知情，并让发射可控。不能接受位置公开的人，不应使用 APRS。</p>
+    <p>影响的性质有三类。隐私与人身安全，来自位置与健康信息。财产，来自本机保存的口令。被骚扰的可能，来自呼号与轨迹的长期可见。</p>
+
+    <h2>七、安全保障措施</h2>
+    <ul>
+      <li>上传与发射默认关闭。首次开启时弹出单独告知，写明信息性质、必要性、对个人权益的影响，勾选后才生效。</li>
+      <li>同意记录可查可清。撤回与授权在同一层设置里。</li>
+      <li>数据只存本机。软件不运营服务器，位置与消息不会因为使用软件而汇集到开发团队。</li>
+      <li>开源。GPL-3.0，信标格式与位置解析都有回归测试，行为可以复核。</li>
+      <li>隐私开关。速度与航向、电量、心率、步数、卫星数、里程各自可关。默认只记录本人轨迹。台站保留天数可设。清除数据可一次清掉。</li>
+      <li>无埋点。软件不上报使用行为。</li>
+    </ul>
+    <p>残余风险也要写明。本机数据库没有额外加密，依赖系统对存储的保护。已经发出的数据无法撤回。第三方服务器的留存时长不由本软件决定。网络定位由第三方接口给出，精度低，本软件不核实。</p>
+
+    <h2>八、个人权利与实现路径</h2>
+    <ul>
+      <li><b>知情</b>。用户协议、首次启动的数据与网络使用告知、本报告。</li>
+      <li><b>决定与撤回</b>。设置里的上传与发射开关，单独同意卡。</li>
+      <li><b>查阅与复制</b>。轨迹历史页、GPX 导出、备份。</li>
+      <li><b>删除</b>。清除数据、卸载软件、删除自己导出的文件。</li>
+      <li><b>针对开发团队自身处理的信息</b>。IP 地址与举报内容，可以通过 GitHub issues 或举报表单提出。</li>
+    </ul>
+
+    <h2>九、评估结论</h2>
+    <p>在上传与发射默认关闭、开启前单独同意、随时可撤回、数据只存本机这四项前提下，处理目的明确，范围限于功能所需，对个人权益的影响可控。评估结论为通过。</p>
+    <p>结论依赖三个条件。条件变化时，本报告随之失效。</p>
+    <ol>
+      <li>上传与发射保持默认关闭，开启前取得单独同意。</li>
+      <li>隐私开关保持在同一设置层级，随时可关。</li>
+      <li>新增对外传输或新增信息类型时，先更新本报告再发布。</li>
+    </ol>
+
+    <h2>十、复核与更新</h2>
+    <p>出现下列情形时重新评估。新增敏感个人信息类型。新增第三方传输。采集方式或默认值变化。相关法规变化。距上次评估满一年。</p>
+    <p>本报告为 V1.0，2026 年 10 月 20 日。报告与软件版本一起公开。</p>
+    <p>意见与异议可以提到 <a href="https://github.com/dariondong/APRSLocus/issues" target="_blank" rel="noopener">GitHub issues</a>，也可以走 <a href="https://ccncqe00x1e4.feishu.cn/share/base/form/shrcn3W4dM6sf47QOfMuYT2kb6b" target="_blank" rel="noopener">举报表单</a>。</p>
+  </div>
+</main>
+
+<div class="foot">
+  © <span id="year">2026</span> BG7LZQ (Darion) ·
+  <a href="https://github.com/dariondong/APRSLocus/blob/main/LICENSE" target="_blank" rel="noopener">GPL-3.0</a> ·
+  <a href="https://github.com/dariondong/APRSLocus" target="_blank" rel="noopener">GitHub</a> ·
+  <a href="terms.html">用户协议</a>
+</div>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+<script src="js/theme.js?v=1" defer></script>
+</body>
+</html>

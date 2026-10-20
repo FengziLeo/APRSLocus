@@ -124,6 +124,15 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://aprslocus.theez.top/en/terms.html"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://aprslocus.theez.top/terms.html"/>
   </url>
+
+  <!-- 个人信息保护影响评估（中文） -->
+  <url>
+    <loc>https://aprslocus.theez.top/pia.html</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
   <url>
     <loc>https://aprslocus.theez.top/manual/index.html</loc>
     <lastmod>2026-09-22</lastmod>

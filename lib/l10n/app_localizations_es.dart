@@ -9957,4 +9957,16 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get manualTitle => "Manual";
 
+  @override
+  String get ssidCustom => "Sufijo propio";
+
+  @override
+  String get ssidCustomHint => "1-2 dígitos o letras";
+
+  @override
+  String get ssidInvalid => "El sufijo debe ser 1-2 dígitos o letras";
+
+  @override
+  String get ssidUse => "Usar este";
+
 }

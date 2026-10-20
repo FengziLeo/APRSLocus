@@ -12,7 +12,7 @@ import 'state.dart';
 import 'models.dart';
 import 'widgets.dart';
 import 'terms_page.dart';
-import 'material.dart';
+import 'settings_widgets.dart';
 
 /// 首次启动引导（OOBE）：语言 → 用户协议确认 → 欢迎 → 呼号 → 符号 → 筛选 → 服务器
 class OobePage extends StatefulWidget {
@@ -36,7 +36,9 @@ class _OobePageState extends State<OobePage> {
   // 两条是等价的（都是一条 TCP 登录），所以这里是一个并列的二选一，
   // 不是「主链路 + 备用」。
   String _link = AppState.srcAprsIs;
-  int _ssid = 0;
+  /// 呼号后缀（不含前导 -）。空串 = 不加后缀；数字或字母都行，
+  /// 形状由 `AppState.normalizeSsid` 判定。
+  String _ssid = '';
   // 界面语言：'' = 跟随系统；'zh' 中文；'en' English
   String _lang = '';
   // 接收筛选：**不再默认勾选任何国家/地区**。
@@ -112,7 +114,7 @@ class _OobePageState extends State<OobePage> {
           return;
         }
         widget.state.myCall = c;
-        widget.state.mySsid = _ssid;
+        widget.state.setSsid(_ssid);
         widget.state.persist();
         break;
       case 4:
@@ -639,86 +641,12 @@ class _OobePageState extends State<OobePage> {
     );
   }
 
-  void _pickSsid(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => MaterialSurface(
-        radius: 24,
-        topOnly: true,
-        child: Container(
-          decoration: BoxDecoration(
-            color: C.sheetFill,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: C.greyLight,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              SizedBox(height: 14),
-              Text(
-                S.of(context).chooseSsidSuffix,
-                style: ts(16, w: FontWeight.w700),
-              ),
-              SizedBox(height: 4),
-              Text(
-                S.of(context).ssidDescShort,
-                style: ts(11, c: C.grey),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 14),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                alignment: WrapAlignment.center,
-                children: [
-                  _ssidOption(S.of(context).none, 0),
-                  for (int i = 1; i <= 15; i++) _ssidOption('-$i', i),
-                ],
-              ),
-              const SizedBox(height: 10),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _ssidOption(String label, int val) {
-    final selected = _ssid == val;
-    return GestureDetector(
-      onTap: () {
-        setState(() => _ssid = val);
-        Navigator.pop(context);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: 64,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: selected ? C.blue : C.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: selected ? C.blue : C.border),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: ts(
-            13,
-            c: selected ? Colors.white : C.slate,
-            w: selected ? FontWeight.w700 : FontWeight.w500,
-          ),
-        ),
-      ),
-    );
+  /// 选后缀：弹层与设置页共用（见 settings_widgets 的 showSsidPicker），
+  /// 这里只把选中的值先存在本页 —— 首次引导要到第 3 步才真正写进 state。
+  Future<void> _pickSsid(BuildContext context) async {
+    final v = await showSsidPicker(context, current: _ssid);
+    if (v == null || !mounted) return;
+    setState(() => _ssid = v);
   }
 
   /// 符号图标：官方 APRS PNG 优先，缺失回退 Material
@@ -841,7 +769,7 @@ class _OobePageState extends State<OobePage> {
                   Icon(Icons.tag_rounded, size: 18, color: C.blue),
                   SizedBox(width: 8),
                   Text(
-                    _ssid == 0 ? S.of(context).noSsid : '-$_ssid',
+                    _ssid.isEmpty ? S.of(context).noSsid : '-$_ssid',
                     style: ts(13, c: C.blue, w: FontWeight.w700),
                   ),
                   Spacer(),
@@ -862,7 +790,7 @@ class _OobePageState extends State<OobePage> {
               S
                   .of(context)
                   .fullCallsign(
-                    '${_call.text.trim().toUpperCase()}${_ssid == 0 ? '' : '-$_ssid'}',
+                    '${_call.text.trim().toUpperCase()}${_ssid.isEmpty ? '' : '-$_ssid'}',
                   ),
               style: ts(12, c: C.blue, w: FontWeight.w600),
             ),

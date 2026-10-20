@@ -9619,4 +9619,16 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get manualTitle => "マニュアル";
 
+  @override
+  String get ssidCustom => "任意のサフィックス";
+
+  @override
+  String get ssidCustomHint => "数字か英字 1〜2 文字";
+
+  @override
+  String get ssidInvalid => "サフィックスは数字か英字 1〜2 文字です";
+
+  @override
+  String get ssidUse => "これを使う";
+
 }

@@ -350,7 +350,7 @@ class _StationIdentityCardState extends State<StationIdentityCard> {
           Text(S.of(context).ssidSuffix, style: ts(12, c: C.slate)),
           Spacer(),
           Text(
-            st.mySsid == 0 ? S.of(context).none : '-${st.mySsid}',
+            st.mySsid.isEmpty ? S.of(context).none : '-${st.mySsid}',
             style: ts(13, c: C.blue, w: FontWeight.w700),
           ),
           SizedBox(width: 4),
@@ -484,68 +484,13 @@ class _StationIdentityCardState extends State<StationIdentityCard> {
     );
   }
 
-  void _pickSsid(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => StatefulBuilder(
-        builder: (ctx, setModalState) => MaterialSurface(
-          radius: 24,
-          topOnly: true,
-          child: Container(
-            decoration: BoxDecoration(
-              color: C.sheetFill,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Container(width: 36, height: 4, decoration: BoxDecoration(
-                  color: C.greyLight, borderRadius: BorderRadius.circular(2))),
-              SizedBox(height: 14),
-              Text(S.of(context).chooseSsidSuffix, style: ts(16, w: FontWeight.w700)),
-              SizedBox(height: 4),
-              Text(S.of(context).ssidDesc,
-                  style: ts(11, c: C.grey), textAlign: TextAlign.center),
-              SizedBox(height: 14),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                alignment: WrapAlignment.center,
-                children: [
-                  for (final val in [0, ...List.generate(15, (i) => i + 1)])
-                    GestureDetector(
-                      onTap: () {
-                        setState(() => st.mySsid = val);
-                        st.persist();
-                        setModalState(() {});
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
-                        width: 64,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: st.mySsid == val ? C.blue : C.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                              color: st.mySsid == val ? C.blue : C.border),
-                        ),
-                        child: Text(val == 0 ? S.of(context).none : '-$val',
-                            textAlign: TextAlign.center,
-                            style: ts(13,
-                                c: st.mySsid == val ? Colors.white : C.slate,
-                                w: st.mySsid == val
-                                    ? FontWeight.w700
-                                    : FontWeight.w500)),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 10),
-            ]),
-          ),
-        ),
-      ),
-    );
+  /// 选后缀：弹层在 settings_widgets 里（两个入口共用同一套），这里只管把
+  /// 选中的值写回并刷新 —— 前缀「-」与合法性都由 [AppState.setSsid] 处理。
+  Future<void> _pickSsid(BuildContext context) async {
+    final v = await showSsidPicker(context, current: st.mySsid);
+    if (v == null || !mounted) return;
+    st.setSsid(v);
+    setState(() {});
   }
 
 }

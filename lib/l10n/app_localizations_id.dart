@@ -9908,4 +9908,16 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get manualTitle => "Panduan";
 
+  @override
+  String get ssidCustom => "Sufiks sendiri";
+
+  @override
+  String get ssidCustomHint => "1-2 angka atau huruf";
+
+  @override
+  String get ssidInvalid => "Sufiks harus 1-2 angka atau huruf";
+
+  @override
+  String get ssidUse => "Pakai ini";
+
 }

@@ -358,6 +358,11 @@ jobs:
       - name: Test feature toggles
         run: flutter test test/features_test.dart
 
+      # 呼号后缀能自己输入（含字母后缀）：老的数字后缀要迁移、脏字符串不能拼进
+      # 呼号发出去、-0 与无后缀是一回事 —— 三种错都编译能过。
+      - name: Test ssid input
+        run: flutter test test/ssid_test.dart
+
       # 发射来源分两条（用户要求）：位置与状态报文一条、消息一条。选消息那条不该
       # 把位置那条带走，只读链路不能被选，旧配置的 dataSource 要跟着带过去 ——
       # 这些都编译能过、analyze 全绿，只表现成「消息怎么从别的链路发出去了」。

@@ -131,7 +131,42 @@ class AppState extends ChangeNotifier {
   static const appVersion = '2.1.26';
   // 我的电台
   String myCall = 'BV2AAA';
-  int mySsid = 0; // 0 = 无后缀, 1-15 = -1 到 -15
+
+  /// 呼号后缀（SSID），**不含前导 -**。空串 = 没有后缀。
+  ///
+  /// 存字符串而不是数字：APRS-IS 主网只认 0–15，但我们自己的 APRSNETCN 服务器
+  /// 收字母后缀（`BI1QKA-B` 这种），所以后缀写成 1–2 位数字或字母都行。
+  /// 旧版本存的是整数（0 = 无后缀），加载时在那里迁移（见 _loadPrefs）。
+  String mySsid = '';
+
+  /// 后缀的合法形状：1–2 位数字或大写字母。
+  static final RegExp ssidPattern = RegExp(r'^[0-9A-Z]{1,2}$');
+
+  /// 把用户输入规整成后缀：去空白、允许带前导 `-`、转大写。
+  ///
+  /// 空串（或只剩一个 `-`）返回 `''` = 不要后缀；形状不对返回 `null`，
+  /// 由界面自己提示 —— 这里不抛异常，因为它接的是输入框内容。
+  static String? normalizeSsid(String raw) {
+    var v = raw.trim().toUpperCase();
+    if (v.startsWith('-')) v = v.substring(1);
+    // `0` 就是「不加后缀」：APRS 里 -0 与不带后缀是一回事，别让它变成一个
+    // 看起来像有后缀、实际没有的值。
+    if (v.isEmpty || v == '0') return '';
+    if (!ssidPattern.hasMatch(v)) return null;
+    return v;
+  }
+
+  /// 设定后缀（会校验、落盘、通知）。形状不对返回 false，什么都不改。
+  bool setSsid(String raw) {
+    final v = normalizeSsid(raw);
+    if (v == null) return false;
+    if (v == mySsid) return true;
+    mySsid = v;
+    persist();
+    _notify();
+    return true;
+  }
+
   String mySymbol = '>';
   // 备注默认**为空**（用户要求）：新装用户不会再被塞一段默认文字。
   // 历史版本曾默认 'APRSlocus 移动台'，老用户升级后由 _loadPrefs 迁移清零。
@@ -172,7 +207,7 @@ class AppState extends ChangeNotifier {
   }
 
   /// 完整呼号（含 SSID 后缀）
-  String get myFullCall => mySsid == 0 ? myCall : '$myCall-$mySsid';
+  String get myFullCall => mySsid.isEmpty ? myCall : '$myCall-$mySsid';
 
   /// 运行平台短名：用于 CONNECT 在线状态帧，便于在 APRS-IS 上区分端侧。
   /// Android / iOS 用系统名，Windows 简写 Win、macOS 简写 Mac。
@@ -4430,7 +4465,7 @@ class AppState extends ChangeNotifier {
 
     // ② 设置项复位（与字段声明处的默认值保持一致）
     myCall = 'BV2AAA';
-    mySsid = 0;
+    mySsid = '';
     mySymbol = '>';
     myComment = '';
     aprsStatusText = '';
@@ -4919,7 +4954,14 @@ class AppState extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       myCall = p.getString('myCall') ?? myCall;
-      mySsid = p.getInt('mySsid') ?? mySsid;
+      // 旧版本存整数（0 = 无后缀，1–15 = 带数字后缀）：两种类型都认，
+      // 认不出的值一律回到「无后缀」，而不是把脏字符串当成呼号的一部分发出去。
+      final rawSsid = p.get('mySsid');
+      if (rawSsid is int) {
+        mySsid = rawSsid == 0 ? '' : '$rawSsid';
+      } else if (rawSsid is String) {
+        mySsid = normalizeSsid(rawSsid) ?? mySsid;
+      }
       mySymbol = p.getString('mySymbol') ?? mySymbol;
       myComment = p.getString('myComment') ?? myComment;
       // 迁移：老版本会把 'APRSlocus 移动台' 当作默认备注存下来。
@@ -5324,7 +5366,7 @@ class AppState extends ChangeNotifier {
   /// [persistNow] 的真正写入口（抽出来是为了让「导出前落盘」与「顺手保存」共用同一份键列表）
   Future<void> _writePrefs(SharedPreferences p) async {
     await p.setString('myCall', myCall);
-    await p.setInt('mySsid', mySsid);
+    await p.setString('mySsid', mySsid);
     await p.setString('mySymbol', mySymbol);
     await p.setString('myComment', myComment);
     await p.setBool('beacon', beaconEnabled);

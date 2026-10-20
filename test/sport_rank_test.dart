@@ -23,7 +23,7 @@ void main() {
     final st = AppState();
     await Future<void>.delayed(const Duration(milliseconds: 30));
     st.myCall = 'BG7LZQ';
-    st.mySsid = 9;
+    st.mySsid = '9';
     return st;
   }
 

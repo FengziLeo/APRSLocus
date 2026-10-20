@@ -9519,6 +9519,18 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get manualTitle => "使用手册";
 
+  @override
+  String get ssidCustom => "自定义后缀";
+
+  @override
+  String get ssidCustomHint => "1–2 位数字或字母";
+
+  @override
+  String get ssidInvalid => "后缀只能是 1–2 位数字或字母";
+
+  @override
+  String get ssidUse => "用这个";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -19034,5 +19046,17 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get manualTitle => "使用手冊";
+
+  @override
+  String get ssidCustom => "自訂後綴";
+
+  @override
+  String get ssidCustomHint => "1–2 位數字或字母";
+
+  @override
+  String get ssidInvalid => "後綴只能是 1–2 位數字或字母";
+
+  @override
+  String get ssidUse => "用這個";
 
 }

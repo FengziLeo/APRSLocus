@@ -4887,5 +4887,9 @@
   "featureLiteBlocks": "精簡模式下模組都關著，關掉精簡模式再選。",
   "featureWeather": "天氣",
   "featureTranslate": "翻譯",
-  "manualTitle": "使用手冊"
+  "manualTitle": "使用手冊",
+  "ssidCustom": "自訂後綴",
+  "ssidCustomHint": "1–2 位數字或字母",
+  "ssidInvalid": "後綴只能是 1–2 位數字或字母",
+  "ssidUse": "用這個"
 }

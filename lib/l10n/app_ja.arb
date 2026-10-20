@@ -4299,5 +4299,9 @@
   "featureLiteBlocks": "軽量モードではモジュールは切です。軽量モードを切ってから選んでください。",
   "featureWeather": "天気",
   "featureTranslate": "翻訳",
-  "manualTitle": "マニュアル"
+  "manualTitle": "マニュアル",
+  "ssidCustom": "任意のサフィックス",
+  "ssidCustomHint": "数字か英字 1〜2 文字",
+  "ssidInvalid": "サフィックスは数字か英字 1〜2 文字です",
+  "ssidUse": "これを使う"
 }

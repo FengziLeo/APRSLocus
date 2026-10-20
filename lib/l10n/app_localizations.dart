@@ -17397,6 +17397,30 @@ abstract class AppLocalizations {
   /// **'使用手册'**
   String get manualTitle;
 
+  /// No description provided for @ssidCustom.
+  ///
+  /// In zh, this message translates to:
+  /// **'自定义后缀'**
+  String get ssidCustom;
+
+  /// No description provided for @ssidCustomHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'1–2 位数字或字母'**
+  String get ssidCustomHint;
+
+  /// No description provided for @ssidInvalid.
+  ///
+  /// In zh, this message translates to:
+  /// **'后缀只能是 1–2 位数字或字母'**
+  String get ssidInvalid;
+
+  /// No description provided for @ssidUse.
+  ///
+  /// In zh, this message translates to:
+  /// **'用这个'**
+  String get ssidUse;
+
 }
 
 class _AppLocalizationsDelegate

@@ -299,7 +299,7 @@ void main() {
       final st = AppState()
         ..smartBeaconEnabled = false
         ..myCall = 'BI7KZM'
-        ..mySsid = 13
+        ..mySsid = '13'
         ..mySymbol = 'r'
         ..myLat = 22 + 16.45 / 60
         ..myLng = 111 + 13.90 / 60
@@ -424,7 +424,7 @@ void main() {
     /// 手填海拔 10.0584 m（→ `/A=000033`）。
     AppState userSetup() => AppState()
       ..myCall = 'BG7LZQ'
-      ..mySsid = 2
+      ..mySsid = '2'
       ..mySymbol = 'b'
       ..myLat = 21 + 55.17 / 60
       ..myLng = 110 + 52.40 / 60
@@ -571,7 +571,7 @@ void main() {
   group('信标带上卫星数（SAT=nn）', () {
     AppState base() => AppState()
       ..myCall = 'BG7LZQ'
-      ..mySsid = 2
+      ..mySsid = '2'
       ..mySymbol = 'b'
       ..myLat = 39.9075
       ..myLng = 116.3972

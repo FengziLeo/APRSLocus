@@ -164,7 +164,7 @@ void main() {
       });
       expect(r.text, isNot(contains('ERROR')));
       expect(st.myCall, 'BD7ABC');
-      expect(st.mySsid, 7);
+      expect(st.mySsid, '7');
       expect(st.myComment, 'hello');
       expect(st.myFullCall, 'BD7ABC-7');
     });

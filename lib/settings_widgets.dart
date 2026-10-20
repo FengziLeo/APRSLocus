@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'theme.dart';
 import 'widgets.dart';
 import 'state.dart';
@@ -1136,3 +1137,183 @@ class SettingsEntryTile extends StatelessWidget {
   }
 }
 
+
+/// ─── 呼号后缀（SSID）选择弹层 ───
+///
+/// 0–15 是 APRS 主网的取值范围，做成格子是为了常用值一点就到。字母后缀
+/// （`-B` 这种）只有我们自己的 APRSNETCN 服务器收，所以下面给一个输入框，
+/// 想用的人自己填 1–2 位数字或字母。
+///
+/// 返回选中的后缀（`''` = 不要后缀）。用户点了外面、或按了返回键返回 `null`，
+/// 调用方据此什么都不改 —— 「关掉」不能等于「清空后缀」。
+Future<String?> showSsidPicker(
+  BuildContext context, {
+  required String current,
+}) {
+  final ctrl = TextEditingController(text: current);
+  // 错误提示存在弹层外面：StatefulBuilder 的 builder 每重建一次就重跑一遍，
+  // 写在里面的局部变量会被重置成 null，提示就永远显示不出来。
+  String? errorText;
+  final done = showModalBottomSheet<String>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => StatefulBuilder(
+      builder: (ctx, setModalState) {
+        final s = S.of(ctx);
+
+        void pick(String v) => Navigator.of(ctx).pop(v);
+
+        void submit() {
+          final v = AppState.normalizeSsid(ctrl.text);
+          if (v == null) {
+            setModalState(() => errorText = s.ssidInvalid);
+            return;
+          }
+          pick(v);
+        }
+
+        Widget chip(String label, String value) {
+          final sel = current == value;
+          return GestureDetector(
+            onTap: () => pick(value),
+            child: Container(
+              width: 64,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: sel ? C.blue : C.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: sel ? C.blue : C.border),
+              ),
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: ts(
+                  13,
+                  c: sel ? Colors.white : C.slate,
+                  w: sel ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ),
+          );
+        }
+
+        return Padding(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: MaterialSurface(
+            radius: 24,
+            topOnly: true,
+            child: Container(
+              decoration: BoxDecoration(
+                color: C.sheetFill,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: C.greyLight,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(s.chooseSsidSuffix, style: ts(16, w: FontWeight.w700)),
+                  const SizedBox(height: 4),
+                  Text(
+                    s.ssidDescShort,
+                    style: ts(11, c: C.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 14),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      chip(s.none, ''),
+                      for (int i = 1; i <= 15; i++) chip('-$i', '$i'),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: ctrl,
+                          autofocus: false,
+                          textCapitalization: TextCapitalization.characters,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp('[0-9A-Za-z]')),
+                            LengthLimitingTextInputFormatter(2),
+                          ],
+                          style: ts(14, w: FontWeight.w700),
+                          decoration: InputDecoration(
+                            labelText: s.ssidCustom,
+                            hintText: s.ssidCustomHint,
+                            hintStyle: ts(11, c: C.greyLight),
+                            isDense: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: C.border),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: C.border),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: C.blue, width: 1.5),
+                            ),
+                          ),
+                          onChanged: (_) {
+                            if (errorText != null) setModalState(() => errorText = null);
+                          },
+                          onSubmitted: (_) => submit(),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: submit,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 13),
+                          decoration: BoxDecoration(
+                            color: C.blue,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            s.ssidUse,
+                            style: ts(13, c: Colors.white, w: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (errorText != null) ...[
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        errorText!,
+                        style: ts(11, c: C.red, h: 1.35),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 10),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    ),
+  );
+  return done.whenComplete(ctrl.dispose);
+}

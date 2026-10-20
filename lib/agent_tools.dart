@@ -225,7 +225,11 @@ final List<AgentToolSpec> kAgentTools = [
       'type': 'object',
       'properties': {
         'callsign': _str,
-        'ssid': {'type': 'integer', 'description': '0..15'},
+        // 后缀现在可以是字母（我们自己的服务器收 `-B` 这种），所以按字符串收。
+        'ssid': {
+          'type': 'string',
+          'description': '1-2 digits or letters, or 0 / empty for none',
+        },
         'symbol': _str,
         'comment': _str,
       },
@@ -1576,10 +1580,16 @@ Future<AgentToolOutcome> executeAgentTool(
           changed.add('callsign=$v');
         }
         if (args.containsKey('ssid')) {
-          final n = _asInt(args['ssid']);
-          if (n == null || n < 0 || n > 15) return _err('ssid must be 0..15');
-          st.mySsid = n;
-          changed.add('ssid=$n');
+          final raw = args['ssid'];
+          if (raw == null) return _err('ssid is null');
+          final text = '$raw'.trim();
+          // 老号码写法（0 / 9）照旧：0 等于不要后缀。
+          final v = AppState.normalizeSsid(text == '0' ? '' : text);
+          if (v == null) {
+            return _err('ssid must be 1-2 digits or letters, or 0 for none');
+          }
+          st.setSsid(v);
+          changed.add('ssid=${v.isEmpty ? '0' : v}');
         }
         if (args.containsKey('symbol')) {
           final v = _val(args, 'symbol');

@@ -4299,5 +4299,9 @@
   "featureLiteBlocks": "Modules stay off in lite mode. Turn it off to pick them.",
   "featureWeather": "Weather",
   "featureTranslate": "Translation",
-  "manualTitle": "Manual"
+  "manualTitle": "Manual",
+  "ssidCustom": "Custom suffix",
+  "ssidCustomHint": "1-2 digits or letters",
+  "ssidInvalid": "The suffix must be 1-2 digits or letters",
+  "ssidUse": "Use this"
 }

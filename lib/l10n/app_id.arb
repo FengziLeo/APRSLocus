@@ -4299,5 +4299,9 @@
   "featureLiteBlocks": "Dalam mode ringkas modul mati. Matikan mode ringkas dulu untuk memilih.",
   "featureWeather": "Cuaca",
   "featureTranslate": "Terjemahan",
-  "manualTitle": "Panduan"
+  "manualTitle": "Panduan",
+  "ssidCustom": "Sufiks sendiri",
+  "ssidCustomHint": "1-2 angka atau huruf",
+  "ssidInvalid": "Sufiks harus 1-2 angka atau huruf",
+  "ssidUse": "Pakai ini"
 }

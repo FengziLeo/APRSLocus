@@ -9898,4 +9898,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get manualTitle => "Manual";
 
+  @override
+  String get ssidCustom => "Custom suffix";
+
+  @override
+  String get ssidCustomHint => "1-2 digits or letters";
+
+  @override
+  String get ssidInvalid => "The suffix must be 1-2 digits or letters";
+
+  @override
+  String get ssidUse => "Use this";
+
 }

@@ -4977,5 +4977,6 @@
   "featureModules": "模块",
   "featureLiteBlocks": "精简模式下模块都关着，关掉精简模式再选。",
   "featureWeather": "天气",
-  "featureTranslate": "翻译"
+  "featureTranslate": "翻译",
+  "manualTitle": "使用手册"
 }

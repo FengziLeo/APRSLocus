@@ -4298,5 +4298,6 @@
   "featureModules": "Modul",
   "featureLiteBlocks": "Dalam mode ringkas modul mati. Matikan mode ringkas dulu untuk memilih.",
   "featureWeather": "Cuaca",
-  "featureTranslate": "Terjemahan"
+  "featureTranslate": "Terjemahan",
+  "manualTitle": "Panduan"
 }

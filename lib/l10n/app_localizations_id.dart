@@ -9905,4 +9905,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get featureTranslate => "Terjemahan";
 
+  @override
+  String get manualTitle => "Panduan";
+
 }

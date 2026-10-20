@@ -9954,4 +9954,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get featureTranslate => "Traducción";
 
+  @override
+  String get manualTitle => "Manual";
+
 }

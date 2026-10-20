@@ -4886,5 +4886,6 @@
   "featureModules": "模組",
   "featureLiteBlocks": "精簡模式下模組都關著，關掉精簡模式再選。",
   "featureWeather": "天氣",
-  "featureTranslate": "翻譯"
+  "featureTranslate": "翻譯",
+  "manualTitle": "使用手冊"
 }

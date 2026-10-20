@@ -4298,5 +4298,6 @@
   "featureModules": "モジュール",
   "featureLiteBlocks": "軽量モードではモジュールは切です。軽量モードを切ってから選んでください。",
   "featureWeather": "天気",
-  "featureTranslate": "翻訳"
+  "featureTranslate": "翻訳",
+  "manualTitle": "マニュアル"
 }

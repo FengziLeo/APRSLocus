@@ -4298,5 +4298,6 @@
   "featureModules": "Modules",
   "featureLiteBlocks": "Modules stay off in lite mode. Turn it off to pick them.",
   "featureWeather": "Weather",
-  "featureTranslate": "Translation"
+  "featureTranslate": "Translation",
+  "manualTitle": "Manual"
 }

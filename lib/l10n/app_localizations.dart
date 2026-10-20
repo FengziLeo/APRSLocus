@@ -17391,6 +17391,12 @@ abstract class AppLocalizations {
   /// **'翻译'**
   String get featureTranslate;
 
+  /// No description provided for @manualTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用手册'**
+  String get manualTitle;
+
 }
 
 class _AppLocalizationsDelegate

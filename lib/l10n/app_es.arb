@@ -4298,5 +4298,6 @@
   "featureModules": "Módulos",
   "featureLiteBlocks": "En modo ligero los módulos están apagados. Desactívalo para elegirlos.",
   "featureWeather": "Tiempo",
-  "featureTranslate": "Traducción"
+  "featureTranslate": "Traducción",
+  "manualTitle": "Manual"
 }

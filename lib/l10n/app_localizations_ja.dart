@@ -9616,4 +9616,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get featureTranslate => "翻訳";
 
+  @override
+  String get manualTitle => "マニュアル";
+
 }

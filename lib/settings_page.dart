@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart'
 import 'package:url_launcher/url_launcher.dart';
 
 import 'feature_page.dart';
+import 'manual_page.dart';
 import 'features.dart';
 import 'notice.dart';
 import 'notice_banner.dart';
@@ -324,6 +325,15 @@ class _SettingsPageState extends State<SettingsPage> {
                       MaterialPageRoute(builder: (_) => const SponsorPage()),
                     ),
                   ),
+                SizedBox(height: 12),
+                // 手册：设备怎么接、报文怎么写、发不出去怎么查，都在官网那六章里。
+                // 精简模式下也保留 —— 它是「东西不会用」时唯一的去处，不属于附加模块。
+                SettingsEntryTile(
+                  icon: Icons.menu_book_rounded,
+                  fallback: const [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                  title: S.of(context).manualTitle,
+                  onTap: () => openManual(context),
+                ),
                 SizedBox(height: 12),
                 // 关于
                 SettingsEntryTile(

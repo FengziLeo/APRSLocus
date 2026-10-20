@@ -9516,6 +9516,9 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get featureTranslate => "翻译";
 
+  @override
+  String get manualTitle => "使用手册";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -19028,5 +19031,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get featureTranslate => "翻譯";
+
+  @override
+  String get manualTitle => "使用手冊";
 
 }

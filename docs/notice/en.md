@@ -129,11 +129,11 @@ The fault was ours. Sorry for the trouble.
 
 ---
 
-## 🔔 What is new: 2.1.23
+## 🔔 What is new: 2.1.24
 
-- The locate button in the top bar opens the device quick panel, where APRS-IS, APRSNETCN SERVER and the radio links switch on one screen. The classic layout's top bar carries the same entry.
-- Message bubbles fade in and rise a touch, settling in 220 ms. Each bubble plays once, so scrolling back through a thread replays nothing.
-- Long-press the beacon bar on the map page to open the station identity panel. Callsign, SSID and comment save as you edit them.
+- The Terms of Use are now V2.0, with 59 clauses in three languages, including the new chapter on separate consent for beacon upload and transmission and the consent form in Appendix 1.
+- Before the first auto-report, RF beacon or iGate is turned on, a page of its own spells out what the data is, why it is necessary and what it means for you. The three features are ticked one by one and all unticked by default; after signing, the switch you tapped really turns on.
+- Beaconing in settings gained a separate consent card you can withdraw from at any time. Withdrawal stops sending at once and leaves a consent log: time, feature, and the version of the notice text.
 
 ---
 
@@ -151,9 +151,9 @@ Look up APALOC in the official TOCALL table and you will find it.
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-Checking for updates now returns the latest stable version, 2.1.23. If you installed 2.2.0, uninstall it first, then install 2.1.23.
+Checking for updates now returns the latest stable version, 2.1.24. If you installed 2.2.0, uninstall it first, then install 2.1.24.
 
-**[Download 2.1.23](https://github.com/dariondong/APRSLocus/releases/download/v2.1.23/APRSLocus_2.1.23.apk)**
+**[Download 2.1.24](https://github.com/dariondong/APRSLocus/releases/download/v2.1.24/APRSLocus_2.1.24.apk)**
 
 ---
 

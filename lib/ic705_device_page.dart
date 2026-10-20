@@ -52,6 +52,15 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
   AppState get st => widget.state;
   AudioLink get audio => widget.state.audio;
 
+  /// 开关「射频信标」：先过用户协议 V2.0 附件一第二项（射频信标发射）。
+  /// 同意书签完会回到这里把开关真的打开（[AppState.ensureRfConsent] 的回调）。
+  Future<void> _setRfBeacon(bool v) async {
+    if (v && !st.ensureRfConsent(() => unawaited(_setRfBeacon(true)))) return;
+    audio.config.rfBeacon = v;
+    await audio.save();
+    if (mounted) setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -476,11 +485,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
           s.kissRfBeacon,
           value: c.rfBeacon,
           color: C.indigo,
-          onChanged: (v) {
-            c.rfBeacon = v;
-            audio.save();
-            if (mounted) setState(() {});
-          },
+          onChanged: (v) => unawaited(_setRfBeacon(v)),
         ),
         SettingsHint(s.icomRfBeaconHint),
         Divider(height: 1, color: C.border),

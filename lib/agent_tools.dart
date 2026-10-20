@@ -1382,6 +1382,12 @@ Future<AgentToolOutcome> executeAgentTool(
       if (!st.myPositionReportable) {
         return _err('No usable GPS fix yet; beacon not sent.');
       }
+      // 上传/发射要用户本人在设备上签「单独同意」（用户协议 V2.0 附件一），
+      // 智能体不能替他签 —— 没签就如实报错，而不是回一句「已发送」。
+      if (!st.consentSatisfied) {
+        return _err('Transmit consent is not signed yet; ask the user to confirm it '
+            'on the device before reporting.');
+      }
       st.sendBeacon();
       return AgentToolOutcome('Beacon sent.', note: 'send_beacon_now');
 
@@ -1392,6 +1398,11 @@ Future<AgentToolOutcome> executeAgentTool(
           final b = _asBool(args['beacon_enabled']);
           if (b == null) return _err('beacon_enabled must be a boolean');
           st.setBeaconEnabled(b);
+          // 没签单独同意时开关不会真的打开（见 AppState.setBeaconEnabled）：
+          // 这里必须如实报错，否则工具回「已改」而实际什么都没变。
+          if (b && !st.beaconEnabled) {
+            return _err('Transmit consent is not signed yet; beacon was not enabled.');
+          }
           changed.add('beacon_enabled');
         }
         if (args.containsKey('beacon_interval_sec')) {

@@ -74,6 +74,15 @@ class _AudioSettingsPageState extends State<AudioSettingsPage> {
   AppState get st => widget.state;
   AudioLink get audio => widget.state.audio;
 
+  /// 开关「射频信标」：先过用户协议 V2.0 附件一第二项（射频信标发射）。
+  Future<void> _setRfBeacon(bool v) async {
+    if (v && !st.ensureRfConsent(() => unawaited(_setRfBeacon(true)))) return;
+    audio.config.rfBeacon = v;
+    await audio.save();
+    st.reloadUi();
+    if (mounted) setState(() {});
+  }
+
   /// 移动端（Android）不能写任意目录：导出走系统下载目录，导入走系统选择器
   bool get _android => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
@@ -743,12 +752,7 @@ class _AudioSettingsPageState extends State<AudioSettingsPage> {
         // 是哪一路信号（issue #14）
         ..._deviceRows(s, output: true),
         SettingsSwitch(s.kissRfBeacon, value: audio.config.rfBeacon,
-            color: C.orange, onChanged: (v) async {
-          audio.config.rfBeacon = v;
-          await audio.save();
-          st.reloadUi();
-          if (mounted) setState(() {});
-        }),
+            color: C.orange, onChanged: (v) => unawaited(_setRfBeacon(v))),
         SettingsHint(s.kissRfBeaconTip, color: C.orange),
         // 这三个是自由文本 / 整数：边输边存（onChanged 里的 _collect 不重启
         // 链路）就够，无需再挂失焦。

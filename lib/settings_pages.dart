@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'theme.dart';
 import 'state.dart';
+import 'consent.dart';
 import 'models.dart';
 import 'widgets.dart';
 import 'settings_widgets.dart';
@@ -1746,10 +1747,101 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
               ),
           ],
         ),
+        SizedBox(height: 16),
+        _consentCard(),
 
       ]),
       ),
     );
+  }
+
+  /// 上传/发射的「单独同意」（用户协议 V2.0 附件一）。
+  ///
+  /// 协议 5.2 要求授权与撤回在**同一层级**：这张卡就是那个层级 ——
+  /// 开关在信标那一节，看记录与撤回在这里，不多点一层、不弹二次确认
+  /// （撤回本身就应该和开启一样直接）。
+  Widget _consentCard() {
+    final s = S.of(context);
+    final log = st.consent.events;
+    return SettingsSectionCard(
+      title: s.consentSection,
+      subtitle: s.consentSectionHint,
+      icon: Icons.gavel_rounded,
+      color: C.orange,
+      children: [
+        for (final scope in ConsentScope.values)
+          SettingsSwitch(
+            _consentScopeName(s, scope),
+            value: st.hasConsent(scope),
+            onChanged: (v) {
+              if (v) {
+                // 授予走同一张同意书（与拨开关弹的是同一页）。
+                st.ensureConsent({scope});
+              } else {
+                unawaited(st.revokeConsent(scope));
+              }
+            },
+          ),
+        Divider(height: 1, color: C.border),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 2),
+          child: Text(s.consentLogTitle,
+              style: ts(12, c: C.slate, w: FontWeight.w700)),
+        ),
+        if (log.isEmpty)
+          SettingsHint(s.consentLogEmpty)
+        else
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 2, 14, 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final e in log.take(8))
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      '${e.stamp} · ${e.version} · '
+                      '${e.granted ? s.consentActGrant : s.consentActRevoke}'
+                      ' · ${_consentScopeName(s, e.scope)}',
+                      style: ts(11, c: C.grey),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 14, 8),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: log.isEmpty
+                  ? null
+                  : () async {
+                      await st.clearConsentLog();
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(s.consentLogCleared)),
+                      );
+                    },
+              icon: const Icon(Icons.delete_outline_rounded, size: 16),
+              label: Text(s.consentLogClear, style: ts(12)),
+            ),
+          ),
+        ),
+        SettingsHint(s.consentLogClearHint),
+      ],
+    );
+  }
+
+  String _consentScopeName(S s, ConsentScope scope) {
+    switch (scope) {
+      case ConsentScope.internet:
+        return s.consentScopeInternet;
+      case ConsentScope.rf:
+        return s.consentScopeRf;
+      case ConsentScope.igate:
+        return s.consentScopeIgate;
+    }
   }
 
   // ─── 智能信标 · 按速度分档编辑区 ───

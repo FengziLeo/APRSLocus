@@ -767,6 +767,16 @@ class _TncDevicePageState extends State<TncDevicePage> {
     );
   }
 
+  /// 开关「射频信标」：先过用户协议 V2.0 附件一第二项（射频信标发射）。
+  /// 同意书签完会回到这里把开关真的打开（[AppState.ensureRfConsent] 的回调）。
+  Future<void> _setRfBeacon(bool v) async {
+    if (v && !st.ensureRfConsent(() => unawaited(_setRfBeacon(true)))) return;
+    tnc.config.rfBeacon = v;
+    await tnc.persistConfig();
+    st.reloadUi();
+    if (mounted) setState(() {});
+  }
+
   /// ⑤ 射频行为
   Widget _rfCard(S s) {
     return SettingsSectionCard(
@@ -776,12 +786,7 @@ class _TncDevicePageState extends State<TncDevicePage> {
       color: C.orange,
       children: [
         SettingsSwitch(s.kissRfBeacon, value: tnc.config.rfBeacon,
-            color: C.orange, onChanged: (v) async {
-          tnc.config.rfBeacon = v;
-          await tnc.persistConfig();
-          st.reloadUi();
-          if (mounted) setState(() {});
-        }),
+            color: C.orange, onChanged: (v) => unawaited(_setRfBeacon(v))),
         SettingsHint(s.kissRfBeaconTip, color: C.orange),
         SettingsSwitch(s.kissAutoAck, value: tnc.config.autoAck,
             color: C.cyan, onChanged: (v) async {

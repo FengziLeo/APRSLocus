@@ -17295,6 +17295,54 @@ abstract class AppLocalizations {
   /// **'取消'**
   String get autoStartAskCancel;
 
+  /// No description provided for @mvTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'需要更新'**
+  String get mvTitle;
+
+  /// No description provided for @mvBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'本版本已停止支持。更新到 {min} 或更高版本之后才能继续使用。'**
+  String mvBody(String min);
+
+  /// No description provided for @mvCurrent.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前版本'**
+  String get mvCurrent;
+
+  /// No description provided for @mvRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'最低版本'**
+  String get mvRequired;
+
+  /// No description provided for @mvReason.
+  ///
+  /// In zh, this message translates to:
+  /// **'说明'**
+  String get mvReason;
+
+  /// No description provided for @mvUpdate.
+  ///
+  /// In zh, this message translates to:
+  /// **'去更新'**
+  String get mvUpdate;
+
+  /// No description provided for @mvExit.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出应用'**
+  String get mvExit;
+
+  /// No description provided for @mvChecking.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在检查…'**
+  String get mvChecking;
+
 }
 
 class _AppLocalizationsDelegate

@@ -4281,5 +4281,14 @@
   "autoStartAskConnect": "これからアプリを開くたびにサーバーへ自動で接続します。",
   "autoStartAskReport": "これからアプリを開くたびにサーバーへ自動で接続し、位置の送信を始めます。",
   "autoStartAskOk": "オンにする",
-  "autoStartAskCancel": "キャンセル"
+  "autoStartAskCancel": "キャンセル",
+  "mvTitle": "アップデートが必要です",
+  "mvBody": "このバージョンはサポートを終了しました。{min} 以降に更新すると続けて使えます。",
+  "mvCurrent": "現在のバージョン",
+  "mvRequired": "最低バージョン",
+  "mvReason": "説明",
+  "mvUpdate": "アップデートする",
+  "mvExit": "アプリを終了",
+  "mvChecking": "確認中…",
+  "@mvBody": {"placeholders": {"min": {"type": "String"}}}
 }

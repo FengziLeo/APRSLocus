@@ -4281,5 +4281,14 @@
   "autoStartAskConnect": "Mulai sekarang aplikasi tersambung ke server setiap kali dibuka.",
   "autoStartAskReport": "Mulai sekarang aplikasi tersambung ke server dan mulai mengirim posisi setiap kali dibuka.",
   "autoStartAskOk": "Aktifkan",
-  "autoStartAskCancel": "Batal"
+  "autoStartAskCancel": "Batal",
+  "mvTitle": "Perlu pembaruan",
+  "mvBody": "Versi ini tidak lagi didukung. Perbarui ke {min} atau versi lebih baru untuk terus memakainya.",
+  "mvCurrent": "Versi saat ini",
+  "mvRequired": "Versi minimum",
+  "mvReason": "Catatan",
+  "mvUpdate": "Perbarui",
+  "mvExit": "Keluar",
+  "mvChecking": "Memeriksa…",
+  "@mvBody": {"placeholders": {"min": {"type": "String"}}}
 }

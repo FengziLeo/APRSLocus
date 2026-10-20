@@ -8,6 +8,7 @@ import 'check_update_page.dart';
 import 'pinned_http.dart';
 import 'state.dart';
 import 'theme.dart';
+import 'version_compare.dart';
 import 'widgets.dart';
 
 /// 启动后检查一次新版本，**有新版就弹提醒**（同一版本只提醒一次）。
@@ -123,36 +124,5 @@ Future<void> _showUpdateDialog(
   );
 }
 
-/// 版本比较：支持 `1.2.5` / `1.2.5.b` / `v1.0.0`。
-///
-/// 与「检查更新」页保持同一套规则：字母后缀视为修复版
-/// （`1.2.5.b > 1.2.5`），数字段 > 字母段（`1.2.6 > 1.2.5.b`）。
-/// 返回 >0 表示 a 更新。
-int compareVersions(String a, String b) {
-  final sa = a.replaceAll(RegExp('^v'), '').split(RegExp(r'[._-]'));
-  final sb = b.replaceAll(RegExp('^v'), '').split(RegExp(r'[._-]'));
-  const letters = 'abcdefghijklmnopqrstuvwxyz';
-  final len = sa.length > sb.length ? sa.length : sb.length;
-  for (var i = 0; i < len; i++) {
-    final hasA = i < sa.length;
-    final hasB = i < sb.length;
-    if (!hasA && hasB) return -1;
-    if (hasA && !hasB) return 1;
-    final x = sa[i];
-    final y = sb[i];
-    final xv = int.tryParse(x);
-    final yv = int.tryParse(y);
-    if (xv != null && yv != null) {
-      if (xv != yv) return xv - yv;
-    } else if (xv != null && yv == null) {
-      return 1;
-    } else if (xv == null && yv != null) {
-      return -1;
-    } else {
-      final xl = x.isNotEmpty ? letters.indexOf(x[0]) : -1;
-      final yl = y.isNotEmpty ? letters.indexOf(y[0]) : -1;
-      if (xl != yl) return xl - yl;
-    }
-  }
-  return 0;
-}
+// 版本比较 compareVersions 已移到 version_compare.dart：最低版本闸门
+// （lib/min_version.dart）也要用它，而那边不该为一个函数把整套界面拉进来。

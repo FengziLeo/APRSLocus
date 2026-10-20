@@ -9568,4 +9568,28 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get autoStartAskCancel => "キャンセル";
 
+  @override
+  String get mvTitle => "アップデートが必要です";
+
+  @override
+  String mvBody(String min) => "このバージョンはサポートを終了しました。$min 以降に更新すると続けて使えます。";
+
+  @override
+  String get mvCurrent => "現在のバージョン";
+
+  @override
+  String get mvRequired => "最低バージョン";
+
+  @override
+  String get mvReason => "説明";
+
+  @override
+  String get mvUpdate => "アップデートする";
+
+  @override
+  String get mvExit => "アプリを終了";
+
+  @override
+  String get mvChecking => "確認中…";
+
 }

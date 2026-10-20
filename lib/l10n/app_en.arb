@@ -4281,5 +4281,14 @@
   "autoStartAskConnect": "From now on the app connects to the server every time you open it.",
   "autoStartAskReport": "From now on the app connects to the server and starts reporting every time you open it.",
   "autoStartAskOk": "Turn on",
-  "autoStartAskCancel": "Cancel"
+  "autoStartAskCancel": "Cancel",
+  "mvTitle": "Update required",
+  "mvBody": "This version is no longer supported. Update to {min} or later to continue.",
+  "mvCurrent": "Current version",
+  "mvRequired": "Minimum version",
+  "mvReason": "Note",
+  "mvUpdate": "Update",
+  "mvExit": "Quit",
+  "mvChecking": "Checking…",
+  "@mvBody": {"placeholders": {"min": {"type": "String"}}}
 }

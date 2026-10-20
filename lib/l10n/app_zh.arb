@@ -4960,5 +4960,14 @@
   "autoStartAskConnect": "以后每次打开软件都会自动连接服务器。",
   "autoStartAskReport": "以后每次打开软件都会自动连接服务器，并开始上报位置。",
   "autoStartAskOk": "开启",
-  "autoStartAskCancel": "取消"
+  "autoStartAskCancel": "取消",
+  "mvTitle": "需要更新",
+  "mvBody": "本版本已停止支持。更新到 {min} 或更高版本之后才能继续使用。",
+  "mvCurrent": "当前版本",
+  "mvRequired": "最低版本",
+  "mvReason": "说明",
+  "mvUpdate": "去更新",
+  "mvExit": "退出应用",
+  "mvChecking": "正在检查…",
+  "@mvBody": {"placeholders": {"min": {"type": "String"}}}
 }

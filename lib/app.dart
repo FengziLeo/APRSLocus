@@ -14,6 +14,7 @@ import 'splash_page.dart';
 import 'oobe_page.dart';
 import 'app_widget.dart';
 import 'blacklist_page.dart';
+import 'min_version_page.dart';
 import 'data_notice_page.dart';
 import 'consent_page.dart';
 import 'agent_notice_page.dart';
@@ -451,6 +452,9 @@ class _AppState extends State<App> {
       // 放在首次引导之前/之后都一样：引导页也不该给被限制的人继续用。
       final bl = _state.blacklistHit;
       if (bl != null) return BlacklistPage(hit: bl, state: _state);
+      // 低于官网要求的最低版本 → 整页拦下：只能去更新页，别处没有出口
+      // （返回键直接退出应用，见 MinVersionPage）。
+      if (_state.versionBlocked) return MinVersionPage(state: _state);
       // 连接服务器前必须签署「数据与网络使用告知」（用户协议 2.4/2.5）：
       // 闸门在 AppState.toggleConnect 里，这里只负责在被请求时把页面显示出来。
       if (_state.pendingDataNotice) return DataNoticePage(state: _state);

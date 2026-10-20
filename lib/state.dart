@@ -57,6 +57,7 @@ import 'theme_store.dart';
 import 'tile_cache.dart';
 import 'ble_hr.dart';
 import 'blacklist.dart';
+import 'min_version.dart';
 import 'agent_allow.dart';
 import 'garmin.dart';
 import 'share_in.dart';
@@ -2613,6 +2614,29 @@ class AppState extends ChangeNotifier {
   /// 下一次**廉价检查**的时刻（真正的拉取在 [recheckBlacklist] 里按 6 小时节流）
   DateTime? _blacklistNext;
 
+  /// 官网要求的最低版本（`assets/min_version.json`）；null = 还没查到 / 拉取失败。
+  ///
+  /// 本机版本低于它时 `app.dart` 用整页拦下：只能去更新页，别的都进不去
+  /// （见 [versionBlocked]）。
+  MinVersion? minVersionLimit;
+
+  /// 下一次**廉价检查**的时刻（真正的拉取在 [recheckMinVersion] 里按 6 小时节流）
+  DateTime? _minVersionNext;
+
+  /// 本会话是否已经**成功**拉到过最低版本（同 [_blacklistFetched]：新会话必拉一次）
+  bool _minVersionFetched = false;
+
+  /// 本机版本是否**低于**官网要求的最低版本。
+  ///
+  /// 没拉到过 / 坏 JSON / 下限留空 / 版本号写错 —— 全部返回 false（失败放行，
+  /// 见 `lib/min_version.dart` 的三条原则）。装了新版本后版本号自己就超过下限，
+  /// 闸门随之消失，不需要任何人去解封。
+  bool get versionBlocked => minVersionLimit?.blocks(appVersion) ?? false;
+
+  /// 需要更新到的版本号（没被拦时是空串）。
+  String get minVersionRequired =>
+      versionBlocked ? (minVersionLimit?.minVersion ?? '') : '';
+
   /// ── 数据与网络使用告知 ──
   ///
   /// 连接服务器**前**必须签署：本软件不提供、不运营、也不推荐任何服务器地址
@@ -2958,6 +2982,45 @@ class AppState extends ChangeNotifier {
       if (changed) _notify();
     } catch (_) {
       // 任何异常都当"没查到"（放行）—— 绝不让这个功能把正常用户挡在门外
+    }
+  }
+
+  /// 查一次官网要求的最低版本。
+  ///
+  /// 时机：启动后一次 + 每 [MinVersion.kRefresh]（6 小时）一次；`force` 供
+  /// 「重新检查」用（绕过节流——装完新版本回来能立刻放行）。
+  ///
+  /// 与 [recheckBlacklist] 同一套原则：**失败放行**（从没拉到过 → 不拦）、
+  /// **拉到过就认缓存**（之后断网也按上次那份）。
+  Future<void> recheckMinVersion({bool force = false}) async {
+    try {
+      final cached = await MinVersion.cached();
+      var mv = cached;
+      final last = await MinVersion.lastChecked();
+      final due = force ||
+          !_minVersionFetched ||
+          last == null ||
+          DateTime.now().difference(last) > MinVersion.kRefresh;
+      if (due) {
+        final fresh = await MinVersion.fetch();
+        if (fresh != null) {
+          mv = fresh;
+          _minVersionFetched = true;
+        }
+        // 拉取失败 → 沿用缓存（有就认）；不置位，留给下次检查再试
+      }
+      final before = versionBlocked;
+      final beforeMin = minVersionRequired;
+      minVersionLimit = mv;
+      if (versionBlocked != before || minVersionRequired != beforeMin) {
+        if (versionBlocked) {
+          _log(LogLevel.warn, '版本',
+              '本机版本 $appVersion 低于官网最低版本 $minVersionRequired');
+        }
+        _notify();
+      }
+    } catch (_) {
+      // 任何异常都当"没查到"（放行）—— 这个功能不能把正常用户挡在门外
     }
   }
 
@@ -5074,6 +5137,9 @@ class AppState extends ChangeNotifier {
       // 离线也拦"的语义也不受影响。
       await recheckBlacklist()
           .timeout(const Duration(milliseconds: 400), onTimeout: () {});
+      // 官网要求的最低版本：同样启动就查一次，同样只等 400ms（联网那份后台跑完）。
+      await recheckMinVersion()
+          .timeout(const Duration(milliseconds: 400), onTimeout: () {});
       // 智能体授权名单：同样启动就查一次，也用 400ms 上限（联网请求会后台跑完）。
       await recheckAgentAllow()
           .timeout(const Duration(milliseconds: 400), onTimeout: () {});
@@ -5566,6 +5632,11 @@ class AppState extends ChangeNotifier {
       if (_blacklistNext == null || DateTime.now().isAfter(_blacklistNext!)) {
         _blacklistNext = DateTime.now().add(const Duration(minutes: 30));
         unawaited(recheckBlacklist());
+      }
+      // 官网要求的最低版本：同一个节拍（30 分钟一次"到点了没"，真正的拉取按 6 小时节流）。
+      if (_minVersionNext == null || DateTime.now().isAfter(_minVersionNext!)) {
+        _minVersionNext = DateTime.now().add(const Duration(minutes: 30));
+        unawaited(recheckMinVersion());
       }
       // 智能体授权名单：同一个节拍（30 分钟一次"到点了没"，真正的拉取按 6 小时节流）。
       if (_agentAllowNext == null || DateTime.now().isAfter(_agentAllowNext!)) {

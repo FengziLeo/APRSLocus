@@ -89,6 +89,11 @@ jobs:
       - name: Check blacklist
         run: python3 tool/check_blacklist.py
 
+      # 官网最低版本文件：手写 JSON，写坏只在「该拦不拦」或「把所有人拦住」上发作。
+      # 并核对应用取址一致、minVersion 不高于当前发布版（写高了就把最新版用户也挡在外）。
+      - name: Check min version
+        run: python3 tool/check_min_version.py
+
       # 智能体授权名单（白名单）与限制名单对称、方向相反：写坏的后果是**授权过的人
       # 被挡在门外**，或 `call` 手滑成 `*` 把智能体对**所有人**开放。这两种在应用里
       # 都不会报错，所以同样钉在这里，连"应用从哪取这份文件 / 申请邮箱"一起核对。
@@ -412,6 +417,11 @@ jobs:
       # 写坏不会报错、只会静默拒绝（或放行所有人），所以用测试钉住。
       - name: Test agent allowlist
         run: flutter test test/agent_allow_test.dart
+
+      # 官网最低版本的解析与判定：该拦不拦（版本号写坏、JSON 坏掉）与不该拦偏拦
+      # 都编译得过、analyze 全绿，只在用户手上才看得出，所以钉在 CI。
+      - name: Test min version gate
+        run: flutter test test/min_version_test.dart
 
       # 智能体「需授权」这道闸在 AppState 上的行为：点开关未授权不许真开、拉不到
       # 名单判未授权、备份/旧版本带进来的 enabled=true 要兜底关掉。驱动真实方法。

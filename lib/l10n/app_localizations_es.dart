@@ -9906,4 +9906,28 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get autoStartAskCancel => "Cancelar";
 
+  @override
+  String get mvTitle => "Actualización necesaria";
+
+  @override
+  String mvBody(String min) => "Esta versión ya no tiene soporte. Actualiza a $min o posterior para seguir usándola.";
+
+  @override
+  String get mvCurrent => "Versión actual";
+
+  @override
+  String get mvRequired => "Versión mínima";
+
+  @override
+  String get mvReason => "Nota";
+
+  @override
+  String get mvUpdate => "Actualizar";
+
+  @override
+  String get mvExit => "Salir";
+
+  @override
+  String get mvChecking => "Comprobando…";
+
 }

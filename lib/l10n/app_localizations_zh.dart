@@ -9468,6 +9468,30 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get autoStartAskCancel => "取消";
 
+  @override
+  String get mvTitle => "需要更新";
+
+  @override
+  String mvBody(String min) => "本版本已停止支持。更新到 $min 或更高版本之后才能继续使用。";
+
+  @override
+  String get mvCurrent => "当前版本";
+
+  @override
+  String get mvRequired => "最低版本";
+
+  @override
+  String get mvReason => "说明";
+
+  @override
+  String get mvUpdate => "去更新";
+
+  @override
+  String get mvExit => "退出应用";
+
+  @override
+  String get mvChecking => "正在检查…";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18932,5 +18956,29 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get autoStartAskCancel => "取消";
+
+  @override
+  String get mvTitle => "需要更新";
+
+  @override
+  String mvBody(String min) => "本版本已停止支援。更新到 $min 或更高版本之後才能繼續使用。";
+
+  @override
+  String get mvCurrent => "目前版本";
+
+  @override
+  String get mvRequired => "最低版本";
+
+  @override
+  String get mvReason => "說明";
+
+  @override
+  String get mvUpdate => "去更新";
+
+  @override
+  String get mvExit => "結束應用程式";
+
+  @override
+  String get mvChecking => "正在檢查…";
 
 }

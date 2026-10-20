@@ -9857,4 +9857,28 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get autoStartAskCancel => "Batal";
 
+  @override
+  String get mvTitle => "Perlu pembaruan";
+
+  @override
+  String mvBody(String min) => "Versi ini tidak lagi didukung. Perbarui ke $min atau versi lebih baru untuk terus memakainya.";
+
+  @override
+  String get mvCurrent => "Versi saat ini";
+
+  @override
+  String get mvRequired => "Versi minimum";
+
+  @override
+  String get mvReason => "Catatan";
+
+  @override
+  String get mvUpdate => "Perbarui";
+
+  @override
+  String get mvExit => "Keluar";
+
+  @override
+  String get mvChecking => "Memeriksa…";
+
 }

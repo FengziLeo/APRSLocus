@@ -133,11 +133,11 @@ The fault was ours. Sorry for the trouble.
 
 ---
 
-## 🔔 What is new: 2.1.24
+## 🔔 What is new: 2.1.25
 
-- The Terms of Use are now V2.0, with 59 clauses in three languages, including the new chapter on separate consent for beacon upload and transmission and the consent form in Appendix 1.
-- Before the first auto-report, RF beacon or iGate is turned on, a page of its own spells out what the data is, why it is necessary and what it means for you. The three features are ticked one by one and all unticked by default; after signing, the switch you tapped really turns on.
-- Beaconing in settings gained a separate consent card you can withdraw from at any time. Withdrawal stops sending at once and leaves a consent log: time, feature, and the version of the notice text.
+- Double-tapping the map zooms in one level around the point you tapped, with the same animation as the "+" button.
+- Beacon settings gained a "When I open the app" row with three choices: do nothing, connect to the server, or go straight into reporting. The default is do nothing, and switching asks for confirmation first.
+- With auto-report off, tapping the pending-confirmation button sends one beacon instead of turning auto-report on along the way.
 
 ---
 
@@ -155,9 +155,9 @@ Look up APALOC in the official TOCALL table and you will find it.
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-Checking for updates now returns the latest stable version, 2.1.24. If you installed 2.2.0, uninstall it first, then install 2.1.24.
+Checking for updates now returns the latest stable version, 2.1.25. If you installed 2.2.0, uninstall it first, then install 2.1.25.
 
-**[Download 2.1.24](https://github.com/dariondong/APRSLocus/releases/download/v2.1.24/APRSLocus_2.1.24.apk)**
+**[Download 2.1.25](https://github.com/dariondong/APRSLocus/releases/download/v2.1.25/APRSLocus_2.1.25.apk)**
 
 ---
 

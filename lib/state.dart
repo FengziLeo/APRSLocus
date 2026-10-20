@@ -42,6 +42,8 @@ import 'diag.dart';
 import 'group_chat.dart';
 import 'strategy_map.dart';
 import 'igate.dart';
+import 'consent.dart';
+import 'terms_version.dart';
 import 'tnc.dart';
 import 'translate.dart';
 import 'agent.dart';
@@ -665,6 +667,9 @@ class AppState extends ChangeNotifier {
   /// 让用户马上在地图上看到自己；没有有效定位时先只放行，等拿到定位后
   /// 由定时器按间隔发出（不会误发旧坐标，见 [myPositionReportable]）。
   void beginReporting() {
+    // 「开始上报」是用户主动放行自动上报的那一下，也是附件一要求的关口：
+    // 没签过同意就先签，签完再回到这里。
+    if (!ensureConsent(beaconConsentScopes, then: beginReporting)) return;
     beaconArmed = true;
     if (!beaconEnabled) setBeaconEnabled(true);
     if (myPositionReportable) sendBeacon();
@@ -1619,6 +1624,13 @@ class AppState extends ChangeNotifier {
   }
 
   void setBeaconEnabled(bool v) {
+    // 开启自动上报 = 开始把位置发到公开网络/空中 → 先过单独同意
+    // （用户协议 V2.0 附件一 / 5.3）。已同意就直接放行。
+    if (v &&
+        !ensureConsent(beaconConsentScopes,
+            then: () => setBeaconEnabled(true))) {
+      return;
+    }
     // 开启信标 = 开始新一次上报会话 → 本次里程从零重新累计
     if (v && !beaconEnabled) _resetTripMileage();
     beaconEnabled = v;
@@ -2574,6 +2586,109 @@ class AppState extends ChangeNotifier {
   /// 拒绝告知（不连接，保持本地）。
   void declineDataNotice() {
     pendingDataNotice = false;
+    _notify();
+  }
+
+  /// ── 上传/发射的单独同意（用户协议 V2.0 附件一）──
+  ///
+  /// 与上面那份「数据与网络使用告知」是**两件事**：那份讲「连不连、连到哪里」，
+  /// 这份讲「把位置发到公开网络或空中」。所以各自独立、谁也不替代谁，
+  /// 同意书也在同一个设置层级可以撤回（协议 5.2 / 5.5）。
+  final ConsentStore consent = ConsentStore();
+
+  /// 等待用户签署的范围。非空时 `app.dart` 整页显示单独同意书。
+  Set<ConsentScope> pendingConsent = {};
+
+  /// 同意之后要继续做的事（用户拨开关 → 弹同意 → 回来把开关真的打开）。
+  VoidCallback? _consentThen;
+
+  bool hasConsent(ConsentScope s) => consent.has(s);
+
+  /// 当前配置下发一个信标需要哪些同意。
+  ///
+  /// 与附件一的三项一一对应：有互联网链路（APRS-IS / APRSNETCN，两者都能
+  /// 发射）就需要第一项；有射频来源（TNC / 声卡）就需要第二项。
+  /// 一条能发射的链路都没配时返回空集 —— 那时信标本来就发不出去，
+  /// 不该凭空拦一道同意。
+  Set<ConsentScope> get beaconConsentScopes {
+    final s = <ConsentScope>{};
+    if (aprsIsOn || acnOn) s.add(ConsentScope.internet);
+    if (tncOn || audioOn) s.add(ConsentScope.rf);
+    return s;
+  }
+
+  /// 当前配置是否已经拿齐「发信标需要的同意」。
+  ///
+  /// 撤回任意一项就变假，[canAutoBeacon] 与发送口子都读它 ——
+  /// 这就是协议 5.5「撤回后立即停止发送新的数据」的落地方式。
+  bool get consentSatisfied => consent.hasAll(beaconConsentScopes);
+
+  /// 需要同意就挂起并返回 false（外壳会把同意书显示出来）；已同意直接返回 true。
+  ///
+  /// [then] 是「同意之后接着做」的动作。这样开关的语义是「点了就是要开」，
+  /// 而不是「点了没反应、自己去再点一遍」。
+  bool ensureConsent(Set<ConsentScope> want, {VoidCallback? then}) {
+    final miss = want.where((s) => !consent.has(s)).toSet();
+    if (miss.isEmpty) return true;
+    pendingConsent = miss;
+    _consentThen = then;
+    _notify();
+    return false;
+  }
+
+  /// 「射频发射」那一项的同意闸（附件一第二项）。
+  bool ensureRfConsent([VoidCallback? then]) =>
+      ensureConsent({ConsentScope.rf}, then: then);
+
+  /// iGate 向射频转就是代表他人发射，所以这项同意同时需要第二项。
+  bool ensureIgateConsent([VoidCallback? then]) =>
+      ensureConsent({ConsentScope.igate, ConsentScope.rf}, then: then);
+
+  /// 用户在同意书上勾选并确认。[picked] 是那一页上真正勾上的功能项。
+  Future<void> acceptConsent(Set<ConsentScope> picked) async {
+    final want = pendingConsent;
+    // 之前已经签过的项不算「新同意」（[ConsentStore.grant] 幂等，不重复写日志）。
+    await consent.grant(picked, kTermsVersion);
+    pendingConsent = {};
+    final then = _consentThen;
+    _consentThen = null;
+    _log(LogLevel.info, '同意', '已签署上传/发射单独同意（$kTermsVersion）');
+    _notify();
+    // 用户可能在同意书上故意漏勾一项：那就**不要**替他把那个功能打开。
+    // 开关本身读 consent，所以这里不回调也不会出现「看见开了却在发」的情况。
+    if (consent.hasAll(want)) then?.call();
+  }
+
+  /// 用户选了「暂不开启」：只关弹窗，不记任何东西。
+  void declineConsent() {
+    pendingConsent = {};
+    _consentThen = null;
+    _notify();
+  }
+
+  /// 撤回一项同意。对应功能立即停（闸门读 [consent]）。
+  Future<void> revokeConsent(ConsentScope s) async {
+    await consent.revoke(s, kTermsVersion);
+    pendingConsent = {};
+    _consentThen = null;
+    // 撤回后必须回到「待确认上报」：否则 beaconArmed 还留着，界面会显示一个
+    // 照走的倒计时，而 canAutoBeacon 已因同意没了而不发 ——
+    // 正是「倒计时走着却不发射」那个老毛病。重新点「开始上报」会再过一次同意。
+    if (!consentSatisfied) beaconArmed = false;
+    _log(LogLevel.info, '同意', '已撤回单独同意（${s.id}）');
+    _notify();
+    _updateNotification();
+  }
+
+  /// 只清同意日志（协议 5.4：可以单独清除）。已作出的同意不动。
+  Future<void> clearConsentLog() async {
+    await consent.clearLog();
+    _notify();
+  }
+
+  /// 测试口子：把同意摆成「已签过」（不写日志、不碰磁盘）。
+  void debugGrantConsent([Iterable<ConsentScope>? scopes]) {
+    consent.debugGrant(scopes ?? ConsentScope.values);
     _notify();
   }
 
@@ -4167,6 +4282,11 @@ class AppState extends ChangeNotifier {
     beaconAutoAsked = false;
     beaconArmed = false; // 恢复出厂：上报确认一并作废（与字段默认值一致）
     dataNoticeAccepted = false;
+    // 单独同意也一样：磁盘上会被下面的 p.clear() 抹掉，内存里必须同时清，
+    // 否则「恢复出厂 → 首次引导」这段还带着上一次安装的同意。
+    consent.reset();
+    pendingConsent = {};
+    _consentThen = null;
     pendingDataNotice = false;
     agentNoticeAccepted = false;
     pendingAgentNotice = false;
@@ -4649,6 +4769,8 @@ class AppState extends ChangeNotifier {
       beaconEnabled = p.getBool('beacon') ?? beaconEnabled;
       beaconAutoAsked = p.getBool('beaconAutoAsked') ?? beaconAutoAsked;
     dataNoticeAccepted = p.getBool('dataNoticeAccepted') ?? false;
+    // 单独同意（用户协议 V2.0 附件一）：与上面那份告知分开存、分开读。
+    await consent.load();
     agentNoticeAccepted = p.getBool('agentNoticeAccepted') ?? false;
       beaconInterval = p.getInt('beaconInterval') ?? beaconInterval;
       beaconNetInterval =
@@ -5871,6 +5993,9 @@ class AppState extends ChangeNotifier {
 
   /// 开关网关
   void setIgateEnabled(bool v) {
+    // 网关往射频转就是代表他人在发射 → 先过单独同意（附件一第三项，
+    // 并同时需要第二项「射频发射」）。
+    if (v && !ensureIgateConsent(() => setIgateEnabled(true))) return;
     igateEnabled = v;
     if (!v) igateTwoWay = false; // 网关关了就不该还留着「往射频转」的开关
     if (v) {
@@ -5912,6 +6037,7 @@ class AppState extends ChangeNotifier {
 
   /// 开关双向网关（IS→RF，会真实发射）
   void setIgateTwoWay(bool v) {
+    if (v && !ensureIgateConsent(() => setIgateTwoWay(true))) return;
     igateTwoWay = v;
     if (v && !igateEnabled) igateEnabled = true;
     _log(LogLevel.info, '网关',
@@ -6151,6 +6277,8 @@ class AppState extends ChangeNotifier {
   /// 刻意做成**显式动作**而不是收到定位就自动打开：射频发射需要持照操作，
   /// 必须由用户点这一下才算知情同意（见 canAutoBeacon 的注释）。
   Future<void> enableRfBeacon() async {
+    // 射频发射（附件一第二项）：没同意就先签，签完再打开。
+    if (!ensureRfConsent(() => unawaited(enableRfBeacon()))) return;
     if (usingTnc) {
       tnc.config.rfBeacon = true;
       await tnc.persistConfig();
@@ -6174,6 +6302,11 @@ class AppState extends ChangeNotifier {
   Future<AutoReportResult> toggleAutoReport() async {
     if (beaconEnabled) {
       setBeaconEnabled(false);
+      return const AutoReportResult(on: false, rfEnabled: false);
+    }
+    // 打开前先过单独同意：没签就弹同意书，勾完再接着把开关真的打开。
+    if (!ensureConsent(beaconConsentScopes,
+        then: () => unawaited(toggleAutoReport()))) {
       return const AutoReportResult(on: false, rfEnabled: false);
     }
     setBeaconEnabled(true);
@@ -6229,6 +6362,9 @@ class AppState extends ChangeNotifier {
       beaconEnabled &&
       myPositionReportable &&
       beaconArmed &&
+      // 单独同意（用户协议 V2.0 附件一）：撤回任意一项就变假，
+      // 与发送口子里的那道闸同一个判据。
+      consentSatisfied &&
       (!myFixCoarse || beaconForceCoarse || locationMode == 'network') &&
       (!usingRf || (usingTnc ? tnc.config.rfBeacon : audio.config.rfBeacon));
 
@@ -7468,6 +7604,12 @@ class AppState extends ChangeNotifier {
     // 「上报现在的位置」，而当前还没有本轮定位，那个坐标就是错的。
     if (!myPositionReportable) return;
     if (!force && !beaconEnabled) return;
+    // 单独同意（协议 5.1 / 5.3）：没有对应范围的同意，一个字节都不发 ——
+    // 自动、手动两条路都经过这里，所以这一个闸就够了。
+    if (!consentSatisfied) {
+      ensureConsent(beaconConsentScopes);
+      return;
+    }
     final lat = myLat!;
     final lng = myLng!;
     final raw = AprsFmt.position(

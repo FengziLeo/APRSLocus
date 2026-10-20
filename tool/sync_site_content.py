@@ -419,6 +419,27 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.24', 'date': '2026-10-20',
+        'items': [
+            ('new',
+             T('第一次开自动上报、开射频信标或开网关之前，先用单独一页把信息性质、必要性、'
+               '对个人权益的影响讲清楚，三个功能项按项勾选，默认全不勾。',
+               '第一次開自動上報、開射頻信標或開閘道之前，先用單獨一頁把信息性質、必要性、'
+               '對個人權益的影響講清楚，三個功能項按項勾選，預設全不勾。',
+               'Before the first auto-report, RF beacon or iGate is turned on, a page of its own '
+               'spells out what the data is, why it is necessary and what it means for you, with '
+               'the three features ticked one by one and all unticked by default.')),
+            ('up',
+             T('用户协议升到 V2.0，三语 59 条，新增第五章「信标上传与发射：须经单独同意」'
+               '与附件一。设置里新增「单独同意」卡，可以随时撤回并查看同意日志。',
+               '使用者條款升到 V2.0，三語 59 條，新增第五章「信標上傳與發射：須經單獨同意」'
+               '與附件一。設定裡新增「單獨同意」卡，可以隨時撤回並檢視同意日誌。',
+               'Terms of Use raised to V2.0 with 59 clauses in three languages, including the new '
+               'chapter on separate consent for beacon upload and transmission, plus Appendix 1. '
+               'A consent card in settings lets you withdraw at any time and read the log.')),
+        ],
+    },
+    {
         'ver': 'v2.1.23', 'date': '2026-10-19',
         'items': [
             ('new',

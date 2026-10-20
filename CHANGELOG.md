@@ -1,5 +1,72 @@
 # 更新日志
 
+## [2.1.24] - 2026-10-20
+
+### 用户协议升到 V2.0
+
+- **三语正文整体换成 V2.0，条款从 46 条到 59 条。** 新增第五章「信标上传与发射：
+  须经单独同意」和附件一「上传/发射信标单独同意书」。
+- 位置信标与它形成的连续轨迹，按《个人信息保护法》写清了「敏感个人信息」的
+  性质、处理目的与必要性。
+- 「关于」页与首次启动显示的版本号一并改成 V2.0。
+
+### 第一次上传或发射前要单独签一次
+
+- **新增一页单独同意书**：三项告知逐条写清，下面是三个功能项，按项勾选
+  （APRS-IS 信标上传 / 射频信标发射 / iGate 转发），默认全不勾。
+- 五个入口都会先弹这一页：自动上报开关、开始上报、一键开射频信标、网关开关、
+  设置里的单独同意卡。签完回到原处，把你点的那个开关真的打开。
+- 故意漏勾的那一项不会被打开。
+
+### 撤回与同意日志
+
+- **设置 → 信标上报下面新增「单独同意」卡**，三个功能项各一个开关，关掉就是
+  撤回。撤回即时停止发送，并把这次连接的上报确认一起作废，界面退回「待确认
+  上报」。
+- 日志记下同意时间、所同意的功能项与告知文本的版本。可以单独清除日志，清日志
+  不影响已经作出的同意。
+- 同意只存在本机，不进备份，恢复出厂时一起清掉。
+- 智能体的「立即上报」与「开关自动上报」也检查这一项，没签就如实报错。
+
+---
+
+## [2.1.24] - 2026-10-20 (English)
+
+### Terms of Use raised to V2.0
+
+- **The three-language text is replaced with V2.0, going from 46 clauses to 59.** Chapter 5
+  (separate consent for beacon upload and transmission) and Appendix 1 (the consent form
+  itself) are new.
+- Position beacons and the continuous track they form are now described as sensitive
+  personal information under the Personal Information Protection Law, with the purpose and
+  the necessity stated in the document.
+- The version shown on the About page and in the first-run guide follows to V2.0.
+
+### A separate consent before the first upload or transmit
+
+- **A new consent page**: the three points are spelled out, followed by three features you
+  tick one by one (APRS-IS beacon upload, RF beacon transmit, iGate forwarding), all
+  unticked by default.
+- Five entry points open it first: the auto-report switch, Start reporting, the one-tap RF
+  beacon, the iGate switch, and the consent card in settings. After signing, the switch you
+  tapped actually turns on.
+- A feature you deliberately left unticked is not turned on.
+
+### Withdrawal and the consent log
+
+- **A new "Separate consent" card under beaconing in settings**: one switch per feature, and
+  turning one off is a withdrawal. Withdrawal stops sending at once and voids this
+  connection's reporting confirmation, so the bar goes back to "waiting for confirmation".
+- The log records the time of consent, the features consented to, and the version of the
+  notice text. You can clear the log on its own; clearing it does not affect consents
+  already given.
+- Consent stays on this device only, is not part of a backup, and is cleared by a factory
+  reset.
+- The agent's "report now" and "toggle auto-report" check it too, and report an error
+  instead of claiming success.
+
+---
+
 ## [2.1.23] - 2026-10-19
 
 ### 设备快捷面板两个入口

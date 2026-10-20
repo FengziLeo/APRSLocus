@@ -1,5 +1,51 @@
 # 更新日志
 
+## [2.1.25] - 2026-10-20
+
+### 地图双击放大
+
+- **在瓦片地图上双击就放大一级**，围绕你点的那一点，动画与右下角的「+」同一档。
+- 没有用系统的双击识别：那会让每次单击都要等一个判断窗口，点台站会变慢。
+
+### 打开软件时
+
+- **上报设置里新增「打开软件时」三档**：不做操作、自动连接服务器、直接进入上报。
+- 默认不做操作。换到后两档之前先弹确认框，把后果写清楚。
+- 自动连接只连接，上报仍要你自己点。直接进入上报也会先过上传发射的单独同意。
+
+### 待确认上报只发一次
+
+- **自动上报没有开启时，点「待确认上报」只发报一次**，不再顺手把自动上报打开。
+- 那枚按钮在总开关没开时写的就是「立即上报」。
+
+---
+
+## [2.1.25] - 2026-10-20 (English)
+
+### Double-tap to zoom the map
+
+- **Double-tapping a tile map zooms in one level** around the point you tapped, with the same
+  animation as the "+" button.
+- The system double-tap detector is not used: it makes every single tap wait for a decision
+  window, which slowed down tapping a station.
+
+### When the app opens
+
+- **Beacon settings gained a "When I open the app" row with three choices**: do nothing, connect
+  to the server, or go straight into reporting.
+- The default is do nothing. Choosing either of the other two asks for confirmation first and
+  says what will happen.
+- Auto connect only connects; reporting still waits for your tap. Going straight into reporting
+  still asks for the separate upload/transmit consent first.
+
+### One beacon when auto-report is off
+
+- **With auto-report off, tapping the pending-confirmation button now sends one beacon** instead
+  of turning auto-report on along the way.
+- That button reads "Send now" while the master switch is off.
+
+---
+
 ## [2.1.24] - 2026-10-20
 
 ### 用户协议升到 V2.0

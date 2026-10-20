@@ -419,6 +419,29 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.25', 'date': '2026-10-20',
+        'items': [
+            ('new',
+             T('地图上双击就放大一级，围绕你点的那一点，与右下角的「+」同一档动画。',
+               '地圖上雙擊就放大一級，圍繞你點的那一點，與右下角的「+」同一檔動畫。',
+               'Double-tapping the map zooms in one level around the point you tapped, with the '
+               'same animation as the "+" button.')),
+            ('new',
+             T('上报设置里新增「打开软件时」三档：不做操作、自动连接服务器、直接进入上报。'
+               '默认不做操作，换档前会先弹确认框。',
+               '上報設定裡新增「打開軟體時」三檔：不做操作、自動連線伺服器、直接進入上報。'
+               '預設不做操作，換檔前會先彈確認框。',
+               'Beacon settings gained a "When I open the app" row with three choices: do '
+               'nothing, connect to the server, or go straight into reporting. The default is do '
+               'nothing, and switching asks for confirmation first.')),
+            ('fix',
+             T('自动上报没有开启时，点「待确认上报」只发报一次，不再顺手把自动上报打开。',
+               '自動上報沒有開啟時，點「待確認上報」只發報一次，不再順手把自動上報打開。',
+               'With auto-report off, tapping the pending-confirmation button sends one beacon '
+               'instead of turning auto-report on along the way.')),
+        ],
+    },
+    {
         'ver': 'v2.1.24', 'date': '2026-10-20',
         'items': [
             ('new',

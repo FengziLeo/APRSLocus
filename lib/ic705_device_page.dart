@@ -303,7 +303,6 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
           color: C.cyan,
           onChanged: (v) => unawaited(_saveConfig(enabled: v)),
         ),
-        SettingsHint(s.icomBindHint(modelName)),
         // issue #35：说明「电台流量走 Wi-Fi、上网仍走移动数据」的路由方式。
         SettingsHint(s.icomLanHotspotRoutingHint),
         Divider(height: 1, color: C.border),
@@ -466,7 +465,6 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
           focusNode: _passFocus,
           onEditingComplete: () => unawaited(_saveConfig()),
         ),
-        SettingsHint(s.icomCredHint),
       ],
     );
   }

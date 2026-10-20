@@ -210,7 +210,6 @@ class _TranslateSettingsPageState extends State<TranslateSettingsPage> {
             ],
           ),
         ),
-        SettingsHint(s.translateLangScopeNote),
         SettingsHint(s.translatePrivacyNote, color: C.orange,
             icon: Icons.privacy_tip_rounded),
       ],
@@ -332,8 +331,6 @@ class _TranslateSettingsPageState extends State<TranslateSettingsPage> {
       color: C.slate,
       children: [
         if (cfg.provider == TransProvider.auto) ...[
-          SettingsHint(s.translateProviderAutoDesc, color: C.green,
-              icon: Icons.auto_awesome_rounded),
           if (svc.lastProviderUsed.isNotEmpty)
             SettingsRow2(s.translateUsedProvider,
                 _providerLabel(s, svc.lastProviderUsed),
@@ -355,8 +352,6 @@ class _TranslateSettingsPageState extends State<TranslateSettingsPage> {
           SettingsInput(s.translateLibreKey, _libreKey,
               onChanged: (_) => unawaited(_collect())),
         ] else if (cfg.provider == TransProvider.indexTranslate) ...[
-          SettingsHint(s.translateBiliTip,
-              color: C.green, icon: Icons.bolt_rounded),
           SettingsInput(s.translateBiliUrl, _biliUrl,
               onChanged: (_) => unawaited(_collect())),
           SettingsInput(s.translateBiliModel, _biliModel,

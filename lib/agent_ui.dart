@@ -272,7 +272,6 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
             await AgentService.instance.saveConfig();
             if (mounted) setState(() {});
           }),
-          SettingsHint(s.agentStreamReplyDesc),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(children: [
@@ -329,14 +328,12 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
             await AgentService.instance.saveConfig();
             if (mounted) setState(() {});
           }),
-          SettingsHint(s.agentAllowSendDesc),
           SettingsSwitch(s.agentAllowSettings,
               value: cfg.allowSettings, color: C.orange, onChanged: (v) async {
             cfg.allowSettings = v;
             await AgentService.instance.saveConfig();
             if (mounted) setState(() {});
           }),
-          SettingsHint(s.agentAllowSettingsDesc),
           SettingsSwitch(s.agentAllowNetwork,
               value: cfg.allowNetwork, color: C.orange, onChanged: (v) async {
             cfg.allowNetwork = v;
@@ -533,7 +530,6 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
             await svc.saveConfig();
             if (mounted) setState(() {});
           }),
-          SettingsHint(s.agentMemoryHint),
           if (mem.isEmpty)
             SettingsHint(s.agentMemoryEmpty)
           else
@@ -591,7 +587,6 @@ class _AgentSettingsPageState extends State<AgentSettingsPage> {
             await svc.saveConfig();
             if (mounted) setState(() {});
           }),
-          SettingsHint(s.agentCompressHint),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(children: [

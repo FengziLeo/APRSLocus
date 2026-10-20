@@ -727,7 +727,6 @@ class _AudioSettingsPageState extends State<AudioSettingsPage> {
             focusNode: _txDelayFocus,
             onEditingComplete: () =>
                 unawaited(_collect().then((_) => _normalizeTexts()))),
-        SettingsHint(s.audioSampleRateTip),
       ],
     );
   }
@@ -747,7 +746,6 @@ class _AudioSettingsPageState extends State<AudioSettingsPage> {
           st.reloadUi();
           if (mounted) setState(() {});
         }),
-        SettingsHint(s.audioTxEnabledTip, color: C.orange),
         // 播放设备选择（仅 Windows）——发时用哪个声卡输出，决定接到电台的
         // 是哪一路信号（issue #14）
         ..._deviceRows(s, output: true),
@@ -800,7 +798,6 @@ class _AudioSettingsPageState extends State<AudioSettingsPage> {
             SettingsHint(s.audioTxLevelLow, color: C.orange,
                 icon: Icons.warning_amber_rounded),
         ],
-        SettingsHint(s.audioTxLevelTip, color: C.grey),
         // 电台不发射时最该先查的一条：软件不会按 PTT。
         SettingsHint(s.audioTxPttHint, color: C.orange,
             icon: Icons.info_outline_rounded),
@@ -810,7 +807,6 @@ class _AudioSettingsPageState extends State<AudioSettingsPage> {
           await audio.save();
           if (mounted) setState(() {});
         }),
-        SettingsHint(s.kissAutoAckTip),
         SettingsSwitch(s.kissAutoReconnect, value: audio.config.autoReconnect,
             color: C.green, onChanged: (v) async {
           audio.config.autoReconnect = v;

@@ -1433,8 +1433,6 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
                   ),
                 ]),
               ),
-              SettingsHint(
-                  S.of(context).settingsManualLocHint),
             ],
           ),
         ],
@@ -1519,7 +1517,6 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
             // 用户反馈「上报的开关到处都有、不知道点哪个」——这里明确指路：
             // 这个开关在主界面（地图）也有一键入口，且带「立即上报」。见
             // widgets.ReportActions。
-            SettingsHint(S.of(context).autoReportEntryHint),
             // ── 打开软件时：不做 / 自动连接 / 自动上报 ──
             //
             // 默认「不做操作」：开机就连网、就发位置是替用户做决定，所以由他自己
@@ -1535,11 +1532,6 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
               },
               onChanged: (v) => unawaited(_pickAutoStart(v)),
             ),
-            SettingsHint(switch (st.autoStartMode) {
-              1 => S.of(context).autoStartConnectHint,
-              2 => S.of(context).autoStartReportHint,
-              _ => S.of(context).autoStartNoneHint,
-            }),
             // 上报状态栏样式：经典（单行）/ 详细（多一行判据，每秒刷新）。
             // 放在信标这一节里：它描述的就是「信标什么时候会发」。（issue #21-2）
             Padding(
@@ -1571,7 +1563,6 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
                 ],
               ),
             ),
-            SettingsHint(S.of(context).beaconBarStyleTip),
             // 纯网络模式：没有可靠速度 → 智能信标 / 距离 / 转弯都不适用，
             // 改用**专用固定间隔**（见 AppState.beaconNetInterval）。
             if (st.locationMode == 'network')
@@ -1686,8 +1677,6 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
                   ),
                 ),
               ),
-            if (st.hasStepSensor)
-              SettingsHint(S.of(context).stepsHint, color: C.grey),
             // 卫星数：如实回显「现在几颗」（来源不说就是「—」，不是 0 ——
             // 「不知道」与「一颗都没有」含义不同，见 AppState.mySats）。
             SettingsRow2(
@@ -1699,7 +1688,6 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
             // 真正的原因通常是来源不给（网络定位 / 机型差异），见 beaconSatsUnknown。
             if (st.mySats == null)
               SettingsHint(S.of(context).beaconSatsUnknown, color: C.grey),
-            if (st.beaconIncludeSats) SettingsHint(S.of(context).beaconSatsHint),
             SettingsRow2(S.of(context).locationStatus,
                 localizedLocationStatus(context, st.locStatus)),
             SettingsRow2(S.of(context).beaconsSent,
@@ -2869,7 +2857,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
       icon: Icons.filter_alt_rounded,
       color: C.cyan,
       children: [
-        SettingsHint(S.of(context).settingsFilterHint),
         SettingsSwitch(S.of(context).filterCenterFollows, value: st.filterFollow, color: C.cyan,
             onChanged: (v) {
           st.filterFollow = v;
@@ -3101,7 +3088,6 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
       icon: Icons.public_rounded,
       color: C.cyan,
       children: [
-        SettingsHint(S.of(context).settingsReceivePrefHint),
         // ── 其他台站（前移到国家列表之前）──
         // 它是「是否也接收未勾选国家的台站」的总开关；
         // 国家列表有 25 项，放在列表底部要滑很久才看得到。
@@ -3364,7 +3350,6 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
             color: C.blue,
             children: [
               _mapTypeSelector(),
-              SettingsHint(S.of(context).mapTypeDesc),
               _heatLevelSelector(st),
               // 无论台站多密 / 缩得多小都画呼号标签。开 = 强制显示（可能糊成一片、
               // 也更费渲染）；关 = 沿用原取舍（台站少或放大到 13 级以上才显示）。
@@ -3372,7 +3357,6 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
                   value: st.mapLabelsAlways,
                   color: C.blue,
                   onChanged: (v) => st.setMapLabelsAlways(v)),
-              SettingsHint(S.of(context).mapLabelsAlwaysDesc, color: C.blue),
               SettingsNavRow(
                 title: S.of(context).offlineMap,
                 subtitle: S.of(context).offlineMapDesc,
@@ -3531,7 +3515,6 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
                 ),
               ),
             ),
-          SettingsHint(S.of(context).uiLayoutHint),
         ],
       ),
     );
@@ -3887,7 +3870,6 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
           // 「选了磨砂玻璃但底色没变成材质那样」是自己点坏了。
           if (ThemeController.instance.active.hasBackground)
             SettingsHint(S.of(context).uiMaterialBgHint, color: C.orange),
-          SettingsHint(S.of(context).uiMaterialHint),
         ],
       ),
     );
@@ -5075,7 +5057,6 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
               if (mounted) setState(() {});
             }),
             if (!st.agentAllowed) SettingsHint(S.of(context).agentAuthHint),
-            SettingsHint(S.of(context).agentModeDesc),
             SettingsNavRow(
               title: S.of(context).agentSettings,
               subtitle: S.of(context).agentSettingsDesc,

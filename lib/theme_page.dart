@@ -590,7 +590,6 @@ class _ThemePageState extends State<ThemePage> {
           nameOf: (v) => _densityName(s, v),
           onPick: (v) => _mutate((x) => x.density = v),
         ),
-        SettingsHint(s.themeDensityHint, color: C.slate),
         const SizedBox(height: 4),
         _chipGroup(
           s: s,
@@ -602,8 +601,6 @@ class _ThemePageState extends State<ThemePage> {
         ),
         // 字体只用系统已装的：不内置字体文件（一款中文字体 5~10MB）。
         // 所以要如实说明「缺失时会回退」，否则用户会以为选项没生效。
-        SettingsHint(s.themeFontHint,
-            color: C.slate, icon: Icons.info_outline_rounded),
       ],
     );
   }

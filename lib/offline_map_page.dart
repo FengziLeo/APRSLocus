@@ -126,7 +126,6 @@ class _OfflineMapPageState extends State<OfflineMapPage> {
             }),
             SettingsHint(s.offlineCacheSwitchDesc, color: C.grey),
             SettingsSwitch(s.offlineOnlySwitch, value: st.offlineOnly, color: C.orange, onChanged: st.setOfflineOnly),
-            SettingsHint(s.offlineOnlySwitchDesc, color: C.grey),
           ]),
         ),
       ],

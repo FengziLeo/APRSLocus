@@ -219,7 +219,6 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
       icon: Icons.bluetooth_rounded,
       color: C.blue,
       children: [
-        SettingsHint(s.extGpsTip, color: C.blue),
         SettingsRow2(
           s.linkBoundDevice,
           link.device?.label ?? s.linkNotBound,
@@ -434,7 +433,6 @@ class _ExtGpsDevicePageState extends State<ExtGpsDevicePage> {
               // 而这几件事决定了上面几行有没有值。
               SettingsRow2(s.extGpsFixSource, fix.source),
               _rawSentence(s, fix.raw),
-              SettingsHint(s.extGpsFixHint),
             ],
     );
   }

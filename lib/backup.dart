@@ -140,6 +140,9 @@ const List<BackupGroupSpec> kBackupGroups = [
     // 界面布局（1.0 经典 / 2.0 地图为基底）：同上 —— 换机后不该被静默换回 1.0，
     // 那会让用户以为「新机上的应用长得不一样」。
     'uiLayout',
+    // 精简模式与自选模块：与 uiLayout 同类的显示偏好 —— 用户在旧机上关掉了
+    // 排行榜、开着精简模式，新机上当然还是那一套。
+    'liteMode', 'featuresOff',
     'uiScale', 'mapType', 'updateChannel', 'heatLevel',
     // 地图标签：与热力图档位同属**地图显示偏好** —— 换机后不该被静默关掉。
     'mapLabelsAlways',

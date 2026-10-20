@@ -3343,7 +3343,9 @@ class _DisplaySettingsPageState extends State<DisplaySettingsPage> {
               if (ThemeController.instance.active.overridesColor('primary'))
                 SettingsHint(S.of(context).themeFixedPrimary, color: C.orange),
               _uiMaterialSelector(st),
-              _uiLayoutSelector(st),
+              // 精简模式下这套外壳不用了（有它自己的一套），所以这一行不显示 ——
+              // 留着能选会让人以为「选了却看不出来」。
+              if (!st.liteMode) _uiLayoutSelector(st),
               _notifStyleSelector(st),
               if (st.notifLiveUpdates) _notifLiveTextSelector(st),
               _notifDiagRow(st),

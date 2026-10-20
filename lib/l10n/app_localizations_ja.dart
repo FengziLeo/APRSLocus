@@ -9592,4 +9592,28 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get mvChecking => "確認中…";
 
+  @override
+  String get featureCat => "機能";
+
+  @override
+  String get featureCatDesc => "モジュールと軽量モード";
+
+  @override
+  String get featureLite => "軽量モード";
+
+  @override
+  String get featureLiteDesc => "APRS の送受信だけを残し、画面を最小限の構成にします。";
+
+  @override
+  String get featureModules => "モジュール";
+
+  @override
+  String get featureLiteBlocks => "軽量モードではモジュールは切です。軽量モードを切ってから選んでください。";
+
+  @override
+  String get featureWeather => "天気";
+
+  @override
+  String get featureTranslate => "翻訳";
+
 }

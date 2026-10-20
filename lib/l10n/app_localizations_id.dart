@@ -9881,4 +9881,28 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get mvChecking => "Memeriksa…";
 
+  @override
+  String get featureCat => "Fitur";
+
+  @override
+  String get featureCatDesc => "Modul dan mode ringkas";
+
+  @override
+  String get featureLite => "Mode ringkas";
+
+  @override
+  String get featureLiteDesc => "Sisakan kirim dan terima APRS saja, dengan tampilan paling sederhana.";
+
+  @override
+  String get featureModules => "Modul";
+
+  @override
+  String get featureLiteBlocks => "Dalam mode ringkas modul mati. Matikan mode ringkas dulu untuk memilih.";
+
+  @override
+  String get featureWeather => "Cuaca";
+
+  @override
+  String get featureTranslate => "Terjemahan";
+
 }

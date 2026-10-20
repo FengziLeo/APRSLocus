@@ -312,6 +312,14 @@ class C {
   /// 反的，而写反了的表现是「整个界面变成另一套布局、但不报错」。
   static bool get sheetLayout => layout == UiLayout.sheet;
 
+  /// 精简模式（设置 → 功能）。由 AppState 在 applySavedTheme 里写入。
+  ///
+  /// 它**不是**第三套布局，与 [layout] 也不互相改写：精简模式选中的时候外壳换
+  /// 成 lite_shell.dart 那套极简布局，关掉之后回到用户自己选的 1.0 / 2.0。
+  /// 写成「选精简模式就把 uiLayout 改成某个值」的话，用户关掉精简模式就再也
+  /// 回不到原来那一套了（而他从没要求换掉它）。
+  static bool liteMode = false;
+
   /// 是否有材质（= 表面要半透明 + 壁纸要画出来）
   static bool get materialOn => material != UiMaterial.none;
 

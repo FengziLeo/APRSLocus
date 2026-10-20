@@ -4290,5 +4290,13 @@
   "mvUpdate": "アップデートする",
   "mvExit": "アプリを終了",
   "mvChecking": "確認中…",
-  "@mvBody": {"placeholders": {"min": {"type": "String"}}}
+  "@mvBody": {"placeholders": {"min": {"type": "String"}}},
+  "featureCat": "機能",
+  "featureCatDesc": "モジュールと軽量モード",
+  "featureLite": "軽量モード",
+  "featureLiteDesc": "APRS の送受信だけを残し、画面を最小限の構成にします。",
+  "featureModules": "モジュール",
+  "featureLiteBlocks": "軽量モードではモジュールは切です。軽量モードを切ってから選んでください。",
+  "featureWeather": "天気",
+  "featureTranslate": "翻訳"
 }

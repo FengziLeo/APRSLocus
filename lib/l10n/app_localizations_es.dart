@@ -9930,4 +9930,28 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get mvChecking => "Comprobando…";
 
+  @override
+  String get featureCat => "Funciones";
+
+  @override
+  String get featureCatDesc => "Módulos y modo ligero";
+
+  @override
+  String get featureLite => "Modo ligero";
+
+  @override
+  String get featureLiteDesc => "Deja solo el envío y la recepción de APRS, con una interfaz mínima.";
+
+  @override
+  String get featureModules => "Módulos";
+
+  @override
+  String get featureLiteBlocks => "En modo ligero los módulos están apagados. Desactívalo para elegirlos.";
+
+  @override
+  String get featureWeather => "Tiempo";
+
+  @override
+  String get featureTranslate => "Traducción";
+
 }

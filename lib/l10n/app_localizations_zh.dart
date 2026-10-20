@@ -9492,6 +9492,30 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get mvChecking => "正在检查…";
 
+  @override
+  String get featureCat => "功能";
+
+  @override
+  String get featureCatDesc => "自选模块与精简模式";
+
+  @override
+  String get featureLite => "精简模式";
+
+  @override
+  String get featureLiteDesc => "只留 APRS 收发，界面换成极简布局。";
+
+  @override
+  String get featureModules => "模块";
+
+  @override
+  String get featureLiteBlocks => "精简模式下模块都关着，关掉精简模式再选。";
+
+  @override
+  String get featureWeather => "天气";
+
+  @override
+  String get featureTranslate => "翻译";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -18980,5 +19004,29 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mvChecking => "正在檢查…";
+
+  @override
+  String get featureCat => "功能";
+
+  @override
+  String get featureCatDesc => "自選模組與精簡模式";
+
+  @override
+  String get featureLite => "精簡模式";
+
+  @override
+  String get featureLiteDesc => "只留 APRS 收發，介面換成極簡版面。";
+
+  @override
+  String get featureModules => "模組";
+
+  @override
+  String get featureLiteBlocks => "精簡模式下模組都關著，關掉精簡模式再選。";
+
+  @override
+  String get featureWeather => "天氣";
+
+  @override
+  String get featureTranslate => "翻譯";
 
 }

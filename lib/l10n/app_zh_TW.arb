@@ -4878,5 +4878,13 @@
   "mvUpdate": "去更新",
   "mvExit": "結束應用程式",
   "mvChecking": "正在檢查…",
-  "@mvBody": {"placeholders": {"min": {"type": "String"}}}
+  "@mvBody": {"placeholders": {"min": {"type": "String"}}},
+  "featureCat": "功能",
+  "featureCatDesc": "自選模組與精簡模式",
+  "featureLite": "精簡模式",
+  "featureLiteDesc": "只留 APRS 收發，介面換成極簡版面。",
+  "featureModules": "模組",
+  "featureLiteBlocks": "精簡模式下模組都關著，關掉精簡模式再選。",
+  "featureWeather": "天氣",
+  "featureTranslate": "翻譯"
 }

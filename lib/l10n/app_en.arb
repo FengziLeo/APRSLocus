@@ -4290,5 +4290,13 @@
   "mvUpdate": "Update",
   "mvExit": "Quit",
   "mvChecking": "Checking…",
-  "@mvBody": {"placeholders": {"min": {"type": "String"}}}
+  "@mvBody": {"placeholders": {"min": {"type": "String"}}},
+  "featureCat": "Features",
+  "featureCatDesc": "Modules and lite mode",
+  "featureLite": "Lite mode",
+  "featureLiteDesc": "Keep only APRS send and receive, in a bare layout.",
+  "featureModules": "Modules",
+  "featureLiteBlocks": "Modules stay off in lite mode. Turn it off to pick them.",
+  "featureWeather": "Weather",
+  "featureTranslate": "Translation"
 }

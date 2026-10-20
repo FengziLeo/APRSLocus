@@ -9871,4 +9871,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get mvChecking => "Checking…";
 
+  @override
+  String get featureCat => "Features";
+
+  @override
+  String get featureCatDesc => "Modules and lite mode";
+
+  @override
+  String get featureLite => "Lite mode";
+
+  @override
+  String get featureLiteDesc => "Keep only APRS send and receive, in a bare layout.";
+
+  @override
+  String get featureModules => "Modules";
+
+  @override
+  String get featureLiteBlocks => "Modules stay off in lite mode. Turn it off to pick them.";
+
+  @override
+  String get featureWeather => "Weather";
+
+  @override
+  String get featureTranslate => "Translation";
+
 }

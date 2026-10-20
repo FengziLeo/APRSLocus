@@ -4290,5 +4290,13 @@
   "mvUpdate": "Actualizar",
   "mvExit": "Salir",
   "mvChecking": "Comprobando…",
-  "@mvBody": {"placeholders": {"min": {"type": "String"}}}
+  "@mvBody": {"placeholders": {"min": {"type": "String"}}},
+  "featureCat": "Funciones",
+  "featureCatDesc": "Módulos y modo ligero",
+  "featureLite": "Modo ligero",
+  "featureLiteDesc": "Deja solo el envío y la recepción de APRS, con una interfaz mínima.",
+  "featureModules": "Módulos",
+  "featureLiteBlocks": "En modo ligero los módulos están apagados. Desactívalo para elegirlos.",
+  "featureWeather": "Tiempo",
+  "featureTranslate": "Traducción"
 }

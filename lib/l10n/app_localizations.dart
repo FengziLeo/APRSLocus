@@ -17343,6 +17343,54 @@ abstract class AppLocalizations {
   /// **'正在检查…'**
   String get mvChecking;
 
+  /// No description provided for @featureCat.
+  ///
+  /// In zh, this message translates to:
+  /// **'功能'**
+  String get featureCat;
+
+  /// No description provided for @featureCatDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'自选模块与精简模式'**
+  String get featureCatDesc;
+
+  /// No description provided for @featureLite.
+  ///
+  /// In zh, this message translates to:
+  /// **'精简模式'**
+  String get featureLite;
+
+  /// No description provided for @featureLiteDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'只留 APRS 收发，界面换成极简布局。'**
+  String get featureLiteDesc;
+
+  /// No description provided for @featureModules.
+  ///
+  /// In zh, this message translates to:
+  /// **'模块'**
+  String get featureModules;
+
+  /// No description provided for @featureLiteBlocks.
+  ///
+  /// In zh, this message translates to:
+  /// **'精简模式下模块都关着，关掉精简模式再选。'**
+  String get featureLiteBlocks;
+
+  /// No description provided for @featureWeather.
+  ///
+  /// In zh, this message translates to:
+  /// **'天气'**
+  String get featureWeather;
+
+  /// No description provided for @featureTranslate.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻译'**
+  String get featureTranslate;
+
 }
 
 class _AppLocalizationsDelegate

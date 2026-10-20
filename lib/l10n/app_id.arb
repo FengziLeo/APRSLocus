@@ -4290,5 +4290,13 @@
   "mvUpdate": "Perbarui",
   "mvExit": "Keluar",
   "mvChecking": "Memeriksa…",
-  "@mvBody": {"placeholders": {"min": {"type": "String"}}}
+  "@mvBody": {"placeholders": {"min": {"type": "String"}}},
+  "featureCat": "Fitur",
+  "featureCatDesc": "Modul dan mode ringkas",
+  "featureLite": "Mode ringkas",
+  "featureLiteDesc": "Sisakan kirim dan terima APRS saja, dengan tampilan paling sederhana.",
+  "featureModules": "Modul",
+  "featureLiteBlocks": "Dalam mode ringkas modul mati. Matikan mode ringkas dulu untuk memilih.",
+  "featureWeather": "Cuaca",
+  "featureTranslate": "Terjemahan"
 }

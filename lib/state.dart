@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models.dart';
+import 'features.dart';
 import 'mock_data.dart';
 import 'services.dart';
 import 'aprs_parse.dart';
@@ -3826,6 +3827,49 @@ class AppState extends ChangeNotifier {
 
   UiLayout get uiLayoutValue => uiLayoutOf(uiLayout);
 
+  // ─── 自选模块 + 精简模式 ───
+  //
+  // 存「关掉的模块 id」，默认全开（理由见 features.dart 顶部）。精简模式是
+  // **另一件事**：它不看模块开关，直接把附加模块全按掉，并把外壳换成
+  // lite_shell.dart 那套极简布局 —— 用户要的是「回到最初的 APRS 工具」。
+  //
+  // 所以模块开关不会被精简模式改写：关掉精简模式，用户自己关过的那几个照旧
+  // 关着。把两组状态合并会导致「开一次精简模式，我调好的模块全丢了」。
+  bool liteMode = false;
+
+  /// 被关掉的模块 id（空 = 全部打开）。
+  final Set<String> featuresOff = <String>{};
+
+  /// 这个模块现在要不要显示。
+  ///
+  /// 精简模式下一律 false —— 调用点只要问这一句就够了，不必每处再写
+  /// `liteMode || …`（写漏一处就是「精简模式里还留着一个额外入口」）。
+  bool featureOn(String id) => !liteMode && !featuresOff.contains(id);
+
+  bool featureEnabled(AppFeature f) => featureOn(f.id);
+
+  /// 打开 / 关掉一个模块。认不出的 id 直接忽略（脏偏好不该造出幽灵开关）。
+  void setFeature(String id, bool on) {
+    if (appFeatureById(id) == null) return;
+    final changed = on ? featuresOff.remove(id) : featuresOff.add(id);
+    if (!changed) return;
+    persist();
+    _notify();
+  }
+
+  /// 切换精简模式。
+  ///
+  /// 走 [applySavedTheme]：它写在 `C` 这个全局调色板上（见 theme.dart 的
+  /// `C.liteMode`），而外壳是在 app.dart 里按 `C` 选的 —— 不重算就会出现
+  /// 「开关点了，界面还是老样子」。
+  void setLiteMode(bool v) {
+    if (liteMode == v) return;
+    liteMode = v;
+    applySavedTheme();
+    persist();
+    _notify();
+  }
+
   /// 切换界面语言
   void setLocale(String lang) {
     locale = lang;
@@ -3939,6 +3983,7 @@ class AppState extends ChangeNotifier {
     // 否则换主题那一下会用上一档材质算出一套错的 alpha。
     C.material = uiMaterialValue;
     C.layout = uiLayoutValue;
+    C.liteMode = liteMode;
     ThemeController.instance.applyColors(
       isDark: darkMode,
       legacyPrimary: themeColorValue,
@@ -4455,6 +4500,8 @@ class AppState extends ChangeNotifier {
     uiScale = 1.0;
     uiMaterial = '';
     uiLayout = '';
+    liteMode = false;
+    featuresOff.clear();
     mapType = 'gaode';
     tileCacheOn = true;
     offlineOnly = false;
@@ -4983,6 +5030,13 @@ class AppState extends ChangeNotifier {
       uiLayout = uiLayoutName(
         uiLayoutOf(p.getString('uiLayout') ?? uiLayout),
       );
+      liteMode = p.getBool('liteMode') ?? liteMode;
+      featuresOff
+        ..clear()
+        ..addAll(
+          (p.getStringList('featuresOff') ?? const <String>[])
+              .where((id) => appFeatureById(id) != null),
+        );
       mapType = p.getString('mapType') ?? mapType;
       // 离线地图：缓存开关与「仅离线」模式
       tileCacheOn = p.getBool('tileCacheOn') ?? tileCacheOn;
@@ -5350,6 +5404,8 @@ class AppState extends ChangeNotifier {
     await p.setDouble('uiScale', uiScale);
     await p.setString('uiMaterial', uiMaterial);
     await p.setString('uiLayout', uiLayout);
+    await p.setBool('liteMode', liteMode);
+    await p.setStringList('featuresOff', featuresOff.toList()..sort());
     await p.setString('mapType', mapType);
     await p.setBool('tileCacheOn', tileCacheOn);
     await p.setBool('offlineOnly', offlineOnly);

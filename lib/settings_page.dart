@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:url_launcher/url_launcher.dart';
 
+import 'feature_page.dart';
+import 'features.dart';
 import 'notice.dart';
 import 'notice_banner.dart';
 import 'theme.dart';
@@ -206,51 +208,65 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 SizedBox(height: 16),
-                // 运动排行榜（issue #22-3：用户要求加在荣誉墙**上方**）
+                // 功能启用：自选模块 + 精简模式。**永远显示** —— 精简模式就是
+                // 从这里关掉的，它自己不能跟着模块一起消失。
                 SettingsEntryTile(
-                  icon: Icons.leaderboard_rounded,
-                  fallback: const [Color(0xFF16A34A), Color(0xFF0B7A37)],
-                  title: S.of(context).sportRank,
-                  desc: S.of(context).sportRankEntryDesc,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => SportRankPage(state: widget.state)),
-                  ),
+                  icon: Icons.tune_rounded,
+                  fallback: const [Color(0xFF475569), Color(0xFF1E293B)],
+                  title: S.of(context).featureCat,
+                  desc: S.of(context).featureCatDesc,
+                  onTap: () => _push(FeaturePage(state: st)),
                 ),
+                SizedBox(height: 12),
+                // 运动排行榜（issue #22-3：用户要求加在荣誉墙**上方**）
+                if (st.featureEnabled(AppFeature.rank))
+                  SettingsEntryTile(
+                    icon: Icons.leaderboard_rounded,
+                    fallback: const [Color(0xFF16A34A), Color(0xFF0B7A37)],
+                    title: S.of(context).sportRank,
+                    desc: S.of(context).sportRankEntryDesc,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => SportRankPage(state: widget.state)),
+                    ),
+                  ),
                 SizedBox(height: 12),
                 // 荣誉墙（徽章墙 / 成就墙 / FIRST FIX）
-                SettingsEntryTile(
-                  icon: Icons.emoji_events_rounded,
-                  fallback: const [Color(0xFFC9A227), Color(0xFF8A6D1F)],
-                  title: Tx.of(context).byKey('honorWall'),
-                  desc: S.of(context).myBadgesAndAchievements,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => HonorWallPage(widget.state.myFullCall,
-                            symbol: widget.state.mySymbol,
-                            symbolTable: '/')),
+                if (st.featureEnabled(AppFeature.honor))
+                  SettingsEntryTile(
+                    icon: Icons.emoji_events_rounded,
+                    fallback: const [Color(0xFFC9A227), Color(0xFF8A6D1F)],
+                    title: Tx.of(context).byKey('honorWall'),
+                    desc: S.of(context).myBadgesAndAchievements,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => HonorWallPage(widget.state.myFullCall,
+                              symbol: widget.state.mySymbol,
+                              symbolTable: '/')),
+                    ),
                   ),
-                ),
                 SizedBox(height: 12),
                 // 翻译设置
-                SettingsEntryTile(
-                  icon: Icons.translate_rounded,
-                  fallback: const [Color(0xFF0E7490), Color(0xFF155E75)],
-                  title: Tx.of(context).byKey('translateSettings'),
-                  desc: S.of(context).translateSettingsSubtitle,
-                  onTap: () => _push(TranslateSettingsPage(state: st)),
-                ),
+                if (st.featureEnabled(AppFeature.translate))
+                  SettingsEntryTile(
+                    icon: Icons.translate_rounded,
+                    fallback: const [Color(0xFF0E7490), Color(0xFF155E75)],
+                    title: Tx.of(context).byKey('translateSettings'),
+                    desc: S.of(context).translateSettingsSubtitle,
+                    onTap: () => _push(TranslateSettingsPage(state: st)),
+                  ),
                 SizedBox(height: 12),
                 // 导出 ADIF（按需求置于「关于」上方）
-                SettingsEntryTile(
-                  icon: Icons.file_download_rounded,
-                  fallback: const [Color(0xFF16A34A), Color(0xFF0B7A37)],
-                  title: Tx.of(context).byKey('exportAdif'),
-                  desc: S.of(context).adifLogFile,
-                  onTap: () => _push(ExportAdifPage(state: widget.state)),
-                ),
+                if (st.featureEnabled(AppFeature.adif))
+                  SettingsEntryTile(
+                    icon: Icons.file_download_rounded,
+                    fallback: const [Color(0xFF16A34A), Color(0xFF0B7A37)],
+                    title: Tx.of(context).byKey('exportAdif'),
+                    desc: S.of(context).adifLogFile,
+                    onTap: () => _push(ExportAdifPage(state: widget.state)),
+                  ),
                 SizedBox(height: 12),
                 // 主题（自定义颜色 / 图标 / 文字）
                 SettingsEntryTile(
@@ -262,13 +278,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 SizedBox(height: 12),
                 // 历史轨迹（个人按天台账：里程 / 速度 / 时长）
-                SettingsEntryTile(
-                  icon: Icons.route_rounded,
-                  fallback: const [Color(0xFF16A34A), Color(0xFF0B7A37)],
-                  title: S.of(context).historyTracks,
-                  desc: S.of(context).historyTracksDesc,
-                  onTap: () => _push(TrackHistoryPage(state: st)),
-                ),
+                if (st.featureEnabled(AppFeature.tracks))
+                  SettingsEntryTile(
+                    icon: Icons.route_rounded,
+                    fallback: const [Color(0xFF16A34A), Color(0xFF0B7A37)],
+                    title: S.of(context).historyTracks,
+                    desc: S.of(context).historyTracksDesc,
+                    onTap: () => _push(TrackHistoryPage(state: st)),
+                  ),
                 SizedBox(height: 12),
                 // 备份与恢复（与 ADIF 导出并列的数据出入口）
                 SettingsEntryTile(
@@ -296,16 +313,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 // 赞助与鸣谢（issue #21-7：用户要求把入口从「关于」里挪到设置页
                 // **关于之上**，并把它当成一个正经入口 —— 支持的渠道要看得见，
                 // 而不是藏在关于页的第二屏）。
-                SettingsEntryTile(
-                  icon: Icons.favorite_rounded,
-                  fallback: const [Color(0xFFF59E0B), Color(0xFFB45309)],
-                  title: S.of(context).sponsorEntry,
-                  desc: S.of(context).sponsorEntryDesc,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SponsorPage()),
+                if (st.featureEnabled(AppFeature.sponsor))
+                  SettingsEntryTile(
+                    icon: Icons.favorite_rounded,
+                    fallback: const [Color(0xFFF59E0B), Color(0xFFB45309)],
+                    title: S.of(context).sponsorEntry,
+                    desc: S.of(context).sponsorEntryDesc,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SponsorPage()),
+                    ),
                   ),
-                ),
                 SizedBox(height: 12),
                 // 关于
                 SettingsEntryTile(
@@ -330,17 +348,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 // 生命守护（issue #22-4）：用户要求「在设置页底下添加一个生命守护页面」。
                 // 放在「关于」之后、退出应用之前 —— 它是设置页最底下的一项，
                 // 与「关于」并列而不是塞进某个业务分组里（它不属于任何一类设置）。
-                SettingsEntryTile(
-                  icon: Icons.health_and_safety_rounded,
-                  fallback: const [Color(0xFFEF4444), Color(0xFF991B1B)],
-                  title: S.of(context).lifeGuard,
-                  desc: S.of(context).lifeGuardEntryDesc,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => LifeGuardPage(state: widget.state)),
+                if (st.featureEnabled(AppFeature.lifeGuard))
+                  SettingsEntryTile(
+                    icon: Icons.health_and_safety_rounded,
+                    fallback: const [Color(0xFFEF4444), Color(0xFF991B1B)],
+                    title: S.of(context).lifeGuard,
+                    desc: S.of(context).lifeGuardEntryDesc,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => LifeGuardPage(state: widget.state)),
+                    ),
                   ),
-                ),
                 if (defaultTargetPlatform != TargetPlatform.windows) ...[
                   SizedBox(height: 16),
                   Container(

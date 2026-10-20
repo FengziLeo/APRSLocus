@@ -352,6 +352,12 @@ jobs:
       - name: Test stations sort persistence
         run: flutter test test/stations_sort_persist_test.dart
 
+      # 自选模块与精简模式：偏好里存「关掉的模块」（默认全开）、精简模式不改写
+      # 用户自己的选择、脏 id 被过滤。三种错都编译能过，只表现成「入口又冒出来了」
+      # 或「我调好的模块全丢了」。
+      - name: Test feature toggles
+        run: flutter test test/features_test.dart
+
       # 发射来源分两条（用户要求）：位置与状态报文一条、消息一条。选消息那条不该
       # 把位置那条带走，只读链路不能被选，旧配置的 dataSource 要跟着带过去 ——
       # 这些都编译能过、analyze 全绿，只表现成「消息怎么从别的链路发出去了」。

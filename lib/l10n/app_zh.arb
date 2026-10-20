@@ -4969,5 +4969,13 @@
   "mvUpdate": "去更新",
   "mvExit": "退出应用",
   "mvChecking": "正在检查…",
-  "@mvBody": {"placeholders": {"min": {"type": "String"}}}
+  "@mvBody": {"placeholders": {"min": {"type": "String"}}},
+  "featureCat": "功能",
+  "featureCatDesc": "自选模块与精简模式",
+  "featureLite": "精简模式",
+  "featureLiteDesc": "只留 APRS 收发，界面换成极简布局。",
+  "featureModules": "模块",
+  "featureLiteBlocks": "精简模式下模块都关着，关掉精简模式再选。",
+  "featureWeather": "天气",
+  "featureTranslate": "翻译"
 }

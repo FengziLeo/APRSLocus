@@ -81,6 +81,41 @@ class _TileMapViewState extends State<TileMapView> {
   Offset? _anchorWorld; // 手势开始时手指下的世界像素点（跟手锚点）
   double _startZoom = 11.0; // 手势起始 zoom（d.scale 是累计值，必须用起始值作基准）
 
+  /// ── 双击放大 ──
+  ///
+  /// 不注册 `GestureDetector.onDoubleTap`：一旦注册，**每一次**单击都要等
+  /// 一个双击判定窗口（~300ms）才发出去，点台站、点地图选点都会明显变慢
+  /// （下面 `build` 里那行注释记的就是这件事）。所以单击照旧立即生效，
+  /// 只是自己数两下：上一次点与这一次若在 320ms 内、且没跑出 40px，
+  /// 就当成双击，围绕那一点放大一级（与右下角「+」同一档，走同样的动画）。
+  DateTime? _lastTapAt;
+  Offset? _lastTapPos;
+  static const int _kDoubleTapMs = 320;
+  static const double _kDoubleTapSlop = 40;
+
+  void _handleTapUp(TapUpDetails d, Size size) {
+    final now = DateTime.now();
+    final prevAt = _lastTapAt;
+    final prev = _lastTapPos;
+    final isDouble = prevAt != null &&
+        prev != null &&
+        now.difference(prevAt).inMilliseconds <= _kDoubleTapMs &&
+        (d.localPosition - prev).distance <= _kDoubleTapSlop;
+    if (!isDouble) {
+      _lastTapAt = now;
+      _lastTapPos = d.localPosition;
+      widget.onTap(d.localPosition);
+      return;
+    }
+    // 双击成功：清掉计时，免得第三下又配成一次。
+    _lastTapAt = null;
+    _lastTapPos = null;
+    final newZoom =
+        (widget.zoom + 1).clamp(widget.minZoom, widget.maxZoom).toDouble();
+    if ((newZoom - widget.zoom).abs() < 0.001) return;
+    widget.onZoomRequest(newZoom, _panForFocus(d.localPosition, newZoom, size));
+  }
+
   /// 手指下的世界像素点
   Offset _worldAt(Offset screen, Size size) {
     final proj = projectionFor(widget.mapType);
@@ -212,8 +247,9 @@ class _TileMapViewState extends State<TileMapView> {
           child: GestureDetector(
             onScaleStart: (d) => _handleScaleStart(d, size),
             onScaleUpdate: (d) => _handleScaleUpdate(d, size),
-            onTapUp: (d) => widget.onTap(d.localPosition),
-            // 注意：不注册 onDoubleTapDown，否则单击需等待双击判定(~300ms)延迟
+            onTapUp: (d) => _handleTapUp(d, size),
+            // 注意：不注册 onDoubleTap/onDoubleTapDown —— 双击由 [_handleTapUp]
+            // 自己数两下（理由见那边注释：注册它会让每次单击都等双击判定）。
             behavior: HitTestBehavior.opaque,
             child: ClipRect(
               child: Stack(

@@ -308,7 +308,10 @@ void main() {
         ..beaconPowerW = 25
         ..beaconAntennaHeightFt = 5120
         ..beaconGainDb = 5
-        ..beaconAltOverrideM = 12; // 让 /A= 也出现，验证两者的先后
+        ..beaconAltOverrideM = 12 // 让 /A= 也出现，验证两者的先后
+        // 上传/发射的单独同意（用户协议 V2.0 附件一）：本文件测报文格式，
+        // 与同意那张纸无关，摆成已签。
+        ..debugGrantConsent();
       st.sendBeacon();
       final raw = st.packets.map((p) => p.raw).firstWhere(
             (r) => r.contains('PHG'),
@@ -360,6 +363,7 @@ void main() {
         ..myLng = 116.4
         ..myHasFix = true
         ..debugSetFreshFix()
+        ..debugGrantConsent()
         ..debugSetLinkUp(AppState.srcAprsIs, true);
       st.sendBeacon();
       expect(st.connInfo, contains('位置'));
@@ -431,7 +435,8 @@ void main() {
       ..beaconGainDb = 3
       ..beaconAltOverrideM = 10.0584
       ..beaconIncludeBattery = false
-      ..myComment = 'E4[中国人能飞]';
+      ..myComment = 'E4[中国人能飞]'
+      ..debugGrantConsent();
 
     String sentRaw(AppState st) => st.packets
         .map((p) => p.raw)
@@ -575,7 +580,8 @@ void main() {
       ..beaconIncludeBattery = false
       ..beaconIncludeSpeed = false
       ..beaconIncludeCourse = false
-      ..myComment = '';
+      ..myComment = ''
+      ..debugGrantConsent();
 
     String posRaw(AppState st) {
       final hits = st.packets.where((p) => p.type == 'position');

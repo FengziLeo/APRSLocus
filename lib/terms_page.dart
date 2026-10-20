@@ -406,7 +406,10 @@ class _Block {
 
 final _reZhHead = RegExp(r'^[一二三四五六七八九十]+、');
 final _reEnHead = RegExp(r'^[1-9]\d*\.\s+[A-Z]');
-final _reMeta = RegExp(r'^(版本|Version|更新日期|Effective Date)');
+/// 附件（V2.0 新增的单独同意书）也算一级标题：中文「附件一…」、英文「Appendix 1…」
+final _reAppendix = RegExp(r'^(附件|附錄|Appendix)\s*[一1]');
+final _reMeta =
+    RegExp(r'^(版本|Version|生效日期|更新日期|Effective Date|Last updated)');
 
 /// 把协议纯文本解析成带样式的块序列
 List<_Block> _parseBlocks(String text) {
@@ -429,7 +432,9 @@ List<_Block> _parseBlocks(String text) {
       out.add(_Block(t, 2));
       continue;
     }
-    if (_reZhHead.hasMatch(t) || _reEnHead.hasMatch(t)) {
+    if (_reZhHead.hasMatch(t) ||
+        _reEnHead.hasMatch(t) ||
+        _reAppendix.hasMatch(t)) {
       out.add(_Block(t, 3));
       continue;
     }

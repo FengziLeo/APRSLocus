@@ -50,6 +50,10 @@ APRS 是一個自由的環境，任何人都可以發送任何訊息，經過無
 
 2026.10.19
 
+## 🎵 信後一首歌：灰色軌跡
+
+@video https://player.bilibili.com/player.html?isOutside=true&aid=829419761&bvid=BV1Ru4y1179h&cid=1227059812&p=1
+
 ## 🚩 違規舉報
 
 如發現違規呼號或違規內容，可以提交舉報表單，協助開發團隊管理。匿名填寫。

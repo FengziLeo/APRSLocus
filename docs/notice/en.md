@@ -50,6 +50,10 @@ Thank you for your support and understanding.
 
 2026.10.19
 
+## 🎵 A song with the letter: 灰色轨迹 (Grey Traces)
+
+@video https://player.bilibili.com/player.html?isOutside=true&aid=829419761&bvid=BV1Ru4y1179h&cid=1227059812&p=1
+
 ## 🚩 Report a violation
 
 If you find a violating callsign or violating content, send it in with this form and help the team keep the network in order.

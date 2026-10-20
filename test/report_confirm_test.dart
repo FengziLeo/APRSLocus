@@ -38,6 +38,9 @@ void main() {
     st.debugSetFreshFix();
     // 从断到连：这是**计划外**的连接变动，不该动确认（初值就是 false）
     st.debugSetLinkUp(AppState.srcAprsIs, true);
+    // 上传/发射的单独同意（用户协议 V2.0 附件一）：本文件测的是「何时才允许
+    // 自动上报」的那道确认，与同意那张纸无关，摆成已签。
+    st.debugGrantConsent();
     return st;
   }
 

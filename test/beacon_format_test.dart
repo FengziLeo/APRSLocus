@@ -39,6 +39,9 @@ void main() {
     st.myLat = 39.9075;
     st.myLng = 116.3972;
     st.debugSetFreshFix();
+    // 用户协议 V2.0 附件一的上传/发射单独同意：本文件测的是报文格式与
+    // 「会不会发射」，与同意那张纸无关，摆成已签。
+    st.debugGrantConsent();
     return st;
   }
 

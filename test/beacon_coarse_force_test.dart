@@ -44,6 +44,9 @@ void main() {
     st.myLat = 39.9075;
     st.myLng = 116.3972;
     st.debugSetFreshFix();
+    // 上传/发射的单独同意（用户协议 V2.0 附件一）：本文件测的是粗定位门控，
+    // 与同意那张纸无关，摆成已签。
+    st.debugGrantConsent();
     return st;
   }
 

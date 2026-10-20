@@ -263,6 +263,13 @@ jobs:
       - name: Test manual report confirmation
         run: flutter test test/report_confirm_test.dart
 
+      # 上传/发射的「单独同意」（用户协议 V2.0 附件一）：三个功能项分别记、
+      # 签完才能开、撤回即停、日志可单独清。这几条错了**编译能过、analyze 也全绿**，
+      # 只会表现成「签了没用」或「撤回了还在发」——后者是拿协议当装饰，
+      # 所以钉在 CI。
+      - name: Test transmit consent
+        run: flutter test test/transmit_consent_test.dart
+
       # 常驻前台服务通知的去重（用户报「反复弹出待确认上报」）：通知文字没变时不能再
       # 重复 notify()，但服务重启后必须重发一次。这两条错了**编译能过、analyze 也全绿**，
       # 只会表现成「偶发多弹一次」或「文字永远不更新」，只能靠 CI 钉住。

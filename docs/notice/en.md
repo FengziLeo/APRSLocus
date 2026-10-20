@@ -133,10 +133,12 @@ The fault was ours. Sorry for the trouble.
 
 ---
 
-## 🔔 What is new: 2.1.26
+## 🔔 What is new: 2.1.27
 
-- Below the minimum version the official site asks for, the app shows only the update page and the back key quits.
-- The minimum is read from the official site. Failing to fetch it, a broken file, or an empty floor all let you through.
+- Settings gained a "Features" page: leaderboard, honours, sponsors, life guard, translation, tracks, ADIF and weather each switch off on its own, and off only hides the entry.
+- Lite mode: one status line and four tabs, keeping only APRS sending and receiving.
+- Settings gained a manual entry that opens the official manual inside the app, following the system language.
+- The SSID field takes custom input: 1-2 digits or letters. Only our own APRSNETCN server accepts a letter suffix.
 
 ---
 
@@ -154,9 +156,9 @@ Look up APALOC in the official TOCALL table and you will find it.
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-Checking for updates now returns the latest stable version, 2.1.26. If you installed 2.2.0, uninstall it first, then install 2.1.26.
+Checking for updates now returns the latest stable version, 2.1.27. If you installed 2.2.0, uninstall it first, then install 2.1.27.
 
-**[Download 2.1.26](https://github.com/dariondong/APRSLocus/releases/download/v2.1.26/APRSLocus_2.1.26.apk)**
+**[Download 2.1.27](https://github.com/dariondong/APRSLocus/releases/download/v2.1.27/APRSLocus_2.1.27.apk)**
 
 ---
 

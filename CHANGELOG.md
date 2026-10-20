@@ -1,5 +1,63 @@
 # 更新日志
 
+## [2.1.27] - 2026-10-20
+
+### 自选模块
+
+- **设置里新增「功能」页**，把排行榜、荣誉墙、赞助、生命守护、翻译、轨迹、ADIF、天气分成一个个开关。
+- 关掉只是收起入口。数据与偏好原样留着，重新打开就回来。
+- 默认全部打开，第一次装上这一版的人什么都不用做。
+
+### 精简模式
+
+- **精简模式把外壳换成极简布局**：上面一行状态，下面四个页签，台站、消息、报文、设置。
+- 精简模式下模块全部关着，但不会改写你自己关过的那几个。关掉精简模式，原来的选择原样回来。
+
+### 使用手册
+
+- **设置里新增「使用手册」**，在应用内直接打开官网手册，跟着系统语言走。
+- 内嵌页面打不开时，交给浏览器。
+
+### 后缀可以填字母
+
+- **呼号后缀支持自定义输入**，1-2 位数字或字母都行，留空就是不填后缀。
+- 字母后缀只有自家的 APRSNETCN 服务器收，公共 APRS-IS 可能拒绝登录。
+
+### 小字少了一些
+
+- 设置页去掉了大半解释性小字，只留会让人做错的那几条。
+
+---
+
+## [2.1.27] - 2026-10-20 (English)
+
+### Modules you pick
+
+- **Settings gained a "Features" page** that turns the leaderboard, honours, sponsors, life guard, translation, tracks, ADIF and weather into separate switches.
+- Turning one off only hides its entry. Data and preferences stay where they are, and come back when you switch it on.
+- Everything starts on, so a first install needs nothing.
+
+### Lite mode
+
+- **Lite mode swaps the shell for a minimal layout**: one status line, then four tabs: stations, messages, packets, settings.
+- In lite mode every module is off, but the ones you switched off yourself are left alone. Leave lite mode and your choices return unchanged.
+
+### Manual
+
+- **Settings gained "Manual"**, opening the official manual inside the app, following the system language.
+- If the embedded page will not open, the browser takes over.
+
+### Letters in the SSID
+
+- **The SSID field takes custom input**: one or two digits or letters, empty for no suffix.
+- Only our own APRSNETCN server accepts a letter suffix; a public APRS-IS server may refuse the login.
+
+### Fewer hints
+
+- Settings dropped most of the small print that explained what a switch does, keeping only the lines that keep you from doing something wrong.
+
+---
+
 ## [2.1.26] - 2026-10-20
 
 ### 版本太旧时先更新

@@ -419,6 +419,38 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.27', 'date': '2026-10-20',
+        'items': [
+            ('new',
+             T('设置里新增「功能」页，排行榜、荣誉墙、赞助、生命守护、翻译、轨迹、ADIF、天气都能单独关掉。'
+               '关掉只是收起入口，重新打开就回来。',
+               '設定裡新增「功能」頁，排行榜、榮譽牆、贊助、生命守護、翻譯、軌跡、ADIF、天氣都能單獨關掉。'
+               '關掉只是收起入口，重新打開就回來。',
+               'Settings gained a "Features" page that switches the leaderboard, honours, sponsors, '
+               'life guard, translation, tracks, ADIF and weather off one by one. Off only hides the '
+               'entry; switch it back on and it returns.')),
+            ('new',
+             T('新增精简模式：上面一行状态，下面四个页签，只留 APRS 收发。',
+               '新增精簡模式：上面一行狀態，下面四個頁籤，只留 APRS 收發。',
+               'Lite mode: one status line and four tabs, keeping only APRS sending and receiving.')),
+            ('new',
+             T('设置里新增「使用手册」，在应用内打开官网手册，跟着系统语言走。',
+               '設定裡新增「使用手冊」，在應用程式內打開官網手冊，跟著系統語言走。',
+               'Settings gained a manual entry that opens the official manual inside the app, '
+               'following the system language.')),
+            ('up',
+             T('呼号后缀支持自定义输入，1-2 位数字或字母都行。字母后缀只有自家的 APRSNETCN 服务器收。',
+               '呼號後綴支援自訂輸入，1-2 位數字或字母都行。字母後綴只有自家的 APRSNETCN 伺服器收。',
+               'The SSID field takes custom input: 1-2 digits or letters. Only our own APRSNETCN '
+               'server accepts a letter suffix.')),
+            ('up',
+             T('设置页去掉大半解释性小字，只留会让人做错的那几条。',
+               '設定頁去掉大半解釋性小字，只留會讓人做錯的那幾條。',
+               'Settings dropped most of the small print that explained a switch, keeping only the '
+               'lines that prevent a mistake.')),
+        ],
+    },
+    {
         'ver': 'v2.1.26', 'date': '2026-10-20',
         'items': [
             ('new',

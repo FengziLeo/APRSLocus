@@ -755,15 +755,25 @@ class ReportActions extends StatelessWidget {
     // 之后它才可点（与 myPositionReportable 同源）。
     if (state.connected && !state.beaconArmed) {
       final ready = state.myPositionReportable;
+      // 自动上报总开关没开时，这枚按钮就是「发一次」，文案也跟着换成「立即上报」：
+      // 点它不会把自动上报顺手打开（用户 2026-10-20）。总开关开着、只是本次连接
+      // 还没确认时，它才是「开始上报」。
+      final autoOn = state.beaconEnabled;
       return ClickCursor(
         child: FilledButton.icon(
-          onPressed: ready ? () => _startReporting(context) : null,
+          onPressed: ready
+              ? () => (autoOn
+                  ? _startReporting(context)
+                  : _reportNow(context))
+              : null,
           icon: Icon(
             ready ? Icons.send_rounded : Icons.location_searching_rounded,
             size: 14,
           ),
           label: Text(
-            ready ? s.reportStartNow : s.beaconWaitingFix,
+            ready
+                ? (autoOn ? s.reportStartNow : s.reportNow)
+                : s.beaconWaitingFix,
             style: ts(11.5, w: FontWeight.w700, c: Colors.white),
           ),
           style: FilledButton.styleFrom(

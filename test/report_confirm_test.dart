@@ -116,15 +116,18 @@ void main() {
       st.dispose();
     });
 
-    test('beginReporting 会顺带打开自动上报总开关', () async {
+    test('自动上报没开时：「开始上报」只发一次，不打开自动上报', () async {
       final st = await connectedFresh();
       st.beaconEnabled = false;
-      expect(st.canAutoBeacon, isFalse);
+      final before = st.beaconsSent;
 
       st.beginReporting();
 
-      expect(st.beaconEnabled, isTrue, reason: '「开始上报」应打开自动上报总开关');
-      expect(st.canAutoBeacon, isTrue);
+      expect(st.beaconEnabled, isFalse,
+          reason: '用户要求：待确认上报点一下只发报一次，不能顺手把自动上报打开');
+      expect(st.beaconArmed, isFalse, reason: '没进自动流程，就不该留下「已放行」的确认');
+      expect(st.beaconsSent, before + 1, reason: '这一下要真的发出去一次');
+      expect(st.beaconPhase, BeaconPhase.off);
 
       st.dispose();
     });

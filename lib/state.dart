@@ -663,15 +663,24 @@ class AppState extends ChangeNotifier {
 
   /// 用户点了正式的「开始上报」按钮 → 本次连接内放行自动上报。
   ///
-  /// 打开自动上报总开关（若尚未打开），已有有效本轮定位时顺带立刻补发一次，
-  /// 让用户马上在地图上看到自己；没有有效定位时先只放行，等拿到定位后
-  /// 由定时器按间隔发出（不会误发旧坐标，见 [myPositionReportable]）。
+  /// 只在自动上报总开关**已经打开**时才放行自动流程：已有有效本轮定位时立刻
+  /// 补发一次，让用户马上在地图上看到自己；没有有效定位时先只放行，等拿到定位
+  /// 后由定时器按间隔发出（不会误发旧坐标，见 [myPositionReportable]）。
+  /// 总开关没开时，这一下只是手动发报一次（见方法内注释）。
   void beginReporting() {
     // 「开始上报」是用户主动放行自动上报的那一下，也是附件一要求的关口：
     // 没签过同意就先签，签完再回到这里。
     if (!ensureConsent(beaconConsentScopes, then: beginReporting)) return;
+    // 自动上报总开关**没开**时，这一下只是一次手动发报：
+    // 不打开总开关、也不放行自动流程。用户 2026-10-20 的要求原话是
+    // 「如果自动上报没有开启的情况下，待确认上报点击后发报一次，而不是进入
+    // 自动流程」—— 想开自动上报走主界面的「自动 / 单次」按钮
+    // （[toggleAutoReport]），两个动作不挤在同一枚按钮里。
+    if (!beaconEnabled) {
+      if (myPositionReportable) sendBeacon();
+      return;
+    }
     beaconArmed = true;
-    if (!beaconEnabled) setBeaconEnabled(true);
     if (myPositionReportable) sendBeacon();
     _notify();
   }

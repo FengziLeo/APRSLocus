@@ -95,12 +95,22 @@ def main() -> int:
                 if RE_CLAUSE.match(ln) and i > 0 and ls[i - 1].strip():
                     errors.append('%s 的条款 `%s` 与上一条**贴在了一起**（缺空行）—— '
                                   '正文会挤成一段' % (name, ln.strip()[:6]))
-        must_have = ['3.5', '3.6', '3.7', '5.3', '7.6', '7.7', '9.4']
+        # V2.0 重排了章节：免责声明挪到第八章、知识产权只剩 7.1-7.3、
+        # 「关于赞赏」变成 10.4，所以关键条款清单跟着换（别再钉旧的 7.6/7.7/9.4）。
+        must_have = ['3.5', '3.6', '3.7', '5.1', '5.2', '5.3', '5.4', '5.5',
+                     '8.6', '10.4']
         for name in LANGS:
             for k in must_have:
                 if k not in clauses.get(name, []):
-                    errors.append('%s 缺条款 %s（iGate 责任 / 未成年人 / 第三方功能 / '
-                                  '生命守护 / 第三方数据免责）' % (name, k))
+                    errors.append('%s 缺条款 %s（iGate 责任 / 未成年人 / 敏感个人信息 / '
+                                  '单独同意与撤回 / 生命守护 / 赞赏）' % (name, k))
+        # 附件一（上传/发射信标单独同意书）必须三语都在
+        appendix = {'terms_zh.txt': '附件一', 'terms_zh_TW.txt': '附件一',
+                    'terms_en.txt': 'Appendix 1'}
+        for name, head in appendix.items():
+            if head not in read(os.path.join(APP_DIR, name)):
+                errors.append('%s 找不到 `%s` —— 单独同意书被删了？'
+                              % (name, head))
         # 这三件事的关键词至少得出现
         words = {
             'terms_zh.txt': ['未成年人', '第三方', '生命守护', '文化习俗', '赞赏'],

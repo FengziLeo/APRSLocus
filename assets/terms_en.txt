@@ -1,8 +1,10 @@
 APRSlocus Terms of Use and Disclaimer
 
-Version: V1.2
+Version: V2.0
 
-Effective Date: October 1, 2026
+Effective Date: October 20, 2026
+
+Last updated: October 20, 2026
 
 Thank you for using APRSlocus! APRSlocus is an open-source APRS client software, licensed under the GPL-3.0 license. This document, together with the GPL-3.0 license, constitutes the complete agreement between you and the development team.
 
@@ -14,9 +16,11 @@ Thank you for using APRSlocus! APRSlocus is an open-source APRS client software,
 
 1.2 The APRS protocol specifications cover various data formats, including position reports, weather data, messages, telemetry, status, objects, items, queries, and bulletins. APRS v1.0 was released in June 2000, v1.1 was updated in July 2004, and the protocol continues to evolve.
 
-1.3 APRS differs from conventional packet radio in four key aspects: ① integration of maps and other data displays; ② use of a one-to-many broadcast protocol for real-time updates; ③ use of generic digital relays without requiring prior knowledge of network topology; ④ since 1997, interconnection of global users through a transparent Internet backbone.
+1.3 APRS differs from conventional packet radio in four key aspects: integration of maps and other data displays; a one-to-many broadcast protocol for real-time updates; generic digital relays that need no prior knowledge of network topology; and, since 1997, a transparent Internet backbone connecting users worldwide.
 
 1.4 As an APRS client, this software sends and receives data in accordance with the above protocol specifications. All data you send through this software follows the APRS protocol format and may be received, stored, and forwarded by other nodes on the global APRS network.
+
+1.5 You should be aware that the position beacons you send through this software, and the continuous track they form, may constitute "movement tracks" — sensitive personal information under the Personal Information Protection Law of the People's Republic of China. Disclosure or unlawful use of such information may put personal safety at risk or harm human dignity. The sole purpose for which this software processes such information is to provide the APRS communication function itself; no alternative exists that delivers the same APRS function without uploading your position, and that is why processing this sensitive personal information is necessary.
 
 ---
 
@@ -29,13 +33,18 @@ Thank you for using APRSlocus! APRSlocus is an open-source APRS client software,
 2.3 The APRS-IS network is operated and maintained by volunteers. All users shall comply with the following basic rules:
 
 · Every APRS-IS packet may be forwarded to radio networks, so beacon rates and packet content must comply with RF usage norms;
+
 · Beacon rates should follow reasonable RF frequency standards (mobile stations no less than 1 minute, weather stations no less than 5 minutes, fixed stations no less than 10 minutes, local infrastructure no less than 20 minutes);
+
 · It is prohibited to inject non-amateur-radio content into APRS-IS while masquerading as an amateur station;
+
 · Access to APRS-IS is limited to operators holding a valid amateur radio callsign.
 
-2.4 We do not provide, operate, or recommend any APRS server address, and we do not provide any Internet service such as APRS-IS, iGate, data upload, data relay, or data storage. The software ships with no server address or port: on first launch and under default settings it connects to no APRS-IS, iGate, or other APRS network server. Whether to connect, and to where, is entirely yours to enter and decide.Before the first server connection the software shows a Data & Network Notice, and connects only after you confirm it.
+2.4 We do not provide, operate, or recommend any APRS server address, and we do not provide any Internet service such as APRS-IS, iGate, data upload, data relay, or data storage. The software ships with no server address or port: on first launch and under default settings it connects to no APRS-IS, iGate, or other APRS network server. Whether to connect, and to where, is entirely yours to enter and decide. Before you first enable a server connection, the software shows a Data & Network Notice, and connects only after you confirm it.
 
 2.5 We have no affiliation, agency, or cooperation with any third-party server. If you configure and connect to one yourself, you must confirm that the server and your use of it comply with the law, and you bear all responsibility arising from cross-border data transfer, personal-data processing, radio regulation, and the third party's terms of service.
+
+2.6 The APRS-IS Passcode mechanism only serves operator verification within the amateur radio community. It is not a means of encrypting, anonymizing, or protecting location data. Do not treat it as a security barrier.
 
 ---
 
@@ -45,28 +54,29 @@ Thank you for using APRSlocus! APRSlocus is an open-source APRS client software,
 
 3.2 According to the Regulations on the Administration of Radio of the People's Republic of China and the Measures for the Administration of Amateur Radio Stations (Ministry of Industry and Information Technology Order No. 67), the establishment and use of amateur radio stations require a valid license. Amateur radio stations may only be used for mutual communication, technical research, and self-training, and may not be used for commercial gain.
 
-3.3 By using this software, you represent and warrant that:
-
-· You hold a valid amateur radio operator certificate and station license (where applicable);
-· You conduct APRS communication using your own legal callsign;
-· Your use complies with the radio regulations of your country or region.
+3.3 By using this software, you represent and warrant that: you hold a valid amateur radio operator certificate and station license (where applicable); you conduct APRS communication using your own legal callsign; and your use complies with the radio regulations of your country or region.
 
 3.4 You shall not use this software to engage in any illegal or improper activities, including but not limited to:
 
 · Tracking or publishing another person's location without their consent;
+
 · Sending harassing, threatening, defamatory, illegal, or false information through this software;
+
 · Sending data at beacon rates higher than reasonable, thereby interfering with normal APRS-IS operations;
+
 · Injecting non-amateur-radio content into APRS-IS or impersonating others;
-· Reverse engineering, decompiling, disassembling, or otherwise infringing the intellectual property rights of this software.
+
+· Cracking, decompiling, disassembling, or otherwise infringing the intellectual property rights of this software.
 
 3.5 Enabling the "Gateway (iGate)" feature or forwarding packets over a radio link means that you will transmit on amateur bands on behalf of others. You are responsible for ensuring that your callsign, frequency, power, and mode of operation are lawful and compliant, and for the content you forward. Do not enable RF forwarding if you do not hold the required operator privileges.
 
-3.6 This software is intended for users with the corresponding legal capacity. Minors (under 18, or the age of majority in your jurisdiction) should use this software with the consent and guidance of a guardian, and the guardian bears all consequences of the minor's use. In particular, minors must not transmit on radio frequencies without the required qualifications.
+3.6 This software is intended for users with the corresponding legal capacity. Minors (under 18, or the age of majority in your jurisdiction) should use this software with the consent and guidance of a guardian, and the guardian bears all consequences of the minor's use. In particular, minors must not transmit on radio frequencies without the required qualifications. For a minor under fourteen, the guardian must additionally give separate consent to the processing of movement-track sensitive personal information involved in the upload or transmit features.
 
 3.7 APRS is a public, international network: the content you send over APRS (position, messages, comments, status) should be truthful, accurate, and lawful, and should respect the laws, religions, and cultural customs of different countries and regions. Do not send false information, unlawful content, or content that could reasonably be seen as harassment or offensive; you are responsible for all content transmitted under your callsign.
 
+3.8 Use only a callsign you lawfully hold, and comply with the Data Security Law, the Personal Information Protection Law, and other applicable laws and regulations. You must not use this software for unlawful tracking, harassment, interference with radio networks, or any other illegal activity.
 
-3.8 Use only a callsign you lawfully hold, and comply with applicable data-protection and personal-information laws. You must not use this software for unlawful tracking, harassment, interference with radio networks, or any other illegal activity.
+3.9 If you display, forward, or export data containing another person's beacons through this software, you must yourself ensure that you have that person's separate consent, or that the data was published by that person and not explicitly refused. This obligation is yours alone and is not transferred to the development team by your use of this software. You must not use backups or GPX files containing other people's location data for tracking, publication, or aggregated display without consent.
 
 ---
 
@@ -74,102 +84,162 @@ Thank you for using APRSlocus! APRSlocus is an open-source APRS client software,
 
 4.1 APRS is by nature a public position-reporting system. APRS data is transmitted in plaintext over amateur radio frequencies and the Internet, and can be received and decoded by anyone. APRS is never encrypted and never private.
 
-4.2 Location tracks, weather data, and messages collected by the APRS-IS network are public data. All APRS data you send through this software may be received, stored, forwarded, and publicly archived by other nodes on the APRS-IS network as well as third-party services .
+4.2 Location tracks, weather data, and messages collected by the APRS-IS network are public data. All APRS data you send through this software may be received, stored, forwarded, and publicly archived by other nodes on the APRS-IS network as well as third-party services. Some public servers retain location data for 180 days or longer; that is decided by each server operator.
 
 4.3 If you do not wish your location to be known to anyone in the world, please do not send it via APRS or the Internet.
 
 4.4 Local Data Storage: To ensure normal operation, this software stores the following data locally on your device:
 
 · Beacon history and track points;
+
 · Sent and received messages;
+
 · Address book (callsigns and notes);
+
 · Custom notes and theme settings for stations;
+
 · Software configuration parameters (e.g., server address, beacon interval, map layer preferences, etc.).
 
-4.5 All the above data is stored only locally on your device and is not automatically uploaded to any server controlled by us or any third party. You can delete this local data by using the "Clear Data" function within the software or by uninstalling the software.
+4.5 All the above data is stored only locally on your device by default and is not automatically uploaded to any server controlled by us or any third party. You can delete this local data by using the "Clear Data" function within the software or by uninstalling the software.
 
-4.6 We do not actively collect, store, or process your personal data. The APRS data you send through this software is transmitted directly via third-party APRS-IS networks and does not pass through any server under our control.
+4.6 By default the software records only the history track belonging to your own callsign. "Record all received stations" is an explicit option you must turn on yourself; it is not a default. History tracks and exported GPX files contain precise timestamped coordinate sequences and may likewise constitute movement-track sensitive personal information.
 
-4.7 You are responsible for safeguarding your device against unauthorised access to your local data. The development team assumes no liability for data disclosure resulting from loss, theft, or unauthorised use of your device.
+4.7 The limits of deletion: the "delete" functions in the software clear the corresponding local data from this software's database and cache. Backups and GPX files that you exported, saved elsewhere, or shared by other means are outside what this software can delete, and you must dispose of them yourself. When you use the backup or export features, the data leaves the software's control as a file, and the software cannot delete it, withdraw it, or limit its further distribution.
 
-4.8 Do not send state secrets, trade secrets, personal data, or sensitive location information over APRS. APRS data may travel in the clear over radio and public networks and may be received, stored, or publicly archived by third parties.
+4.8 We do not actively collect, store, or process your personal data. The APRS data you send through this software is transmitted directly via third-party APRS-IS networks and does not pass through any server under our control.
 
----
+4.9 You are responsible for safeguarding your device against unauthorised access to your local data. The development team assumes no liability for data disclosure resulting from loss, theft, or use of your device by others.
 
-5. Third-Party Services
-
-5.1 This software ships with no server address: it may connect to a third-party APRS-IS server that you enter yourself, as well as to third-party map services (e.g., Amap). These services are independently provided by third parties; we assume no responsibility for their availability, accuracy, or security, and we have no affiliation, agency, or cooperation with them.
-
-5.2 When using third-party services, you shall comply with their respective terms of use and privacy policies.
-
-5.3 In addition to APRS-IS and map services, this software communicates with other third parties when you use the corresponding features: it sends a location when fetching weather (QWeather), the text to be translated when translating messages (Google Translate or an endpoint you configure yourself), a version request to GitHub when checking for updates, accesses the link you add for Garmin LiveTrack, and loads third-party map tiles (Amap, Baidu, Tencent, OpenStreetMap, CARTO, Esri, etc.). Such communication only happens when you actively use that feature, and not otherwise. Each provider processes data under its own terms and privacy policy.
-
-
-5.4 In addition, so that the software works properly, on launch the app requests a few small static files from our official site and public code-hosting services: the in-app notice, the remote configuration list, the APRS device-identifier database, and the member list. These requests only download; they never upload your callsign, position, messages, or install ID. Apart from these, the app performs no background network communication.
+4.10 Do not send state secrets, trade secrets, personal privacy, or sensitive location information over APRS. APRS data may travel in the clear over radio and public networks and may be received, stored, or publicly archived by third parties.
 
 ---
 
-6. Intellectual Property
+5. Beacon Upload and Transmission: Separate Consent Required
 
-6.1 APRSlocus is open-source software under the GPL-3.0 license. You may use, modify, and distribute the source code of this software in accordance with the GPL-3.0 terms.
+5.1 Connecting to an APRS-IS server, turning on beacon upload, enabling RF transmission, enabling iGate forwarding — every feature that sends beacons to a public network or to radio frequencies — is off by default. Such features must never be enabled in any way without the user's own action.
 
-6.2 The name "APRSlocus", its icon, and related logos are owned by the development team and may not be used without permission.
+5.2 The switches for those features belong on their own settings level inside the software; they must not be folded into the first-run guide or into a blanket privacy-policy consent flow. The path for granting consent and the path for withdrawing it must sit on the same level, and the withdrawal entry must not be buried deeper than the granting entry.
 
-6.3 "APRS" is a registered trademark of Bob Bruninga (WB4APR). Use of the term "APRS" in this software is solely to indicate compatibility and does not imply any affiliation with or endorsement by the trademark holder.
+5.3 Before any upload or transmit feature is turned on for the first time, this software tells you the following three points in a separate dialog of its own and obtains your active, checked confirmation:
 
----
+(1) Nature of the information: the content you are about to upload contains movement tracks, which are sensitive personal information under the Personal Information Protection Law.
 
-7. Disclaimer of Liability
+(2) Necessity: the APRS function depends on sending your position to a public network; no alternative delivers the same function without uploading.
 
-7.1 This software is provided "AS IS" without any express or implied warranties, including but not limited to warranties of merchantability, fitness for a particular purpose, and non-infringement.
+(3) Impact on your rights and interests: once data enters APRS-IS it is stored by third-party servers. Some public servers retain location data for 180 days or longer, and the retention period of the raw packets is decided by each server operator. Once data enters a public network it cannot be withdrawn or deleted, and anyone may aggregate, analyse, or keep it for a long time.
 
-7.2 APRS relies on radio communications and the Internet. We cannot guarantee that the service will be available at all times. We assume no liability for interruptions or data loss caused by network failures, server maintenance, third-party service changes, force majeure, or other reasons.
+5.4 Your separate consent — the time of consent, the features consented to, and the version identifier of the notice text — is kept in a separate log stored locally on your device, and is not deleted automatically when business data is cleared. That log exists to prove, in the event of a dispute, that consent was given with full knowledge. You may clear the consent log on its own; clearing it does not affect the lawfulness of processing carried out before it was cleared.
 
-7.3 This software is an auxiliary tool for amateur radio enthusiasts and is not intended for mission-critical scenarios involving life or property safety. The development team assumes no liability for any direct or indirect losses (including but not limited to location errors, communication interruptions, or data acquisition by third parties) arising from the use of this software.
+5.5 You may withdraw your separate consent at any time, on the same settings level described in 5.2. After withdrawal the software stops sending new data through that feature at once. Withdrawal does not affect data that already entered APRS-IS before the withdrawal; that data is beyond this software's control.
 
-7.4 The APRS-IS is a public network. Data you send through this software may be received, stored, and used by third parties. You are responsible for judging the appropriateness of the information you publish and for bearing the corresponding consequences.
-
-7.5 In no event shall the development team's total liability to you exceed the amount you paid for this software (if any). Since this software is provided free of charge, the liability cap is zero.
-
-7.6 Features such as "Life Guard", "crash/fall detection", and "heart-rate alarms" are auxiliary reminders based on phone sensors and location only. They are not medical devices and not an emergency service, and they may miss events, raise false alarms, or be delayed; they also depend on device state and network availability. Do not rely on them to protect personal safety. In an emergency, call your local emergency number directly.
-
-7.7 When you use features such as weather, translation, maps, app updates, or Garmin LiveTrack, the relevant data (for example your location, the text to be translated, device and version information) is sent to the third-party software service you choose. We cannot control how those providers process, store, retain, or redistribute it, and we assume no liability for their handling of your data or for any consequences arising from it. Those transfers are governed by the providers' own terms and privacy policies. You may use the core APRS features of this software without using any of these features.
-
-
-7.8 The development team is not liable for any direct or indirect loss caused by servers you configure, data you upload, or your own use of this software (including but not limited to data disclosure, loss of connectivity, or restrictions placed on your account or callsign).
+5.6 This software may offer privacy-enhancing options such as position fuzzing, turning off speed/course/altitude, and station blocking. Turn them on yourself according to your own tolerance for risk.
 
 ---
 
-8. Changes and Termination
+6. Third-Party Services
 
-8.1 We reserve the right to revise this agreement in response to changes in laws, regulations, or business needs. The revised agreement will be published within the software, in the GitHub repository, or on official channels. If you continue to use this software after such revision, you will be deemed to have accepted the revised agreement.
+6.1 This software ships with no server address: it may connect to a third-party APRS-IS server that you enter yourself, as well as to third-party map services (e.g., Amap). These services are independently provided by third parties; we assume no responsibility for their availability, accuracy, or security, and we have no affiliation, agency, or cooperation with them.
 
-8.2 If you violate any provision of this agreement, we reserve the right to restrict, suspend, or terminate your use of this software.
+6.2 The main data flows are as follows:
 
-8.3 This agreement terminates when you cease using this software or when we cease distribution.
+(1) APRS-IS connection: triggered only after you complete the separate consent in Appendix 1 and turn it on manually; data flows to the APRS-IS server you entered; it may send your callsign, position beacons, and message content.
 
----
+(2) Map tile loading: triggered when you open the map view; data flows to the map provider you selected (Amap, Baidu, Tencent, OpenStreetMap, CARTO, Esri, and others); typically a map request and your IP address are sent.
 
-9. Miscellaneous
+(3) Translation: triggered when you actively use translation; data flows to the translation endpoint you selected; the text to be translated is sent.
 
-9.1 The formation, performance, interpretation, and dispute resolution of this agreement shall be governed by the laws of the People's Republic of China.
+(4) LiveTrack sharing: triggered when you add a sharing link yourself; data flows to the sharing service you chose (such as Garmin); location data is sent, depending on that service.
 
-9.2 Any dispute arising out of or in connection with this agreement shall first be settled through friendly negotiation. If negotiation fails, either party may submit the dispute to a competent court in the People's Republic of China.
+(5) Update check: triggered on launch; data flows to GitHub or an update server; the current version number is sent, and your callsign and position are not uploaded.
 
-9.3 If any provision of this agreement is held to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.
+These communications happen only when you actively use the corresponding feature, and not otherwise; each provider processes data under its own terms and privacy policy.
 
-9.4 About tips and donations: this software is provided free of charge. Any tip or donation you make is entirely voluntary and is a token of encouragement to the development team; it does not constitute the purchase of any goods or services, and does not buy any special feature, priority support, or service-level commitment. Except where otherwise required by law, donations are non-refundable. Whether or not you donate has no effect on your access to the full functionality of this software. Minors should obtain a guardian's consent before making a donation.
-
----
-
-10. Contact Us
-
-If you have any questions, suggestions, or complaints regarding this agreement, you may contact us via:
-
-· GitHub Repository: search for "APRSlocus" and submit an Issue
-
-For matters related to personal information or this agreement, please open an Issue in the GitHub repository above (publicly visible, and easy for other users to check).
+6.3 In addition, so that the software works properly, on launch the app requests a few small static files from our official site and public code-hosting services: the in-app notice, the remote configuration list, the APRS device-identifier database, and the member list. These requests only download; they never upload your callsign, position, messages, or install ID. Apart from these, the app performs no background network communication.
 
 ---
 
-73 and happy operating!
+7. Intellectual Property
+
+7.1 APRSlocus is open-source software under the GPL-3.0 license. You may use, modify, and distribute the source code of this software in accordance with the GPL-3.0 terms.
+
+7.2 The name "APRSlocus", its icon, and related logos are owned by the development team and may not be used without permission.
+
+7.3 "APRS" is a registered trademark of Bob Bruninga (WB4APR). Use of the term "APRS" in this software is solely to indicate compatibility and does not imply any affiliation with, cooperation with, or endorsement by the trademark holder.
+
+---
+
+8. Disclaimer of Liability
+
+8.1 This software is provided "AS IS" without any express or implied warranties, including but not limited to warranties of merchantability, fitness for a particular purpose, and non-infringement.
+
+8.2 APRS relies on radio communications and the Internet. We cannot guarantee that the service will be available at all times. We assume no liability for interruptions or data loss caused by network failures, server maintenance, third-party service changes, force majeure, or other reasons.
+
+8.3 This software is an auxiliary tool for amateur radio enthusiasts and is not intended for mission-critical scenarios involving life or property safety. The development team assumes no liability for any direct or indirect losses (including but not limited to location errors, communication interruptions, or data acquisition by third parties) arising from the use of this software.
+
+8.4 The APRS-IS is a public network. Data you send through this software may be received, stored, and used by third parties. You are responsible for judging the appropriateness of the information you publish and for bearing the corresponding consequences.
+
+8.5 In no event shall the development team's total liability to you exceed the amount you paid for this software (if any). Since this software is provided free of charge, the liability cap is zero.
+
+8.6 Features such as "Life Guard", "crash/fall detection", and "heart-rate alarms" are auxiliary reminders based on phone sensors and location only. They are not medical devices and not an emergency service, and they may miss events, raise false alarms, or be delayed; they also depend on device state and network availability. Do not rely on them to protect personal safety. In an emergency, call your local emergency number directly.
+
+8.7 When you use features such as weather, translation, maps, app updates, or Garmin LiveTrack, the relevant data is sent to the third-party software service you choose. We cannot control how those providers process, store, retain, or redistribute it, and we assume no liability for their handling of your data or for any consequences arising from it. Those transfers are governed by the providers' own terms and privacy policies. You may use the core APRS features of this software without using any of these features.
+
+8.8 The development team is not liable for any direct or indirect loss caused by servers you configure, data you upload, or your own use of this software (including but not limited to data disclosure, loss of connectivity, or restrictions placed on your account or callsign).
+
+8.9 Where you have not completed the separate consent in Appendix 1 and have not turned on any upload or transmit feature, the development team does not become the personal information processor of your location data merely because you use this software. Once you send a beacon to a public network through this software, however, that transmission is initiated by you, and you bear the consequences.
+
+---
+
+9. Changes and Termination
+
+9.1 We reserve the right to revise this agreement in response to changes in laws and regulations or to business needs. The revised agreement will be published within the software, in the GitHub repository, or on official channels. A change to the rules for processing sensitive personal information or to the scope of separate consent will require your separate consent again; it will not be replaced by "continued use means acceptance".
+
+9.2 If you violate any provision of this agreement, we reserve the right to restrict, suspend, or terminate your use of this software.
+
+9.3 This agreement terminates when you cease using this software or when we cease distribution.
+
+---
+
+10. Miscellaneous
+
+10.1 The formation, performance, interpretation, and dispute resolution of this agreement shall be governed by the laws of the People's Republic of China.
+
+10.2 Any dispute arising out of or in connection with this agreement shall be settled through friendly negotiation. If negotiation fails, either party may bring the dispute before a people's court with jurisdiction in the People's Republic of China.
+
+10.3 If any provision of this agreement is held to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.
+
+10.4 About donations: this software is provided free of charge. Any donation you make is entirely voluntary, is a token of encouragement to the development team, and does not constitute the purchase of any service or any consideration in return.
+
+10.5 This agreement and Appendix 1 together constitute the complete agreement between you and the development team regarding the use of this software. Appendix 1 is not part of the main agreement, and the general consent given to the main agreement does not cover the processing described in Appendix 1.
+
+---
+
+Appendix 1: Separate Consent for Uploading and Transmitting Beacons
+
+This consent is independent of the main APRSlocus Terms of Use and Disclaimer. The general consent given to the main agreement does not cover the processing described in this consent.
+
+I have read and understood the following:
+
+1) The beacons I send through APRSlocus contain my movement tracks, which are sensitive personal information under the Personal Information Protection Law of the People's Republic of China.
+
+2) Sending that information is necessary because the APRS function itself depends on sending my position to a public network, and no alternative delivers the same function without uploading.
+
+3) Once data enters APRS-IS it is stored by third-party servers. Some public servers retain location data for 180 days or longer, as each server operator decides. Once data enters a public network it cannot be withdrawn or deleted, and anyone may aggregate and analyse it.
+
+4) I understand that the path for withdrawing consent sits on the same level as the path for granting it; after withdrawal the software stops sending new data, and data that already entered the public network before the withdrawal is unaffected.
+
+5) I understand that the APRS-IS Passcode mechanism is not a privacy protection measure, and that APRS data is neither encrypted nor private.
+
+I give my voluntary, explicit, separate consent to the processing described above.
+
+□ I agree (you must tick this yourself; it is unticked by default)
+
+Features consented to:
+
+□ APRS-IS beacon upload
+
+□ RF beacon transmission
+
+□ iGate forwarding
+
+Time of consent and version identifier: recorded automatically by this software in a separate log on this device.

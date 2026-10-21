@@ -2,7 +2,11 @@
 //  LiveActivityPlugin.swift
 //  APRSLocus
 //
-//  灵动岛 / 锁屏实时活动的原生实现（iOS 16.1+）。
+//  灵动岛 / 锁屏实时活动的原生实现（iOS 16.2+）。
+//
+//  为什么是 16.2 而不是 16.1：灵动岛本身从 16.1 就有，但 Xcode 的 SDK 把
+//  `ActivityContent` / `request(attributes:content:pushType:)` / `update(_:)`
+//  / `end(_:dismissalPolicy:)` 这套 API 标成了 16.2+。要用它们就得 16.2。
 //
 //  与 Android 16 的实时更新（状态栏胶囊）是同一件事的两个平台实现：Dart 侧
 //  在 `lib/state.dart` 的 `_updateNotification` 里拼好一行状态，Android 走
@@ -22,7 +26,7 @@ import ActivityKit
 import Flutter
 import UIKit
 
-@available(iOS 16.1, *)
+@available(iOS 16.2, *)
 final class LiveActivityPlugin {
   static let channelName = "com.aprslocus/live_activity"
 

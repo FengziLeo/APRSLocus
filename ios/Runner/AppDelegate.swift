@@ -29,9 +29,9 @@ import UIKit
     BleHrPlugin.register(with: messenger)
     // 声卡 TNC（AVAudioEngine）：AFSK 采集 / 播放 PCM16。
     AudioPlugin.register(with: messenger)
-    // 灵动岛 / 锁屏实时活动（iOS 16.1+）：与 Android 16 的状态栏胶囊是同一件事。
+    // 灵动岛 / 锁屏实时活动（iOS 16.2+）：与 Android 16 的状态栏胶囊是同一件事。
     // 低版本系统里 ActivityKit 根本不存在，所以整体包在可用性判断里。
-    if #available(iOS 16.1, *) {
+    if #available(iOS 16.2, *) {
       LiveActivityPlugin.register(with: messenger)
     }
   }

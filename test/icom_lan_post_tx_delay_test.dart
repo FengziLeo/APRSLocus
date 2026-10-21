@@ -16,11 +16,12 @@ import 'package:aprslocus/net/icom_lan_protocol.dart';
 import 'package:aprslocus/net/icom_lan_settings.dart';
 import 'package:aprslocus/net/icom_lan_tx_audio_packetizer.dart';
 
-IcomLanConfig config({int postTxDelayMs = 0}) => IcomLanConfig(
+/// [postTxDelayMs] 传 null 时用构造函数默认值（不覆盖）。
+IcomLanConfig config({int? postTxDelayMs}) => IcomLanConfig(
       host: '192.168.59.1',
       username: 'ic705',
       password: 'password',
-      postTxDelayMs: postTxDelayMs,
+      postTxDelayMs: postTxDelayMs ?? IcomLanConfig.defaultPostTxDelayMs,
     );
 
 /// 12 kHz / 每包 240 样本 = 20 ms 一包。

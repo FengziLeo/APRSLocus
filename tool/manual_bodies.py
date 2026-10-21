@@ -16,6 +16,8 @@ BODIES = {
 <thead><tr><th>我想…</th><th>去哪</th></tr></thead><tbody>
 <tr><td><b>第一次用</b>，从零跑到收到报文</td><td><a href="start.html">快速上手</a></td></tr>
 <tr><td><b>接上电台</b>（蓝牙/USB TNC、音频、Kenwood）</td><td><a href="connections.html#rf">连接 → 接电台</a></td></tr>
+<tr><td><b>只用国内服务器</b>（APRSNETCN，地址自己填）</td><td><a href="connections.html#acn">连接 → APRSNETCN</a></td></tr>
+<tr><td><b>接外接 GPS 模块</b>（蓝牙 NMEA）</td><td><a href="connections.html#extgps">连接 → 外接 GPS</a></td></tr>
 <tr><td><b>让别人看到我</b>（信标上报）</td><td><a href="beacon.html">位置信标</a></td></tr>
 <tr><td><b>发消息</b>、建群、跨语言聊天</td><td><a href="messaging.html">消息与群聊</a></td></tr>
 <tr><td><b>做网关</b>（把射频听到的送上互联网）</td><td><a href="connections.html#igate">网关 iGate</a></td></tr>
@@ -27,6 +29,8 @@ BODIES = {
 <thead><tr><th>我想…</th><th>去哪</th></tr></thead><tbody>
 <tr><td><b>第一次用</b>，從零跑到收到封包</td><td><a href="start.html">快速上手</a></td></tr>
 <tr><td><b>接上電臺</b>（藍牙/USB TNC、音訊、Kenwood）</td><td><a href="connections.html#rf">連線 → 接電臺</a></td></tr>
+<tr><td><b>只用國內伺服器</b>（APRSNETCN，位址自己填）</td><td><a href="connections.html#acn">連線 → APRSNETCN</a></td></tr>
+<tr><td><b>接外接 GPS 模組</b>（藍牙 NMEA）</td><td><a href="connections.html#extgps">連線 → 外接 GPS</a></td></tr>
 <tr><td><b>讓別人看到我</b>（信標上報）</td><td><a href="beacon.html">位置信標</a></td></tr>
 <tr><td><b>發訊息</b>、建組、跨語言聊天</td><td><a href="messaging.html">訊息與群組</a></td></tr>
 <tr><td><b>做閘道</b>（把射頻聽到的送上網際網路）</td><td><a href="connections.html#igate">閘道 iGate</a></td></tr>
@@ -38,6 +42,8 @@ BODIES = {
 <thead><tr><th>I want to…</th><th>Go to</th></tr></thead><tbody>
 <tr><td><b>Use it for the first time</b>, from zero to a received packet</td><td><a href="start.html">Quick Start</a></td></tr>
 <tr><td><b>Hook up a radio</b> (Bluetooth/USB TNC, audio, Kenwood)</td><td><a href="connections.html#rf">Connections → into a radio</a></td></tr>
+<tr><td><b>Use a domestic server only</b> (APRSNETCN, address you supply)</td><td><a href="connections.html#acn">Connections → APRSNETCN</a></td></tr>
+<tr><td><b>Add an external GPS</b> (Bluetooth NMEA)</td><td><a href="connections.html#extgps">Connections → external GPS</a></td></tr>
 <tr><td><b>Be seen</b> by others (position beacon)</td><td><a href="beacon.html">Beaconing</a></td></tr>
 <tr><td><b>Send messages</b>, run a group, chat across languages</td><td><a href="messaging.html">Messaging</a></td></tr>
 <tr><td><b>Run an iGate</b> (relay RF onto the internet)</td><td><a href="connections.html#igate">iGate</a></td></tr>
@@ -49,7 +55,7 @@ BODIES = {
 <ul class="m-index-list">
 <li><a href="start.html">快速上手</a> —— 安装、七步向导、Passcode、收第一条报文</li>
 <li><a href="interface.html">界面导览</a> —— 五个页签、面板手势、返回键</li>
-<li><a href="connections.html">连接与数据来源</a> —— 五条链路、APRS-IS、接电台、iGate、链路自检</li>
+<li><a href="connections.html">连接与数据来源</a> —— 六条链路、两条互联网、外接 GPS、接电台、iGate、链路自检</li>
 <li><a href="beacon.html">位置信标</a> —— 间隔、速度分档、无 GPS、报文示例</li>
 <li><a href="messaging.html">消息与群聊</a> —— 单聊、67/512 红线、群聊、翻译</li>
 <li><a href="maps.html">地图与显示</a> —— 图源、坐标纠偏、离线地图、主题</li>
@@ -67,7 +73,7 @@ BODIES = {
 <ul class="m-index-list">
 <li><a href="start.html">快速上手</a> —— 安裝、七步引導、Passcode、收第一則封包</li>
 <li><a href="interface.html">介面導覽</a> —— 五個頁籤、面板手勢、返回鍵</li>
-<li><a href="connections.html">連線與資料來源</a> —— 五條鏈路、APRS-IS、接電臺、iGate、鏈路自檢</li>
+<li><a href="connections.html">連線與資料來源</a> —— 六條鏈路、兩條網際網路、外接 GPS、接電臺、iGate、鏈路自檢</li>
 <li><a href="beacon.html">位置信標</a> —— 間隔、速度分檔、無 GPS、封包示例</li>
 <li><a href="messaging.html">訊息與群組</a> —— 單聊、67/512 紅線、群組、翻譯</li>
 <li><a href="maps.html">地圖與顯示</a> —— 圖磚、座標校正、離線地圖、主題</li>
@@ -85,7 +91,7 @@ BODIES = {
 <ul class="m-index-list">
 <li><a href="start.html">Quick Start</a> — install, seven-step wizard, Passcode, first packet</li>
 <li><a href="interface.html">Interface</a> — five tabs, panel gestures, the Back key</li>
-<li><a href="connections.html">Connections</a> — five links, APRS-IS, radio hookup, iGate, self-test</li>
+<li><a href="connections.html">Connections</a> — six links, the two internet servers, external GPS, radio hookup, iGate, self-test</li>
 <li><a href="beacon.html">Beaconing</a> — interval, speed tiers, no GPS, frame example</li>
 <li><a href="messaging.html">Messaging</a> — direct chat, the 67/512 limits, groups, translation</li>
 <li><a href="maps.html">Maps &amp; Display</a> — tiles, datum correction, offline maps, themes</li>
@@ -171,20 +177,20 @@ A yellow “unverified” banner means the Passcode is still wrong — next sect
 <div class="callout warn"><span class="co-ic">⚠️</span><div><p><b>Passcode 是 APRS-IS 的登录验证码</b>，把你的呼号验证到网络。
 留空或默认 <code>-1</code> 只能<b>连接</b>，消息与群组都收发不了。到
 <a href="https://aprs.cool/AprsPG" target="_blank" rel="noopener">APRS Passcode 查询</a>
-用<b>完整呼号</b>生成后填入 <b>设置 → 连接 → Passcode</b>。
+用<b>完整呼号</b>生成后填入 <b>设置 → 服务器 → APRS-IS 服务器 → Passcode</b>。
 填错时主页顶部会出现黄色「未验证」横幅 —— 那就是它。</p></div></div>
 <ul>
-<li><b>改完要保存</b>：连接页的改动点「保存并应用」才生效。</li>
+<li><b>改完自动保存</b>：地址、端口和 Passcode 都不用点按钮。接收过滤那张卡例外，它要点「保存并应用过滤」。</li>
 <li><b>要它一直上报</b>：系统设置里允许 APRSlocus 后台运行、关掉省电优化、允许自启动；通知栏可一键退出。</li>
 </ul>
 ''', '''
 <div class="callout warn"><span class="co-ic">⚠️</span><div><p><b>Passcode 是 APRS-IS 的登入驗證碼</b>，把你的呼號驗證到網路。
 留空或預設 <code>-1</code> 只能<b>連線</b>，訊息與群組都收發不了。到
 <a href="https://aprs.cool/AprsPG" target="_blank" rel="noopener">APRS Passcode 查詢</a>
-用<b>完整呼號</b>產生後填入 <b>設定 → 連線 → Passcode</b>。
+用<b>完整呼號</b>產生後填入 <b>設定 → 伺服器 → APRS-IS 伺服器 → Passcode</b>。
 填錯時首頁頂部會出現黃色「未驗證」橫幅 —— 那就是它。</p></div></div>
 <ul>
-<li><b>改完要儲存</b>：連線頁的改动點「儲存並套用」才生效。</li>
+<li><b>改完自動儲存</b>：位址、連接埠和 Passcode 都不用點按鈕。接收過濾那張卡例外，它要點「儲存並套用過濾」。</li>
 <li><b>要它一直上報</b>：系統設定裡允許 APRSLocus 背景執行、關掉省電最佳化、允許自啟動；通知欄可一鍵結束。</li>
 </ul>
 ''', '''
@@ -192,10 +198,10 @@ A yellow “unverified” banner means the Passcode is still wrong — next sect
 Left empty or at the default <code>-1</code> you can only <b>connect</b> — no messaging, no groups.
 Generate one for your <b>full callsign</b> at the
 <a href="https://aprs.cool/AprsPG" target="_blank" rel="noopener">APRS Passcode generator</a>
-and put it into <b>Settings → Connection → Passcode</b>. A wrong value shows the yellow
+and put it into <b>Settings → Server → APRS-IS server → Passcode</b>. A wrong value shows the yellow
 “unverified” banner on the home page.</p></div></div>
 <ul>
-<li><b>Save after editing</b>: connection changes apply only with “Save &amp; apply”.</li>
+<li><b>Changes save themselves</b>: address, port and Passcode need no button. The receive filter card is the exception, it waits for “Save &amp; apply filter”.</li>
 <li><b>Keep beaconing</b>: allow background running, disable battery optimisation and allow auto-start in your system settings; the notification offers a one-tap Exit.</li>
 </ul>
 '''),
@@ -269,7 +275,7 @@ Still zero? Go to <a href="troubleshooting.html">Troubleshooting</a>.</p></div><
 <tr><td>2</td><td><b>台站</b></td><td>收到的台站：筛选、搜索、详情、收藏、轨迹回放</td></tr>
 <tr><td>3</td><td><b>消息</b></td><td>单聊与群聊的统一会话列表，带未读角标</td></tr>
 <tr><td>4</td><td><b>数据包</b></td><td>原始报文流（可复制、可按类型筛选）与分级日志</td></tr>
-<tr><td>5</td><td><b>设置</b></td><td>八个分组 + 荣誉墙、翻译、ADIF、主题、轨迹、备份入口</td></tr>
+<tr><td>5</td><td><b>设置</b></td><td>八个分组 + 十一个直达入口（含「功能」：自选模块与精简模式）</td></tr>
 </tbody></table></div>
 <div class="callout info"><span class="co-ic">🗺️</span><div><p><b>地图永远在最底下</b>：点其它页签时面板是「浮」在地图上的，再点「地图」就把面板收起来 ——
 所以任何时候你其实都能回到地图。</p></div></div>
@@ -281,7 +287,7 @@ Still zero? Go to <a href="troubleshooting.html">Troubleshooting</a>.</p></div><
 <tr><td>2</td><td><b>臺站</b></td><td>收到的臺站：篩選、搜尋、詳情、收藏、軌跡回放</td></tr>
 <tr><td>3</td><td><b>訊息</b></td><td>單聊與群組的統一會話列表，帶未讀角標</td></tr>
 <tr><td>4</td><td><b>資料封包</b></td><td>原始封包串流（可複製、可按類型篩選）與分級日誌</td></tr>
-<tr><td>5</td><td><b>設定</b></td><td>八個分組 + 榮譽牆、翻譯、ADIF、主題、軌跡、備份入口</td></tr>
+<tr><td>5</td><td><b>設定</b></td><td>八個分組 + 十一個直達入口（含「功能」：自選模組與精簡模式）</td></tr>
 </tbody></table></div>
 <div class="callout info"><span class="co-ic">🗺️</span><div><p><b>地圖永遠在最底下</b>：點其它頁籤時面板是「浮」在地圖上的，再點「地圖」就把面板收起來 ——
 所以任何時候你其實都能回到地圖。</p></div></div>
@@ -293,7 +299,7 @@ Still zero? Go to <a href="troubleshooting.html">Troubleshooting</a>.</p></div><
 <tr><td>2</td><td><b>Stations</b></td><td>stations you received: filter, search, detail, favourites, playback</td></tr>
 <tr><td>3</td><td><b>Messages</b></td><td>one list for direct and group chats, with unread badges</td></tr>
 <tr><td>4</td><td><b>Packets</b></td><td>raw packet stream (copyable, filterable) and the graded log</td></tr>
-<tr><td>5</td><td><b>Settings</b></td><td>eight categories plus honor wall, translation, ADIF, themes, tracks, backup</td></tr>
+<tr><td>5</td><td><b>Settings</b></td><td>eight categories plus eleven direct entries (including Features: modules and lite mode)</td></tr>
 </tbody></table></div>
 <div class="callout info"><span class="co-ic">🗺️</span><div><p><b>The map is always the base</b>: other tabs raise a panel <i>over</i> the map, and tapping
 Map again lowers it — so you can always get back to the map.</p></div></div>
@@ -345,83 +351,167 @@ the scroll position should still be there.</p></div></div>
 
 # ─────────────────────────── 连接与数据来源 ───────────────────────────
 'connections': [
-    ('sources', T('五条链路：收可以多选，发只有一条', '五條鏈路：收可複選，發只有一條', 'Five links: many RX, one TX'), '''
-<p>路径 <b>设置 → 连接 → 数据来源</b>。勾中的链路都会<b>收</b>报文，但<b>发射只有一条</b> ——
-右侧圆点标记的那条。同一个呼号从两条链路发出去会造成重复报文。</p>
+    ('sources', T('六条链路：两条在互联网，四条接电台', '六條鏈路：兩條在網際網路，四條接電臺', 'Six links: two on the internet, four into a radio'), '''
+<p>入口 <b>设置 → 服务器</b>。这一页只摆两台互联网服务器，一台一张卡，卡上有自己的开关，点进去才是它的地址与口令。</p>
 <div class="doc-table-wrap"><table class="doc-table">
-<thead><tr><th>来源</th><th>链路</th><th>收</th><th>发</th></tr></thead><tbody>
-<tr><td><b>APRS-IS</b></td><td>互联网 TCP，服务器地址自己填</td><td>✓</td><td>✓</td></tr>
-<tr><td><b>TNC</b></td><td>蓝牙 SPP / USB 串口（OTG），KISS 协议，接电台</td><td>✓</td><td>✓</td></tr>
+<thead><tr><th>链路</th><th>走什么</th><th>收</th><th>发</th></tr></thead><tbody>
+<tr><td><b>APRS-IS</b></td><td>互联网 TCP，地址自己填</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>APRSNETCN SERVER</b></td><td>同一套协议的国内服务器，地址自己填</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>TNC</b></td><td>蓝牙 SPP 或 USB 串口，KISS 协议</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>音频</b></td><td>耳机口接电台，AFSK 1200（Bell 202）</td><td>✓</td><td>✓</td></tr>
-<tr><td><b>PKWDWPL</b></td><td>蓝牙/串口读 Kenwood 的 <code>$PKWDWPL</code> 航点语句</td><td>✓</td><td><b>✗ 只读</b></td></tr>
-<tr><td><b>WLAN 电台直连</b></td><td>Wi-Fi / 以太网直连（支持 IC-705 / IC-9700 / IC-7610 / IC-905 等），CI-V 控制 + 网络音频</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>WLAN 电台直连</b></td><td>Wi-Fi 直连 Icom 电台（IC-705 / IC-9700 等）</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>PKWDWPL</b></td><td>读 Kenwood 输出的航点语句</td><td>✓</td><td><b>✗ 只读</b></td></tr>
 </tbody></table></div>
-<div class="callout warn"><span class="co-ic">📡</span><div><p><b>接收范围默认 300 km</b>（最小 10 km），用 <code>r/纬度/经度/半径</code> 过滤 ——
-改完必须点 <b>「保存并应用」</b> 才生效。想收全球就把半径调大或关掉过滤中心跟随。</p></div></div>
+<p><b>发射要分两行选。</b>「位置与状态报文」可以同时勾几条链路，两条互联网链路一起发也不会撞包。「消息」只勾一条，它只认自己那条链路，没连上就发不出去。</p>
+<div class="callout warn"><span class="co-ic">📡</span><div><p><b>接收范围默认 300 km</b>（最小 10 km），规则是 <code>r/纬度/经度/半径</code>。改完要点 <b>「保存并应用过滤」</b> 才生效。</p></div></div>
 ''', '''
-<p>路徑 <b>設定 → 連線 → 資料來源</b>。勾中的鏈路都會<b>收</b>封包，但<b>發射只有一條</b> ——
-右側圓點標記的那條。同一個呼號從兩條鏈路發出去會造成重複封包。</p>
+<p>入口 <b>設定 → 伺服器</b>。這一頁只擺兩台網際網路伺服器，一台一張卡，卡上有自己的開關，點進去才是它的位址與口令。</p>
 <div class="doc-table-wrap"><table class="doc-table">
-<thead><tr><th>來源</th><th>鏈路</th><th>收</th><th>發</th></tr></thead><tbody>
-<tr><td><b>APRS-IS</b></td><td>網際網路 TCP，伺服器位址自己填</td><td>✓</td><td>✓</td></tr>
-<tr><td><b>TNC</b></td><td>藍牙 SPP / USB 序列埠（OTG），KISS 協定，接電臺</td><td>✓</td><td>✓</td></tr>
+<thead><tr><th>鏈路</th><th>走什麼</th><th>收</th><th>發</th></tr></thead><tbody>
+<tr><td><b>APRS-IS</b></td><td>網際網路 TCP，位址自己填</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>APRSNETCN SERVER</b></td><td>同一套協定的國內伺服器，位址自己填</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>TNC</b></td><td>藍牙 SPP 或 USB 序列埠，KISS 協定</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>音訊</b></td><td>耳機孔接電臺，AFSK 1200（Bell 202）</td><td>✓</td><td>✓</td></tr>
-<tr><td><b>PKWDWPL</b></td><td>藍牙/序列埠讀 Kenwood 的 <code>$PKWDWPL</code> 航點語句</td><td>✓</td><td><b>✗ 唯讀</b></td></tr>
-<tr><td><b>WLAN 電台直連</b></td><td>Wi-Fi / 乙太網路直連（支援 IC-705 / IC-9700 / IC-7610 / IC-905 等），CI-V 控制 + 網路音訊</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>WLAN 電臺直連</b></td><td>Wi-Fi 直連 Icom 電臺（IC-705 / IC-9700 等）</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>PKWDWPL</b></td><td>讀 Kenwood 輸出的航點語句</td><td>✓</td><td><b>✗ 唯讀</b></td></tr>
 </tbody></table></div>
-<div class="callout warn"><span class="co-ic">📡</span><div><p><b>接收範圍預設 300 km</b>（最小 10 km），用 <code>r/緯度/經度/半徑</code> 過濾 ——
-改完必須點 <b>「儲存並套用」</b>才生效。想收全球就把半徑調大或關掉過濾中心跟隨。</p></div></div>
+<p><b>發射要分兩行選。</b>「位置與狀態封包」可以同時勾幾條鏈路，兩條網際網路鏈路一起發也不會撞包。「訊息」只勾一條，它只認自己那條鏈路，沒連上就發不出去。</p>
+<div class="callout warn"><span class="co-ic">📡</span><div><p><b>接收範圍預設 300 km</b>（最小 10 km），規則是 <code>r/緯度/經度/半徑</code>。改完要點 <b>「儲存並套用過濾」</b> 才生效。</p></div></div>
 ''', '''
-<p>Path: <b>Settings → Connection → Data sources</b>. Every ticked link <b>receives</b>, but there is
-only <b>one transmit source</b> — the one marked with the dot. Transmitting the same callsign over
-two links produces duplicate packets.</p>
+<p>Entry: <b>Settings → Server</b>. The page holds the two internet servers only, one card each, each with its own switch. The address and credentials live one level down.</p>
 <div class="doc-table-wrap"><table class="doc-table">
-<thead><tr><th>Source</th><th>Link</th><th>RX</th><th>TX</th></tr></thead><tbody>
-<tr><td><b>APRS-IS</b></td><td>internet TCP, you enter the server address</td><td>✓</td><td>✓</td></tr>
-<tr><td><b>TNC</b></td><td>Bluetooth SPP / USB serial (OTG), KISS, into a radio</td><td>✓</td><td>✓</td></tr>
+<thead><tr><th>Link</th><th>Carries</th><th>RX</th><th>TX</th></tr></thead><tbody>
+<tr><td><b>APRS-IS</b></td><td>TCP over the internet, address you supply</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>APRSNETCN SERVER</b></td><td>a domestic server on the same protocol, address you supply</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>TNC</b></td><td>Bluetooth SPP or USB serial, KISS protocol</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>Audio</b></td><td>headphone jack into a radio, AFSK 1200 (Bell 202)</td><td>✓</td><td>✓</td></tr>
-<tr><td><b>PKWDWPL</b></td><td>Bluetooth/serial reader of a Kenwood radio’s <code>$PKWDWPL</code> waypoints</td><td>✓</td><td><b>✗ receive-only</b></td></tr>
-<tr><td><b>WLAN radio direct</b></td><td>Wi-Fi / Ethernet direct link (supporting IC-705 / IC-9700 / IC-7610 / IC-905 etc.), CI-V + LAN audio</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>WLAN radio</b></td><td>Wi-Fi straight to an Icom radio (IC-705 / IC-9700 and similar)</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>PKWDWPL</b></td><td>reads the waypoint sentences a Kenwood radio emits</td><td>✓</td><td><b>✗ read-only</b></td></tr>
 </tbody></table></div>
-<div class="callout warn"><span class="co-ic">📡</span><div><p><b>The receive range defaults to 300 km</b> (10 km minimum), filtered with
-<code>r/lat/lng/radius</code> — press <b>“Save &amp; apply”</b> after changing it. For worldwide
-reception, raise the radius or stop following your position.</p></div></div>
+<p><b>Transmitting is picked in two rows.</b> “Position and status” can tick several links, so both internet links may carry the beacon without clashing. “Messages” takes one link only; it uses that link and nothing else, so a dropped link means the message does not go out.</p>
+<div class="callout warn"><span class="co-ic">📡</span><div><p><b>The receive range defaults to 300 km</b> (10 km minimum) and is sent as <code>r/lat/lon/radius</code>. Press <b>“Save &amp; apply filter”</b> or the change does nothing.</p></div></div>
 '''),
     ('aprsis', T('接上 APRS-IS', '接上 APRS-IS', 'Connect APRS-IS'), '''
+<p>两条互联网链路是平的，APRS-IS 不特殊。它的参数都在自己的子页里，与 APRSNETCN 那张卡各管各的。</p>
 <ol class="m-steps">
-<li><b>设置 → 连接</b>，填入服务器地址与端口 <code>14580</code>。</li>
-<li>填入 <b>Passcode</b>（用完整呼号生成，见 <a href="start.html#passcode">快速上手</a>）。</li>
-<li>点 <b>「保存并应用」</b> —— 连接页的改动不保存不会生效。</li>
-<li>回主页看链路状态卡：变成「已连接」、收包计数开始增长。</li>
+<li><b>设置 → 服务器 → APRS-IS 服务器</b>，填服务器地址与端口 <code>14580</code>。地址留空就连不上，软件不预置服务器。</li>
+<li>填 <b>Passcode</b>：用完整呼号生成，见 <a href="start.html#passcode">快速上手</a>。留空或 <code>-1</code> 只能收，消息发不出去。</li>
+<li>打开卡片顶部的开关。主页本来连着的话这一条会自己连上，没连着就回主页点连接。</li>
+<li>看链路状态卡：显示已连接，收包计数开始涨。</li>
 </ol>
 <ul>
-<li><b>断线会自己重连</b>：按 <b>8 → 16 → 32 → 60 秒</b> 渐进退避，不用手动重连。</li>
-<li><b>服务器返回 <code>unverified</code></b> = Passcode 没通过，回到第 2 步。</li>
-<li>想用自建中转 / WebSocket：同一处填 <b>WebSocket URL（可选）</b>，留空走标准 TCP。</li>
+<li>地址、端口和 Passcode 改了<b>自动保存</b>，不用再点按钮。</li>
+<li><b>断线自己重连</b>：8 → 16 → 32 → 60 秒逐步退回。</li>
+<li>服务器回 <code>unverified</code> 就是 Passcode 没通过，回第 2 步。</li>
+<li>要走自建中转就填 <b>WebSocket URL</b>，留空走标准 TCP。</li>
 </ul>
 ''', '''
+<p>兩條網際網路鏈路是平的，APRS-IS 不特殊。它的參數都在自己的子頁裡，與 APRSNETCN 那張卡各管各的。</p>
 <ol class="m-steps">
-<li><b>設定 → 連線</b>，填入伺服器位址與埠 <code>14580</code>。</li>
-<li>填入 <b>Passcode</b>（用完整呼號產生，見 <a href="start.html#passcode">快速上手</a>）。</li>
-<li>點 <b>「儲存並套用」</b> —— 連線頁的改动不儲存不會生效。</li>
-<li>回首頁看鏈路狀態卡：變成「已連線」、收包計數開始增長。</li>
+<li><b>設定 → 伺服器 → APRS-IS 伺服器</b>，填伺服器位址與連接埠 <code>14580</code>。位址留空就連不上，軟體不預置伺服器。</li>
+<li>填 <b>Passcode</b>：用完整呼號產生，見 <a href="start.html#passcode">快速上手</a>。留空或 <code>-1</code> 只能收，訊息發不出去。</li>
+<li>打開卡片頂部的開關。首頁本來連著的話這一條會自己連上，沒連著就回首頁點連接。</li>
+<li>看鏈路狀態卡：顯示已連接，收封包計數開始漲。</li>
 </ol>
 <ul>
-<li><b>斷線會自己重連</b>：按 <b>8 → 16 → 32 → 60 秒</b> 漸進退避，不用手動重連。</li>
-<li><b>伺服器回傳 <code>unverified</code></b> = Passcode 沒通過，回到第 2 步。</li>
-<li>想用自建中轉 / WebSocket：同一處填 <b>WebSocket URL（可選）</b>，留空走標準 TCP。</li>
+<li>位址、連接埠和 Passcode 改了<b>自動儲存</b>，不用再點按鈕。</li>
+<li><b>斷線自己重連</b>：8 → 16 → 32 → 60 秒逐步退回。</li>
+<li>伺服器回 <code>unverified</code> 就是 Passcode 沒通過，回第 2 步。</li>
+<li>要走自建中轉就填 <b>WebSocket URL</b>，留空走標準 TCP。</li>
 </ul>
 ''', '''
+<p>The two internet links are peers, and APRS-IS gets no special status. Its parameters live on its own sub-page, separate from the APRSNETCN card.</p>
 <ol class="m-steps">
-<li><b>Settings → Connection</b>: enter the server address and port <code>14580</code>.</li>
-<li>Enter your <b>Passcode</b> (generated for the full callsign, see <a href="start.html#passcode">Quick Start</a>).</li>
-<li>Press <b>“Save &amp; apply”</b> — connection edits do nothing until you save.</li>
-<li>Back on the home page the link card reads “connected” and the counter climbs.</li>
+<li><b>Settings → Server → APRS-IS server</b>: enter the address and port <code>14580</code>. An empty address connects nothing; no server is preset.</li>
+<li>Enter the <b>Passcode</b>, generated from your full callsign (see <a href="start.html#passcode">Quick Start</a>). Empty or <code>-1</code> receives only; messages will not go out.</li>
+<li>Switch the card on. If the app was already connected this link joins by itself; otherwise tap Connect on the home screen.</li>
+<li>Watch the link card: it reads connected and the RX counter starts climbing.</li>
 </ol>
 <ul>
-<li><b>It reconnects by itself</b>: progressive backoff of <b>8 → 16 → 32 → 60 s</b>.</li>
-<li><b>Server replies <code>unverified</code></b> = the Passcode failed — go back to step 2.</li>
-<li>Custom relay / WebSocket: fill <b>WebSocket URL (optional)</b> in the same place; empty = plain TCP.</li>
+<li>Address, port and Passcode <b>save themselves</b>; there is no button to press.</li>
+<li><b>A dropped link reconnects on its own</b>: 8 → 16 → 32 → 60 seconds.</li>
+<li>A server reply of <code>unverified</code> means the Passcode failed, back to step 2.</li>
+<li>For your own relay fill in the <b>WebSocket URL</b>; leave it empty for plain TCP.</li>
+</ul>
+'''),
+    ('acn', T('第二条链路：APRSNETCN', '第二條鏈路：APRSNETCN', 'The second link: APRSNETCN'), '''
+<p>APRSNETCN 与 APRS-IS 并列。它跑同一套 APRS-IS 协议，服务器在国内，地址同样要自己填。收发都能走它，只连它一条也能用。</p>
+<ol class="m-steps">
+<li><b>设置 → 服务器 → APRSNETCN SERVER</b>，填地址与端口。</li>
+<li>填 <b>Passcode</b>。服务器给过账号与口令的，把这两格也填上。</li>
+<li>打开开关，看卡片里的链路状态。</li>
+<li>要 24 小时台站就在卡片下面点同步，收下来的台站与 APRS-IS 的并在一起。</li>
+</ol>
+<ul>
+<li><b>登录结果</b>单独一行。口令错了链路会连上又断开，原因只写在这里。</li>
+<li>两台同时在线时同一条报文<b>只记一次</b>，两边各收一份也不会重复计数。</li>
+<li>换了地址或口令后点卡片里的<b>重连</b>，新参数才生效。</li>
+</ul>
+''', '''
+<p>APRSNETCN 與 APRS-IS 並列。它跑同一套 APRS-IS 協定，伺服器在國內，位址同樣要自己填。收發都能走它，只連它一條也能用。</p>
+<ol class="m-steps">
+<li><b>設定 → 伺服器 → APRSNETCN SERVER</b>，填位址與連接埠。</li>
+<li>填 <b>Passcode</b>。伺服器給過帳號與口令的，把這兩格也填上。</li>
+<li>打開開關，看卡片裡的鏈路狀態。</li>
+<li>要 24 小時臺站就在卡片下面點同步，收下來的臺站與 APRS-IS 的併在一起。</li>
+</ol>
+<ul>
+<li><b>登入結果</b>單獨一行。口令錯了鏈路會連上又斷開，原因只寫在這裡。</li>
+<li>兩台同時在線時同一則封包<b>只記一次</b>，兩邊各收一份也不會重複計數。</li>
+<li>換了位址或口令後點卡片裡的<b>重連</b>，新參數才生效。</li>
+</ul>
+''', '''
+<p>APRSNETCN stands beside APRS-IS. It speaks the same APRS-IS protocol, the server sits in China, and the address is yours to fill in. It can carry both directions, and it can be the only link online.</p>
+<ol class="m-steps">
+<li><b>Settings → Server → APRSNETCN SERVER</b>: enter the address and port.</li>
+<li>Enter the <b>Passcode</b>. If the server handed you an account and password, fill those two boxes as well.</li>
+<li>Switch it on and watch the link status inside the card.</li>
+<li>For the 24-hour station list, tap sync below the card; those stations are merged with the ones from APRS-IS.</li>
+</ol>
+<ul>
+<li><b>The login result</b> has a row of its own. A wrong password makes the link connect and drop, and this row is the only place that says why.</li>
+<li>With both servers online the same packet is <b>counted once</b>, so two copies do not inflate the totals.</li>
+<li>After changing the address or password, tap <b>reconnect</b> in the card so the new values take effect.</li>
+</ul>
+'''),
+    ('extgps', T('外接 GPS 模块', '外接 GPS 模組', 'External GPS module'), '''
+<p>外接 GPS 是一台蓝牙 NMEA 模块，接上以后由它供位置。它的定位比手机稳，也省手机的电。它不是一条 APRS 链路，只负责告诉应用你在哪。</p>
+<ol class="m-steps">
+<li><b>设置 → 设备 → 外接 GPS</b>。</li>
+<li>点扫描设备，选中模块后绑定。模块走蓝牙 SPP，要先在系统里配对。</li>
+<li>连接成功后看「当前定位」：纬度、经度、卫星数和精度都在这一块。</li>
+<li>要卫星数随信标发出去，去 <b>设置 → 定位上报</b> 打开「卫星数」。</li>
+</ol>
+<ul>
+<li>模块在位时手机定位<b>自动待机</b>。模块掉线会切回手机 GPS，日志里写一句。</li>
+<li>「严格校验和」默认开，语句校验不符直接丢弃。排查兼容性问题时可以关掉，改成只标注。</li>
+<li>语句计数在涨但没有定位，多数是室内收不到星。语句不涨就查蓝牙这一层。</li>
+</ul>
+''', '''
+<p>外接 GPS 是一台藍牙 NMEA 模組，接上以後由它供位置。它的定位比手機穩，也省手機的電。它不是一條 APRS 鏈路，只負責告訴應用你在哪。</p>
+<ol class="m-steps">
+<li><b>設定 → 裝置 → 外接 GPS</b>。</li>
+<li>點掃描裝置，選中模組後綁定。模組走藍牙 SPP，要先在系統裡配對。</li>
+<li>連接成功後看「目前定位」：緯度、經度、衛星數和精度都在這一塊。</li>
+<li>要衛星數隨信標送出去，去 <b>設定 → 定位上報</b> 打開「衛星數」。</li>
+</ol>
+<ul>
+<li>模組在位時手機定位<b>自動待機</b>。模組掉線會切回手機 GPS，日誌裡寫一句。</li>
+<li>「嚴格校驗和」預設開，語句校驗不符直接丟棄。排查相容性問題時可以關掉，改成只標註。</li>
+<li>語句計數在漲但沒有定位，多數是室內收不到星。語句不漲就查藍牙這一層。</li>
+</ul>
+''', '''
+<p>An external GPS is a Bluetooth NMEA module. Once it is connected it supplies the position, which is steadier than the phone and easier on the battery. It is not an APRS link; it only tells the app where you are.</p>
+<ol class="m-steps">
+<li><b>Settings → Device → External GPS</b>.</li>
+<li>Scan, pick the module and bind it. The module runs Bluetooth SPP, so pair it in the system first.</li>
+<li>Once connected, read the “current fix” block: latitude, longitude, satellites and accuracy.</li>
+<li>To send the satellite count with the beacon, open <b>Settings → Position reporting</b> and switch on “Satellites”.</li>
+</ol>
+<ul>
+<li>While the module delivers fixes the phone GPS <b>stands by</b>. If the module drops out the phone takes over and the log says so.</li>
+<li>“Strict checksum” is on by default, so a sentence that fails the checksum is dropped. Turn it off to flag mismatches instead of discarding them.</li>
+<li>A rising sentence count with no fix usually means you are indoors. A flat count means the Bluetooth layer is the problem.</li>
 </ul>
 '''),
     ('rf', T('接电台：TNC / 音频 / PKWDWPL / Icom', '接電臺：TNC / 音訊 / PKWDWPL / Icom', 'Into a radio: TNC / audio / PKWDWPL / Icom'), '''

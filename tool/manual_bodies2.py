@@ -263,7 +263,7 @@ use Android or Windows for offline maps.</p></div></div>
 # ─────────────────────────── 台站与筛选 ───────────────────────────
 'stations': [
     ('receive', T('收什么：范围与接收偏好', '收什麼：範圍與接收偏好', 'What you receive'), '''
-<p>两层过滤都在 <b>设置 → 连接</b>，决定「报文到不到得了你」：</p>
+<p>两层过滤都在 <b>设置 → 服务器</b>，决定「报文到不到得了你」：</p>
 <ol class="m-steps">
 <li><b>接收范围过滤</b>：<code>r/纬度/经度/半径</code>，默认 <b>300 km</b>（最小 10 km）。
 勾「过滤中心跟随我的位置」就以你为圆心；改完点 <b>保存并应用</b>。</li>
@@ -274,7 +274,7 @@ use Android or Windows for offline maps.</p></div></div>
 <div class="callout warn"><span class="co-ic">🧭</span><div><p>「收不到」先查这两处，再查链路 —— 顺序反了会白折腾：
 范围 300 km 之外的台站，链路再通也到不了你。</p></div></div>
 ''', '''
-<p>兩層過濾都在 <b>設定 → 連線</b>，決定「封包到不到得了你」：</p>
+<p>兩層過濾都在 <b>設定 → 伺服器</b>，決定「封包到不到得了你」：</p>
 <ol class="m-steps">
 <li><b>接收範圍過濾</b>：<code>r/緯度/經度/半徑</code>，預設 <b>300 km</b>（最小 10 km）。
 勾「過濾中心跟隨我的位置」就以你為圓心；改完點 <b>儲存並套用</b>。</li>
@@ -285,7 +285,7 @@ use Android or Windows for offline maps.</p></div></div>
 <div class="callout warn"><span class="co-ic">🧭</span><div><p>「收不到」先查這兩處，再查鏈路 —— 順序反了會白折騰：
 範圍 300 km 之外的臺站，鏈路再通也到不了你。</p></div></div>
 ''', '''
-<p>Both filters live under <b>Settings → Connection</b> and decide whether packets can reach you at all:</p>
+<p>Both filters live under <b>Settings → Server</b> and decide whether packets can reach you at all:</p>
 <ol class="m-steps">
 <li><b>Receive range</b>: <code>r/lat/lng/radius</code>, <b>300 km</b> by default (10 km minimum).
 “Follow my position” centres it on you; press <b>Save &amp; apply</b> after changing it.</li>
@@ -299,7 +299,7 @@ a station 400 km away cannot reach you through a 300 km filter however healthy t
     ('display', T('看什么：列表筛选', '看什麼：列表篩選', 'What you display'), '''
 <p><b>台站页签</b>上再做一层<b>展示筛选</b>（不影响接收）：</p>
 <ul>
-<li><b>状态</b>：在线 / 移动 / 静止 —— 「在线判定时长」在 <b>设置 → 连接 → 数据上限</b>（默认 5 分钟）。</li>
+<li><b>状态</b>：在线 / 移动 / 静止 —— 「在线判定时长」在 <b>设置 → 服务器 → 数据上限</b>（默认 5 分钟）。</li>
 <li><b>类型</b>：APRS 类型（车载/固定/中继/气象）、软件（APRSLocus）、设备类别与具体型号。</li>
 <li><b>收藏</b>：标星的台站单独一档。</li>
 <li><b>搜索</b>：呼号 / 类型 / 备注 / 网格 —— 台站几万条也不卡（内存上限默认 10 万条，可调）。</li>
@@ -311,7 +311,7 @@ a station 400 km away cannot reach you through a 300 km filter however healthy t
 ''', '''
 <p><b>臺站頁籤</b>上再做一層<b>展示篩選</b>（不影響接收）：</p>
 <ul>
-<li><b>狀態</b>：線上 / 移動 / 靜止 —— 「線上判定時長」在 <b>設定 → 連線 → 資料上限</b>（預設 5 分鐘）。</li>
+<li><b>狀態</b>：線上 / 移動 / 靜止 —— 「線上判定時長」在 <b>設定 → 伺服器 → 資料上限</b>（預設 5 分鐘）。</li>
 <li><b>類型</b>：APRS 類型（車載/固定/中繼/氣象）、軟體（APRSLocus）、裝置類別與具體型號。</li>
 <li><b>收藏</b>：加星的臺站單獨一檔。</li>
 <li><b>搜尋</b>：呼號 / 類型 / 備註 / 網格 —— 臺站幾萬條也不卡（記憶體上限預設 10 萬條，可調）。</li>
@@ -323,7 +323,7 @@ a station 400 km away cannot reach you through a 300 km filter however healthy t
 ''', '''
 <p>The <b>Stations tab</b> adds a <b>display filter</b> on top (it does not affect receiving):</p>
 <ul>
-<li><b>Status</b>: online / moving / static — the “online window” is under <b>Settings → Connection → Data caps</b> (5 minutes by default).</li>
+<li><b>Status</b>: online / moving / static — the “online window” is under <b>Settings → Server → Data caps</b> (5 minutes by default).</li>
 <li><b>Type</b>: APRS type (mobile/fixed/relay/weather), software (APRSLocus), device class and exact model.</li>
 <li><b>Favourites</b>: starred stations get their own bucket.</li>
 <li><b>Search</b>: callsign / type / comment / grid — stays fast at tens of thousands (100k stations in memory by default, adjustable).</li>
@@ -392,7 +392,7 @@ bundled snapshot plus online updates.</li>
 <li><b>导出</b>（设置 → 备份与恢复 → 导出备份）：设置配置（电台、信标、地图、筛选、数据来源、服务器等）
 与本地数据进<b>一个 JSON</b>；可勾选是否包含图片。</li>
 <li><b>导入</b>：选择备份文件（或从剪贴板粘贴）→ 导入后<b>重启应用</b>生效。</li>
-<li>换机 / 重装的顺序：装应用 → 导入 → 重启 → 核对「设置 → 连接」的服务器与 Passcode。</li>
+<li>换机 / 重装的顺序：装应用 → 导入 → 重启 → 核对「设置 → 服务器」里两条链路的地址与 Passcode。</li>
 </ol>
 <div class="callout warn"><span class="co-ic">🔐</span><div><p><b>白名单导入</b>：只认该分组白名单内的键 —— 来路不明的 JSON 改不了内部设置；
 更高版本的备份会被拒绝并提示先升级。<b>备份文件含呼号、服务器口令与 API 密钥，请妥善保管。</b></p>
@@ -403,7 +403,7 @@ bundled snapshot plus online updates.</li>
 <li><b>匯出</b>（設定 → 備份與恢復 → 匯出備份）：設定組態（電臺、信標、地圖、篩選、資料來源、伺服器等）
 與本地資料進<b>一個 JSON</b>；可勾選是否包含圖片。</li>
 <li><b>匯入</b>：選擇備份檔案（或從剪貼簿貼上）→ 匯入後<b>重啟應用</b>生效。</li>
-<li>換機 / 重裝的順序：裝應用 → 匯入 → 重啟 → 核對「設定 → 連線」的伺服器與 Passcode。</li>
+<li>換機 / 重裝的順序：裝應用 → 匯入 → 重啟 → 核對「設定 → 伺服器」裡兩條鏈路的位址與 Passcode。</li>
 </ol>
 <div class="callout warn"><span class="co-ic">🔐</span><div><p><b>白名單匯入</b>：只認該分組白名單內的鍵 —— 來路不明的 JSON 改不了內部設定；
 更高版本的備份會被拒絕並提示先升級。<b>備份檔案含呼號、伺服器口令與 API 金鑰，請妥善保管。</b></p>
@@ -414,7 +414,7 @@ bundled snapshot plus online updates.</li>
 <li><b>Export</b> (Settings → Backup → export): configuration (station, beacon, map, filters, sources, server…)
 plus local data into <b>one JSON</b>; images are optional.</li>
 <li><b>Import</b>: pick the file (or paste from the clipboard) → <b>restart the app</b> to apply.</li>
-<li>New device order: install → import → restart → re-check server and Passcode under Settings → Connection.</li>
+<li>New device order: install → import → restart → re-check the addresses and Passcode of both links under Settings → Server.</li>
 </ol>
 <div class="callout warn"><span class="co-ic">🔐</span><div><p><b>Whitelisted import</b>: only keys inside that group’s whitelist are accepted, so a file from
 someone else cannot rewrite internal settings; a backup from a newer version is rejected with
@@ -426,6 +426,7 @@ Documents, web uses the clipboard. Reading is capped at <b>32 MB</b>.</p></div><
 <ol class="m-steps">
 <li>入口：<b>设置 → 历史轨迹</b>。</li>
 <li>按天落盘：<code>tracklog/YYYY-MM-DD.json</code>，记录经纬度、速度、航向、海拔、精度 —— 退出重进还在。</li>
+<li><b>导出 GPX</b>：可选今天 / 7 天 / 30 天 / 365 天 / 自定义区间。文件落在下载目录（桌面端是文档目录），导出后还能直接分享。没有轨迹点的那天不会生成空轨道。</li>
 <li>每天一屏：总里程、平均与最高速度、<b>移动时长</b>、轨迹点数；可按天删除或一键清空。
 移动时长只累计确实在动的段 —— 中途停车吃饭的两小时不算开车。</li>
 <li><b>点进某天可回放</b>：底图与主地图同一套（同缓存、同坐标纠偏）；轨迹随播放生长、可拖进度、
@@ -440,6 +441,7 @@ Documents, web uses the clipboard. Reading is capped at <b>32 MB</b>.</p></div><
 <ol class="m-steps">
 <li>入口：<b>設定 → 歷史軌跡</b>。</li>
 <li>按天落盤：<code>tracklog/YYYY-MM-DD.json</code>，記錄經緯度、速度、航向、海拔、精度 —— 退出重進還在。</li>
+<li><b>匯出 GPX</b>：可選今天 / 7 天 / 30 天 / 365 天 / 自訂區間。檔案落在下載目錄（桌面端是文件目錄），匯出後還能直接分享。沒有軌跡點的那天不會產生空軌道。</li>
 <li>每天一屏：總里程、平均與最高速度、<b>移動時長</b>、軌跡點數；可按天刪除或一鍵清空。
 移動時長只累計確實在動的段 —— 中途停車吃飯的兩小時不算開車。</li>
 <li><b>點進某天可回放</b>：底圖與主地圖同一套（同快取、同座標校正）；軌跡隨播放生長、可拖進度、
@@ -454,6 +456,7 @@ Documents, web uses the clipboard. Reading is capped at <b>32 MB</b>.</p></div><
 <ol class="m-steps">
 <li>Entry: <b>Settings → Track history</b>.</li>
 <li>Saved per local day (<code>tracklog/YYYY-MM-DD.json</code>) with lat/lng, speed, course, altitude and accuracy — it survives a restart.</li>
+<li><b>Export GPX</b>: today, 7, 30, 365 days or a custom range. The file lands in Downloads (Documents on desktop) and can be shared straight from the share sheet. Empty days produce no empty track.</li>
 <li>One screen per day: distance, average and top speed, <b>moving time</b>, point count; delete a day or clear all.
 Moving time only counts segments that genuinely moved — a two-hour lunch stop is not billed as driving.</li>
 <li><b>Tap a day to replay it</b>: same tile stack as the main map (same cache, same correction), the line grows as it plays,
@@ -641,9 +644,9 @@ go back to <a href="stations.html">Stations</a>; nothing at all = link problem, 
     ('matrix', T('症状 → 原因 → 动作', '症狀 → 原因 → 动作', 'Symptom → cause → action'), '''
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>症状</th><th>最可能的原因</th><th>动作</th></tr></thead><tbody>
-<tr><td>黄色「未验证」横幅</td><td>Passcode 空 / 错</td><td>设置 → 连接 → 填正确 Passcode → 保存并应用</td></tr>
+<tr><td>黄色「未验证」横幅</td><td>Passcode 空 / 错</td><td>设置 → 服务器 → APRS-IS 服务器：填对 Passcode</td></tr>
 <tr><td>连不上服务器</td><td>网络 / 服务器地址 / 端口</td><td>核对填的服务器地址与端口；断线会自动 8→16→32→60s 重连，等一轮</td></tr>
-<tr><td>数据包页一条都没有</td><td>没勾数据来源 / 范围过滤太窄</td><td>设置 → 连接：勾 APRS-IS；范围半径调大 → 保存并应用</td></tr>
+<tr><td>数据包页一条都没有</td><td>没勾数据来源 / 范围过滤太窄</td><td>设置 → 服务器：打开 APRS-IS 开关；范围半径调大 → 保存并应用过滤</td></tr>
 <tr><td>收到但地图上看不到</td><td>列表筛选挡住了</td><td>台站页点「清除筛选」；核对状态/类型筛选</td></tr>
 <tr><td>自己位置不显示/乱跳</td><td>没定位权限 / 用了网络粗定位</td><td>给定位权限；设置 → 定位上报 → 定位模式选纯 GPS</td></tr>
 <tr><td>TNC 能收不能发</td><td>停在命令模式 / 线速不匹配</td><td>发送初始化串（<code>KISS ON</code>）；核对 9600~115200 与电台一致</td></tr>
@@ -657,9 +660,9 @@ go back to <a href="stations.html">Stations</a>; nothing at all = link problem, 
 ''', '''
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>症狀</th><th>最可能的原因</th><th>動作</th></tr></thead><tbody>
-<tr><td>黃色「未驗證」橫幅</td><td>Passcode 空 / 錯</td><td>設定 → 連線 → 填正確 Passcode → 儲存並套用</td></tr>
+<tr><td>黃色「未驗證」橫幅</td><td>Passcode 空 / 錯</td><td>設定 → 伺服器 → APRS-IS 伺服器：填對 Passcode</td></tr>
 <tr><td>連不上伺服器</td><td>網路 / 伺服器位址 / 埠</td><td>核對填的伺服器位址與埠；斷線會自動 8→16→32→60s 重連，等一輪</td></tr>
-<tr><td>封包頁一條都沒有</td><td>沒勾資料來源 / 範圍過濾太窄</td><td>設定 → 連線：勾 APRS-IS；範圍半徑調大 → 儲存並套用</td></tr>
+<tr><td>封包頁一條都沒有</td><td>沒勾資料來源 / 範圍過濾太窄</td><td>設定 → 伺服器：打開 APRS-IS 開關；範圍半徑調大 → 儲存並套用過濾</td></tr>
 <tr><td>收到但地圖上看不見</td><td>列表篩選擋住了</td><td>臺站頁點「清除篩選」；核對狀態/類型篩選</td></tr>
 <tr><td>自己位置不顯示/亂跳</td><td>沒定位權限 / 用了網路粗定位</td><td>給定位權限；設定 → 定位上報 → 定位模式選純 GPS</td></tr>
 <tr><td>TNC 能收不能發</td><td>停在命令模式 / 線速不匹配</td><td>送出初始化字串（<code>KISS ON</code>）；核對 9600~115200 與電臺一致</td></tr>
@@ -673,9 +676,9 @@ go back to <a href="stations.html">Stations</a>; nothing at all = link problem, 
 ''', '''
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>Symptom</th><th>Likely cause</th><th>Action</th></tr></thead><tbody>
-<tr><td>Yellow “unverified” banner</td><td>Passcode empty or wrong</td><td>Settings → Connection → correct it → Save &amp; apply</td></tr>
+<tr><td>Yellow “unverified” banner</td><td>Passcode empty or wrong</td><td>Settings → Server → APRS-IS server: correct the Passcode</td></tr>
 <tr><td>Cannot reach the server</td><td>network / address / port</td><td>check the address and port you entered; reconnects run 8→16→32→60 s — wait one cycle</td></tr>
-<tr><td>Packets tab is empty</td><td>no source ticked / range too narrow</td><td>Settings → Connection: tick APRS-IS, raise the radius → Save &amp; apply</td></tr>
+<tr><td>Packets tab is empty</td><td>no source ticked / range too narrow</td><td>Settings → Server: switch APRS-IS on, raise the radius → Save &amp; apply filter</td></tr>
 <tr><td>Received but not on the map</td><td>list filter hiding it</td><td>Stations → clear filters; re-check status/type</td></tr>
 <tr><td>My position missing or jumping</td><td>no location permission / network fixes</td><td>grant permission; Settings → Beacon → GPS only</td></tr>
 <tr><td>TNC receives, never transmits</td><td>command mode / baud mismatch</td><td>send the init string (<code>KISS ON</code>); match 9600–115200 to the radio</td></tr>

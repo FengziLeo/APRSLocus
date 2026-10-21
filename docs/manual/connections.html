@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>连接与数据来源 — APRSlocus</title>
-<meta name="description" content="目标：选对数据来源、把 APRS-IS 连上并验证，必要时接上电台跑通射频链路。">
+<meta name="description" content="目标：把互联网链路连上并验证，需要射频时再接一条电台链路。">
 <meta name="theme-color" content="#0a0e12">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="APRSlocus">
 <meta property="og:title" content="连接与数据来源 — APRSlocus">
-<meta property="og:description" content="目标：选对数据来源、把 APRS-IS 连上并验证，必要时接上电台跑通射频链路。">
+<meta property="og:description" content="目标：把互联网链路连上并验证，需要射频时再接一条电台链路。">
 <meta property="og:url" content="https://aprslocus.theez.top/manual/connections.html">
 <meta property="og:image" content="https://aprslocus.theez.top/assets/logo.png">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="连接与数据来源 — APRSlocus">
-<meta name="twitter:description" content="目标：选对数据来源、把 APRS-IS 连上并验证，必要时接上电台跑通射频链路。">
+<meta name="twitter:description" content="目标：把互联网链路连上并验证，需要射频时再接一条电台链路。">
 <link rel="canonical" href="https://aprslocus.theez.top/manual/connections.html">
     <link rel="alternate" hreflang="zh-CN" href="https://aprslocus.theez.top/manual/connections.html">
     <link rel="alternate" hreflang="zh-TW" href="https://aprslocus.theez.top/zh-TW/manual/connections.html">
@@ -41,7 +41,7 @@
   "@context": "https://schema.org",
   "@type": "TechArticle",
   "name": "连接与数据来源 — APRSlocus",
-  "description": "目标：选对数据来源、把 APRS-IS 连上并验证，必要时接上电台跑通射频链路。",
+  "description": "目标：把互联网链路连上并验证，需要射频时再接一条电台链路。",
   "url": "https://aprslocus.theez.top/manual/connections.html",
   "inLanguage": "zh-CN",
   "dateModified": "2026-09-23",
@@ -129,7 +129,7 @@
   </nav>
   <div class="section-head reveal">
     <h1>连接与数据来源</h1>
-    <p>目标：选对数据来源、把 APRS-IS 连上并验证，必要时接上电台跑通射频链路。</p>
+    <p>目标：把互联网链路连上并验证，需要射频时再接一条电台链路。</p>
   </div>
 
   <div class="manual-tools reveal">
@@ -159,40 +159,74 @@
         <a href="platform.html">平台差异</a>
         <a href="troubleshooting.html">故障排查</a>
       <div class="mn-title">本页目录</div>
-        <a href="#sources">五条链路：收可以多选，发只有一条</a>
+        <a href="#sources">六条链路：两条在互联网，四条接电台</a>
         <a href="#aprsis">接上 APRS-IS</a>
+        <a href="#acn">第二条链路：APRSNETCN</a>
+        <a href="#extgps">外接 GPS 模块</a>
         <a href="#rf">接电台：TNC / 音频 / PKWDWPL / Icom</a>
         <a href="#igate">网关 iGate</a>
         <a href="#selftest">链路自检与排错顺序</a>
     </nav>
     <div class="manual-body">
   <section class="chapter reveal" id="sources">
-    <h2 id="sources">五条链路：收可以多选，发只有一条<a class="hdr-anchor" href="#sources" aria-label="本节永久链接" title="本节永久链接">#</a></h2>
-<p>路径 <b>设置 → 连接 → 数据来源</b>。勾中的链路都会<b>收</b>报文，但<b>发射只有一条</b> ——
-右侧圆点标记的那条。同一个呼号从两条链路发出去会造成重复报文。</p>
+    <h2 id="sources">六条链路：两条在互联网，四条接电台<a class="hdr-anchor" href="#sources" aria-label="本节永久链接" title="本节永久链接">#</a></h2>
+<p>入口 <b>设置 → 服务器</b>。这一页只摆两台互联网服务器，一台一张卡，卡上有自己的开关，点进去才是它的地址与口令。</p>
 <div class="doc-table-wrap"><table class="doc-table">
-<thead><tr><th>来源</th><th>链路</th><th>收</th><th>发</th></tr></thead><tbody>
-<tr><td><b>APRS-IS</b></td><td>互联网 TCP，服务器地址自己填</td><td>✓</td><td>✓</td></tr>
-<tr><td><b>TNC</b></td><td>蓝牙 SPP / USB 串口（OTG），KISS 协议，接电台</td><td>✓</td><td>✓</td></tr>
+<thead><tr><th>链路</th><th>走什么</th><th>收</th><th>发</th></tr></thead><tbody>
+<tr><td><b>APRS-IS</b></td><td>互联网 TCP，地址自己填</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>APRSNETCN SERVER</b></td><td>同一套协议的国内服务器，地址自己填</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>TNC</b></td><td>蓝牙 SPP 或 USB 串口，KISS 协议</td><td>✓</td><td>✓</td></tr>
 <tr><td><b>音频</b></td><td>耳机口接电台，AFSK 1200（Bell 202）</td><td>✓</td><td>✓</td></tr>
-<tr><td><b>PKWDWPL</b></td><td>蓝牙/串口读 Kenwood 的 <code>$PKWDWPL</code> 航点语句</td><td>✓</td><td><b>✗ 只读</b></td></tr>
-<tr><td><b>WLAN 电台直连</b></td><td>Wi-Fi / 以太网直连（支持 IC-705 / IC-9700 / IC-7610 / IC-905 等），CI-V 控制 + 网络音频</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>WLAN 电台直连</b></td><td>Wi-Fi 直连 Icom 电台（IC-705 / IC-9700 等）</td><td>✓</td><td>✓</td></tr>
+<tr><td><b>PKWDWPL</b></td><td>读 Kenwood 输出的航点语句</td><td>✓</td><td><b>✗ 只读</b></td></tr>
 </tbody></table></div>
-<div class="callout warn"><span class="co-ic">📡</span><div><p><b>接收范围默认 300 km</b>（最小 10 km），用 <code>r/纬度/经度/半径</code> 过滤 ——
-改完必须点 <b>「保存并应用」</b> 才生效。想收全球就把半径调大或关掉过滤中心跟随。</p></div></div>
+<p><b>发射要分两行选。</b>「位置与状态报文」可以同时勾几条链路，两条互联网链路一起发也不会撞包。「消息」只勾一条，它只认自己那条链路，没连上就发不出去。</p>
+<div class="callout warn"><span class="co-ic">📡</span><div><p><b>接收范围默认 300 km</b>（最小 10 km），规则是 <code>r/纬度/经度/半径</code>。改完要点 <b>「保存并应用过滤」</b> 才生效。</p></div></div>
   </section>
   <section class="chapter reveal" id="aprsis">
     <h2 id="aprsis">接上 APRS-IS<a class="hdr-anchor" href="#aprsis" aria-label="本节永久链接" title="本节永久链接">#</a></h2>
+<p>两条互联网链路是平的，APRS-IS 不特殊。它的参数都在自己的子页里，与 APRSNETCN 那张卡各管各的。</p>
 <ol class="m-steps">
-<li><b>设置 → 连接</b>，填入服务器地址与端口 <code>14580</code>。</li>
-<li>填入 <b>Passcode</b>（用完整呼号生成，见 <a href="start.html#passcode">快速上手</a>）。</li>
-<li>点 <b>「保存并应用」</b> —— 连接页的改动不保存不会生效。</li>
-<li>回主页看链路状态卡：变成「已连接」、收包计数开始增长。</li>
+<li><b>设置 → 服务器 → APRS-IS 服务器</b>，填服务器地址与端口 <code>14580</code>。地址留空就连不上，软件不预置服务器。</li>
+<li>填 <b>Passcode</b>：用完整呼号生成，见 <a href="start.html#passcode">快速上手</a>。留空或 <code>-1</code> 只能收，消息发不出去。</li>
+<li>打开卡片顶部的开关。主页本来连着的话这一条会自己连上，没连着就回主页点连接。</li>
+<li>看链路状态卡：显示已连接，收包计数开始涨。</li>
 </ol>
 <ul>
-<li><b>断线会自己重连</b>：按 <b>8 → 16 → 32 → 60 秒</b> 渐进退避，不用手动重连。</li>
-<li><b>服务器返回 <code>unverified</code></b> = Passcode 没通过，回到第 2 步。</li>
-<li>想用自建中转 / WebSocket：同一处填 <b>WebSocket URL（可选）</b>，留空走标准 TCP。</li>
+<li>地址、端口和 Passcode 改了<b>自动保存</b>，不用再点按钮。</li>
+<li><b>断线自己重连</b>：8 → 16 → 32 → 60 秒逐步退回。</li>
+<li>服务器回 <code>unverified</code> 就是 Passcode 没通过，回第 2 步。</li>
+<li>要走自建中转就填 <b>WebSocket URL</b>，留空走标准 TCP。</li>
+</ul>
+  </section>
+  <section class="chapter reveal" id="acn">
+    <h2 id="acn">第二条链路：APRSNETCN<a class="hdr-anchor" href="#acn" aria-label="本节永久链接" title="本节永久链接">#</a></h2>
+<p>APRSNETCN 与 APRS-IS 并列。它跑同一套 APRS-IS 协议，服务器在国内，地址同样要自己填。收发都能走它，只连它一条也能用。</p>
+<ol class="m-steps">
+<li><b>设置 → 服务器 → APRSNETCN SERVER</b>，填地址与端口。</li>
+<li>填 <b>Passcode</b>。服务器给过账号与口令的，把这两格也填上。</li>
+<li>打开开关，看卡片里的链路状态。</li>
+<li>要 24 小时台站就在卡片下面点同步，收下来的台站与 APRS-IS 的并在一起。</li>
+</ol>
+<ul>
+<li><b>登录结果</b>单独一行。口令错了链路会连上又断开，原因只写在这里。</li>
+<li>两台同时在线时同一条报文<b>只记一次</b>，两边各收一份也不会重复计数。</li>
+<li>换了地址或口令后点卡片里的<b>重连</b>，新参数才生效。</li>
+</ul>
+  </section>
+  <section class="chapter reveal" id="extgps">
+    <h2 id="extgps">外接 GPS 模块<a class="hdr-anchor" href="#extgps" aria-label="本节永久链接" title="本节永久链接">#</a></h2>
+<p>外接 GPS 是一台蓝牙 NMEA 模块，接上以后由它供位置。它的定位比手机稳，也省手机的电。它不是一条 APRS 链路，只负责告诉应用你在哪。</p>
+<ol class="m-steps">
+<li><b>设置 → 设备 → 外接 GPS</b>。</li>
+<li>点扫描设备，选中模块后绑定。模块走蓝牙 SPP，要先在系统里配对。</li>
+<li>连接成功后看「当前定位」：纬度、经度、卫星数和精度都在这一块。</li>
+<li>要卫星数随信标发出去，去 <b>设置 → 定位上报</b> 打开「卫星数」。</li>
+</ol>
+<ul>
+<li>模块在位时手机定位<b>自动待机</b>。模块掉线会切回手机 GPS，日志里写一句。</li>
+<li>「严格校验和」默认开，语句校验不符直接丢弃。排查兼容性问题时可以关掉，改成只标注。</li>
+<li>语句计数在涨但没有定位，多数是室内收不到星。语句不涨就查蓝牙这一层。</li>
 </ul>
   </section>
   <section class="chapter reveal" id="rf">

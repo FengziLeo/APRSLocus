@@ -179,9 +179,9 @@ TNC 另有初始化字串與發射自檢（狀態封包，不含座標）。</li
     <h2 id="matrix">症狀 → 原因 → 動作<a class="hdr-anchor" href="#matrix" aria-label="本節永久連結" title="本節永久連結">#</a></h2>
 <div class="doc-table-wrap"><table class="doc-table">
 <thead><tr><th>症狀</th><th>最可能的原因</th><th>動作</th></tr></thead><tbody>
-<tr><td>黃色「未驗證」橫幅</td><td>Passcode 空 / 錯</td><td>設定 → 連線 → 填正確 Passcode → 儲存並套用</td></tr>
+<tr><td>黃色「未驗證」橫幅</td><td>Passcode 空 / 錯</td><td>設定 → 伺服器 → APRS-IS 伺服器：填對 Passcode</td></tr>
 <tr><td>連不上伺服器</td><td>網路 / 伺服器位址 / 埠</td><td>核對填的伺服器位址與埠；斷線會自動 8→16→32→60s 重連，等一輪</td></tr>
-<tr><td>封包頁一條都沒有</td><td>沒勾資料來源 / 範圍過濾太窄</td><td>設定 → 連線：勾 APRS-IS；範圍半徑調大 → 儲存並套用</td></tr>
+<tr><td>封包頁一條都沒有</td><td>沒勾資料來源 / 範圍過濾太窄</td><td>設定 → 伺服器：打開 APRS-IS 開關；範圍半徑調大 → 儲存並套用過濾</td></tr>
 <tr><td>收到但地圖上看不見</td><td>列表篩選擋住了</td><td>臺站頁點「清除篩選」；核對狀態/類型篩選</td></tr>
 <tr><td>自己位置不顯示/亂跳</td><td>沒定位權限 / 用了網路粗定位</td><td>給定位權限；設定 → 定位上報 → 定位模式選純 GPS</td></tr>
 <tr><td>TNC 能收不能發</td><td>停在命令模式 / 線速不匹配</td><td>送出初始化字串（<code>KISS ON</code>）；核對 9600~115200 與電臺一致</td></tr>

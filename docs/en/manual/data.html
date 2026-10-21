@@ -179,7 +179,7 @@
 <li><b>Export</b> (Settings → Backup → export): configuration (station, beacon, map, filters, sources, server…)
 plus local data into <b>one JSON</b>; images are optional.</li>
 <li><b>Import</b>: pick the file (or paste from the clipboard) → <b>restart the app</b> to apply.</li>
-<li>New device order: install → import → restart → re-check server and Passcode under Settings → Connection.</li>
+<li>New device order: install → import → restart → re-check the addresses and Passcode of both links under Settings → Server.</li>
 </ol>
 <div class="callout warn"><span class="co-ic">🔐</span><div><p><b>Whitelisted import</b>: only keys inside that group’s whitelist are accepted, so a file from
 someone else cannot rewrite internal settings; a backup from a newer version is rejected with
@@ -192,6 +192,7 @@ Documents, web uses the clipboard. Reading is capped at <b>32 MB</b>.</p></div><
 <ol class="m-steps">
 <li>Entry: <b>Settings → Track history</b>.</li>
 <li>Saved per local day (<code>tracklog/YYYY-MM-DD.json</code>) with lat/lng, speed, course, altitude and accuracy — it survives a restart.</li>
+<li><b>Export GPX</b>: today, 7, 30, 365 days or a custom range. The file lands in Downloads (Documents on desktop) and can be shared straight from the share sheet. Empty days produce no empty track.</li>
 <li>One screen per day: distance, average and top speed, <b>moving time</b>, point count; delete a day or clear all.
 Moving time only counts segments that genuinely moved — a two-hour lunch stop is not billed as driving.</li>
 <li><b>Tap a day to replay it</b>: same tile stack as the main map (same cache, same correction), the line grows as it plays,

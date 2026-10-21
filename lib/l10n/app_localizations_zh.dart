@@ -9534,6 +9534,69 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get icomTxTailLabel => "发射后置延迟 (Post TX Delay, ms)";
 
+  @override
+  String get cracCertTitle => "操作证书查询";
+
+  @override
+  String get cracCertName => "姓名";
+
+  @override
+  String get cracCertNumber => "证书编号";
+
+  @override
+  String get cracCertId => "身份证件 ID";
+
+  @override
+  String get cracCertPrivacy => "姓名与证件号会发到这个查询接口，结果只留在本机。";
+
+  @override
+  String get cracCertQuery => "查询";
+
+  @override
+  String get cracCertQuerying => "查询中…";
+
+  @override
+  String get cracCertResult => "查询结果";
+
+  @override
+  String get cracCertNeedName => "先填姓名";
+
+  @override
+  String get cracCertNeedKey => "证书编号和证件 ID 填一个";
+
+  @override
+  String get cracCertNotFound => "没有查到记录";
+
+  @override
+  String get cracCertFailed => "查询失败：";
+
+  @override
+  String cracCertSaved(String call) => "已记到呼号 $call";
+
+  @override
+  String cracCertOtherCall(String call) => "这条登记的是 $call，没记到当前呼号";
+
+  @override
+  String get cracCertType => "证书类别";
+
+  @override
+  String get cracCertCall => "呼号";
+
+  @override
+  String get cracCertPassDate => "通过日期";
+
+  @override
+  String get cracCertIssueDate => "核发日期";
+
+  @override
+  String get cracCertRegion => "地点";
+
+  @override
+  String get cracCertValid => "有效期至";
+
+  @override
+  String cracCertBadge(String type) => "$type 类操作证";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -19064,5 +19127,68 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get icomTxTailLabel => "發射後置延遲 (Post TX Delay, ms)";
+
+  @override
+  String get cracCertTitle => "操作證書查詢";
+
+  @override
+  String get cracCertName => "姓名";
+
+  @override
+  String get cracCertNumber => "證書編號";
+
+  @override
+  String get cracCertId => "身分證件 ID";
+
+  @override
+  String get cracCertPrivacy => "姓名與證件號會發到這個查詢介面，結果只留在本機。";
+
+  @override
+  String get cracCertQuery => "查詢";
+
+  @override
+  String get cracCertQuerying => "查詢中…";
+
+  @override
+  String get cracCertResult => "查詢結果";
+
+  @override
+  String get cracCertNeedName => "先填姓名";
+
+  @override
+  String get cracCertNeedKey => "證書編號和證件 ID 填一個";
+
+  @override
+  String get cracCertNotFound => "沒有查到記錄";
+
+  @override
+  String get cracCertFailed => "查詢失敗：";
+
+  @override
+  String cracCertSaved(String call) => "已記到呼號 $call";
+
+  @override
+  String cracCertOtherCall(String call) => "這條登記的是 $call，沒記到目前呼號";
+
+  @override
+  String get cracCertType => "證書類別";
+
+  @override
+  String get cracCertCall => "呼號";
+
+  @override
+  String get cracCertPassDate => "通過日期";
+
+  @override
+  String get cracCertIssueDate => "核發日期";
+
+  @override
+  String get cracCertRegion => "地點";
+
+  @override
+  String get cracCertValid => "有效期至";
+
+  @override
+  String cracCertBadge(String type) => "$type 類操作證";
 
 }

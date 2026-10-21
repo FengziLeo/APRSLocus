@@ -9923,4 +9923,67 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get icomTxTailLabel => "Tunda pasca-TX (ms)";
 
+  @override
+  String get cracCertTitle => "Cek sertifikat";
+
+  @override
+  String get cracCertName => "Nama";
+
+  @override
+  String get cracCertNumber => "No. sertifikat";
+
+  @override
+  String get cracCertId => "Nomor identitas";
+
+  @override
+  String get cracCertPrivacy => "Nama dan nomor yang Anda isi dikirim ke layanan ini. Hasilnya tetap di perangkat ini.";
+
+  @override
+  String get cracCertQuery => "Cek";
+
+  @override
+  String get cracCertQuerying => "Memeriksa…";
+
+  @override
+  String get cracCertResult => "Hasil";
+
+  @override
+  String get cracCertNeedName => "Isi nama dulu";
+
+  @override
+  String get cracCertNeedKey => "Isi nomor sertifikat atau nomor identitas";
+
+  @override
+  String get cracCertNotFound => "Tidak ada catatan";
+
+  @override
+  String get cracCertFailed => "Pemeriksaan gagal: ";
+
+  @override
+  String cracCertSaved(String call) => "Disimpan untuk $call";
+
+  @override
+  String cracCertOtherCall(String call) => "Catatan ini milik $call, bukan panggilan Anda";
+
+  @override
+  String get cracCertType => "Kelas";
+
+  @override
+  String get cracCertCall => "Panggilan";
+
+  @override
+  String get cracCertPassDate => "Lulus pada";
+
+  @override
+  String get cracCertIssueDate => "Terbit";
+
+  @override
+  String get cracCertRegion => "Tempat";
+
+  @override
+  String get cracCertValid => "Berlaku hingga";
+
+  @override
+  String cracCertBadge(String type) => "Lisensi kelas $type";
+
 }

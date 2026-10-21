@@ -19,6 +19,7 @@ import 'device_page.dart';
 import 'acn_link_page.dart';
 import 'aprs_is_cards.dart';
 import 'ic705_device_page.dart';
+import 'crac_cert_page.dart';
 import 'platform_caps.dart';
 import 'pkwdwpl_device_page.dart';
 import 'tnc_page.dart';
@@ -344,21 +345,43 @@ class _StationIdentityCardState extends State<StationIdentityCard> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: C.border, width: 0.4))),
+        // 右端这一簇（SSID / 完整呼号 / 两个徽章 / 箭头）在窄屏上可能超宽：
+        // 左边标签让位（Flexible 1 : 3），整簇再用 FittedBox 缩一点，
+        // 不会溢出，也不会把徽章挤成省略号。
         child: Row(children: [
           Icon(Icons.tag_rounded, size: 16, color: C.blue),
           SizedBox(width: 8),
-          Text(S.of(context).ssidSuffix, style: ts(12, c: C.slate)),
-          Spacer(),
-          Text(
-            st.mySsid.isEmpty ? S.of(context).none : '-${st.mySsid}',
-            style: ts(13, c: C.blue, w: FontWeight.w700),
+          Flexible(
+            child: Text(S.of(context).ssidSuffix,
+                style: ts(12, c: C.slate),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
           ),
-          SizedBox(width: 4),
-          Text('· ${st.myFullCall}', style: ts(10, c: C.grey)),
-          SizedBox(width: 6),
-          HonorBadge(st.myFullCall, symbol: st.mySymbol),
-          SizedBox(width: 4),
-          Icon(Icons.chevron_right_rounded, size: 18, color: C.grey),
+          SizedBox(width: 8),
+          Flexible(
+            flex: 3,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(
+                  st.mySsid.isEmpty ? S.of(context).none : '-${st.mySsid}',
+                  style: ts(13, c: C.blue, w: FontWeight.w700),
+                ),
+                SizedBox(width: 4),
+                Text('· ${st.myFullCall}', style: ts(10, c: C.grey)),
+                SizedBox(width: 6),
+                HonorBadge(st.myFullCall, symbol: st.mySymbol),
+                // 操作证书徽章：只在查到的证书记录对得上当前呼号时才在。
+                if (st.cracCertType.isNotEmpty) ...[
+                  SizedBox(width: 4),
+                  CracCertBadge(st.cracCertType),
+                ],
+                SizedBox(width: 4),
+                Icon(Icons.chevron_right_rounded, size: 18, color: C.grey),
+              ]),
+            ),
+          ),
         ]),
       ),
     );
@@ -5050,6 +5073,18 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
                   SizedBox(width: 4),
                   Icon(Icons.chevron_right_rounded, size: 18, color: C.grey),
                 ]),
+              ),
+            ),
+            Divider(height: 1, color: C.border),
+            // 开发人员自测：操作证书查询。查到就把呼号与证书类别记在本机，
+            // 上面呼号旁那枚徽章才有东西可显示。
+            SettingsNavRow(
+              title: S.of(context).cracCertTitle,
+              icon: Icons.verified_user_rounded,
+              color: C.green,
+              trailing: st.cracCert?.typeLabel ?? '',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => CracCertPage(state: st)),
               ),
             ),
             Divider(height: 1, color: C.border),

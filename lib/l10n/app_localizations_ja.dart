@@ -9634,4 +9634,67 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get icomTxTailLabel => "送信後ディレイ (Post TX Delay, ms)";
 
+  @override
+  String get cracCertTitle => "操作免許の照会";
+
+  @override
+  String get cracCertName => "氏名";
+
+  @override
+  String get cracCertNumber => "免許番号";
+
+  @override
+  String get cracCertId => "身分証明書 ID";
+
+  @override
+  String get cracCertPrivacy => "入力した氏名と番号はこの照会窓口に送られます。結果は本機にだけ残ります。";
+
+  @override
+  String get cracCertQuery => "照会";
+
+  @override
+  String get cracCertQuerying => "照会中…";
+
+  @override
+  String get cracCertResult => "照会結果";
+
+  @override
+  String get cracCertNeedName => "先に氏名を入れてください";
+
+  @override
+  String get cracCertNeedKey => "免許番号か身分証明書 ID のどちらかを入力";
+
+  @override
+  String get cracCertNotFound => "記録が見つかりません";
+
+  @override
+  String get cracCertFailed => "照会に失敗：";
+
+  @override
+  String cracCertSaved(String call) => "コールサイン $call に記録しました";
+
+  @override
+  String cracCertOtherCall(String call) => "この記録は $call のものです。現在のコールサインには記録しません";
+
+  @override
+  String get cracCertType => "免許の種類";
+
+  @override
+  String get cracCertCall => "コールサイン";
+
+  @override
+  String get cracCertPassDate => "合格日";
+
+  @override
+  String get cracCertIssueDate => "交付日";
+
+  @override
+  String get cracCertRegion => "場所";
+
+  @override
+  String get cracCertValid => "有効期限";
+
+  @override
+  String cracCertBadge(String type) => "$type 級免許";
+
 }

@@ -17427,6 +17427,132 @@ abstract class AppLocalizations {
   /// **'发射后置延迟 (Post TX Delay, ms)'**
   String get icomTxTailLabel;
 
+  /// No description provided for @cracCertTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'操作证书查询'**
+  String get cracCertTitle;
+
+  /// No description provided for @cracCertName.
+  ///
+  /// In zh, this message translates to:
+  /// **'姓名'**
+  String get cracCertName;
+
+  /// No description provided for @cracCertNumber.
+  ///
+  /// In zh, this message translates to:
+  /// **'证书编号'**
+  String get cracCertNumber;
+
+  /// No description provided for @cracCertId.
+  ///
+  /// In zh, this message translates to:
+  /// **'身份证件 ID'**
+  String get cracCertId;
+
+  /// No description provided for @cracCertPrivacy.
+  ///
+  /// In zh, this message translates to:
+  /// **'姓名与证件号会发到这个查询接口，结果只留在本机。'**
+  String get cracCertPrivacy;
+
+  /// No description provided for @cracCertQuery.
+  ///
+  /// In zh, this message translates to:
+  /// **'查询'**
+  String get cracCertQuery;
+
+  /// No description provided for @cracCertQuerying.
+  ///
+  /// In zh, this message translates to:
+  /// **'查询中…'**
+  String get cracCertQuerying;
+
+  /// No description provided for @cracCertResult.
+  ///
+  /// In zh, this message translates to:
+  /// **'查询结果'**
+  String get cracCertResult;
+
+  /// No description provided for @cracCertNeedName.
+  ///
+  /// In zh, this message translates to:
+  /// **'先填姓名'**
+  String get cracCertNeedName;
+
+  /// No description provided for @cracCertNeedKey.
+  ///
+  /// In zh, this message translates to:
+  /// **'证书编号和证件 ID 填一个'**
+  String get cracCertNeedKey;
+
+  /// No description provided for @cracCertNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有查到记录'**
+  String get cracCertNotFound;
+
+  /// No description provided for @cracCertFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'查询失败：'**
+  String get cracCertFailed;
+
+  /// No description provided for @cracCertSaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'已记到呼号 {call}'**
+  String cracCertSaved(String call);
+
+  /// No description provided for @cracCertOtherCall.
+  ///
+  /// In zh, this message translates to:
+  /// **'这条登记的是 {call}，没记到当前呼号'**
+  String cracCertOtherCall(String call);
+
+  /// No description provided for @cracCertType.
+  ///
+  /// In zh, this message translates to:
+  /// **'证书类别'**
+  String get cracCertType;
+
+  /// No description provided for @cracCertCall.
+  ///
+  /// In zh, this message translates to:
+  /// **'呼号'**
+  String get cracCertCall;
+
+  /// No description provided for @cracCertPassDate.
+  ///
+  /// In zh, this message translates to:
+  /// **'通过日期'**
+  String get cracCertPassDate;
+
+  /// No description provided for @cracCertIssueDate.
+  ///
+  /// In zh, this message translates to:
+  /// **'核发日期'**
+  String get cracCertIssueDate;
+
+  /// No description provided for @cracCertRegion.
+  ///
+  /// In zh, this message translates to:
+  /// **'地点'**
+  String get cracCertRegion;
+
+  /// No description provided for @cracCertValid.
+  ///
+  /// In zh, this message translates to:
+  /// **'有效期至'**
+  String get cracCertValid;
+
+  /// No description provided for @cracCertBadge.
+  ///
+  /// In zh, this message translates to:
+  /// **'{type} 类操作证'**
+  String cracCertBadge(String type);
+
 }
 
 class _AppLocalizationsDelegate

@@ -9972,4 +9972,67 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get icomTxTailLabel => "Retardo posterior TX (ms)";
 
+  @override
+  String get cracCertTitle => "Consulta de certificado";
+
+  @override
+  String get cracCertName => "Nombre";
+
+  @override
+  String get cracCertNumber => "N.º de certificado";
+
+  @override
+  String get cracCertId => "N.º de identidad";
+
+  @override
+  String get cracCertPrivacy => "El nombre y el número que escribes van a este servicio. El resultado se queda en este dispositivo.";
+
+  @override
+  String get cracCertQuery => "Consultar";
+
+  @override
+  String get cracCertQuerying => "Consultando…";
+
+  @override
+  String get cracCertResult => "Resultado";
+
+  @override
+  String get cracCertNeedName => "Escribe un nombre primero";
+
+  @override
+  String get cracCertNeedKey => "Rellena el n.º de certificado o el de identidad";
+
+  @override
+  String get cracCertNotFound => "No se encontró ningún registro";
+
+  @override
+  String get cracCertFailed => "Error en la consulta: ";
+
+  @override
+  String cracCertSaved(String call) => "Guardado para $call";
+
+  @override
+  String cracCertOtherCall(String call) => "Este registro es de $call, no de tu indicativo";
+
+  @override
+  String get cracCertType => "Clase";
+
+  @override
+  String get cracCertCall => "Indicativo";
+
+  @override
+  String get cracCertPassDate => "Aprobado el";
+
+  @override
+  String get cracCertIssueDate => "Emitido el";
+
+  @override
+  String get cracCertRegion => "Lugar";
+
+  @override
+  String get cracCertValid => "Válido hasta";
+
+  @override
+  String cracCertBadge(String type) => "Licencia clase $type";
+
 }

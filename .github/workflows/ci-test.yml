@@ -450,6 +450,11 @@ jobs:
       - name: Test IC-705 post-TX delay
         run: flutter test test/icom_lan_post_tx_delay_test.dart
 
+      # 操作证书查询：三张表字段各不相同，解析写错只会表现成「查到了全空白」；
+      # 本地记录解析写错，表现成「徽章指向一个不是本人的呼号」。
+      - name: Test CRAC certificate lookup
+        run: flutter test test/crac_cert_test.dart
+
       # 外接 GPS（蓝牙 SPP / NMEA 0183）的解析与装配：度分换算、XOR 校验、
       # talker 不区分（GP/GN/BD）、状态位与质量位（V / 0 只能算 noFix 不能算失败）、
       # 多条语句合并成一条定位。这几件全是「编译能过、analyze 全绿」的纯逻辑，

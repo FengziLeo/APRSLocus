@@ -44,6 +44,7 @@ import 'group_chat.dart';
 import 'strategy_map.dart';
 import 'igate.dart';
 import 'consent.dart';
+import 'crac_cert.dart';
 import 'terms_version.dart';
 import 'tnc.dart';
 import 'translate.dart';
@@ -4273,6 +4274,33 @@ class AppState extends ChangeNotifier {
     'status',
   ];
 
+  /// 操作证书验证结果（JSON，见 [CracCertInfo]）。空串 = 没查过。
+  ///
+  /// 查询页（设置 → 高级 → 开发人员）查到就写这里，设置页的呼号旁据此
+  /// 挂徽章；徽章只对得上呼号时才挂。
+  String cracCertJson = '';
+
+  CracCertInfo? get cracCert => CracCertInfo.fromJson(cracCertJson);
+
+  /// 当前呼号去掉 SSID（`BG7LZQ-7` → `BG7LZQ`）。
+  String get myBaseCall => _baseCall(myCall);
+
+  /// 当前呼号对应的证书类别（`A`/`B`/`C`，空 = 没有验证或对不上号）——
+  /// 设置页那一枚徽章以它为准。
+  String get cracCertType {
+    final info = cracCert;
+    if (info == null || info.type.isEmpty) return '';
+    return info.call == myBaseCall ? info.type : '';
+  }
+
+  Future<void> setCracCert(CracCertInfo? info) async {
+    final next = info?.encode() ?? '';
+    if (next == cracCertJson) return;
+    cracCertJson = next;
+    await persist();
+    _notify();
+  }
+
   int maxStations = 100000; // 台站上限（默认无限制，可下调）
 
   /// 数据包列表上限（历史记录条数）。原先硬编码 200，偏少。
@@ -4559,6 +4587,7 @@ class AppState extends ChangeNotifier {
     applyFilterToMap = false;
     mapHiddenTypes.clear();
     stationSort = 'call';
+    cracCertJson = '';
     maxStations = 100000;
     maxPackets = 2000;
     onlineWindowMin = 5;
@@ -5121,6 +5150,7 @@ class AppState extends ChangeNotifier {
       if (savedSort != null && stationSorts.contains(savedSort)) {
         stationSort = savedSort;
       }
+      cracCertJson = p.getString('cracCertJson') ?? cracCertJson;
       maxStations = p.getInt('maxStations') ?? maxStations;
       maxPackets = p.getInt('maxPackets') ?? maxPackets;
       onlineWindowMin = p.getInt('onlineWindowMin') ?? onlineWindowMin;
@@ -5470,6 +5500,7 @@ class AppState extends ChangeNotifier {
     await p.setStringList(
         'mapHiddenTypes', mapHiddenTypes.map((g) => g.name).toList());
     await p.setString('stationSort', stationSort);
+    await p.setString('cracCertJson', cracCertJson);
     await p.setInt('maxStations', maxStations);
     await p.setInt('maxPackets', maxPackets);
     await p.setInt('onlineWindowMin', onlineWindowMin);

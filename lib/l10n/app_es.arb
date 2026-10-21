@@ -4336,5 +4336,6 @@
   "cracCertClearDone": "Certificado borrado",
   "devLockTitle": "Código de desarrollador",
   "devLockTip": "Bloqueado. Mantén pulsado e introduce el código.",
-  "devLockWrong": "Código incorrecto"
+  "devLockWrong": "Código incorrecto",
+  "cracCertVerified": "Verificado"
 }

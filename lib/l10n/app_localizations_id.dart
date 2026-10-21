@@ -10010,4 +10010,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get devLockWrong => "Kode salah";
 
+  @override
+  String get cracCertVerified => "Terverifikasi";
+
 }

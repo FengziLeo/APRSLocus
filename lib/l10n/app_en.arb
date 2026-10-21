@@ -4336,5 +4336,6 @@
   "cracCertClearDone": "Certificate cleared",
   "devLockTitle": "Developer code",
   "devLockTip": "Locked. Long-press and enter the code.",
-  "devLockWrong": "Wrong code"
+  "devLockWrong": "Wrong code",
+  "cracCertVerified": "Verified"
 }

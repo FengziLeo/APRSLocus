@@ -4924,5 +4924,6 @@
   "cracCertClearDone": "已清除認證資訊",
   "devLockTitle": "開發人員密碼",
   "devLockTip": "已鎖定，長按輸入密碼",
-  "devLockWrong": "密碼不對"
+  "devLockWrong": "密碼不對",
+  "cracCertVerified": "已認證"
 }

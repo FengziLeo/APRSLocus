@@ -98,4 +98,18 @@ void main() {
     expect(CracCertInfo.fromJson('{"name": "没有呼号"}'), isNull,
         reason: '没有呼号的记录不能挂到任何呼号上');
   });
+
+  test('设置页那一小块：姓名与证书编号都打码', () {
+    // 姓名只留第一个字
+    expect(maskCracName('董俊志'), '董**');
+    expect(maskCracName('张三'), '张*');
+    expect(maskCracName('李'), '李');
+    expect(maskCracName('  '), '');
+    // 证书编号前后各留几位，中间一律星号；长度不同留的位数不同
+    expect(maskCracCertNo('A4500000570'), 'A450***0570');
+    expect(maskCracCertNo('12345678'), '12****78');
+    expect(maskCracCertNo('123456'), '12**56');
+    expect(maskCracCertNo('1234'), '1***');
+    expect(maskCracCertNo(''), '');
+  });
 }

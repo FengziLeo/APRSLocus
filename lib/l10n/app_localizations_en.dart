@@ -10000,4 +10000,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get devLockWrong => "Wrong code";
 
+  @override
+  String get cracCertVerified => "Verified";
+
 }

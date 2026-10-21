@@ -17601,6 +17601,12 @@ abstract class AppLocalizations {
   /// **'口令不对'**
   String get devLockWrong;
 
+  /// No description provided for @cracCertVerified.
+  ///
+  /// In zh, this message translates to:
+  /// **'已认证'**
+  String get cracCertVerified;
+
 }
 
 class _AppLocalizationsDelegate

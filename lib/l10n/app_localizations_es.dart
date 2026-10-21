@@ -10059,4 +10059,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get devLockWrong => "Código incorrecto";
 
+  @override
+  String get cracCertVerified => "Verificado";
+
 }

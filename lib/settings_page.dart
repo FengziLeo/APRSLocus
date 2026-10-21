@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart'
 import 'package:url_launcher/url_launcher.dart';
 
 import 'feature_page.dart';
+import 'crac_cert.dart';
 import 'manual_page.dart';
 import 'features.dart';
 import 'notice.dart';
@@ -90,6 +91,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   margin: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 20),
+                // 操作证书那一小块：已认证 + 类别，姓名与证书编号打码
+                _certChip(),
                 // 连接状态横幅
                 _connBanner(),
                 SizedBox(height: 16),
@@ -567,6 +570,56 @@ class _SettingsPageState extends State<SettingsPage> {
             SizedBox(width: 6),
             Icon(Icons.chevron_right_rounded, color: C.grey, size: 18),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// 操作证书的小框：连接状态条上方一行，内容是「已认证 + 类别」
+  /// 加上打码的姓名与证书编号。
+  ///
+  /// 为什么要打码：这一页很容易被截图发出去，姓名与证书编号只留头尾。
+  /// 没有记录、或记录不是当前呼号的，整块不出现。
+  Widget _certChip() {
+    final info = st.cracCert;
+    if (info == null || info.call != st.myBaseCall) {
+      return const SizedBox.shrink();
+    }
+    final s = S.of(context);
+    final maskedName = maskCracName(info.name);
+    final maskedNo = maskCracCertNo(info.certNo);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: C.greenBg,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: C.green.withValues(alpha: 0.35)),
+          ),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 2,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.verified_rounded, size: 13, color: C.green),
+                const SizedBox(width: 4),
+                Text(
+                  info.typeLabel.isEmpty
+                      ? s.cracCertVerified
+                      : '${s.cracCertVerified} · ${info.typeLabel}',
+                  style: ts(11, c: C.green, w: FontWeight.w700),
+                ),
+              ]),
+              if (maskedName.isNotEmpty)
+                Text(maskedName, style: ts(10, c: C.slate)),
+              if (maskedNo.isNotEmpty)
+                Text(maskedNo, style: ts(10, c: C.slate)),
+            ],
+          ),
         ),
       ),
     );

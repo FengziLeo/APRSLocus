@@ -4336,5 +4336,6 @@
   "cracCertClearDone": "証明書を削除しました",
   "devLockTitle": "開発者用の合言葉",
   "devLockTip": "ロック中。長押しで合言葉を入力",
-  "devLockWrong": "合言葉が違います"
+  "devLockWrong": "合言葉が違います",
+  "cracCertVerified": "確認済み"
 }

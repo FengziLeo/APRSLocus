@@ -147,6 +147,28 @@ class CracCertInfo {
   }
 }
 
+/// 把姓名打码：留第一个字，其余每个字换成 `*`。
+///
+/// 设置页那一小块「已认证」要在别人看得见的地方出现（截图、给别人看屏幕），
+/// 姓名与证书编号都只留一点点，够认就行。
+String maskCracName(String name) {
+  final t = name.trim();
+  if (t.isEmpty) return '';
+  if (t.length == 1) return t;
+  return t[0] + '*' * (t.length - 1);
+}
+
+/// 把证书编号打码：长度够就前后各留几位，中间一律 `*`。
+String maskCracCertNo(String no) {
+  final t = no.trim();
+  if (t.isEmpty) return '';
+  if (t.length <= 4) return t[0] + '*' * (t.length - 1);
+  if (t.length <= 8) {
+    return t.substring(0, 2) + '*' * (t.length - 4) + t.substring(t.length - 2);
+  }
+  return t.substring(0, 4) + '*' * (t.length - 8) + t.substring(t.length - 4);
+}
+
 /// 一次查询的结果。
 class CracCertResult {
   const CracCertResult({

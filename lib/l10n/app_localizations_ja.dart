@@ -9721,4 +9721,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get devLockWrong => "合言葉が違います";
 
+  @override
+  String get cracCertVerified => "確認済み";
+
 }

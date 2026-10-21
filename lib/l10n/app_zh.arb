@@ -5015,5 +5015,6 @@
   "cracCertClearDone": "已清除认证信息",
   "devLockTitle": "开发人员口令",
   "devLockTip": "已锁定，长按输口令",
-  "devLockWrong": "口令不对"
+  "devLockWrong": "口令不对",
+  "cracCertVerified": "已认证"
 }

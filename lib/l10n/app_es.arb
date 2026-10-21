@@ -4309,7 +4309,7 @@
   "cracCertName": "Nombre",
   "cracCertNumber": "N.º de certificado",
   "cracCertId": "N.º de identidad",
-  "cracCertPrivacy": "El nombre y el número de certificado que escribes van a este servicio. El resultado se queda en este dispositivo. No se pide documento de identidad y no se puede usar.",
+  "cracCertPrivacy": "El nombre y el número de certificado se usan solo para esta consulta. Ni el servidor ni la aplicación los recogen, y el resultado queda en este dispositivo.",
   "cracCertQuery": "Consultar",
   "cracCertQuerying": "Consultando…",
   "cracCertResult": "Resultado",
@@ -4328,5 +4328,10 @@
   "cracCertBadge": "Licencia clase {type}",
   "@cracCertSaved": {"placeholders": {"call": {"type": "String"}}},
   "@cracCertOtherCall": {"placeholders": {"call": {"type": "String"}}},
-  "@cracCertBadge": {"placeholders": {"type": {"type": "String"}}}
+  "@cracCertBadge": {"placeholders": {"type": {"type": "String"}}},
+  "cracCertInfo": "Certificado",
+  "cracCertChecked": "Consulta",
+  "cracCertClear": "Borrar certificado",
+  "cracCertClearAsk": "Esta página dejará de mostrar el certificado. Puedes consultarlo otra vez cuando quieras.",
+  "cracCertClearDone": "Certificado borrado"
 }

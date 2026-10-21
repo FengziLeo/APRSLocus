@@ -4309,7 +4309,7 @@
   "cracCertName": "Nama",
   "cracCertNumber": "No. sertifikat",
   "cracCertId": "Nomor identitas",
-  "cracCertPrivacy": "Nama dan nomor sertifikat yang Anda isi dikirim ke layanan ini. Hasilnya tetap di perangkat ini. Nomor identitas tidak diminta dan tidak bisa dipakai.",
+  "cracCertPrivacy": "Nama dan nomor sertifikat hanya dipakai untuk pengecekan ini. Server maupun aplikasi tidak mengumpulkannya, dan hasilnya tetap di perangkat ini.",
   "cracCertQuery": "Cek",
   "cracCertQuerying": "Memeriksa…",
   "cracCertResult": "Hasil",
@@ -4328,5 +4328,10 @@
   "cracCertBadge": "Lisensi kelas {type}",
   "@cracCertSaved": {"placeholders": {"call": {"type": "String"}}},
   "@cracCertOtherCall": {"placeholders": {"call": {"type": "String"}}},
-  "@cracCertBadge": {"placeholders": {"type": {"type": "String"}}}
+  "@cracCertBadge": {"placeholders": {"type": {"type": "String"}}},
+  "cracCertInfo": "Sertifikat",
+  "cracCertChecked": "Waktu cek",
+  "cracCertClear": "Hapus sertifikat",
+  "cracCertClearAsk": "Halaman ini berhenti menampilkan sertifikat. Kamu bisa cek lagi kapan saja.",
+  "cracCertClearDone": "Sertifikat dihapus"
 }

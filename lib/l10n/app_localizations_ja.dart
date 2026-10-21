@@ -9647,7 +9647,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cracCertId => "身分証明書 ID";
 
   @override
-  String get cracCertPrivacy => "入力した氏名と免許番号はこの照会窓口に送られます。結果は本機にだけ残ります。身分証明書の番号は求めず、その方法も用意していません。";
+  String get cracCertPrivacy => "氏名と証明書番号はこの照会の確認にだけ使います。サーバーもアプリも収集しません。結果は本機にだけ残ります。";
 
   @override
   String get cracCertQuery => "照会";
@@ -9696,5 +9696,20 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String cracCertBadge(String type) => "$type 級免許";
+
+  @override
+  String get cracCertInfo => "証明書";
+
+  @override
+  String get cracCertChecked => "照会日時";
+
+  @override
+  String get cracCertClear => "証明書を削除";
+
+  @override
+  String get cracCertClearAsk => "削除するとこのページの証明書表示が消えます。いつでも照会し直せます。";
+
+  @override
+  String get cracCertClearDone => "証明書を削除しました";
 
 }

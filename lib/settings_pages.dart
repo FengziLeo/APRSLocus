@@ -345,7 +345,7 @@ class _StationIdentityCardState extends State<StationIdentityCard> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: C.border, width: 0.4))),
-        // 右端这一簇（SSID / 完整呼号 / 两个徽章 / 箭头）在窄屏上可能超宽：
+        // 右端这一簇（SSID / 完整呼号 / 徽章 / 箭头）在窄屏上可能超宽：
         // 左边标签让位（Flexible 1 : 3），整簇再用 FittedBox 缩一点，
         // 不会溢出，也不会把徽章挤成省略号。
         child: Row(children: [
@@ -372,11 +372,6 @@ class _StationIdentityCardState extends State<StationIdentityCard> {
                 Text('· ${st.myFullCall}', style: ts(10, c: C.grey)),
                 SizedBox(width: 6),
                 HonorBadge(st.myFullCall, symbol: st.mySymbol),
-                // 操作证书徽章：只在查到的证书记录对得上当前呼号时才在。
-                if (st.cracCertType.isNotEmpty) ...[
-                  SizedBox(width: 4),
-                  CracCertBadge(st.cracCertType),
-                ],
                 SizedBox(width: 4),
                 Icon(Icons.chevron_right_rounded, size: 18, color: C.grey),
               ]),
@@ -535,6 +530,7 @@ class _StationSettingsPageState extends State<StationSettingsPage> {
         color: C.blue,
         body: Column(children: [
           StationIdentityCard(state: st),
+          _certCard(),
           SizedBox(height: 16),
           SettingsSectionCard(
             title: S.of(context).displayInfo,
@@ -550,6 +546,74 @@ class _StationSettingsPageState extends State<StationSettingsPage> {
         ]),
       ),
     );
+  }
+
+  /// 认证信息：本机存着的那条操作证书记录（由 [CracCertPage] 写入）。
+  ///
+  /// 只在查到过记录时出现 —— 没查过就整块不占位置。清除也放在这里，
+  /// 记录是在哪块显示的，撤销就在哪块做。
+  Widget _certCard() {
+    final info = st.cracCert;
+    if (info == null) return const SizedBox.shrink();
+    final s = S.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: SettingsSectionCard(
+        title: s.cracCertInfo,
+        icon: Icons.verified_user_rounded,
+        color: C.green,
+        children: [
+          if (info.typeLabel.isNotEmpty)
+            SettingsRow2(s.cracCertType, info.typeLabel),
+          SettingsRow2(s.cracCertCall, info.call),
+          if (info.certNo.isNotEmpty)
+            SettingsRow2(s.cracCertNumber, info.certNo),
+          if (info.at.isNotEmpty) SettingsRow2(s.cracCertChecked, info.at),
+          InkWell(
+            onTap: _clearCert,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(children: [
+                Icon(Icons.delete_outline_rounded, size: 16, color: C.red),
+                const SizedBox(width: 8),
+                Text(s.cracCertClear,
+                    style: ts(12, c: C.red, w: FontWeight.w600)),
+              ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 清除本机存的证书记录。要用户点一次确认，清掉之后可以重新查。
+  Future<void> _clearCert() async {
+    final s = S.of(context);
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(s.cracCertClear, style: ts(15, w: FontWeight.w700)),
+        content: Text(s.cracCertClearAsk, style: ts(12, c: C.slate)),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(s.cancel, style: ts(13, c: C.slate))),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(s.clear,
+                  style: ts(13, c: C.red, w: FontWeight.w700))),
+        ],
+      ),
+    );
+    if (yes != true || !mounted) return;
+    st.setCracCert(null);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(s.cracCertClearDone),
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: C.ink,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    ));
   }
 
   Widget _symbolPicker() {
@@ -5076,8 +5140,8 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
               ),
             ),
             Divider(height: 1, color: C.border),
-            // 开发人员自测：操作证书查询。查到就把呼号与证书类别记在本机，
-            // 上面呼号旁那枚徽章才有东西可显示。
+            // 开发人员自测：操作证书查询。查到就把记录记在本机，
+            // 电台页的「认证信息」那块才有东西可显示。
             SettingsNavRow(
               title: S.of(context).cracCertTitle,
               icon: Icons.verified_user_rounded,

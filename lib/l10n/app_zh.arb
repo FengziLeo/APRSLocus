@@ -4988,7 +4988,7 @@
   "cracCertName": "姓名",
   "cracCertNumber": "证书编号",
   "cracCertId": "身份证件 ID",
-  "cracCertPrivacy": "姓名与证书编号会发到这个查询接口，结果只留在本机。证件号不用填，也不提供那种查法。",
+  "cracCertPrivacy": "姓名和证书编号只用于这次查询验证。服务器不收集，软件也不收集，结果只留在本机。",
   "cracCertQuery": "查询",
   "cracCertQuerying": "查询中…",
   "cracCertResult": "查询结果",
@@ -5007,5 +5007,10 @@
   "cracCertBadge": "{type} 类操作证",
   "@cracCertSaved": {"placeholders": {"call": {"type": "String"}}},
   "@cracCertOtherCall": {"placeholders": {"call": {"type": "String"}}},
-  "@cracCertBadge": {"placeholders": {"type": {"type": "String"}}}
+  "@cracCertBadge": {"placeholders": {"type": {"type": "String"}}},
+  "cracCertInfo": "认证信息",
+  "cracCertChecked": "查询时间",
+  "cracCertClear": "清除认证信息",
+  "cracCertClearAsk": "清除后这一页不再显示认证信息，可以重新查。",
+  "cracCertClearDone": "已清除认证信息"
 }

@@ -17553,6 +17553,36 @@ abstract class AppLocalizations {
   /// **'{type} 类操作证'**
   String cracCertBadge(String type);
 
+  /// No description provided for @cracCertInfo.
+  ///
+  /// In zh, this message translates to:
+  /// **'认证信息'**
+  String get cracCertInfo;
+
+  /// No description provided for @cracCertChecked.
+  ///
+  /// In zh, this message translates to:
+  /// **'查询时间'**
+  String get cracCertChecked;
+
+  /// No description provided for @cracCertClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除认证信息'**
+  String get cracCertClear;
+
+  /// No description provided for @cracCertClearAsk.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除后这一页不再显示认证信息，可以重新查。'**
+  String get cracCertClearAsk;
+
+  /// No description provided for @cracCertClearDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'已清除认证信息'**
+  String get cracCertClearDone;
+
 }
 
 class _AppLocalizationsDelegate

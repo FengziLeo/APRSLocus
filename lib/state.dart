@@ -4277,22 +4277,14 @@ class AppState extends ChangeNotifier {
 
   /// 操作证书验证结果（JSON，见 [CracCertInfo]）。空串 = 没查过。
   ///
-  /// 查询页（设置 → 高级 → 开发人员）查到就写这里，设置页的呼号旁据此
-  /// 挂徽章；徽章只对得上呼号时才挂。
+  /// 查询页（设置 → 高级 → 开发人员）查到就写这里，电台页的「认证信息」
+  /// 那块从它取数；清除也清这里。
   String cracCertJson = '';
 
   CracCertInfo? get cracCert => CracCertInfo.fromJson(cracCertJson);
 
   /// 当前呼号去掉 SSID（`BG7LZQ-7` → `BG7LZQ`）。
   String get myBaseCall => _baseCall(myCall);
-
-  /// 当前呼号对应的证书类别（`A`/`B`/`C`，空 = 没有验证或对不上号）——
-  /// 设置页那一枚徽章以它为准。
-  String get cracCertType {
-    final info = cracCert;
-    if (info == null || info.type.isEmpty) return '';
-    return info.call == myBaseCall ? info.type : '';
-  }
 
   void setCracCert(CracCertInfo? info) {
     final next = info?.encode() ?? '';

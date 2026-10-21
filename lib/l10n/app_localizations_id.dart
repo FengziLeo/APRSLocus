@@ -9936,7 +9936,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get cracCertId => "Nomor identitas";
 
   @override
-  String get cracCertPrivacy => "Nama dan nomor sertifikat yang Anda isi dikirim ke layanan ini. Hasilnya tetap di perangkat ini. Nomor identitas tidak diminta dan tidak bisa dipakai.";
+  String get cracCertPrivacy => "Nama dan nomor sertifikat hanya dipakai untuk pengecekan ini. Server maupun aplikasi tidak mengumpulkannya, dan hasilnya tetap di perangkat ini.";
 
   @override
   String get cracCertQuery => "Cek";
@@ -9985,5 +9985,20 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String cracCertBadge(String type) => "Lisensi kelas $type";
+
+  @override
+  String get cracCertInfo => "Sertifikat";
+
+  @override
+  String get cracCertChecked => "Waktu cek";
+
+  @override
+  String get cracCertClear => "Hapus sertifikat";
+
+  @override
+  String get cracCertClearAsk => "Halaman ini berhenti menampilkan sertifikat. Kamu bisa cek lagi kapan saja.";
+
+  @override
+  String get cracCertClearDone => "Sertifikat dihapus";
 
 }

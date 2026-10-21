@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /// 操作证书查询页（设置 → 高级 → 开发人员）。
 ///
-/// 查到了就把「呼号 + 证书类别」记在本机，设置页的呼号旁会挂一枚徽章
-/// （见 `StationIdentityCard` 的 `_ssidRow`）。查不到、网络不通都只在那行
-/// 结果里说，不改动任何已有记录 —— 一次失败的查询不该把已验过的徽章抹掉。
+/// 查到了就把「呼号 + 证书类别」记在本机，电台页的「认证信息」那块
+/// 显示的就是这条记录（见 `_StationSettingsPageState._certCard`）。
+/// 查不到、网络不通都只在那行结果里说，不改动任何已有记录 ——
+/// 一次失败的查询不该把已验过的记录抹掉。
 library;
 
 import 'package:flutter/material.dart';

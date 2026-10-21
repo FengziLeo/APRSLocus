@@ -485,33 +485,6 @@ class SettingsMiniSwitch extends StatelessWidget {
 /// 用 [LabelValueRow] 而不是 `Text + Spacer + Text`：后者的两端都是**自然宽**，
 /// 一旦值是长的用户数据（设备名如 `Serial /dev/ttyUSB0 @38400`、蓝牙 MAC、
 /// 呼号、`host:port`）就整行溢出（黄黑斜纹）—— 这正是「设备名称会溢出」的原因。
-/// 操作证书那枚徽章（设置页呼号旁）。
-///
-/// 只在查到的证书记录对得上当前呼号时才挂（见 `AppState.cracCertType`）；
-/// 换呼号或换人就自动不挂 —— 一枚挂在错呼号上的证书比不挂更糟。
-class CracCertBadge extends StatelessWidget {
-  final String type;
-  const CracCertBadge(this.type, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: C.green.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: C.green.withValues(alpha: 0.55)),
-      ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.verified_rounded, size: 12, color: C.green),
-        const SizedBox(width: 3),
-        Text(S.of(context).cracCertBadge(type),
-            style: ts(10, c: C.green, w: FontWeight.w700)),
-      ]),
-    );
-  }
-}
-
 class SettingsRow2 extends StatelessWidget {
   final String label, value;
   final Color? valueColor;

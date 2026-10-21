@@ -9547,7 +9547,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cracCertId => "身份证件 ID";
 
   @override
-  String get cracCertPrivacy => "姓名与证书编号会发到这个查询接口，结果只留在本机。证件号不用填，也不提供那种查法。";
+  String get cracCertPrivacy => "姓名和证书编号只用于这次查询验证。服务器不收集，软件也不收集，结果只留在本机。";
 
   @override
   String get cracCertQuery => "查询";
@@ -9596,6 +9596,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String cracCertBadge(String type) => "$type 类操作证";
+
+  @override
+  String get cracCertInfo => "认证信息";
+
+  @override
+  String get cracCertChecked => "查询时间";
+
+  @override
+  String get cracCertClear => "清除认证信息";
+
+  @override
+  String get cracCertClearAsk => "清除后这一页不再显示认证信息，可以重新查。";
+
+  @override
+  String get cracCertClearDone => "已清除认证信息";
 
 }
 
@@ -19141,7 +19156,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get cracCertId => "身分證件 ID";
 
   @override
-  String get cracCertPrivacy => "姓名與證書編號會發到這個查詢介面，結果只留在本機。證件號不用填，也不提供那種查法。";
+  String get cracCertPrivacy => "姓名和證書編號只用於這次查詢驗證。伺服器不收集，軟體也不收集，結果只留在本機。";
 
   @override
   String get cracCertQuery => "查詢";
@@ -19190,5 +19205,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String cracCertBadge(String type) => "$type 類操作證";
+
+  @override
+  String get cracCertInfo => "認證資訊";
+
+  @override
+  String get cracCertChecked => "查詢時間";
+
+  @override
+  String get cracCertClear => "清除認證資訊";
+
+  @override
+  String get cracCertClearAsk => "清除後這一頁不再顯示認證資訊，可以重新查。";
+
+  @override
+  String get cracCertClearDone => "已清除認證資訊";
 
 }

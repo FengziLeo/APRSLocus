@@ -4309,7 +4309,7 @@
   "cracCertName": "氏名",
   "cracCertNumber": "免許番号",
   "cracCertId": "身分証明書 ID",
-  "cracCertPrivacy": "入力した氏名と免許番号はこの照会窓口に送られます。結果は本機にだけ残ります。身分証明書の番号は求めず、その方法も用意していません。",
+  "cracCertPrivacy": "氏名と証明書番号はこの照会の確認にだけ使います。サーバーもアプリも収集しません。結果は本機にだけ残ります。",
   "cracCertQuery": "照会",
   "cracCertQuerying": "照会中…",
   "cracCertResult": "照会結果",
@@ -4328,5 +4328,10 @@
   "cracCertBadge": "{type} 級免許",
   "@cracCertSaved": {"placeholders": {"call": {"type": "String"}}},
   "@cracCertOtherCall": {"placeholders": {"call": {"type": "String"}}},
-  "@cracCertBadge": {"placeholders": {"type": {"type": "String"}}}
+  "@cracCertBadge": {"placeholders": {"type": {"type": "String"}}},
+  "cracCertInfo": "証明書",
+  "cracCertChecked": "照会日時",
+  "cracCertClear": "証明書を削除",
+  "cracCertClearAsk": "削除するとこのページの証明書表示が消えます。いつでも照会し直せます。",
+  "cracCertClearDone": "証明書を削除しました"
 }

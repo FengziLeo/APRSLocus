@@ -9985,7 +9985,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get cracCertId => "N.º de identidad";
 
   @override
-  String get cracCertPrivacy => "El nombre y el número de certificado que escribes van a este servicio. El resultado se queda en este dispositivo. No se pide documento de identidad y no se puede usar.";
+  String get cracCertPrivacy => "El nombre y el número de certificado se usan solo para esta consulta. Ni el servidor ni la aplicación los recogen, y el resultado queda en este dispositivo.";
 
   @override
   String get cracCertQuery => "Consultar";
@@ -10034,5 +10034,20 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String cracCertBadge(String type) => "Licencia clase $type";
+
+  @override
+  String get cracCertInfo => "Certificado";
+
+  @override
+  String get cracCertChecked => "Consulta";
+
+  @override
+  String get cracCertClear => "Borrar certificado";
+
+  @override
+  String get cracCertClearAsk => "Esta página dejará de mostrar el certificado. Puedes consultarlo otra vez cuando quieras.";
+
+  @override
+  String get cracCertClearDone => "Certificado borrado";
 
 }

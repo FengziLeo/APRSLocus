@@ -26,13 +26,12 @@ struct APRSLocusLiveActivity: Widget {
     } dynamicIsland: { context in
       DynamicIsland {
         DynamicIslandExpandedRegion(.leading) {
-          Label {
+          HStack(spacing: 3) {
+            Image(systemName: "dot.radiowaves.left.and.right")
+              .font(.caption2)
             Text(context.state.call.isEmpty ? "APRSLocus" : context.state.call)
               .font(.caption2.weight(.semibold))
               .lineLimit(1)
-          } icon: {
-            Image(systemName: "dot.radiowaves.left.and.right")
-              .font(.caption2)
           }
           .foregroundStyle(.secondary)
         }

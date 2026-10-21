@@ -4294,11 +4294,11 @@ class AppState extends ChangeNotifier {
     return info.call == myBaseCall ? info.type : '';
   }
 
-  Future<void> setCracCert(CracCertInfo? info) async {
+  void setCracCert(CracCertInfo? info) {
     final next = info?.encode() ?? '';
     if (next == cracCertJson) return;
     cracCertJson = next;
-    await persist();
+    persist();
     _notify();
   }
 

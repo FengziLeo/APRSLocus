@@ -81,7 +81,7 @@ class _CracCertPageState extends State<CracCertPage> {
       return;
     }
     if (call.isEmpty) return;
-    await st.setCracCert(CracCertInfo(
+    st.setCracCert(CracCertInfo(
       call: call,
       name: rec.name,
       type: rec.type,

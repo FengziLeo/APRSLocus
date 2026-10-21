@@ -31,6 +31,29 @@ from manual_bodies import BODIES                        # noqa: E402
 from manual_bodies2 import BODIES as BODIES2, SETTINGS_INTRO   # noqa: E402
 import extract_settings as ES                           # noqa: E402
 
+# 代码里的 SettingsHint 被精简后，说明列会大面积空掉。这里从已发布过的说明
+# （tool/manual_desc.json，由 .scratch/manual_desc_extract.py 从上一版三语页抽出）
+# 把空格补回来，只在代码没给说明时用，不覆盖新文案。
+try:
+    DESC = json.load(io.open(os.path.join(ROOT, 'tool', 'manual_desc.json'),
+                             encoding='utf-8'))
+except (IOError, ValueError):
+    DESC = {}
+
+
+def desc_fallback(lang, row, kind=''):
+    """表格说明为空时回查旧文案；返回的已经是 HTML 片段，不再转义。
+
+    按字段名回查是安全的（字段在整个应用里唯一）；按标签只在总览那两行用，
+    别处的同名标签（「连接」既是分组卡也是链路状态）会串错内容。
+    """
+    table = DESC.get(lang) or {}
+    if row.get('field') and table.get(row['field']):
+        return table[row['field']]
+    if not kind.startswith('hub_'):
+        return ''
+    return table.get('lbl:' + strip_tags(row.get('label') or ''), '')
+
 BODIES.update(BODIES2)
 
 SITE = 'https://aprslocus.theez.top'
@@ -95,6 +118,7 @@ KIND = {
     'SettingsRow2':    T('只读状态', '唯讀狀態', 'Read-only'),
     'SettingsNavRow':  T('入口', '入口', 'Entry'),
     '_custom':         T('选项卡', '選項卡', 'Choice card'),
+    '_field':          T('输入框', '輸入框', 'Text input'),
     '_action':         T('按钮', '按鈕', 'Button'),
     'hub_cat':         T('分组卡', '分組卡', 'Category card'),
     'hub_entry':       T('直达入口', '直達入口', 'Direct entry'),
@@ -236,7 +260,7 @@ def build_settings(lang):
             if not sec['title'] and not rows and not sec['note']:
                 continue
             parts.append('      <div class="m-sub">')
-            if sec['title']:
+            if sec['title'] and sec['title'] != title:
                 parts.append('        <h4>%s</h4>' % esc(sec['title']))
             if sec['subtitle']:
                 parts.append('        <p class="m-grp-sub">%s</p>' % md_inline(esc(sec['subtitle'])))
@@ -254,7 +278,7 @@ def build_settings(lang):
                     kind = KIND.get(r['kind'], T('控件', '控件', 'Control'))[lang]
                     # 默认值：只有可编辑控件才显示（状态/计数显示默认值会误导）
                     editable = r['kind'] in ('SettingsInput', 'SettingsSwitch',
-                                             'SettingsMiniSwitch', '_custom')
+                                             'SettingsMiniSwitch', '_custom', '_field')
                     d = NO_DEFAULT[lang]
                     if editable and r['field']:
                         dv = r['default']
@@ -272,11 +296,16 @@ def build_settings(lang):
                             ' · '.join(md_inline(esc(o)) for o in r['opts'])
                     desc = ' / '.join(x for x in (r['tip'] or r['hint'] or '',
                                                   r['sub'], *r['subsub']) if x)
+                    old = '' if desc else desc_fallback(lang, r, r['kind'])
+                    if old:
+                        desc = old            # 旧文案已是 HTML，直接拼进表格
+                    else:
+                        desc = md_inline(esc(desc))
                     fld = '<code class="m-field">%s</code>' % esc(r['field']) if r['field'] and editable else ''
                     parts.append(
                         '<tr><td><b>%s</b>%s</td><td><span class="m-kind">%s</span></td>'
                         '<td class="m-def">%s</td><td>%s</td></tr>'
-                        % (label, (' ' + fld) if fld else '', kind, d, md_inline(esc(desc))))
+                        % (label, (' ' + fld) if fld else '', kind, d, desc))
                 parts.append('</tbody></table></div>')
             parts.append('      </div>')
         secs.append(dict(id=sid, title=title, html='\n'.join(parts)))
@@ -316,7 +345,7 @@ def render_head(lang, file, title, desc, anchors):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title}</title>
 <meta name="description" content="{desc}">
-<meta name="theme-color" content="#f3f6fd">
+<meta name="theme-color" content="#0a0e12">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="APRSlocus">
 <meta property="og:title" content="{title}">
@@ -333,15 +362,14 @@ def render_head(lang, file, title, desc, anchors):
 <link rel="stylesheet" href="{asset}css/style.css?v=8">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <script>
-/* 主题：localStorage 优先，否则跟随系统；首帧前执行防闪白 */
+/* 主题：localStorage 优先，没存过就用深色（本站默认皮肤 = 深空黑）；首帧前执行防闪底 */
 (function () {{
   try {{
     var t = localStorage.getItem('theme');
-    if (t !== 'dark' && t !== 'light')
-      t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (t !== 'dark' && t !== 'light') t = 'dark';
     document.documentElement.setAttribute('data-theme', t);
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', t === 'dark' ? '#0b1220' : '#f3f6fd');
+    if (m) m.setAttribute('content', t === 'dark' ? '#0a0e12' : '#f4f7fc');
   }} catch (e) {{}}
 }})();
 </script>
@@ -498,7 +526,7 @@ def render_page(lang, file, idx, title, lead, body_html, related, anchors):
   <svg class="backtop-arrow" viewBox="0 0 24 24"><path d="M12 5l7 7-1.4 1.4L13 8.8V20h-2V8.8l-4.6 4.6L5 12l7-7z"/></svg>
 </a>
 
-<script src="{asset}js/main.js"></script>
+<script src="{asset}js/main.js?v=8"></script>
 <script>
 /* 手册页专属：小节搜索 + 侧栏 scrollspy（无 JS 时正文照常可读） */
 (function () {{

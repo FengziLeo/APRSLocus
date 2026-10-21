@@ -10,15 +10,15 @@ from manual_content import T
 # ── 设置参考页：每个分组的三语导语（表格外的「怎么用」提示） ──
 SETTINGS_INTRO = {
     '设置': T(
-        '设置页顶部是 <b>8 张分组卡</b>（点进去是子页面），下面还有 6 个直达入口。'
-        '本页把每个子页里的设置项逐条列出：名称、控件、默认值、说明 —— 默认值直接取自代码，'
+        '设置页顶部是 <b>8 张分组卡</b>（点进去是子页面），下面还有 11 个直达入口。'
+        '本页把每个子页里的设置项逐条列出：名称、控件、默认值、说明。默认值直接取自代码，'
         '改了代码重新生成即对齐。',
-        '設定頁頂部是 <b>8 張分組卡</b>（點進去是子頁面），下面還有 6 個直達入口。'
-        '本頁把每個子頁裡的設定項逐條列出：名稱、控件、預設值、說明 —— 預設值直接取自程式碼，'
+        '設定頁頂部是 <b>8 張分組卡</b>（點進去是子頁面），下面還有 11 個直達入口。'
+        '本頁把每個子頁裡的設定項逐條列出：名稱、控件、預設值、說明。預設值直接取自程式碼，'
         '改了程式碼重新產生即對齊。',
         'The Settings page opens with <b>eight category cards</b> (each leading to its own page) '
-        'plus six direct entries. Below, every setting is listed: name, control, default, meaning — '
-        'defaults are read from the code, so regenerating keeps them honest.'),
+        'plus eleven direct entries. Below, every setting is listed: name, control, default, meaning. '
+        'Defaults are read from the code, so regenerating keeps them honest.'),
     '电台': T(
         '身份是所有报文的根：呼号必须与你的执照一致，SSID 决定台站类型（-9 车载、-7 手持常见）。',
         '身份是所有封包的根：呼號必須與你的執照一致，SSID 決定臺站類型（-9 車載、-7 手持常見）。',
@@ -31,13 +31,40 @@ SETTINGS_INTRO = {
         '報什麼（速度/方位角/電量可關）。',
         'Three decisions: what fixes you (GPS / network / manual), how often (60 s default, 5 s floor) '
         'and what travels in the frame (speed/course/battery can be switched off).'),
-    '连接': T(
-        'APRS-IS 服务器与 Passcode、数据来源多选、接收范围（默认 300 km）、数据上限。'
-        '改完点「保存并应用」才生效。',
-        'APRS-IS 伺服器與 Passcode、資料來源複選、接收範圍（預設 300 km）、資料上限。'
-        '改完點「儲存並套用」才生效。',
-        'APRS-IS server and Passcode, multi-select data sources, receive range (300 km default) and '
-        'data caps. Changes apply only with “Save &amp; apply”.'),
+    '服务器': T(
+        '两台服务器各有一张卡，点进去才是各自的地址与口令。这一页自己的设置是接收范围、'
+        '数据上限与呼号筛选，改完点「保存并应用」才生效。',
+        '兩台伺服器各有一張卡，點進去才是各自的位址與口令。這一頁自己的設定是接收範圍、'
+        '資料上限與呼號篩選，改完點「儲存並套用」才生效。',
+        'One card per server; the address and credentials live one level down. This page keeps the '
+        'receive range, the data caps and a callsign filter. Changes apply only with '
+        '“Save &amp; apply”.'),
+    'APRS-IS 服务器': T(
+        '一条 APRS-IS 链路：地址、端口、Passcode 与 WebSocket 地址。地址留空就连不上，软件不预置服务器。',
+        '一條 APRS-IS 鏈路：位址、連接埠、Passcode 與 WebSocket 位址。位址留空就連不上，軟體不預置伺服器。',
+        'One APRS-IS link: address, port, Passcode and an optional WebSocket URL. An empty address '
+        'connects nothing; no server is preset.'),
+    'APRSNETCN SERVER': T(
+        'APRSNETCN 与 APRS-IS 并列。地址和端口填这里，再填账号与 Passcode。'
+        '两台服务器可以同时在线，报文两边各收一份。',
+        'APRSNETCN 與 APRS-IS 並列。位址和連接埠填這裡，再填帳號與 Passcode。'
+        '兩台伺服器可以同時在線，封包兩邊各收一份。',
+        'APRSNETCN stands beside APRS-IS. Address and port go here, then the account and Passcode. '
+        'Both servers can be online at once and each brings its own copy of the traffic.'),
+    '外接 GPS': T(
+        '外接 GPS 是一台蓝牙 NMEA 模块。它在上报位置时优先，手机定位可以待机省电；'
+        '模块掉线会自动回到手机 GPS。',
+        '外接 GPS 是一台藍牙 NMEA 模組。它在上報位置時優先，手機定位可以待機省電；'
+        '模組掉線會自動回到手機 GPS。',
+        'An external GPS is a Bluetooth NMEA module. While it delivers fixes it takes priority and '
+        'the phone GPS stands by; if the module drops out the phone takes over again.'),
+    '功能': T(
+        '上半是精简模式，下半是模块开关。精简模式只换界面，你关过的模块原样保留；'
+        '关掉某个模块，它在设置里那个入口就不再出现。',
+        '上半是精簡模式，下半是模組開關。精簡模式只換介面，你關過的模組原樣保留；'
+        '關掉某個模組，它在設定裡那個入口就不再出現。',
+        'Lite mode on top, module switches below. Lite mode only changes the shell; modules you '
+        'switched off stay switched off. Turning a module off also removes its entry from Settings.'),
     '显示': T(
         '深色模式、天气组件、单位与网格在这里；地图类型与离线地图在地图菜单与对应子页。'
         '另有一个<b>公告横幅</b>开关（默认开）：横幅显示在主页／地图的顶部，'

@@ -619,8 +619,9 @@ def main():
         chk('settings defaults present',
             'class="m-field">port<' in s and '14580' in s)
     uniq = set(set_stats.values())
+    # 分组数不写死（同文件上面的教训）：守的是三语彼此一致 + 不能空页
     chk('settings tables aligned across languages',
-        len(uniq) == 1 and next(iter(uniq))[0] == 16 and next(iter(uniq))[1] >= 150,
+        len(uniq) == 1 and next(iter(uniq))[0] >= 16 and next(iter(uniq))[1] >= 150,
         str(set_stats))
     # 任务式素材：真实报文 + m-steps（且不得误用首页 .steps）
     s = read('docs/manual/start.html')

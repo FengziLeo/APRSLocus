@@ -133,12 +133,11 @@ The fault was ours. Sorry for the trouble.
 
 ---
 
-## 🔔 What is new: 2.1.27
+## 🔔 What is new: 2.1.28
 
-- Settings gained a "Features" page: leaderboard, honours, sponsors, life guard, translation, tracks, ADIF and weather each switch off on its own, and off only hides the entry.
-- Lite mode: one status line and four tabs, keeping only APRS sending and receiving.
-- Settings gained a manual entry that opens the official manual inside the app, following the system language.
-- The SSID field takes custom input: 1-2 digits or letters. Only our own APRSNETCN server accepts a letter suffix.
+- Sending over WLAN on an IC-705 often lost the end of a packet. The app now holds PTT for a while after the audio ends, 200 ms by default.
+- The IC-705 page has a new post-TX delay field that takes 0 to 2000.
+- The Dynamic Island and the lock screen show the current state on iPhone, with the callsign and the countdown to the next beacon. Needs iOS 16.2 or later.
 
 ---
 
@@ -156,9 +155,9 @@ Look up APALOC in the official TOCALL table and you will find it.
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-Checking for updates now returns the latest stable version, 2.1.27. If you installed 2.2.0, uninstall it first, then install 2.1.27.
+Checking for updates now returns the latest stable version, 2.1.28. If you installed 2.2.0, uninstall it first, then install 2.1.28.
 
-**[Download 2.1.27](https://github.com/dariondong/APRSLocus/releases/download/v2.1.27/APRSLocus_2.1.27.apk)**
+**[Download 2.1.28](https://github.com/dariondong/APRSLocus/releases/download/v2.1.28/APRSLocus_2.1.28.apk)**
 
 ---
 

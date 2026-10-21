@@ -9991,4 +9991,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get cracCertClearDone => "Certificate cleared";
 
+  @override
+  String get devLockTitle => "Developer code";
+
+  @override
+  String get devLockTip => "Locked. Long-press and enter the code.";
+
+  @override
+  String get devLockWrong => "Wrong code";
+
 }

@@ -10001,4 +10001,13 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get cracCertClearDone => "Sertifikat dihapus";
 
+  @override
+  String get devLockTitle => "Kode pengembang";
+
+  @override
+  String get devLockTip => "Terkunci. Tekan lama lalu masukkan kode.";
+
+  @override
+  String get devLockWrong => "Kode salah";
+
 }

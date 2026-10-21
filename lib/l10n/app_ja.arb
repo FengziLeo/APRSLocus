@@ -4333,5 +4333,8 @@
   "cracCertChecked": "照会日時",
   "cracCertClear": "証明書を削除",
   "cracCertClearAsk": "削除するとこのページの証明書表示が消えます。いつでも照会し直せます。",
-  "cracCertClearDone": "証明書を削除しました"
+  "cracCertClearDone": "証明書を削除しました",
+  "devLockTitle": "開発者用の合言葉",
+  "devLockTip": "ロック中。長押しで合言葉を入力",
+  "devLockWrong": "合言葉が違います"
 }

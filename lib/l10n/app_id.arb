@@ -4333,5 +4333,8 @@
   "cracCertChecked": "Waktu cek",
   "cracCertClear": "Hapus sertifikat",
   "cracCertClearAsk": "Halaman ini berhenti menampilkan sertifikat. Kamu bisa cek lagi kapan saja.",
-  "cracCertClearDone": "Sertifikat dihapus"
+  "cracCertClearDone": "Sertifikat dihapus",
+  "devLockTitle": "Kode pengembang",
+  "devLockTip": "Terkunci. Tekan lama lalu masukkan kode.",
+  "devLockWrong": "Kode salah"
 }

@@ -17583,6 +17583,24 @@ abstract class AppLocalizations {
   /// **'已清除认证信息'**
   String get cracCertClearDone;
 
+  /// No description provided for @devLockTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'开发人员口令'**
+  String get devLockTitle;
+
+  /// No description provided for @devLockTip.
+  ///
+  /// In zh, this message translates to:
+  /// **'已锁定，长按输口令'**
+  String get devLockTip;
+
+  /// No description provided for @devLockWrong.
+  ///
+  /// In zh, this message translates to:
+  /// **'口令不对'**
+  String get devLockWrong;
+
 }
 
 class _AppLocalizationsDelegate

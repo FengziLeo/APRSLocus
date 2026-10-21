@@ -10050,4 +10050,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get cracCertClearDone => "Certificado borrado";
 
+  @override
+  String get devLockTitle => "Código de desarrollador";
+
+  @override
+  String get devLockTip => "Bloqueado. Mantén pulsado e introduce el código.";
+
+  @override
+  String get devLockWrong => "Código incorrecto";
+
 }

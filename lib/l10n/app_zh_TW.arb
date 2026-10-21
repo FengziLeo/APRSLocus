@@ -4921,5 +4921,8 @@
   "cracCertChecked": "查詢時間",
   "cracCertClear": "清除認證資訊",
   "cracCertClearAsk": "清除後這一頁不再顯示認證資訊，可以重新查。",
-  "cracCertClearDone": "已清除認證資訊"
+  "cracCertClearDone": "已清除認證資訊",
+  "devLockTitle": "開發人員密碼",
+  "devLockTip": "已鎖定，長按輸入密碼",
+  "devLockWrong": "密碼不對"
 }

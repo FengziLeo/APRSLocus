@@ -4333,5 +4333,8 @@
   "cracCertChecked": "Consulta",
   "cracCertClear": "Borrar certificado",
   "cracCertClearAsk": "Esta página dejará de mostrar el certificado. Puedes consultarlo otra vez cuando quieras.",
-  "cracCertClearDone": "Certificado borrado"
+  "cracCertClearDone": "Certificado borrado",
+  "devLockTitle": "Código de desarrollador",
+  "devLockTip": "Bloqueado. Mantén pulsado e introduce el código.",
+  "devLockWrong": "Código incorrecto"
 }

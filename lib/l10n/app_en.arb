@@ -4333,5 +4333,8 @@
   "cracCertChecked": "Checked",
   "cracCertClear": "Clear certificate",
   "cracCertClearAsk": "This page will stop showing the certificate. You can look it up again any time.",
-  "cracCertClearDone": "Certificate cleared"
+  "cracCertClearDone": "Certificate cleared",
+  "devLockTitle": "Developer code",
+  "devLockTip": "Locked. Long-press and enter the code.",
+  "devLockWrong": "Wrong code"
 }

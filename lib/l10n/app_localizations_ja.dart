@@ -9712,4 +9712,13 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get cracCertClearDone => "証明書を削除しました";
 
+  @override
+  String get devLockTitle => "開発者用の合言葉";
+
+  @override
+  String get devLockTip => "ロック中。長押しで合言葉を入力";
+
+  @override
+  String get devLockWrong => "合言葉が違います";
+
 }

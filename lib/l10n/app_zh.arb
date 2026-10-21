@@ -5012,5 +5012,8 @@
   "cracCertChecked": "查询时间",
   "cracCertClear": "清除认证信息",
   "cracCertClearAsk": "清除后这一页不再显示认证信息，可以重新查。",
-  "cracCertClearDone": "已清除认证信息"
+  "cracCertClearDone": "已清除认证信息",
+  "devLockTitle": "开发人员口令",
+  "devLockTip": "已锁定，长按输口令",
+  "devLockWrong": "口令不对"
 }

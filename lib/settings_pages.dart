@@ -4856,8 +4856,19 @@ class AdvancedSettingsPage extends StatefulWidget {
 }
 
 class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
+  /// 开发人员那一块的解锁口令。用户指定的 134679，就写在代码里：
+  /// 这一块平时锁着，点标题不会展开，长按输一次口令才开。
+  static const String _devCode = '134679';
+
   bool _labOpen = false;
   bool _devOpen = false;
+
+  /// 本次打开高级设置页期间是否已输过口令。不持久化 —— 下次进来又是锁着的。
+  bool _devUnlocked = false;
+
+  /// 口令弹层里的输入框。留成字段、在 dispose 里统一释放：
+  /// 弹层关闭动画还没走完就 dispose 掉控制器的话，动画里那一帧会用到已释放对象。
+  final _devCodeEntry = TextEditingController();
   final _devInput = TextEditingController();
   String? _devResult;
 
@@ -4865,8 +4876,78 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
 
   @override
   void dispose() {
+    _devCodeEntry.dispose();
     _devInput.dispose();
     super.dispose();
+  }
+
+  /// 点标题：没解锁就只说一句「长按输口令」，解锁后才正常折叠。
+  void _toggleDev() {
+    if (!_devUnlocked) {
+      _devToast(S.of(context).devLockTip);
+      return;
+    }
+    setState(() => _devOpen = !_devOpen);
+  }
+
+  /// 长按标题：输一次口令才解锁并展开。已解锁时就是普通的展开/收起。
+  Future<void> _unlockDev() async {
+    if (_devUnlocked) {
+      setState(() => _devOpen = !_devOpen);
+      return;
+    }
+    final s = S.of(context);
+    final input = _devCodeEntry..clear();
+    final code = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(children: [
+          Icon(Icons.lock_outline_rounded, size: 20, color: C.purple),
+          const SizedBox(width: 8),
+          Text(s.devLockTitle, style: ts(15, w: FontWeight.w700)),
+        ]),
+        content: TextField(
+          controller: input,
+          autofocus: true,
+          keyboardType: TextInputType.number,
+          obscureText: true,
+          maxLength: 6,
+          decoration: InputDecoration(
+            counterText: '',
+            hintText: s.devLockTitle,
+            hintStyle: ts(13, c: C.grey),
+          ),
+          style: ts(15, w: FontWeight.w700),
+          onSubmitted: (v) => Navigator.pop(ctx, v),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(s.cancel, style: ts(13, c: C.slate))),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, input.text),
+              child: Text(s.confirm,
+                  style: ts(13, c: C.purple, w: FontWeight.w700))),
+        ],
+      ),
+    );
+    if (!mounted || code == null) return;
+    if (code.trim() != _devCode) {
+      _devToast(s.devLockWrong);
+      return;
+    }
+    setState(() {
+      _devUnlocked = true;
+      _devOpen = true;
+    });
+  }
+
+  void _devToast(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 2),
+    ));
   }
 
   /// 确认后重新运行设置向导
@@ -5104,11 +5185,16 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
         SizedBox(height: 16),
         SettingsFold(
           title: S.of(context).devDesc,
-          subtitle: S.of(context).settingsDevSubtitle,
-          icon: Icons.bug_report_rounded,
+          subtitle: _devUnlocked
+              ? S.of(context).settingsDevSubtitle
+              : S.of(context).devLockTip,
+          icon: _devUnlocked
+              ? Icons.bug_report_rounded
+              : Icons.lock_outline_rounded,
           color: C.purple,
           open: _devOpen,
-          onToggle: () => setState(() => _devOpen = !_devOpen),
+          onToggle: _toggleDev,
+          onLongPress: _unlockDev,
           children: [
             SettingsSwitch(S.of(context).simData, value: st.devMode,
                 onChanged: st.setDevMode),

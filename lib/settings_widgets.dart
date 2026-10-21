@@ -862,6 +862,9 @@ class SettingsFold extends StatelessWidget {
   final Color color;
   final bool open;
   final VoidCallback onToggle;
+
+  /// 长按标题行（开发人员那一块用它来输口令解锁，平时点不开）。
+  final VoidCallback? onLongPress;
   final List<Widget> children;
   const SettingsFold({
     super.key,
@@ -871,6 +874,7 @@ class SettingsFold extends StatelessWidget {
     required this.color,
     required this.open,
     required this.onToggle,
+    this.onLongPress,
     required this.children,
   });
 
@@ -881,6 +885,7 @@ class SettingsFold extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         InkWell(
           onTap: onToggle,
+          onLongPress: onLongPress,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
             child: Row(children: [

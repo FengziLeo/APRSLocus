@@ -9612,6 +9612,15 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get cracCertClearDone => "已清除认证信息";
 
+  @override
+  String get devLockTitle => "开发人员口令";
+
+  @override
+  String get devLockTip => "已锁定，长按输口令";
+
+  @override
+  String get devLockWrong => "口令不对";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -19220,5 +19229,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get cracCertClearDone => "已清除認證資訊";
+
+  @override
+  String get devLockTitle => "開發人員密碼";
+
+  @override
+  String get devLockTip => "已鎖定，長按輸入密碼";
+
+  @override
+  String get devLockWrong => "密碼不對";
 
 }

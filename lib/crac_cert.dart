@@ -158,15 +158,12 @@ String maskCracName(String name) {
   return t[0] + '*' * (t.length - 1);
 }
 
-/// 把证书编号打码：长度够就前后各留几位，中间一律 `*`。
+/// 把证书编号打码：只留开头几位，后面全打星号。
 String maskCracCertNo(String no) {
   final t = no.trim();
   if (t.isEmpty) return '';
-  if (t.length <= 4) return t[0] + '*' * (t.length - 1);
-  if (t.length <= 8) {
-    return t.substring(0, 2) + '*' * (t.length - 4) + t.substring(t.length - 2);
-  }
-  return t.substring(0, 4) + '*' * (t.length - 8) + t.substring(t.length - 4);
+  final keep = t.length > 4 ? 4 : 1;
+  return t.substring(0, keep) + '*' * (t.length - keep);
 }
 
 /// 一次查询的结果。

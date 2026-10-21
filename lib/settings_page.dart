@@ -575,10 +575,10 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  /// 操作证书的小框：连接状态条上方一行，内容是「已认证 + 类别」
-  /// 加上打码的姓名与证书编号。
+  /// 操作证书的小框：连接状态条上方一行，左边是「已认证 + 类别」，
+  /// 右边是打码的姓名与证书编号。
   ///
-  /// 为什么要打码：这一页很容易被截图发出去，姓名与证书编号只留头尾。
+  /// 为什么要打码：这一页很容易被截图发出去，姓名只留首字，编号只留开头几位。
   /// 没有记录、或记录不是当前呼号的，整块不出现。
   Widget _certChip() {
     final info = st.cracCert;
@@ -586,41 +586,39 @@ class _SettingsPageState extends State<SettingsPage> {
       return const SizedBox.shrink();
     }
     final s = S.of(context);
-    final maskedName = maskCracName(info.name);
-    final maskedNo = maskCracCertNo(info.certNo);
+    final masked = [maskCracName(info.name), maskCracCertNo(info.certNo)]
+        .where((t) => t.isNotEmpty)
+        .join(' · ');
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: C.greenBg,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: C.green.withValues(alpha: 0.35)),
-          ),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 2,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.verified_rounded, size: 13, color: C.green),
-                const SizedBox(width: 4),
-                Text(
-                  info.typeLabel.isEmpty
-                      ? s.cracCertVerified
-                      : '${s.cracCertVerified} · ${info.typeLabel}',
-                  style: ts(11, c: C.green, w: FontWeight.w700),
-                ),
-              ]),
-              if (maskedName.isNotEmpty)
-                Text(maskedName, style: ts(10, c: C.slate)),
-              if (maskedNo.isNotEmpty)
-                Text(maskedNo, style: ts(10, c: C.slate)),
-            ],
-          ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        decoration: BoxDecoration(
+          color: C.greenBg,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: C.green.withValues(alpha: 0.35)),
         ),
+        child: Row(children: [
+          Icon(Icons.verified_rounded, size: 13, color: C.green),
+          const SizedBox(width: 4),
+          Text(
+            info.typeLabel.isEmpty
+                ? s.cracCertVerified
+                : '${s.cracCertVerified} · ${info.typeLabel}',
+            style: ts(11, c: C.green, w: FontWeight.w700),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              masked,
+              style: ts(10, c: C.slate),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ]),
       ),
     );
   }

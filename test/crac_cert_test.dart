@@ -106,9 +106,9 @@ void main() {
     expect(maskCracName('李'), '李');
     expect(maskCracName('  '), '');
     // 证书编号前后各留几位，中间一律星号；长度不同留的位数不同
-    expect(maskCracCertNo('A4500000570'), 'A450***0570');
-    expect(maskCracCertNo('12345678'), '12****78');
-    expect(maskCracCertNo('123456'), '12**56');
+    expect(maskCracCertNo('A4500000570'), 'A450*******');
+    expect(maskCracCertNo('12345678'), '1234****');
+    expect(maskCracCertNo('123456'), '1234**');
     expect(maskCracCertNo('1234'), '1***');
     expect(maskCracCertNo(''), '');
   });

@@ -999,7 +999,17 @@ class IcomLanRxSession implements IcomLanRadioSession {
         initialAudioSequence: _nextTxAudioSequence,
       );
       final datagrams =
-          packetizer.packetize(samples, sampleRateHz: sampleRate);
+          packetizer.packetize(
+        samples,
+        sampleRateHz: sampleRate,
+        // 尾部静音 = 固定 60 ms 防截尾 + 用户配的后置发射延迟。
+        // 延迟做在音频里而不是「发完再 sleep」：整段音频是按实时节奏
+        // 一包一包送进电台的，多送一段静音就等于把松 PTT 的时刻往后推，
+        // 同时让电台的抖动缓冲一直有数据可放（电台不会在缓冲见底时先静音）。
+        trailingSilenceMs:
+            IcomLanTxAudioPacketizer.defaultTrailingSilenceMs +
+                config.postTxDelayMs.clamp(0, IcomLanConfig.maxPostTxDelayMs),
+      );
       _nextTxOuterSequence = packetizer.outerSequence;
       _nextTxAudioSequence = packetizer.audioSequence;
 

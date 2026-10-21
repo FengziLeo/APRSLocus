@@ -34,6 +34,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
   late final TextEditingController _pass;
   late final TextEditingController _civAddr;
   late final TextEditingController _txDelay;
+  late final TextEditingController _txTail;
   late final TextEditingController _rfPath;
 
   /// 失焦提交用的焦点节点（`onEditingComplete` 只在回车时触发，见 [_onBlur]）。
@@ -43,6 +44,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
   late final FocusNode _passFocus;
   late final FocusNode _civFocus;
   late final FocusNode _delayFocus;
+  late final FocusNode _tailFocus;
   late final FocusNode _pathFocus;
 
   late WlanRadioModel _selectedModel;
@@ -74,6 +76,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
       text: '0x${c.icomLan.radioCivAddress.toRadixString(16).toUpperCase()}',
     );
     _txDelay = TextEditingController(text: '${c.afsk.txDelayMs}');
+    _txTail = TextEditingController(text: '${c.icomLan.postTxDelayMs}');
     // issue #35：WLAN 直连也走射频（audio.config.path 即中继路径），
     // 此前只有 TNC 页 / 音频页能改，这页没有入口 —— 用户抱怨「改了不生效」。
     _rfPath = TextEditingController(text: c.path);
@@ -83,6 +86,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
     _passFocus = FocusNode();
     _civFocus = FocusNode();
     _delayFocus = FocusNode();
+    _tailFocus = FocusNode();
     _pathFocus = FocusNode();
     // 失焦即落定：`onEditingComplete` 只在按键盘「完成/回车」时触发，
     // **失焦不触发** —— 只挂它的话「填完随手点别处」等于什么都没存
@@ -95,7 +99,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
   /// 本页全部输入框的焦点：失焦落定与 dispose 都靠它遍历。
   List<FocusNode> get _focuses => [
         _hostFocus, _portFocus, _userFocus,
-        _passFocus, _civFocus, _delayFocus, _pathFocus,
+        _passFocus, _civFocus, _delayFocus, _tailFocus, _pathFocus,
       ];
 
   /// 整组都不再持有焦点时落定一次（组内转移焦点不提交，避免打断输入）。
@@ -112,6 +116,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
     _pass.dispose();
     _civAddr.dispose();
     _txDelay.dispose();
+    _txTail.dispose();
     _rfPath.dispose();
     for (final f in _focuses) {
       f.dispose();
@@ -144,6 +149,8 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
     final oldDelay = c.afsk.txDelayMs;
     final civ = _parseInt(_civAddr, _selectedModel.defaultCivAddress).clamp(0x01, 0xFF);
     final delay = _parseInt(_txDelay, 200).clamp(0, 2000);
+    final tail = _parseInt(_txTail, IcomLanConfig.defaultPostTxDelayMs)
+        .clamp(0, IcomLanConfig.maxPostTxDelayMs);
 
     c.icomLan = IcomLanConfig(
       host: _host.text.trim(),
@@ -154,6 +161,7 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
       radioCivAddress: civ,
       controllerCivAddress: c.icomLan.controllerCivAddress,
       clientName: c.icomLan.clientName,
+      postTxDelayMs: tail,
     );
 
     c.afsk = c.afsk.copyWith(txDelayMs: delay);
@@ -492,6 +500,15 @@ class _Ic705DevicePageState extends State<Ic705DevicePage> {
           _txDelay,
           hint: '200',
           focusNode: _delayFocus,
+          onEditingComplete: () => unawaited(_saveConfig()),
+        ),
+        // WLAN 直连的报尾：音频发完后继续发射一段时间，否则电台松 PTT
+        // 时自己的抖动缓冲里还压着最后一个包，对方收到的是缺尾的帧。
+        SettingsInput(
+          s.icomTxTailLabel,
+          _txTail,
+          hint: '${IcomLanConfig.defaultPostTxDelayMs}',
+          focusNode: _tailFocus,
           onEditingComplete: () => unawaited(_saveConfig()),
         ),
         SettingsInput(

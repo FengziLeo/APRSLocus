@@ -4303,5 +4303,6 @@
   "ssidCustom": "Custom suffix",
   "ssidCustomHint": "1-2 digits or letters",
   "ssidInvalid": "The suffix must be 1-2 digits or letters",
-  "ssidUse": "Use this"
+  "ssidUse": "Use this",
+  "icomTxTailLabel": "Post-TX delay (ms)"
 }

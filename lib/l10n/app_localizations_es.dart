@@ -9969,4 +9969,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get ssidUse => "Usar este";
 
+  @override
+  String get icomTxTailLabel => "Retardo posterior TX (ms)";
+
 }

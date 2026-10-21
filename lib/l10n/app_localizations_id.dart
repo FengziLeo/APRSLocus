@@ -9920,4 +9920,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get ssidUse => "Pakai ini";
 
+  @override
+  String get icomTxTailLabel => "Tunda pasca-TX (ms)";
+
 }

@@ -9531,6 +9531,9 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get ssidUse => "用这个";
 
+  @override
+  String get icomTxTailLabel => "发射后置延迟 (Post TX Delay, ms)";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -19058,5 +19061,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get ssidUse => "用這個";
+
+  @override
+  String get icomTxTailLabel => "發射後置延遲 (Post TX Delay, ms)";
 
 }

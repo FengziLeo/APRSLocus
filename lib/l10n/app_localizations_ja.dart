@@ -9631,4 +9631,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get ssidUse => "これを使う";
 
+  @override
+  String get icomTxTailLabel => "送信後ディレイ (Post TX Delay, ms)";
+
 }

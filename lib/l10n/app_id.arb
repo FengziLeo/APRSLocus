@@ -4303,5 +4303,6 @@
   "ssidCustom": "Sufiks sendiri",
   "ssidCustomHint": "1-2 angka atau huruf",
   "ssidInvalid": "Sufiks harus 1-2 angka atau huruf",
-  "ssidUse": "Pakai ini"
+  "ssidUse": "Pakai ini",
+  "icomTxTailLabel": "Tunda pasca-TX (ms)"
 }

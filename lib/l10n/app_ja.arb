@@ -4303,5 +4303,6 @@
   "ssidCustom": "任意のサフィックス",
   "ssidCustomHint": "数字か英字 1〜2 文字",
   "ssidInvalid": "サフィックスは数字か英字 1〜2 文字です",
-  "ssidUse": "これを使う"
+  "ssidUse": "これを使う",
+  "icomTxTailLabel": "送信後ディレイ (Post TX Delay, ms)"
 }

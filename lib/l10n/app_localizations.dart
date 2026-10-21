@@ -17421,6 +17421,12 @@ abstract class AppLocalizations {
   /// **'用这个'**
   String get ssidUse;
 
+  /// No description provided for @icomTxTailLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'发射后置延迟 (Post TX Delay, ms)'**
+  String get icomTxTailLabel;
+
 }
 
 class _AppLocalizationsDelegate

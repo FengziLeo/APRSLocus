@@ -4891,5 +4891,6 @@
   "ssidCustom": "自訂後綴",
   "ssidCustomHint": "1–2 位數字或字母",
   "ssidInvalid": "後綴只能是 1–2 位數字或字母",
-  "ssidUse": "用這個"
+  "ssidUse": "用這個",
+  "icomTxTailLabel": "發射後置延遲 (Post TX Delay, ms)"
 }

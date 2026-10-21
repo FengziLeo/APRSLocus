@@ -4303,5 +4303,6 @@
   "ssidCustom": "Sufijo propio",
   "ssidCustomHint": "1-2 dígitos o letras",
   "ssidInvalid": "El sufijo debe ser 1-2 dígitos o letras",
-  "ssidUse": "Usar este"
+  "ssidUse": "Usar este",
+  "icomTxTailLabel": "Retardo posterior TX (ms)"
 }

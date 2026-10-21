@@ -9910,4 +9910,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get ssidUse => "Use this";
 
+  @override
+  String get icomTxTailLabel => "Post-TX delay (ms)";
+
 }

@@ -445,6 +445,11 @@ jobs:
       - name: Test IC-705 hotspot network routing
         run: flutter test test/icom_lan_android_network_test.dart test/icom_lan_udp_channel_test.dart
 
+      # WLAN 发射后置延迟：WLAN 下电台在报尾发完前就松 PTT，对方收不全。
+      # 延迟、夹取与序列化都是纯逻辑，错了不会编译失败，只表现为「填了没用」。
+      - name: Test IC-705 post-TX delay
+        run: flutter test test/icom_lan_post_tx_delay_test.dart
+
       # 外接 GPS（蓝牙 SPP / NMEA 0183）的解析与装配：度分换算、XOR 校验、
       # talker 不区分（GP/GN/BD）、状态位与质量位（V / 0 只能算 noFix 不能算失败）、
       # 多条语句合并成一条定位。这几件全是「编译能过、analyze 全绿」的纯逻辑，

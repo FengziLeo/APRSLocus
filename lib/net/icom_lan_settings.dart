@@ -98,9 +98,21 @@ class IcomLanConfig {
     this.model = WlanRadioModel.ic705,
     this.radioCivAddress = 0xa4,
     this.controllerCivAddress = 0xe0,
+    this.postTxDelayMs = defaultPostTxDelayMs,
     this.usernameMaxLength = 16,
     this.passwordMaxLength = 16,
   });
+
+  /// 发射后置延迟默认值（ms）。
+  ///
+  /// WLAN 直连时音频包按实时节奏送进电台，电台自己的抖动缓冲还会再压一段；
+  /// 最后一个音频包刚发完就松开 PTT，缓冲里剩下的报尾就没机会发出去 ——
+  /// 对方收到的是缺尾的帧，校验不过，等于整条报文丢了。这段延迟把
+  /// 「音频发完」到「松 PTT」之间留出时间，让报尾真正上完空中。
+  static const int defaultPostTxDelayMs = 200;
+
+  /// 发射后置延迟上限（ms）。
+  static const int maxPostTxDelayMs = 2000;
 
   /// 电台 IP（局域网地址）。
   final String host;
@@ -125,6 +137,10 @@ class IcomLanConfig {
 
   /// 本机 CI-V 地址（默认 0xE0）。
   final int controllerCivAddress;
+
+  /// 音频发完后继续发射的时间（ms），用来把报尾送完整（见
+  /// [defaultPostTxDelayMs]）。0 = 只要固定的 60 ms 尾部静音。
+  final int postTxDelayMs;
 
   final int usernameMaxLength;
   final int passwordMaxLength;
@@ -169,6 +185,7 @@ class IcomLanConfig {
     WlanRadioModel? model,
     int? radioCivAddress,
     int? controllerCivAddress,
+    int? postTxDelayMs,
   }) =>
       IcomLanConfig(
         host: host ?? this.host,
@@ -180,6 +197,7 @@ class IcomLanConfig {
         radioCivAddress: radioCivAddress ?? this.radioCivAddress,
         controllerCivAddress:
             controllerCivAddress ?? this.controllerCivAddress,
+        postTxDelayMs: postTxDelayMs ?? this.postTxDelayMs,
       );
 
   Map<String, dynamic> toJson() => {
@@ -190,6 +208,7 @@ class IcomLanConfig {
         'clientName': clientName,
         'model': model.id,
         'radioCivAddress': radioCivAddress,
+        'postTxDelayMs': postTxDelayMs,
       };
 
   static IcomLanConfig fromJson(Object? json) {
@@ -208,6 +227,8 @@ class IcomLanConfig {
       model: model,
       radioCivAddress:
           readInt(json['radioCivAddress'], model.defaultCivAddress),
+      postTxDelayMs: readInt(json['postTxDelayMs'], defaultPostTxDelayMs)
+          .clamp(0, maxPostTxDelayMs),
     );
   }
 }

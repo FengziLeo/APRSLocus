@@ -4982,5 +4982,6 @@
   "ssidCustom": "自定义后缀",
   "ssidCustomHint": "1–2 位数字或字母",
   "ssidInvalid": "后缀只能是 1–2 位数字或字母",
-  "ssidUse": "用这个"
+  "ssidUse": "用这个",
+  "icomTxTailLabel": "发射后置延迟 (Post TX Delay, ms)"
 }

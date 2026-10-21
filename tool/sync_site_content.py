@@ -419,6 +419,21 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.28', 'date': '2026-10-21',
+        'items': [
+            ('fix',
+             T('IC-705 走 WLAN 发射时，报尾不会在松 PTT 前被切掉。后置发射延迟默认 200 ms，可在 IC-705 页调整。',
+               'IC-705 走 WLAN 發射時，報尾不會在鬆 PTT 前被切掉。後置發射延遲預設 200 ms，可在 IC-705 頁調整。',
+               'Over WLAN on an IC-705 the tail of a packet is no longer cut before PTT drops. '
+               'The post-TX delay defaults to 200 ms and is adjustable on the IC-705 page.')),
+            ('new',
+             T('iPhone 的灵动岛和锁屏显示当前状态，与 Android 16 的状态栏胶囊同源。需 iOS 16.2 及以上。',
+               'iPhone 的靈動島和鎖屏顯示目前狀態，與 Android 16 的狀態列膠囊同源。需 iOS 16.2 及以上。',
+               'The Dynamic Island and lock screen on iPhone show the current state, the same content '
+               'as the Android 16 status bar pill. Needs iOS 16.2 or later.')),
+        ],
+    },
+    {
         'ver': 'v2.1.27', 'date': '2026-10-20',
         'items': [
             ('new',

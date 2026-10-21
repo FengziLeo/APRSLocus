@@ -1,5 +1,37 @@
 # 更新日志
 
+## [2.1.28] - 2026-10-21
+
+### 报尾不会再被切掉
+
+- **IC-705 走 WLAN 发射时，报文末尾常被切掉**：音频还在电台的缓冲里，PTT 已经松了，对方收到的是缺尾的帧，校验不过。
+- 现在音频发完后再按住 PTT 一段时间，默认 200 ms。IC-705 页新增「发射后置延迟」，0 到 2000 都能填。
+- 手动按住 PTT 把整条报文发完就通的那种情况，这条设置就是它。
+
+### iPhone 上的灵动岛
+
+- **灵动岛和锁屏上能看当前状态**：呼号、正在发生的事、距下次上报的倒计时。
+- 与 Android 16 的状态栏胶囊读同一份内容，显示什么在「通知显示样式 → 实时更新」里选。
+- 需要 iOS 16.2 及以上。
+
+---
+
+## [2.1.28] - 2026-10-21 (English)
+
+### The tail is no longer cut off
+
+- **Sending over WLAN on an IC-705 often lost the end of a packet**: audio was still sitting in the radio buffer while PTT had already dropped, so the far end got a frame with no tail and failed the check.
+- The app now holds PTT for a while after the audio ends. The default is 200 ms; the IC-705 page has a new post-TX delay field that takes 0 to 2000.
+- This is the same thing you did by holding PTT by hand until the whole packet went out.
+
+### Dynamic Island on iPhone
+
+- **The Dynamic Island and the lock screen show the current state**: callsign, what is happening, and the countdown to the next beacon.
+- It reads the same content as the Android 16 status bar pill. Pick what it shows under Notification style, live updates.
+- Needs iOS 16.2 or later.
+
+---
+
 ## [2.1.27] - 2026-10-20
 
 ### 自选模块

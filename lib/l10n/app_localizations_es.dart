@@ -9985,7 +9985,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get cracCertId => "N.º de identidad";
 
   @override
-  String get cracCertPrivacy => "El nombre y el número que escribes van a este servicio. El resultado se queda en este dispositivo.";
+  String get cracCertPrivacy => "El nombre y el número de certificado que escribes van a este servicio. El resultado se queda en este dispositivo. No se pide documento de identidad y no se puede usar.";
 
   @override
   String get cracCertQuery => "Consultar";
@@ -10000,7 +10000,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get cracCertNeedName => "Escribe un nombre primero";
 
   @override
-  String get cracCertNeedKey => "Rellena el n.º de certificado o el de identidad";
+  String get cracCertNeedKey => "Rellena el n.º de certificado";
 
   @override
   String get cracCertNotFound => "No se encontró ningún registro";

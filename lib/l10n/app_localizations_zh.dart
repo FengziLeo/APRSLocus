@@ -9547,7 +9547,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cracCertId => "身份证件 ID";
 
   @override
-  String get cracCertPrivacy => "姓名与证件号会发到这个查询接口，结果只留在本机。";
+  String get cracCertPrivacy => "姓名与证书编号会发到这个查询接口，结果只留在本机。证件号不用填，也不提供那种查法。";
 
   @override
   String get cracCertQuery => "查询";
@@ -9562,7 +9562,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cracCertNeedName => "先填姓名";
 
   @override
-  String get cracCertNeedKey => "证书编号和证件 ID 填一个";
+  String get cracCertNeedKey => "证书编号要填";
 
   @override
   String get cracCertNotFound => "没有查到记录";
@@ -19141,7 +19141,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get cracCertId => "身分證件 ID";
 
   @override
-  String get cracCertPrivacy => "姓名與證件號會發到這個查詢介面，結果只留在本機。";
+  String get cracCertPrivacy => "姓名與證書編號會發到這個查詢介面，結果只留在本機。證件號不用填，也不提供那種查法。";
 
   @override
   String get cracCertQuery => "查詢";
@@ -19156,7 +19156,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get cracCertNeedName => "先填姓名";
 
   @override
-  String get cracCertNeedKey => "證書編號和證件 ID 填一個";
+  String get cracCertNeedKey => "證書編號要填";
 
   @override
   String get cracCertNotFound => "沒有查到記錄";

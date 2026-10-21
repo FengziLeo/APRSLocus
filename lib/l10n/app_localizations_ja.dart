@@ -9647,7 +9647,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cracCertId => "身分証明書 ID";
 
   @override
-  String get cracCertPrivacy => "入力した氏名と番号はこの照会窓口に送られます。結果は本機にだけ残ります。";
+  String get cracCertPrivacy => "入力した氏名と免許番号はこの照会窓口に送られます。結果は本機にだけ残ります。身分証明書の番号は求めず、その方法も用意していません。";
 
   @override
   String get cracCertQuery => "照会";
@@ -9662,7 +9662,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cracCertNeedName => "先に氏名を入れてください";
 
   @override
-  String get cracCertNeedKey => "免許番号か身分証明書 ID のどちらかを入力";
+  String get cracCertNeedKey => "免許番号を入れてください";
 
   @override
   String get cracCertNotFound => "記録が見つかりません";

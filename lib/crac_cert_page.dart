@@ -26,7 +26,6 @@ class _CracCertPageState extends State<CracCertPage> {
   // 不预填任何值：姓名与证件号都是要用户自己填的。
   final _name = TextEditingController();
   final _cert = TextEditingController();
-  final _id = TextEditingController();
 
   bool _busy = false;
   CracCertResult? _result;
@@ -40,7 +39,6 @@ class _CracCertPageState extends State<CracCertPage> {
   void dispose() {
     _name.dispose();
     _cert.dispose();
-    _id.dispose();
     super.dispose();
   }
 
@@ -51,7 +49,7 @@ class _CracCertPageState extends State<CracCertPage> {
       _toast(s.cracCertNeedName);
       return;
     }
-    if (_cert.text.trim().isEmpty && _id.text.trim().isEmpty) {
+    if (_cert.text.trim().isEmpty) {
       _toast(s.cracCertNeedKey);
       return;
     }
@@ -59,11 +57,7 @@ class _CracCertPageState extends State<CracCertPage> {
       _busy = true;
       _note = '';
     });
-    final result = await queryCracCert(
-      name: name,
-      certNo: _cert.text,
-      idNo: _id.text,
-    );
+    final result = await queryCracCert(name: name, certNo: _cert.text);
     if (!mounted) return;
     setState(() {
       _busy = false;
@@ -125,8 +119,6 @@ class _CracCertPageState extends State<CracCertPage> {
               SettingsInput(s.cracCertName, _name,
                   onEditingComplete: () => _query()),
               SettingsInput(s.cracCertNumber, _cert,
-                  onEditingComplete: () => _query()),
-              SettingsInput(s.cracCertId, _id,
                   onEditingComplete: () => _query()),
               SettingsHint(s.cracCertPrivacy),
               Padding(

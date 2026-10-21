@@ -9926,7 +9926,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cracCertId => "ID number";
 
   @override
-  String get cracCertPrivacy => "The name and ID you type go to this lookup service. The result stays on this device.";
+  String get cracCertPrivacy => "The name and certificate number you type go to this lookup service. The result stays on this device. An ID number is not asked for, and cannot be used.";
 
   @override
   String get cracCertQuery => "Look up";
@@ -9941,7 +9941,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cracCertNeedName => "Enter a name first";
 
   @override
-  String get cracCertNeedKey => "Fill in the certificate no. or the ID";
+  String get cracCertNeedKey => "Fill in the certificate number";
 
   @override
   String get cracCertNotFound => "No record found";

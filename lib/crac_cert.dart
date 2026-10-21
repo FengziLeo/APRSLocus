@@ -175,11 +175,14 @@ enum CracCertStatus {
   failed,
 }
 
-/// 发一次查询。`certNo` 与 `idNo` 至少要有一个，否则后端只会回查无此人。
+/// 发一次查询：只认「姓名 + 完整证书编号」这一种。
+///
+/// 后端还支持用身份证件号查，但**本应用不提供这条路**：证件号是比操作证
+/// 敏感得多的东西，为了给呼号挂一枚徽章去填它，不值得。`idCarNumber` 仍然
+/// 按接口形状发空串。
 Future<CracCertResult> queryCracCert({
   required String name,
-  String certNo = '',
-  String idNo = '',
+  required String certNo,
   Duration timeout = const Duration(seconds: 25),
 }) async {
   final body = jsonEncode({
@@ -188,7 +191,7 @@ Future<CracCertResult> queryCracCert({
       'page_size': '100',
       'name': name.trim(),
       'certificateNo': certNo.trim(),
-      'idCarNumber': idNo.trim(),
+      'idCarNumber': '',
     },
   });
 

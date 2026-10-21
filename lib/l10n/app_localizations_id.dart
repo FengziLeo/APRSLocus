@@ -9936,7 +9936,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get cracCertId => "Nomor identitas";
 
   @override
-  String get cracCertPrivacy => "Nama dan nomor yang Anda isi dikirim ke layanan ini. Hasilnya tetap di perangkat ini.";
+  String get cracCertPrivacy => "Nama dan nomor sertifikat yang Anda isi dikirim ke layanan ini. Hasilnya tetap di perangkat ini. Nomor identitas tidak diminta dan tidak bisa dipakai.";
 
   @override
   String get cracCertQuery => "Cek";
@@ -9951,7 +9951,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get cracCertNeedName => "Isi nama dulu";
 
   @override
-  String get cracCertNeedKey => "Isi nomor sertifikat atau nomor identitas";
+  String get cracCertNeedKey => "Isi nomor sertifikat";
 
   @override
   String get cracCertNotFound => "Tidak ada catatan";

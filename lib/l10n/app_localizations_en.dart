@@ -9662,7 +9662,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifLiveTitle => "Live updates";
 
   @override
-  String get notifLiveHint => "On Android 16 this promotes the ongoing notification to the status bar pill and shows the countdown to the next beacon. Where the system lacks it or the app is not allowed, it stays a normal ongoing notification.";
+  String get notifLiveHint => "On Android 16 this promotes the ongoing notification to the status bar pill; on iPhone it shows on the Dynamic Island and the lock screen. Pick what it shows below. Where the system lacks it, it stays a normal ongoing notification.";
 
   @override
   String get notifTitle => "Notifications";

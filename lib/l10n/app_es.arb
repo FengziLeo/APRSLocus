@@ -4219,7 +4219,7 @@
   "aprsIsEntryDesc": "Dirección, puerto y passcode",
   "txKindPosition": "Paquetes de posición y estado",
   "notifLiveTitle": "Actualizaciones en vivo",
-  "notifLiveHint": "En Android 16 la notificación permanente pasa a la píldora de la barra de estado y muestra la cuenta atrás del próximo balizamiento. Si el sistema no lo admite, sigue siendo una notificación normal.",
+  "notifLiveHint": "En Android 16 la notificación permanente pasa a la píldora de la barra de estado; en iPhone aparece en la Dynamic Island y en la pantalla bloqueada. Abajo eliges qué muestra. Si el sistema no lo admite, sigue siendo una notificación normal.",
   "notifTitle": "Notificaciones",
   "notifStyleTitle": "Estilo de notificación",
   "notifStylePlain": "Notificación permanente normal",

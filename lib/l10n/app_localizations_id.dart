@@ -9672,7 +9672,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get notifLiveTitle => "Pembaruan langsung";
 
   @override
-  String get notifLiveHint => "Di Android 16, notifikasi tetap naik ke pil bilah status dan menampilkan hitung mundur beacon berikutnya. Kalau tidak didukung, tetap notifikasi biasa.";
+  String get notifLiveHint => "Di Android 16 notifikasi tetap naik ke pil bilah status; di iPhone tampil di Dynamic Island dan layar kunci. Isi yang ditampilkan dipilih di bawah. Kalau tidak didukung, tetap notifikasi biasa.";
 
   @override
   String get notifTitle => "Notifikasi";

@@ -44,6 +44,7 @@ import 'group_chat.dart';
 import 'strategy_map.dart';
 import 'igate.dart';
 import 'consent.dart';
+import 'live_activity.dart';
 import 'crac_cert.dart';
 import 'terms_version.dart';
 import 'tnc.dart';
@@ -11334,6 +11335,20 @@ class AppState extends ChangeNotifier {
     }
     loc.updateNotification(parts.join(' · '),
         live: notifLiveUpdates, short: short, countdown: countdown);
+    // iOS：灵动岛与锁屏上的那条实时活动读同一份文案（Android 用的是
+    // 上面那条常驻通知的提升）。关掉实时更新就把活动收掉。
+    if (notifLiveUpdates) {
+      unawaited(LiveActivity.update(
+        call: myFullCall,
+        line: parts.join(' · '),
+        short: short,
+        endsAt: counting
+            ? DateTime.now().add(Duration(seconds: beaconSecondsLeft))
+            : null,
+      ));
+    } else {
+      unawaited(LiveActivity.end());
+    }
   }
 }
 

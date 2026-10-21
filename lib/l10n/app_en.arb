@@ -4219,7 +4219,7 @@
   "aprsIsEntryDesc": "Address, port and passcode",
   "txKindPosition": "Position and status packets",
   "notifLiveTitle": "Live updates",
-  "notifLiveHint": "On Android 16 this promotes the ongoing notification to the status bar pill and shows the countdown to the next beacon. Where the system lacks it or the app is not allowed, it stays a normal ongoing notification.",
+  "notifLiveHint": "On Android 16 this promotes the ongoing notification to the status bar pill; on iPhone it shows on the Dynamic Island and the lock screen. Pick what it shows below. Where the system lacks it, it stays a normal ongoing notification.",
   "notifTitle": "Notifications",
   "notifStyleTitle": "Notification style",
   "notifStylePlain": "Normal ongoing notification",

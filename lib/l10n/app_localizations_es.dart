@@ -9721,7 +9721,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get notifLiveTitle => "Actualizaciones en vivo";
 
   @override
-  String get notifLiveHint => "En Android 16 la notificación permanente pasa a la píldora de la barra de estado y muestra la cuenta atrás del próximo balizamiento. Si el sistema no lo admite, sigue siendo una notificación normal.";
+  String get notifLiveHint => "En Android 16 la notificación permanente pasa a la píldora de la barra de estado; en iPhone aparece en la Dynamic Island y en la pantalla bloqueada. Abajo eliges qué muestra. Si el sistema no lo admite, sigue siendo una notificación normal.";
 
   @override
   String get notifTitle => "Notificaciones";

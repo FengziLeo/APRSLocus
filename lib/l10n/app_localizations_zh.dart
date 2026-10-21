@@ -9283,7 +9283,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notifLiveTitle => "实时通知";
 
   @override
-  String get notifLiveHint => "开启后，Android 16 会把常驻通知提成状态栏那一小条，显示距下次上报的倒计时。系统不支持或不允许时，还是普通常驻通知。";
+  String get notifLiveHint => "开启后，Android 16 会把常驻通知提成状态栏那一小条，iPhone 上显示在灵动岛和锁屏；显示什么在下面选。系统不支持时还是普通常驻通知。";
 
   @override
   String get notifTitle => "通知";
@@ -18877,7 +18877,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get notifLiveTitle => "即時通知";
 
   @override
-  String get notifLiveHint => "開啟後，Android 16 會把常駐通知提成狀態列那一小條，顯示距下次上報的倒數。系統不支援或不允許時，還是普通常駐通知。";
+  String get notifLiveHint => "開啟後，Android 16 會把常駐通知提成狀態列那一小條，iPhone 上顯示在靈動島和鎖屏；顯示什麼在下面選。系統不支援時還是普通常駐通知。";
 
   @override
   String get notifTitle => "通知";

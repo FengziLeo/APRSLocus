@@ -455,6 +455,11 @@ jobs:
       - name: Test CRAC certificate lookup
         run: flutter test test/crac_cert_test.dart
 
+      # 灵动岛（Live Activity）的 Dart 侧：去重与非 iOS 平台的拦截都会「静默
+      # 正常」，只在真机上表现为刷屏限流或每次都失败，所以用 mock 通道钉住。
+      - name: Test live activity channel
+        run: flutter test test/live_activity_test.dart
+
       # 外接 GPS（蓝牙 SPP / NMEA 0183）的解析与装配：度分换算、XOR 校验、
       # talker 不区分（GP/GN/BD）、状态位与质量位（V / 0 只能算 noFix 不能算失败）、
       # 多条语句合并成一条定位。这几件全是「编译能过、analyze 全绿」的纯逻辑，

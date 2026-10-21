@@ -9383,7 +9383,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifLiveTitle => "リアルタイム通知";
 
   @override
-  String get notifLiveHint => "Android 16 では常駐通知がステータスバーのカプセルに昇格し、次のビーコンの残り時間が出ます。未対応・不許可のときは通常の常駐通知のままです。";
+  String get notifLiveHint => "Android 16 では常駐通知がステータスバーのカプセルに昇格し、iPhone ではダイナミックアイランドとロック画面に出ます。何を出すかは下で選びます。未対応のときは通常の常駐通知のままです。";
 
   @override
   String get notifTitle => "通知";

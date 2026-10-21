@@ -4807,7 +4807,7 @@
   "aprsIsEntryDesc": "位址、埠與 passcode",
   "txKindPosition": "位置與狀態報文",
   "notifLiveTitle": "即時通知",
-  "notifLiveHint": "開啟後，Android 16 會把常駐通知提成狀態列那一小條，顯示距下次上報的倒數。系統不支援或不允許時，還是普通常駐通知。",
+  "notifLiveHint": "開啟後，Android 16 會把常駐通知提成狀態列那一小條，iPhone 上顯示在靈動島和鎖屏；顯示什麼在下面選。系統不支援時還是普通常駐通知。",
   "notifTitle": "通知",
   "notifStyleTitle": "通知顯示樣式",
   "notifStylePlain": "普通常駐通知",

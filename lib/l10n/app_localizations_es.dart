@@ -10077,4 +10077,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get cracCertClosed => "Aún no disponible";
 
+  @override
+  String get cracCertWhyRequired => "El protocolo APRS-IS pone en el desarrollador del software el deber de verificar que los usuarios sean radioaficionados.";
+
 }

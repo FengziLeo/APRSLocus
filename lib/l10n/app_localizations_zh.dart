@@ -9639,6 +9639,9 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get cracCertClosed => "暂不开放";
 
+  @override
+  String get cracCertWhyRequired => "APRS-IS 协议 软件开发者有责任与义务验证软件使用者为业余无线电爱好者";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -19274,5 +19277,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get cracCertClosed => "暫不開放";
+
+  @override
+  String get cracCertWhyRequired => "APRS-IS 協議 軟體開發者有責任與義務驗證軟體使用者為業餘無線電愛好者";
 
 }

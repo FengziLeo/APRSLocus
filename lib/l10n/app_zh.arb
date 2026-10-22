@@ -5022,5 +5022,6 @@
   "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
   "historyRecord": "记录历史轨迹",
   "historyEmptyOff": "记录没开。打开上面的开关才会记。",
-  "cracCertClosed": "暂不开放"
+  "cracCertClosed": "暂不开放",
+  "cracCertWhyRequired": "APRS-IS 协议 软件开发者有责任与义务验证软件使用者为业余无线电爱好者"
 }

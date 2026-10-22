@@ -17637,6 +17637,12 @@ abstract class AppLocalizations {
   /// **'暂不开放'**
   String get cracCertClosed;
 
+  /// No description provided for @cracCertWhyRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'APRS-IS 协议 软件开发者有责任与义务验证软件使用者为业余无线电爱好者'**
+  String get cracCertWhyRequired;
+
 }
 
 class _AppLocalizationsDelegate

@@ -4343,5 +4343,6 @@
   "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
   "historyRecord": "Registrar historial",
   "historyEmptyOff": "La grabación está desactivada. Actívala arriba para empezar.",
-  "cracCertClosed": "Aún no disponible"
+  "cracCertClosed": "Aún no disponible",
+  "cracCertWhyRequired": "El protocolo APRS-IS pone en el desarrollador del software el deber de verificar que los usuarios sean radioaficionados."
 }

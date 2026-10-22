@@ -110,6 +110,14 @@ KEYS = {
     'cracCertClosed': (
         '暂不开放', '暫不開放', 'Not open yet', '未公開',
         'Aún no disponible', 'Belum dibuka'),
+    # 认证页面里那句「为什么要有这一步」—— 用户给的原话
+    'cracCertWhyRequired': (
+        'APRS-IS 协议 软件开发者有责任与义务验证软件使用者为业余无线电爱好者',
+        'APRS-IS 協議 軟體開發者有責任與義務驗證軟體使用者為業餘無線電愛好者',
+        'The APRS-IS protocol puts the duty on the software developer to verify that users are amateur radio operators.',
+        'APRS-IS プロトコルでは、利用者がアマチュア無線家であることを確認する責任と義務がソフトウェア開発者にあります。',
+        'El protocolo APRS-IS pone en el desarrollador del software el deber de verificar que los usuarios sean radioaficionados.',
+        'Protokol APRS-IS menetapkan kewajiban pengembang perangkat lunak untuk memastikan pengguna adalah penggemar radio amatir.'),
 }
 
 META = {

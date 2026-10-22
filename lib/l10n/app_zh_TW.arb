@@ -4931,5 +4931,6 @@
   "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
   "historyRecord": "記錄歷史軌跡",
   "historyEmptyOff": "記錄沒開。打開上面的開關才會記。",
-  "cracCertClosed": "暫不開放"
+  "cracCertClosed": "暫不開放",
+  "cracCertWhyRequired": "APRS-IS 協議 軟體開發者有責任與義務驗證軟體使用者為業餘無線電愛好者"
 }

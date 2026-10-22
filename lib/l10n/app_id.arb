@@ -4343,5 +4343,6 @@
   "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
   "historyRecord": "Rekam riwayat",
   "historyEmptyOff": "Perekaman mati. Nyalakan sakelar di atas untuk mulai.",
-  "cracCertClosed": "Belum dibuka"
+  "cracCertClosed": "Belum dibuka",
+  "cracCertWhyRequired": "Protokol APRS-IS menetapkan kewajiban pengembang perangkat lunak untuk memastikan pengguna adalah penggemar radio amatir."
 }

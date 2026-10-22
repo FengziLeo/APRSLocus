@@ -127,20 +127,29 @@ class _CracCertPageState extends State<CracCertPage> {
                 child: SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: _busy ? null : _query,
+                    // 认证按钮先置灰（用户 2026-10-22：「操作证认证保留但是认证按钮
+                    // 是灰色的」）。按钮不接 onPressed —— 门关着就不要假装能查；
+                    // 表单与查询实现都留着，开的时候把这一行改回 `_query` 就行。
+                    onPressed: null,
                     style: FilledButton.styleFrom(
                       backgroundColor: C.green,
+                      disabledBackgroundColor: C.greyBg,
+                      disabledForegroundColor: C.slate,
                       padding: const EdgeInsets.symmetric(vertical: 11),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                     ),
                     child: Text(
                       _busy ? s.cracCertQuerying : s.cracCertQuery,
-                      style: ts(12, c: Colors.white, w: FontWeight.w700),
+                      style: ts(12, w: FontWeight.w700),
                     ),
                   ),
                 ),
               ),
+              // 为什么要有这一步（用户原话）：APRS-IS 协议里，验证使用者确实是
+              // 业余无线电爱好者是软件开发者的责任与义务。
+              SettingsHint(s.cracCertWhyRequired, icon: Icons.gavel_rounded),
+              const SizedBox(height: 6),
             ],
           ),
           const SizedBox(height: 16),

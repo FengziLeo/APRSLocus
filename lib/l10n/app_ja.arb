@@ -4343,5 +4343,6 @@
   "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
   "historyRecord": "履歴を記録",
   "historyEmptyOff": "記録は切っています。上のスイッチを入れると記録します。",
-  "cracCertClosed": "未公開"
+  "cracCertClosed": "未公開",
+  "cracCertWhyRequired": "APRS-IS プロトコルでは、利用者がアマチュア無線家であることを確認する責任と義務がソフトウェア開発者にあります。"
 }

@@ -9739,4 +9739,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get cracCertClosed => "未公開";
 
+  @override
+  String get cracCertWhyRequired => "APRS-IS プロトコルでは、利用者がアマチュア無線家であることを確認する責任と義務がソフトウェア開発者にあります。";
+
 }

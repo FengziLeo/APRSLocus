@@ -18,6 +18,7 @@ import 'audio_page.dart';
 import 'device_page.dart';
 import 'acn_link_page.dart';
 import 'aprs_is_cards.dart';
+import 'crac_cert_page.dart';
 import 'ic705_device_page.dart';
 import 'platform_caps.dart';
 import 'pkwdwpl_device_page.dart';
@@ -5167,19 +5168,16 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
               ),
             ),
             Divider(height: 1, color: C.border),
-            // 开发人员自测：操作证书查询。**暂不开放** —— 用户 2026-10-22 改了口径：
-            // 界面上不展示验证功能，但这一行作为标签留着（他后来又说「保留开发者
-            // 入口」）；不接 onTap，点了什么都不发生，也不要假装能进。
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              child: Row(children: [
-                Icon(Icons.verified_user_rounded, size: 16, color: C.grey),
-                SizedBox(width: 8),
-                Text(S.of(context).cracCertTitle,
-                    style: ts(12, c: C.grey, w: FontWeight.w600)),
-                Spacer(),
-                Text(S.of(context).cracCertClosed, style: ts(11, c: C.grey)),
-              ]),
+            // 开发人员自测：操作证书查询。页面进得去，但里面那颗认证按钮是灰的
+            // （用户 2026-10-22：「操作证认证保留但是认证按钮是灰色的」）。
+            SettingsNavRow(
+              title: S.of(context).cracCertTitle,
+              icon: Icons.verified_user_rounded,
+              color: C.green,
+              trailing: S.of(context).cracCertClosed,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => CracCertPage(state: st)),
+              ),
             ),
             Divider(height: 1, color: C.border),
             InkWell(

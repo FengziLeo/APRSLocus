@@ -419,6 +419,22 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.29', 'date': '2026-10-22',
+        'items': [
+            ('fix',
+             T('GPS 模式下偶发停在「已保存位置」不再定位，切到模拟位置再切回来才恢复。现在启动会等配置加载完成再起定位，回到前台也会补一次检查。',
+               'GPS 模式下偶發停在「已儲存位置」不再定位，切到模擬位置再切回來才恢復。現在啟動會等設定載入完成再起定位，回到前景也會補一次檢查。',
+               'In GPS mode the app could stay on "saved position" and stop locating until you switched '
+               'to simulated location and back. Start-up now waits for the settings to load before '
+               'locating, and coming back to the foreground checks once more.')),
+            ('new',
+             T('GPS 采样间隔可以自己调，1 秒到 30 秒六档，默认 1 秒。只在 Android 且不是纯网络模式时出现。',
+               'GPS 取樣間隔可以自己調，1 秒到 30 秒六檔，預設 1 秒。只在 Android 且不是純網路模式時出現。',
+               'The GPS sampling interval is adjustable in six steps from 1 to 30 seconds, 1 second by '
+               'default. It shows on Android outside network-only mode.')),
+        ],
+    },
+    {
         'ver': 'v2.1.28', 'date': '2026-10-21',
         'items': [
             ('fix',

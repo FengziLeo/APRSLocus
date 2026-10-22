@@ -133,11 +133,11 @@ The fault was ours. Sorry for the trouble.
 
 ---
 
-## 🔔 What is new: 2.1.28
+## 🔔 What is new: 2.1.29
 
-- Sending over WLAN on an IC-705 often lost the end of a packet. The app now holds PTT for a while after the audio ends, 200 ms by default.
-- The IC-705 page has a new post-TX delay field that takes 0 to 2000.
-- The Dynamic Island and the lock screen show the current state on iPhone, with the callsign and the countdown to the next beacon. Needs iOS 16.2 or later.
+- In GPS mode the app could stay on "saved position" and stop locating until you switched to simulated location and back. Start-up now waits for the settings to load before locating.
+- Coming back to the foreground checks once more and restarts the foreground service if the system killed it.
+- Location mode gained a GPS sampling row, six steps from 1 to 30 seconds, 1 second by default.
 
 ---
 
@@ -155,9 +155,9 @@ Look up APALOC in the official TOCALL table and you will find it.
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-Checking for updates now returns the latest stable version, 2.1.28. If you installed 2.2.0, uninstall it first, then install 2.1.28.
+Checking for updates now returns the latest stable version, 2.1.29. If you installed 2.2.0, uninstall it first, then install 2.1.29.
 
-**[Download 2.1.28](https://github.com/dariondong/APRSLocus/releases/download/v2.1.28/APRSLocus_2.1.28.apk)**
+**[Download 2.1.29](https://github.com/dariondong/APRSLocus/releases/download/v2.1.29/APRSLocus_2.1.29.apk)**
 
 ---
 

@@ -1,5 +1,33 @@
 # 更新日志
 
+## [2.1.29] - 2026-10-22
+
+### GPS 模式下不再停在「已保存位置」
+
+- **GPS 模式下偶发不定位，界面一直停在「已保存位置」，切到模拟位置再切回来才恢复**：启动后自动起定位那一步只等 900 毫秒就判断加载完成，真机上配置加载更慢，这一步被跳过，之后再没有东西去起 GPS。
+- 现在等配置加载真的完成后才起定位。回到前台还会补一次检查，前台服务被系统掐掉就重起。
+
+### GPS 采样间隔可调
+
+- 设置 → 定位上报 → 定位模式里多一行「GPS 采样间隔」，1 / 2 / 3 / 5 / 10 / 30 秒六档，默认 1 秒。
+- 嫌耗电就往大调。只作用于 GPS，网络定位仍固定 10 秒；只在 Android 且不是纯网络模式时出现。
+
+---
+
+## [2.1.29] - 2026-10-22 (English)
+
+### No more sitting on a saved position in GPS mode
+
+- **In GPS mode the app sometimes stopped locating and stayed on "saved position"; switching to simulated location and back brought it round**: the start-up step that begins locating waited a fixed 900 ms for the settings to load, real devices load slower, that step was skipped, and nothing started GPS afterwards.
+- Locating now waits until the load has really finished. Coming back to the foreground checks once more and restarts the foreground service if the system killed it.
+
+### GPS sampling interval
+
+- Settings → Beaconing → Location mode gained a GPS sampling row: 1 / 2 / 3 / 5 / 10 / 30 seconds, 1 second by default.
+- Raise it to save battery. It affects GPS only, network locating stays at 10 seconds, and the row shows on Android outside network-only mode.
+
+---
+
 ## [2.1.28] - 2026-10-21
 
 ### 报尾不会再被切掉

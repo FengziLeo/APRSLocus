@@ -5,7 +5,7 @@
 /// 显示在电台页的「认证信息」那块。
 ///
 /// 接口事实（照抄会踩的坑都记在这里）：
-///   * 地址只有 `/CRAC/app/...` 这个前缀能用，`/CRAC/a/...` 会 302 到登录页；
+///   * 地址只有构建时注入的那一条能用，前端的 `/a/` 前缀会 302 到登录页；
 ///   * 请求体必须是**嵌套** JSON `{"req":{...}}`；网页里看到的 `req=<json串>`
 ///     是它自己的前端拼法，照抄会被后端判 400/415；
 ///   * `code: 10000` 成功，`10010` 查无此人，其余按失败处理；
@@ -21,10 +21,24 @@ import 'dart:convert';
 
 import 'net/http_send.dart';
 
-/// 查询接口。
-const String cracCertEndpoint =
-    'https://zhipu.allspectrum.cn:9528/CRAC/app/businessSupport/'
-    'cracOperationCert/getOperCertByParamWeb';
+/// 查询接口地址。
+///
+/// **源码里不留明文**：发行包由 CI 在构建时从仓库 Secrets 注入
+/// （`--dart-define=CRAC_ENDPOINT=...`，见 `.github/workflows/build-release.yml`）。
+/// 仓库是公开的，这类第三方接口的地址不该跟着源码走。没有注入时
+/// [cracCertConfigured] 为假，查询直接回「未配置」，不发任何请求。
+const String cracCertEndpoint = String.fromEnvironment('CRAC_ENDPOINT');
+
+/// 本次构建有没有注入查询地址。
+bool get cracCertConfigured => cracCertEndpoint.trim().isNotEmpty;
+
+/// 接口站点根（`scheme://host[:port]`）。Origin / Referer 由它拼出来，
+/// 不再各写一份地址。
+String get _cracCertOrigin {
+  final u = Uri.tryParse(cracCertEndpoint.trim());
+  if (u == null || !u.hasScheme || u.host.isEmpty) return '';
+  return '${u.scheme}://${u.authority}';
+}
 
 /// 一张表里的一条记录（三张表的字段已经摊平成同一形状，空值就是空串）。
 class CracCertRecord {
@@ -204,6 +218,12 @@ Future<CracCertResult> queryCracCert({
   required String certNo,
   Duration timeout = const Duration(seconds: 25),
 }) async {
+  if (!cracCertConfigured) {
+    return const CracCertResult(
+      status: CracCertStatus.failed,
+      message: '未配置查询地址',
+    );
+  }
   final body = jsonEncode({
     'req': {
       'page_no': '1',
@@ -222,9 +242,8 @@ Future<CracCertResult> queryCracCert({
       headers: {
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
-        'Origin': 'https://zhipu.allspectrum.cn:9528',
-        'Referer':
-            'https://zhipu.allspectrum.cn:9528/CRAC/crac/pages/list_cert.html',
+        if (_cracCertOrigin.isNotEmpty) 'Origin': _cracCertOrigin,
+        if (_cracCertOrigin.isNotEmpty) 'Referer': '$_cracCertOrigin/',
       },
       body: body,
       timeout: timeout,

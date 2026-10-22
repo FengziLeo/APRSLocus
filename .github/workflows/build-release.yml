@@ -13,6 +13,11 @@ on:
 permissions:
   contents: write
 
+# 第三方接口的参数与地址一律不进源码（本仓库是公开的）：QWEATHER_KEY /
+# QWEATHER_HOST / TIANDITU_KEY / CRAC_ENDPOINT 都在构建时用 --dart-define 从仓库
+# Secrets 注入，源码里只有 `String.fromEnvironment`。没配置时对应功能自己报
+# 「未配置」，包里也就没有那串地址。
+
 # 同一个 tag 被反复刷新时（改一处 bug 就并回同版号重跑），**取消上一次仍在跑的构建**。
 # 否则多次构建并发，Release 会被"先跑完的那次"更新 —— 用户下载到的可能是中间某次
 # 的产物，看着就像"这一版没带上修复"（v2.0.20 就踩过这个坑）。
@@ -52,7 +57,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Windows (Release)
-        run: flutter build windows --release --dart-define=QWEATHER_KEY=${{ secrets.QWEATHER_KEY }} --dart-define=QWEATHER_HOST=${{ secrets.QWEATHER_HOST || 'pf4ewvjfqj.re.qweatherapi.com' }} --dart-define=TIANDITU_KEY=${{ secrets.TIANDITU_KEY }}
+        run: flutter build windows --release --dart-define=QWEATHER_KEY=${{ secrets.QWEATHER_KEY }} --dart-define=QWEATHER_HOST=${{ secrets.QWEATHER_HOST || 'pf4ewvjfqj.re.qweatherapi.com' }} --dart-define=TIANDITU_KEY=${{ secrets.TIANDITU_KEY }} --dart-define=CRAC_ENDPOINT=${{ secrets.CRAC_ENDPOINT }}
 
       - name: Setup Inno Setup
         shell: pwsh
@@ -135,7 +140,7 @@ jobs:
       # 这样 64 位用户走的还是原来那条路，**应用内更新逻辑一行都不用改**。
       # 这条不变量由 tool/check_release_assets.py 盯着（改名字/改顺序都会当场报红）。
       - name: Build APK (Release, split per ABI)
-        run: flutter build apk --release --split-per-abi --dart-define=QWEATHER_KEY=${{ secrets.QWEATHER_KEY }} --dart-define=QWEATHER_HOST=${{ secrets.QWEATHER_HOST || 'pf4ewvjfqj.re.qweatherapi.com' }} --dart-define=TIANDITU_KEY=${{ secrets.TIANDITU_KEY }}
+        run: flutter build apk --release --split-per-abi --dart-define=QWEATHER_KEY=${{ secrets.QWEATHER_KEY }} --dart-define=QWEATHER_HOST=${{ secrets.QWEATHER_HOST || 'pf4ewvjfqj.re.qweatherapi.com' }} --dart-define=TIANDITU_KEY=${{ secrets.TIANDITU_KEY }} --dart-define=CRAC_ENDPOINT=${{ secrets.CRAC_ENDPOINT }}
 
       - name: Rename APKs (split per ABI)
         shell: bash
@@ -194,7 +199,7 @@ jobs:
         run: flutter pub get
 
       - name: Build iOS (Release, no codesign)
-        run: flutter build ios --release --dart-define=QWEATHER_KEY=${{ secrets.QWEATHER_KEY }} --dart-define=QWEATHER_HOST=${{ secrets.QWEATHER_HOST || 'pf4ewvjfqj.re.qweatherapi.com' }} --dart-define=TIANDITU_KEY=${{ secrets.TIANDITU_KEY }} --no-codesign
+        run: flutter build ios --release --dart-define=QWEATHER_KEY=${{ secrets.QWEATHER_KEY }} --dart-define=QWEATHER_HOST=${{ secrets.QWEATHER_HOST || 'pf4ewvjfqj.re.qweatherapi.com' }} --dart-define=TIANDITU_KEY=${{ secrets.TIANDITU_KEY }} --dart-define=CRAC_ENDPOINT=${{ secrets.CRAC_ENDPOINT }} --no-codesign
 
       # 把 .app 封成**未签名 .ipa**。为什么非有这一步不可：
       # `.app` 是**目录**，而 action-gh-release 对目录是**静默跳过** ——

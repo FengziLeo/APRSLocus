@@ -10080,4 +10080,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get cracCertWhyRequired => "El protocolo APRS-IS pone en el desarrollador del software el deber de verificar que los usuarios sean radioaficionados.";
 
+  @override
+  String get cracCertEntry => "Verificación de licencia";
+
+  @override
+  String get cracCertVoluntary => "La verificación es voluntaria. La app funciona igual sin ella.";
+
+  @override
+  String get cracCertLocal => "La comprobación la hace el programa, sin revisión humana. El resultado vuelve solo a este dispositivo y guarda únicamente si pasó y la clase.";
+
 }

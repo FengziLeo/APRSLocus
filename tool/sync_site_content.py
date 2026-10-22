@@ -419,6 +419,18 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.31', 'date': '2026-10-22',
+        'items': [
+            ('new',
+             T('电台页多了一块「操作证验证」，点进去是单独一页，先读说明再点我同意，才出现表单。填姓名和证书编号，程序向 CRAC 的验证接口查一次，结果只回本机、只保留是否通过和证书类别。验证自愿，只有内地呼号显示这一块。',
+               '電台頁多了一塊「操作證驗證」，點進去是單獨一頁，先讀說明再點我同意，才出現表單。填姓名和證書編號，程式向 CRAC 的驗證介面查一次，結果只回本機、只保留是否通過和證書類別。驗證自願，只有內地呼號顯示這一塊。',
+               'The station page gained a licence check block. It opens a page of its own, and the form only '
+               'appears after you read the notes and tap I agree. Type your name and licence number, the app '
+               'asks the CRAC check endpoint once, and the result comes back to this device only, keeping just '
+               'the pass and the class. Verification is voluntary and only mainland China callsigns see it.')),
+        ],
+    },
+    {
         'ver': 'v2.1.30', 'date': '2026-10-22',
         'items': [
             ('fix',

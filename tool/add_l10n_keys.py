@@ -110,6 +110,27 @@ KEYS = {
     'cracCertClosed': (
         '暂不开放', '暫不開放', 'Not open yet', '未公開',
         'Aún no disponible', 'Belum dibuka'),
+    # 电台页的入口 + 那一页的三条说明
+    'cracCertEntry': (
+        '操作证验证', '操作證驗證', 'Licence check', '操作資格の確認',
+        'Verificación de licencia', 'Pemeriksaan lisensi'),
+    'cracCertVoluntary': (
+        '验证自愿，不验证也能照常用。',
+        '驗證自願，不驗證也能照常用。',
+        'Verification is voluntary. The app works the same without it.',
+        '認証は任意です。しなくても同じように使えます。',
+        'La verificación es voluntaria. La app funciona igual sin ella.',
+        'Verifikasi bersifat sukarela. Aplikasi tetap berjalan sama tanpanya.'),
+    'cracCertLocal': (
+        '查询由程序直接完成，没有人工审核。结果只回本机，只保留是否通过和证书类别。',
+        '查詢由程式直接完成，沒有任何人工作業。結果只回本機，只保留是否通過和證書類別。',
+        'The check runs by program, with no human review. The result comes back to this device only, '
+        'and keeps just the pass and the licence class.',
+        '照合はプログラムが行い、人手の審査はありません。結果はこの端末にだけ戻り、通過と資格クラスだけを残します。',
+        'La comprobación la hace el programa, sin revisión humana. El resultado vuelve solo a este '
+        'dispositivo y guarda únicamente si pasó y la clase.',
+        'Pemeriksaan dijalankan oleh program, tanpa tinjauan manusia. Hasilnya kembali hanya ke '
+        'perangkat ini, berisi lulus dan kelas lisensi saja.'),
     # 认证页面里那句「为什么要有这一步」—— 用户给的原话
     'cracCertWhyRequired': (
         'APRS-IS 协议 软件开发者有责任与义务验证软件使用者为业余无线电爱好者',

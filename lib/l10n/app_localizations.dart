@@ -17643,6 +17643,24 @@ abstract class AppLocalizations {
   /// **'APRS-IS 协议 软件开发者有责任与义务验证软件使用者为业余无线电爱好者'**
   String get cracCertWhyRequired;
 
+  /// No description provided for @cracCertEntry.
+  ///
+  /// In zh, this message translates to:
+  /// **'操作证验证'**
+  String get cracCertEntry;
+
+  /// No description provided for @cracCertVoluntary.
+  ///
+  /// In zh, this message translates to:
+  /// **'验证自愿，不验证也能照常用。'**
+  String get cracCertVoluntary;
+
+  /// No description provided for @cracCertLocal.
+  ///
+  /// In zh, this message translates to:
+  /// **'查询由程序直接完成，没有人工审核。结果只回本机，只保留是否通过和证书类别。'**
+  String get cracCertLocal;
+
 }
 
 class _AppLocalizationsDelegate

@@ -10031,4 +10031,13 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get cracCertWhyRequired => "Protokol APRS-IS menetapkan kewajiban pengembang perangkat lunak untuk memastikan pengguna adalah penggemar radio amatir.";
 
+  @override
+  String get cracCertEntry => "Pemeriksaan lisensi";
+
+  @override
+  String get cracCertVoluntary => "Verifikasi bersifat sukarela. Aplikasi tetap berjalan sama tanpanya.";
+
+  @override
+  String get cracCertLocal => "Pemeriksaan dijalankan oleh program, tanpa tinjauan manusia. Hasilnya kembali hanya ke perangkat ini, berisi lulus dan kelas lisensi saja.";
+
 }

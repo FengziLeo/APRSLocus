@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/// 操作证书查询页（设置 → 高级 → 开发人员）。
+/// 操作证验证页（电台页的入口，也可从设置 → 高级 → 开发人员 进）。
+///
+/// 两段：先一页说明，用户点「我同意」才看到表单 —— 用户 2026-10-22：
+/// 「点击操作证验证之后，将会单独跳转一页进行操作证验证，进行同意」。
+/// 同意不落盘，每次进来重新问一遍；拒绝就直接退回去，什么都不发。
 ///
 /// 查到了就把「呼号 + 证书类别」记在本机，电台页的「认证信息」那块
 /// 显示的就是这条记录（见 `_StationSettingsPageState._certCard`）。
@@ -30,6 +34,10 @@ class _CracCertPageState extends State<CracCertPage> {
 
   bool _busy = false;
   CracCertResult? _result;
+
+  /// 这一次进来是否已经同意。**不持久化**：每次进这一页都要重新同意一次
+  /// （用户要的是「跳转一页……进行同意」这个动作本身，而不是一次性开关）。
+  bool _agreed = false;
 
   /// 结果行下方那句「已记到呼号 X / 这条登记的是 Y」。
   String _note = '';
@@ -108,55 +116,99 @@ class _CracCertPageState extends State<CracCertPage> {
     return ListenableBuilder(
       listenable: st,
       builder: (context, _) => SettingsPageShell(
-        title: s.cracCertTitle,
+        title: s.cracCertEntry,
         icon: Icons.verified_user_rounded,
         color: C.green,
-        body: Column(children: [
-          SettingsSectionCard(
-            title: s.cracCertTitle,
-            icon: Icons.manage_search_rounded,
-            color: C.green,
-            children: [
-              SettingsInput(s.cracCertName, _name,
-                  onEditingComplete: () => _query()),
-              SettingsInput(s.cracCertNumber, _cert,
-                  onEditingComplete: () => _query()),
-              SettingsHint(s.cracCertPrivacy),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 2, 14, 12),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    // 认证按钮先置灰（用户 2026-10-22：「操作证认证保留但是认证按钮
-                    // 是灰色的」）。按钮不接 onPressed —— 门关着就不要假装能查；
-                    // 表单与查询实现都留着，开的时候把这一行改回 `_query` 就行。
-                    onPressed: null,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: C.green,
-                      disabledBackgroundColor: C.greyBg,
-                      disabledForegroundColor: C.slate,
-                      padding: const EdgeInsets.symmetric(vertical: 11),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: Text(
-                      _busy ? s.cracCertQuerying : s.cracCertQuery,
-                      style: ts(12, w: FontWeight.w700),
-                    ),
-                  ),
-                ),
-              ),
-              // 为什么要有这一步（用户原话）：APRS-IS 协议里，验证使用者确实是
-              // 业余无线电爱好者是软件开发者的责任与义务。
-              SettingsHint(s.cracCertWhyRequired, icon: Icons.gavel_rounded),
-              const SizedBox(height: 6),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _resultCard(s),
-        ]),
+        body: _agreed ? _form(s) : _consent(s),
       ),
     );
+  }
+
+  /// 第一段：先把事情说清楚，用户点「我同意」才看得到表单。
+  ///
+  /// 四条说明按「数据去哪、怎么检、是不是必须做、为什么要有这一步」排。
+  Widget _consent(S s) {
+    return Column(children: [
+      SettingsSectionCard(
+        title: s.cracCertEntry,
+        icon: Icons.policy_rounded,
+        color: C.green,
+        children: [
+          SettingsHint(s.cracCertPrivacy),
+          SettingsHint(s.cracCertLocal, icon: Icons.rule_rounded),
+          SettingsHint(s.cracCertVoluntary,
+              icon: Icons.volunteer_activism_rounded),
+          SettingsHint(s.cracCertWhyRequired, icon: Icons.gavel_rounded),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 4, 14, 12),
+            child: Row(children: [
+              Expanded(
+                child: FilledButton(
+                  onPressed: () => setState(() => _agreed = true),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: C.green,
+                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(s.consentAgree,
+                      style: ts(12, c: Colors.white, w: FontWeight.w700)),
+                ),
+              ),
+              const SizedBox(width: 10),
+              // 不同意就直接退回去：什么都不填、什么都不发。
+              TextButton(
+                onPressed: () => Navigator.of(context).maybePop(),
+                child: Text(s.cancel, style: ts(12, c: C.slate)),
+              ),
+            ]),
+          ),
+        ],
+      ),
+    ]);
+  }
+
+  /// 第二段：表单 + 查询。
+  Widget _form(S s) {
+    return Column(children: [
+      SettingsSectionCard(
+        title: s.cracCertEntry,
+        icon: Icons.manage_search_rounded,
+        color: C.green,
+        children: [
+          SettingsInput(s.cracCertName, _name,
+              onEditingComplete: () => _query()),
+          SettingsInput(s.cracCertNumber, _cert,
+              onEditingComplete: () => _query()),
+          SettingsHint(s.cracCertPrivacy),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 2, 14, 12),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _busy ? null : _query,
+                style: FilledButton.styleFrom(
+                  backgroundColor: C.green,
+                  disabledBackgroundColor: C.greyBg,
+                  disabledForegroundColor: C.slate,
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text(
+                  _busy ? s.cracCertQuerying : s.cracCertQuery,
+                  style: ts(12, c: Colors.white, w: FontWeight.w700),
+                ),
+              ),
+            ),
+          ),
+          SettingsHint(s.cracCertWhyRequired, icon: Icons.gavel_rounded),
+          const SizedBox(height: 6),
+        ],
+      ),
+      const SizedBox(height: 16),
+      _resultCard(s),
+    ]);
   }
 
   Widget _resultCard(S s) {
@@ -165,9 +217,16 @@ class _CracCertPageState extends State<CracCertPage> {
     if (result != null) {
       switch (result.status) {
         case CracCertStatus.found:
-          for (final rec in result.records) {
-            children.addAll(_recordRows(s, rec));
-          }
+          // 只回「通过 + 证书类别」（用户 2026-10-22：只返回验证成功与 A/B/C 证）。
+          // 接口其实带了姓名/证号/发证日期这些字段，这里一律不展 —— 多列一行
+          // 就多一种「拿别人的记录当自己的」异议，也不该把人家的证件号留在屏幕上。
+          final rec = result.records.first;
+          children.add(_line(
+            rec.typeLabel.isEmpty
+                ? s.cracCertVerified
+                : '${s.cracCertVerified} · ${rec.typeLabel}',
+            C.green,
+          ));
           break;
         case CracCertStatus.notFound:
           children.add(_line(s.cracCertNotFound, C.orange));
@@ -185,25 +244,6 @@ class _CracCertPageState extends State<CracCertPage> {
       color: C.green,
       children: children,
     );
-  }
-
-  List<Widget> _recordRows(S s, CracCertRecord rec) {
-    final rows = <Widget>[_line(rec.table, C.green)];
-    void add(String label, String value) {
-      if (value.trim().isEmpty) return;
-      rows.add(SettingsRow2(label, value));
-    }
-
-    add(s.cracCertName, rec.name);
-    add(s.cracCertNumber, rec.certNo);
-    if (rec.type.isNotEmpty) add(s.cracCertType, rec.typeLabel);
-    add(s.cracCertCall, rec.call);
-    add(s.cracCertPassDate, rec.passDate);
-    add(s.cracCertIssueDate, rec.issueDate);
-    add(s.cracCertRegion, rec.region);
-    add(s.cracCertValid, rec.validThrough);
-    add(s.cracCertId, rec.idMasked);
-    return rows;
   }
 
   Widget _line(String text, Color color) => Container(

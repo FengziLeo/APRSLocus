@@ -4344,5 +4344,8 @@
   "historyRecord": "Registrar historial",
   "historyEmptyOff": "La grabación está desactivada. Actívala arriba para empezar.",
   "cracCertClosed": "Aún no disponible",
-  "cracCertWhyRequired": "El protocolo APRS-IS pone en el desarrollador del software el deber de verificar que los usuarios sean radioaficionados."
+  "cracCertWhyRequired": "El protocolo APRS-IS pone en el desarrollador del software el deber de verificar que los usuarios sean radioaficionados.",
+  "cracCertEntry": "Verificación de licencia",
+  "cracCertVoluntary": "La verificación es voluntaria. La app funciona igual sin ella.",
+  "cracCertLocal": "La comprobación la hace el programa, sin revisión humana. El resultado vuelve solo a este dispositivo y guarda únicamente si pasó y la clase."
 }

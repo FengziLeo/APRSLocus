@@ -4344,5 +4344,8 @@
   "historyRecord": "履歴を記録",
   "historyEmptyOff": "記録は切っています。上のスイッチを入れると記録します。",
   "cracCertClosed": "未公開",
-  "cracCertWhyRequired": "APRS-IS プロトコルでは、利用者がアマチュア無線家であることを確認する責任と義務がソフトウェア開発者にあります。"
+  "cracCertWhyRequired": "APRS-IS プロトコルでは、利用者がアマチュア無線家であることを確認する責任と義務がソフトウェア開発者にあります。",
+  "cracCertEntry": "操作資格の確認",
+  "cracCertVoluntary": "認証は任意です。しなくても同じように使えます。",
+  "cracCertLocal": "照合はプログラムが行い、人手の審査はありません。結果はこの端末にだけ戻り、通過と資格クラスだけを残します。"
 }

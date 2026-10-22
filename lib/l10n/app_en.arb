@@ -4344,5 +4344,8 @@
   "historyRecord": "Track history",
   "historyEmptyOff": "Recording is off. Turn it on above to start.",
   "cracCertClosed": "Not open yet",
-  "cracCertWhyRequired": "The APRS-IS protocol puts the duty on the software developer to verify that users are amateur radio operators."
+  "cracCertWhyRequired": "The APRS-IS protocol puts the duty on the software developer to verify that users are amateur radio operators.",
+  "cracCertEntry": "Licence check",
+  "cracCertVoluntary": "Verification is voluntary. The app works the same without it.",
+  "cracCertLocal": "The check runs by program, with no human review. The result comes back to this device only, and keeps just the pass and the licence class."
 }

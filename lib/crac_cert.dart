@@ -32,6 +32,21 @@ const String cracCertEndpoint = String.fromEnvironment('CRAC_ENDPOINT');
 /// 本次构建有没有注入查询地址。
 bool get cracCertConfigured => cracCertEndpoint.trim().isNotEmpty;
 
+/// 这个呼号能不能用操作证验证。
+///
+/// 用户 2026-10-22：「仅对中国用户中国呼号激活，其他地区的呼号不会显示」。
+/// CRAC 那边只收录内地、香港与外国来访者这三张表，而内地呼号才是 BAA–BZZ
+/// 这一段；台湾的 BV 不在 CRAC 里（那边用自己的系统），所以一并排掉。
+/// 不合格的呼号连入口都不出 —— 让一个 JA 台友点进去、填完名字再被告知
+/// 「没有查到」，比不给他看这个入口更伤人。
+bool cracCallSupported(String call) {
+  final c = call.trim().toUpperCase();
+  if (c.length < 3) return false;
+  if (!c.startsWith('B')) return false;
+  if (c.startsWith('BV')) return false;
+  return true;
+}
+
 /// 接口站点根（`scheme://host[:port]`）。Origin / Referer 由它拼出来，
 /// 不再各写一份地址。
 String get _cracCertOrigin {

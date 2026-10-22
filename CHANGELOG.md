@@ -1,5 +1,25 @@
 # 更新日志
 
+## [2.1.31] - 2026-10-22
+
+### 电台页可以验证操作证
+
+- **电台页多了一块「操作证验证」**：点进去是单独一页，先把说明读完、点「我同意」，才出现表单。
+- 填姓名和证书编号，程序向 CRAC 的验证接口查一次。没有人工审核，结果只回本机，只保留是否通过和证书类别。
+- 验证自愿，不验证也能照常用。只有内地的呼号显示这一块。
+
+---
+
+## [2.1.31] - 2026-10-22 (English)
+
+### Licence check on the station page
+
+- **The station page gained a licence check block**: tapping it opens a page of its own, and the form only appears after you read the notes and tap "I agree".
+- Type your name and licence number; the app asks the CRAC check endpoint once. No human review, the result comes back to this device only and keeps just the pass and the licence class.
+- Verification is voluntary, the app works the same without it, and only mainland China callsigns see the block.
+
+---
+
 ## [2.1.30] - 2026-10-22
 
 ### 历史轨迹默认不记录

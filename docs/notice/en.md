@@ -133,11 +133,11 @@ The fault was ours. Sorry for the trouble.
 
 ---
 
-## 🔔 What is new: 2.1.30
+## 🔔 What is new: 2.1.31
 
-- Track history used to record all the time. It is off by default now; turn it on at the top of the track history page.
-- Days you already recorded stay viewable, deletable and exportable as GPX.
-- Lite mode puts the reporting bar back under the tabs, so a manual beacon no longer means a trip to settings.
+- The station page gained a licence check. It opens a page of its own, and the form only appears after you read the notes and tap "I agree".
+- Type your name and licence number; the app asks the CRAC check endpoint once. The result comes back to this device only and keeps just the pass and the class.
+- Verification is voluntary and the app works the same without it. Only mainland China callsigns see the block.
 
 ---
 
@@ -155,9 +155,9 @@ Look up APALOC in the official TOCALL table and you will find it.
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-Checking for updates now returns the latest stable version, 2.1.30. If you installed 2.2.0, uninstall it first, then install 2.1.30.
+Checking for updates now returns the latest stable version, 2.1.31. If you installed 2.2.0, uninstall it first, then install 2.1.31.
 
-**[Download 2.1.30](https://github.com/dariondong/APRSLocus/releases/download/v2.1.30/APRSLocus_2.1.30.apk)**
+**[Download 2.1.31](https://github.com/dariondong/APRSLocus/releases/download/v2.1.31/APRSLocus_2.1.31.apk)**
 
 ---
 

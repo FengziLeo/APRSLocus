@@ -18,6 +18,7 @@ import 'audio_page.dart';
 import 'device_page.dart';
 import 'acn_link_page.dart';
 import 'aprs_is_cards.dart';
+import 'crac_cert.dart';
 import 'crac_cert_page.dart';
 import 'ic705_device_page.dart';
 import 'platform_caps.dart';
@@ -548,13 +549,15 @@ class _StationSettingsPageState extends State<StationSettingsPage> {
     );
   }
 
-  /// 认证信息：本机存着的那条操作证书记录（由 [CracCertPage] 写入）。
+  /// 操作证验证：入口在本机没记录时，记录在本机有记录时。
   ///
-  /// 只在查到过记录时出现 —— 没查过就整块不占位置。清除也放在这里，
-  /// 记录是在哪块显示的，撤销就在哪块做。
+  /// 用户 2026-10-22：电台页就能验证操作证，点进去**单独一页**先同意再填；
+  /// 只有内地呼号显示（其他地区的呼号不出现这一块）。
+  ///
+  /// 清除也放在这里 —— 记录是在哪块显示的，撤销就在哪块做。
   Widget _certCard() {
+    if (!cracCallSupported(st.myBaseCall)) return const SizedBox.shrink();
     final info = st.cracCert;
-    if (info == null) return const SizedBox.shrink();
     final s = S.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 16),
@@ -563,27 +566,56 @@ class _StationSettingsPageState extends State<StationSettingsPage> {
         icon: Icons.verified_user_rounded,
         color: C.green,
         children: [
-          if (info.typeLabel.isNotEmpty)
-            SettingsRow2(s.cracCertType, info.typeLabel),
-          SettingsRow2(s.cracCertCall, info.call),
-          if (info.certNo.isNotEmpty)
-            SettingsRow2(s.cracCertNumber, info.certNo),
-          if (info.at.isNotEmpty) SettingsRow2(s.cracCertChecked, info.at),
-          InkWell(
-            onTap: _clearCert,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              child: Row(children: [
-                Icon(Icons.delete_outline_rounded, size: 16, color: C.red),
-                const SizedBox(width: 8),
-                Text(s.cracCertClear,
-                    style: ts(12, c: C.red, w: FontWeight.w600)),
-              ]),
+          if (info == null)
+            InkWell(
+              onTap: _openCertPage,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                child: Row(children: [
+                  Icon(Icons.add_circle_outline_rounded,
+                      size: 16, color: C.green),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(s.cracCertEntry,
+                        style: ts(13, c: C.ink, w: FontWeight.w600)),
+                  ),
+                  Icon(Icons.chevron_right_rounded, size: 18, color: C.grey),
+                ]),
+              ),
+            )
+          else ...[
+            if (info.typeLabel.isNotEmpty)
+              SettingsRow2(s.cracCertType, info.typeLabel),
+            SettingsRow2(s.cracCertCall, info.call),
+            if (info.certNo.isNotEmpty)
+              SettingsRow2(s.cracCertNumber, info.certNo),
+            if (info.at.isNotEmpty) SettingsRow2(s.cracCertChecked, info.at),
+            InkWell(
+              onTap: _clearCert,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                child: Row(children: [
+                  Icon(Icons.delete_outline_rounded, size: 16, color: C.red),
+                  const SizedBox(width: 8),
+                  Text(s.cracCertClear,
+                      style: ts(12, c: C.red, w: FontWeight.w600)),
+                ]),
+              ),
             ),
-          ),
+          ],
+          SettingsHint(s.cracCertVoluntary),
         ],
       ),
     );
+  }
+
+  /// 跳进验证页：那一页自己有一段说明与「我同意」，同意后才看得到表单。
+  void _openCertPage() {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => CracCertPage(state: st),
+    ));
   }
 
   /// 清除本机存的证书记录。要用户点一次确认，清掉之后可以重新查。
@@ -5237,13 +5269,13 @@ class _AdvancedSettingsPageState extends State<AdvancedSettingsPage> {
               ),
             ),
             Divider(height: 1, color: C.border),
-            // 开发人员自测：操作证书查询。页面进得去，但里面那颗认证按钮是灰的
-            // （用户 2026-10-22：「操作证认证保留但是认证按钮是灰色的」）。
+            // 开发人员自测：操作证验证。电台页也能进（那边只对内地的呼号显示），
+            // 这一行是给开发者自己留的口子；右边显示已经验过的类别。
             SettingsNavRow(
-              title: S.of(context).cracCertTitle,
+              title: S.of(context).cracCertEntry,
               icon: Icons.verified_user_rounded,
               color: C.green,
-              trailing: S.of(context).cracCertClosed,
+              trailing: st.cracCert?.typeLabel ?? '',
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => CracCertPage(state: st)),
               ),

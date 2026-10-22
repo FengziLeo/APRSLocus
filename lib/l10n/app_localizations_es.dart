@@ -10074,4 +10074,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get historyEmptyOff => "La grabación está desactivada. Actívala arriba para empezar.";
 
+  @override
+  String get cracCertClosed => "Aún no disponible";
+
 }

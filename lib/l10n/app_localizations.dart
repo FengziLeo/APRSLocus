@@ -17631,6 +17631,12 @@ abstract class AppLocalizations {
   /// **'记录没开。打开上面的开关才会记。'**
   String get historyEmptyOff;
 
+  /// No description provided for @cracCertClosed.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂不开放'**
+  String get cracCertClosed;
+
 }
 
 class _AppLocalizationsDelegate

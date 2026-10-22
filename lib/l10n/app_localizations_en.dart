@@ -10015,4 +10015,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get historyEmptyOff => "Recording is off. Turn it on above to start.";
 
+  @override
+  String get cracCertClosed => "Not open yet";
+
 }

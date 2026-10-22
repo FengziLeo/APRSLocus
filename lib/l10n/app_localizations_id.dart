@@ -10025,4 +10025,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get historyEmptyOff => "Perekaman mati. Nyalakan sakelar di atas untuk mulai.";
 
+  @override
+  String get cracCertClosed => "Belum dibuka";
+
 }

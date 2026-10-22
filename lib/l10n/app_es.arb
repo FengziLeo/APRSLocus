@@ -4342,5 +4342,6 @@
   "gpsSampleSec": "{s} s",
   "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
   "historyRecord": "Registrar historial",
-  "historyEmptyOff": "La grabación está desactivada. Actívala arriba para empezar."
+  "historyEmptyOff": "La grabación está desactivada. Actívala arriba para empezar.",
+  "cracCertClosed": "Aún no disponible"
 }

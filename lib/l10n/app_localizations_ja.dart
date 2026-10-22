@@ -9736,4 +9736,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get historyEmptyOff => "記録は切っています。上のスイッチを入れると記録します。";
 
+  @override
+  String get cracCertClosed => "未公開";
+
 }

@@ -4930,5 +4930,6 @@
   "gpsSampleSec": "{s} 秒",
   "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
   "historyRecord": "記錄歷史軌跡",
-  "historyEmptyOff": "記錄沒開。打開上面的開關才會記。"
+  "historyEmptyOff": "記錄沒開。打開上面的開關才會記。",
+  "cracCertClosed": "暫不開放"
 }

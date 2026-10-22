@@ -106,6 +106,10 @@ KEYS = {
         '記録は切っています。上のスイッチを入れると記録します。',
         'La grabación está desactivada. Actívala arriba para empezar.',
         'Perekaman mati. Nyalakan sakelar di atas untuk mulai.'),
+    # 开发人员里那一行操作证书查询的标签：功能先关着，位置留着
+    'cracCertClosed': (
+        '暂不开放', '暫不開放', 'Not open yet', '未公開',
+        'Aún no disponible', 'Belum dibuka'),
 }
 
 META = {

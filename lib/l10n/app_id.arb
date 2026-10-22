@@ -4342,5 +4342,6 @@
   "gpsSampleSec": "{s} dtk",
   "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
   "historyRecord": "Rekam riwayat",
-  "historyEmptyOff": "Perekaman mati. Nyalakan sakelar di atas untuk mulai."
+  "historyEmptyOff": "Perekaman mati. Nyalakan sakelar di atas untuk mulai.",
+  "cracCertClosed": "Belum dibuka"
 }

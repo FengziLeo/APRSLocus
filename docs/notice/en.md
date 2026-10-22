@@ -133,11 +133,11 @@ The fault was ours. Sorry for the trouble.
 
 ---
 
-## 🔔 What is new: 2.1.29
+## 🔔 What is new: 2.1.30
 
-- In GPS mode the app could stay on "saved position" and stop locating until you switched to simulated location and back. Start-up now waits for the settings to load before locating.
-- Coming back to the foreground checks once more and restarts the foreground service if the system killed it.
-- Location mode gained a GPS sampling row, six steps from 1 to 30 seconds, 1 second by default.
+- Track history used to record all the time. It is off by default now; turn it on at the top of the track history page.
+- Days you already recorded stay viewable, deletable and exportable as GPX.
+- Lite mode puts the reporting bar back under the tabs, so a manual beacon no longer means a trip to settings.
 
 ---
 
@@ -155,9 +155,9 @@ Look up APALOC in the official TOCALL table and you will find it.
 
 The 2.2.0 build published on the Qingling (清零) channel by mistake has been taken down, and the channel works normally again.
 
-Checking for updates now returns the latest stable version, 2.1.29. If you installed 2.2.0, uninstall it first, then install 2.1.29.
+Checking for updates now returns the latest stable version, 2.1.30. If you installed 2.2.0, uninstall it first, then install 2.1.30.
 
-**[Download 2.1.29](https://github.com/dariondong/APRSLocus/releases/download/v2.1.29/APRSLocus_2.1.29.apk)**
+**[Download 2.1.30](https://github.com/dariondong/APRSLocus/releases/download/v2.1.30/APRSLocus_2.1.30.apk)**
 
 ---
 

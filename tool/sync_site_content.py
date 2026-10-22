@@ -419,6 +419,23 @@ CARDS = [
 # 只列「重点版本」：中间几十个纯修 bug 的版本归纳进文字说明，完整记录指向 Releases。
 CL = [
     {
+        'ver': 'v2.1.30', 'date': '2026-10-22',
+        'items': [
+            ('fix',
+             T('历史轨迹以前一直在记，现在默认关。要记就在历史轨迹页顶部把开关打开，关着时那一页会直接说记录没开。已经记下的那些天照旧能看、能删、能导出。',
+               '歷史軌跡以前一直在記，現在預設關。要記就在歷史軌跡頁頂端把開關打開，關著時那一頁會直接說記錄沒開。已經記下的那些天照舊能看、能刪、能匯出。',
+               'Track history used to record all the time; it is off by default now. Turn it on at the top '
+               'of the track history page. Days you already recorded stay viewable, deletable and '
+               'exportable.')),
+            ('new',
+             T('精简模式的页签下面补回上报状态条，左边是现在这一发是什么，右边是自动或单次与立即上报，手动发一包不用再去设置页。',
+               '精簡模式的頁籤下面補回上報狀態條，左邊是現在這一發是什麼，右邊是自動或單次與立即上報，手動發一包不用再去設定頁。',
+               'Lite mode puts the reporting bar back under the tabs: what this beacon is on the left, '
+               'auto or single plus send now on the right, so a manual beacon no longer means a trip to '
+               'settings.')),
+        ],
+    },
+    {
         'ver': 'v2.1.29', 'date': '2026-10-22',
         'items': [
             ('fix',

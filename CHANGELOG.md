@@ -1,5 +1,33 @@
 # 更新日志
 
+## [2.1.30] - 2026-10-22
+
+### 历史轨迹默认不记录
+
+- **历史轨迹以前是一直在记的**：定位一动就往按天的文件里写，谁翻过账看得一清二楚。现在默认关，要记就在设置 → 历史轨迹页顶部把开关打开。
+- 关着时那一页会直接说记录没开。已经记下的那些天照旧能看、能删、能导出 GPX。
+
+### 精简模式补回上报状态条
+
+- **精简模式的页签下面多了一行**：左边是现在这一发是什么（未连接、距下次上报 42s、待确认上报这一类），右边是「自动 / 单次」与「立即上报」。
+- 以前在精简模式里想手动发一包，得绕到设置页去。这一行与地图页那条横杠用的是同一份文案。
+
+---
+
+## [2.1.30] - 2026-10-22 (English)
+
+### Track history is off by default
+
+- **Track history used to record all the time**: every fix went into that day's file. It is off by default now; turn it on at the top of the track history page.
+- While it is off, that page says so plainly. Days you already recorded stay viewable, deletable and exportable as GPX.
+
+### The reporting bar is back in lite mode
+
+- **Lite mode has one more row under the tabs**: what this beacon is on the left (not connected, 42s to the next beacon, waiting for confirmation), auto or single plus send now on the right.
+- A manual beacon in lite mode used to mean a trip to settings. The row shares its wording with the bar on the map page.
+
+---
+
 ## [2.1.29] - 2026-10-22
 
 ### GPS 模式下不再停在「已保存位置」

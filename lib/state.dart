@@ -5888,7 +5888,15 @@ class AppState extends ChangeNotifier {
     // 启动后自动获取定位：仅在 OOBE 已完成（非首次）时进行；
     // 首次启动的权限请求移到 OOBE 完成后由 _requestLocationAfterOobe 触发。
     Future.delayed(const Duration(milliseconds: 900), () async {
-      if (_disposed || !initialized) return;
+      if (_disposed) return;
+      // ⚠ 必须等初始化**真的**落地，不能只看「900ms 到点了没有」。
+      // `_loadPrefs()` 是异步的（各设备配置 + 本地库 + 三条开机自检各带 400ms
+      // 上限），冷启动时经常超过 900ms。以前这里只判一次
+      // 「初始化好了没」，没好就直接 return，于是加载慢过 900ms 时
+      // 「启动自动定位」这条**唯一**的全自动路径就整个丢掉了：界面一直停在
+      // 「已保存位置」，用户得去「模拟位置」再切回 GPS 才恢复（用户报的正是这个）。
+      await _waitInitialized();
+      if (!initialized) return; // 加载卡到 30 秒上限：这一轮不自动起定位
       if (!oobeDone) return;
       if (useSimLocation) {
         // 模拟位置不读 GPS，但要**对称地**把保活前台服务拉起来：GPS 模式启动就
@@ -5912,6 +5920,19 @@ class AppState extends ChangeNotifier {
       if (_disposed) return;
       unawaited(autoStartOnLaunch());
     });
+  }
+
+  /// 等 [_loadPrefs] 跑完（`initialized` 转真）。
+  ///
+  /// 为什么要等而不是睡固定时长：见构造器里「启动自动定位」那段的说明 ——
+  /// 固定等待一旦短于真实加载时间，自动定位就静默失效，界面永远停在
+  /// 「已保存位置」，只有手动切一次模拟位置再切回来才恢复。
+  /// 上限 30 秒：加载卡死时也不能把后面的启动流程挂住。
+  Future<void> _waitInitialized() async {
+    for (var i = 0; i < 300; i++) {
+      if (_disposed || initialized) return;
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
   }
 
   /// OOBE 完成后的定位引导：请求定位权限并启动定位，失败不阻塞（可手动再开）

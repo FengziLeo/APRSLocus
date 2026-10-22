@@ -96,6 +96,16 @@ def main() -> int:
          'pauseForExternal 没把原生模式切成 keepalive（就停不了采样）')
     forbid('lib/state.dart', '_phoneGpsPaused = true;\n      loc.stop();',
            '外置 GPS 接管时还在停前台服务 —— 后台连接与信标定时器会静默失效')
+
+    # 启动自动定位**不许**依赖一个固定延时：`_loadPrefs()` 慢过它就静默失效，
+    # 界面永远停在「已保存位置」，只有手动切一次模拟位置再切回来才恢复。
+    # 用户报的就是这个，而且它不报错、不告警 —— 只能钉在这里。
+    need('lib/state.dart', 'await _waitInitialized();',
+         '启动自动定位没有等初始化落地 —— 加载慢过固定延时就会整条失效')
+    forbid('lib/state.dart', 'if (_disposed || !initialized) return;',
+         '启动自动定位又退回「按固定延时判一次初始化」—— 加载慢就永远停在已保存位置')
+    need('lib/state.dart', 'Future<void> _waitInitialized() async {',
+         '缺少 _waitInitialized：没有「等初始化落地」的实现')
     # 外接 GPS 模块**启用着但早已断流**时，不准再拿它当挡粗点的理由：
     # 室内/纯网络模式下那等于永远没有位置（同一个用户报告的另一半）。
     forbid('lib/state.dart', 'if (coarse && nmeaGpsOn) return;',

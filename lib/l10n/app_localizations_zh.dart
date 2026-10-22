@@ -9630,6 +9630,12 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String gpsSampleSec(String s) => "$s 秒";
 
+  @override
+  String get historyRecord => "记录历史轨迹";
+
+  @override
+  String get historyEmptyOff => "记录没开。打开上面的开关才会记。";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -19256,5 +19262,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String gpsSampleSec(String s) => "$s 秒";
+
+  @override
+  String get historyRecord => "記錄歷史軌跡";
+
+  @override
+  String get historyEmptyOff => "記錄沒開。打開上面的開關才會記。";
 
 }

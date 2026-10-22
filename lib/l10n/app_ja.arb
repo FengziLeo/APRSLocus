@@ -4340,5 +4340,7 @@
   "cracCertVerified": "確認済み",
   "gpsSampleTitle": "GPS サンプリング間隔",
   "gpsSampleSec": "{s} 秒",
-  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}}
+  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
+  "historyRecord": "履歴を記録",
+  "historyEmptyOff": "記録は切っています。上のスイッチを入れると記録します。"
 }

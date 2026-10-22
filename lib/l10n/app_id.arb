@@ -4340,5 +4340,7 @@
   "cracCertVerified": "Terverifikasi",
   "gpsSampleTitle": "Sampling GPS",
   "gpsSampleSec": "{s} dtk",
-  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}}
+  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
+  "historyRecord": "Rekam riwayat",
+  "historyEmptyOff": "Perekaman mati. Nyalakan sakelar di atas untuk mulai."
 }

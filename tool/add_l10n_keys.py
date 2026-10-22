@@ -95,6 +95,17 @@ KEYS = {
     # 附近台站那个数是**带单位**的（台/局/est…），单位只能跟着语言走
     'notifLiveNearShort': (
         '{n} 台', '{n} 臺', '{n} stn', '{n} 局', '{n} est', '{n} stn'),
+    # ── 历史轨迹：记录开关（默认关）──
+    'historyRecord': (
+        '记录历史轨迹', '記錄歷史軌跡', 'Track history', '履歴を記録',
+        'Registrar historial', 'Rekam riwayat'),
+    'historyEmptyOff': (
+        '记录没开。打开上面的开关才会记。',
+        '記錄沒開。打開上面的開關才會記。',
+        'Recording is off. Turn it on above to start.',
+        '記録は切っています。上のスイッチを入れると記録します。',
+        'La grabación está desactivada. Actívala arriba para empezar.',
+        'Perekaman mati. Nyalakan sakelar di atas untuk mulai.'),
 }
 
 META = {

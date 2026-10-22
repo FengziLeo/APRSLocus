@@ -4340,5 +4340,7 @@
   "cracCertVerified": "Verified",
   "gpsSampleTitle": "GPS sampling",
   "gpsSampleSec": "{s} s",
-  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}}
+  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
+  "historyRecord": "Track history",
+  "historyEmptyOff": "Recording is off. Turn it on above to start."
 }

@@ -277,6 +277,8 @@ class _TrackHistoryPageState extends State<TrackHistoryPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          _recordCard(),
+          const SizedBox(height: 10),
           if (_loading)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 40),
@@ -345,12 +347,38 @@ class _TrackHistoryPageState extends State<TrackHistoryPage> {
           Icon(Icons.route_rounded, size: 34, color: C.grey),
           const SizedBox(height: 10),
           Text(
-            S.of(context).historyEmpty,
+            widget.state.trackLogOn
+                ? S.of(context).historyEmpty
+                : S.of(context).historyEmptyOff,
             textAlign: TextAlign.center,
             style: ts(12, c: C.slate, h: 1.6),
           ),
         ],
       ),
+    );
+  }
+
+  /// 记录开关（默认关）。
+  ///
+  /// 用户 2026-10-22：「历史轨迹默认不开启，需要开启后才能记录」。开关就放在
+  /// 台账本身上面 —— 「记在哪儿」与「记不记」在同一屏，不用再跑一趟设置页。
+  Widget _recordCard() {
+    final s = S.of(context);
+    return SettingsSectionCard(
+      title: s.historyRecord,
+      icon: Icons.fiber_manual_record_rounded,
+      color: C.green,
+      children: [
+        SettingsSwitch(
+          s.historyRecord,
+          value: widget.state.trackLogOn,
+          color: C.green,
+          onChanged: (v) {
+            widget.state.setTrackLogOn(v);
+            setState(() {});
+          },
+        ),
+      ],
     );
   }
 

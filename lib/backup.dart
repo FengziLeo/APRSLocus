@@ -88,6 +88,9 @@ const List<BackupGroupSpec> kBackupGroups = [
     // 地图页上报状态栏的样式（经典 / 详细）：与其它显示偏好同类 ——
     // 换机后当然希望屏幕还是自己调好的那副样子。
     'beaconBarDetailed',
+    // 历史轨迹要不要记录：与显示偏好同类，用户既然开了就说明他要继续记，
+    // 换机后回到「默认关」会让他以为新机上不再记录。
+    'trackLogOn',
     // 纯网络定位时的台站符号 + 外置 GPS 待机 + 心率异常告警：三者都是
     // 「用户自己配的行为偏好」，换机后应当保留。
     'networkSymbol', 'extGpsStandby',

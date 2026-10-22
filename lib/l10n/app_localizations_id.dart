@@ -10019,4 +10019,10 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String gpsSampleSec(String s) => "$s dtk";
 
+  @override
+  String get historyRecord => "Rekam riwayat";
+
+  @override
+  String get historyEmptyOff => "Perekaman mati. Nyalakan sakelar di atas untuk mulai.";
+
 }

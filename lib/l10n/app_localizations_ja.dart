@@ -9730,4 +9730,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String gpsSampleSec(String s) => "$s 秒";
 
+  @override
+  String get historyRecord => "履歴を記録";
+
+  @override
+  String get historyEmptyOff => "記録は切っています。上のスイッチを入れると記録します。";
+
 }

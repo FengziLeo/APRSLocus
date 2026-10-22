@@ -10009,4 +10009,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String gpsSampleSec(String s) => "$s s";
 
+  @override
+  String get historyRecord => "Track history";
+
+  @override
+  String get historyEmptyOff => "Recording is off. Turn it on above to start.";
+
 }

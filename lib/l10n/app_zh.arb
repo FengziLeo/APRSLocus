@@ -5019,5 +5019,7 @@
   "cracCertVerified": "已认证",
   "gpsSampleTitle": "GPS 采样间隔",
   "gpsSampleSec": "{s} 秒",
-  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}}
+  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
+  "historyRecord": "记录历史轨迹",
+  "historyEmptyOff": "记录没开。打开上面的开关才会记。"
 }

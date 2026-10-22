@@ -512,16 +512,19 @@ class AppState extends ChangeNotifier {
       // 历史台账（按天落盘）：GPS 那条路径写在同一个条件里，这里也必须写 ——
       // 不写的话「外部源接管期间」在历史记录里是**一段空白**（而手机 GPS 正好被
       // 让位，两边都不记，用户回头看会觉得那一段路凭空消失）。
-      TrackLogStore.instance.record(
-        lat: lat,
-        lng: lng,
-        speedKmh: speed,
-        course: myCourse,
-        alt: altM,
-        accuracyM: accuracyM,
-        // 轨迹点自带的心率（佳明有），没有就是当前心率带的值
-        hr: myHr,
-      );
+      // 记录开关默认关（[trackLogOn]），与屏幕轨迹无关：屏幕上那条线照旧画。
+      if (trackLogOn) {
+        TrackLogStore.instance.record(
+          lat: lat,
+          lng: lng,
+          speedKmh: speed,
+          course: myCourse,
+          alt: altM,
+          accuracyM: accuracyM,
+          // 轨迹点自带的心率（佳明有），没有就是当前心率带的值
+          hr: myHr,
+        );
+      }
       // 接管期间的里程也要记，否则那段路在里程里是空白（与台账一致）
       if (last != null) _addMileage(movedM / 1000.0);
     }
@@ -1449,6 +1452,21 @@ class AppState extends ChangeNotifier {
 
   void setBeaconBarDetailed(bool v) {
     beaconBarDetailed = v;
+    persist();
+    _notify();
+  }
+
+  /// 历史轨迹（按天落盘的台账）是否记录。**默认关** —— 用户 2026-10-22：
+  /// 「历史轨迹默认不开启，需要开启后才能记录」。
+  ///
+  /// 台账写的是几点在哪、走了多远，属于会留在设备上的位置历史；默认不写，
+  /// 谁要翻账谁自己打开（入口在设置 → 历史轨迹那一页）。关掉之后已经记下的
+  /// 那些天照旧可看可删，只是不再往上追加。
+  bool trackLogOn = false;
+
+  void setTrackLogOn(bool v) {
+    if (trackLogOn == v) return;
+    trackLogOn = v;
     persist();
     _notify();
   }
@@ -4541,6 +4559,7 @@ class AppState extends ChangeNotifier {
     beaconAltOverrideM = null;
     beaconIncludeHr = true;
     beaconBarDetailed = true;
+    trackLogOn = false;
     networkSymbol = '';
     extGpsStandby = true;
     hrAlarmEnabled = true;
@@ -5052,6 +5071,7 @@ class AppState extends ChangeNotifier {
       beaconIncludeHr = p.getBool('beaconIncludeHr') ?? beaconIncludeHr;
       beaconBarDetailed =
           p.getBool('beaconBarDetailed') ?? beaconBarDetailed;
+      trackLogOn = p.getBool('trackLogOn') ?? trackLogOn;
       networkSymbol = p.getString('networkSymbol') ?? networkSymbol;
       extGpsStandby = p.getBool('extGpsStandby') ?? extGpsStandby;
       hrAlarmEnabled = p.getBool('hrAlarmEnabled') ?? hrAlarmEnabled;
@@ -5462,6 +5482,7 @@ class AppState extends ChangeNotifier {
     await p.setString('aprsStatusText', aprsStatusText);
     await p.setBool('beaconIncludeHr', beaconIncludeHr);
     await p.setBool('beaconBarDetailed', beaconBarDetailed);
+    await p.setBool('trackLogOn', trackLogOn);
     await p.setString('networkSymbol', networkSymbol);
     await p.setBool('extGpsStandby', extGpsStandby);
     await p.setBool('hrAlarmEnabled', hrAlarmEnabled);
@@ -7861,15 +7882,18 @@ class AppState extends ChangeNotifier {
         // 个人历史台账（按天落盘）与屏幕轨迹分开写：只在「确实在动」时
         // 记，并带上速度/航向/精度，供事后按天统计里程与速度；
         // 有心率读数（心率带 / 佳明）就一并记下，供事后画心率折线（issue #17）。
-        TrackLogStore.instance.record(
-          lat: outLat,
-          lng: outLng,
-          speedKmh: speed * 3.6,
-          course: myCourse,
-          alt: alt,
-          accuracyM: accuracy,
-          hr: myHr,
-        );
+        // 记录开关默认关（[trackLogOn]）—— 没打开就不往台账里写。
+        if (trackLogOn) {
+          TrackLogStore.instance.record(
+            lat: outLat,
+            lng: outLng,
+            speedKmh: speed * 3.6,
+            course: myCourse,
+            alt: alt,
+            accuracyM: accuracy,
+            hr: myHr,
+          );
+        }
         // 里程与轨迹点同门限累计（见 _addMileage）：只在有上一个点时才有位移
         if (last != null) _addMileage(movedM / 1000.0);
       }

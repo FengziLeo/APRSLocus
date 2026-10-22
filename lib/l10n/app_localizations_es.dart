@@ -10068,4 +10068,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String gpsSampleSec(String s) => "$s s";
 
+  @override
+  String get historyRecord => "Registrar historial";
+
+  @override
+  String get historyEmptyOff => "La grabación está desactivada. Actívala arriba para empezar.";
+
 }

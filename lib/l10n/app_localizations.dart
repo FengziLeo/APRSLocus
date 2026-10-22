@@ -17619,6 +17619,18 @@ abstract class AppLocalizations {
   /// **'{s} 秒'**
   String gpsSampleSec(String s);
 
+  /// No description provided for @historyRecord.
+  ///
+  /// In zh, this message translates to:
+  /// **'记录历史轨迹'**
+  String get historyRecord;
+
+  /// No description provided for @historyEmptyOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'记录没开。打开上面的开关才会记。'**
+  String get historyEmptyOff;
+
 }
 
 class _AppLocalizationsDelegate

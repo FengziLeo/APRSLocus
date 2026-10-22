@@ -4928,5 +4928,7 @@
   "cracCertVerified": "已認證",
   "gpsSampleTitle": "GPS 取樣間隔",
   "gpsSampleSec": "{s} 秒",
-  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}}
+  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}},
+  "historyRecord": "記錄歷史軌跡",
+  "historyEmptyOff": "記錄沒開。打開上面的開關才會記。"
 }

@@ -139,6 +139,8 @@ class LocationService : Service() {
         const val ACTION_TOGGLE_CONNECT = "com.aprslocus.action.TOGGLE_CONNECT"
         const val ACTION_EXIT = "com.aprslocus.action.EXIT"
         const val EXTRA_MODE = "location_mode"
+        /** GPS 采样间隔（毫秒），由 Dart 侧随 startService 传入；0/缺省 = 用默认 1 秒 */
+        const val EXTRA_INTERVAL = "intervalMs"
         const val MODE_GPS = "gps"
         const val MODE_GPS_NETWORK = "gps_network"
         /**
@@ -156,6 +158,23 @@ class LocationService : Service() {
         val keepAliveOnly: Boolean get() = mode == MODE_KEEPALIVE
         /** 定位模式：gps = 纯 GPS；gps_network = GPS + 网络辅助；network = 纯网络 */
         @Volatile var mode: String = "gps_network"
+
+        /**
+         * GPS 采样间隔（毫秒）。用户在设置页可以调（1/2/3/5/10/30 秒）。
+         *
+         * 原来写死 1000ms / 5m：1 秒是导航类应用的常规取样率，轨迹拐弯不被切角；
+         * 嫌耗电的用户往大调，用同一套 provider 监听（minDistance 仍是 5m，
+         * 所以静止时不会因为间隔小而白白亮 GPS）。
+         */
+        @Volatile var gpsIntervalMs: Long = 1000L
+
+        /** 运行中调采样间隔：重建 provider 监听（服务没在跑就只记下来） */
+        fun setSamplingStatic(ms: Int) {
+            if (ms <= 0) return
+            gpsIntervalMs = ms.toLong()
+            instance?.restartLocationUpdates()
+        }
+
         /** 接受定位的精度上限（米）。超过则丢弃，避免基站/Wi-Fi 粗点引起漂移 */
         const val MAX_ACCURACY_M = 150f
         /** 网络定位仅在 GPS 停更超过该时长时作为兜底（毫秒） */
@@ -351,6 +370,9 @@ class LocationService : Service() {
         // 读取定位模式（Flutter 启动服务时传入）
         intent?.getStringExtra(EXTRA_MODE)?.let {
             if (it == MODE_GPS || it == MODE_GPS_NETWORK || it == MODE_NETWORK || it == MODE_KEEPALIVE) mode = it
+        }
+        intent?.getIntExtra(EXTRA_INTERVAL, 0)?.let {
+            if (it > 0) gpsIntervalMs = it.toLong()
         }
         val notification = try {
             buildNotification("APRSlocus 运行中")
@@ -670,13 +692,13 @@ class LocationService : Service() {
         var gpsRequested = false
         if (useGps) {
             try {
-                // minTime 10s → 1s（用户反馈「实时轨迹采样率低」）：
+                // minTime 默认 10s → 用户可调（默认 1s，见 gpsIntervalMs）：
                 // 10s 是「省电优先」的取值，代价是轨迹每 10 秒才一个点 —— 骑车/开车时
                 // 一个拐弯正好落在两个点之间，画出来就是一条切角的斜线。
                 // 1s 是导航类应用的常规取样率；下方 minDistance 仍是 5m，静止时 GPS 不给
-                // 回调，所以待机功耗并不跟着涨。
+                // 回调，所以待机功耗并不同着涨。嫌耗电的用户在设置里往大调。
                 lm.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, 1000L, 5f, listener, Looper.getMainLooper())
+                    LocationManager.GPS_PROVIDER, gpsIntervalMs, 5f, listener, Looper.getMainLooper())
                 gpsRequested = true
             } catch (_: Exception) {}
         }

@@ -46,15 +46,25 @@ def main() -> int:
         return '\n'.join(l for l in text.split('\n')
                          if not l.lstrip().startswith('//'))
 
-    # ── ① 采样率：GPS 必须按 1s 注册 ──
+    # ── ① 采样率：GPS **默认**必须 1s 级，间隔本身可由用户自调 ──
+    #
+    # 用户先说「实时轨迹采样率低」（要求 1s），后来又要求「用户可自调 GPS
+    # 采样率」。所以判据变成两条：默认值仍是 1s 级，而**注册时**必须用那个
+    # 可调变量 —— 写回字面量就等于用户选的档位不生效，而这一点从界面上完全看不出来。
     kt = read('android/app/src/main/kotlin/com/aprslocus/aprslocus/LocationService.kt')
-    gps = re.search(r'GPS_PROVIDER,\s*(\d+)L', kt)
-    if not gps:
-        errors.append('LocationService.kt 里找不到 GPS_PROVIDER 的注册 —— '
+    default = re.search(r'gpsIntervalMs:\s*Long\s*=\s*(\d+)L', kt)
+    if not default:
+        errors.append('LocationService.kt 里找不到 GPS 采样间隔的默认值 —— '
                       '定位采样率无从确认')
-    elif int(gps.group(1)) > 2000:
-        errors.append(f'GPS 采样 minTime = {gps.group(1)}ms（> 2000）—— '
-                      '用户反馈过「实时轨迹采样率低」，应保持 1s 级')
+    elif int(default.group(1)) > 2000:
+        errors.append(f'GPS 采样默认值 = {default.group(1)}ms（> 2000）—— '
+                      '用户反馈过「实时轨迹采样率低」，默认应保持 1s 级')
+    lit = re.search(r'GPS_PROVIDER,\s*(\d+)L', kt)
+    if lit:
+        errors.append(f'GPS 注册写回了字面量 {lit.group(1)}ms —— '
+                      '用户自调的档位就不会生效，应传 gpsIntervalMs')
+    if 'GPS_PROVIDER, gpsIntervalMs, 5f' not in kt:
+        errors.append('GPS 注册的 minTime 不是用户选的那个间隔（gpsIntervalMs）')
     # 网络辅助定位保持低频率（只做兜底，不该跟着 1s 轮询）
     net = re.search(r'NETWORK_PROVIDER,\s*(\d+)L', kt)
     if not net:

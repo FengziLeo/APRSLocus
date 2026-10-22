@@ -4061,6 +4061,26 @@ class AppState extends ChangeNotifier {
   // 定位模式：'gps' = 纯 GPS；'gps_network' = GPS + 网络辅助；'network' = 纯网络
   String locationMode = 'gps_network';
 
+  /// GPS 采样间隔（秒）：用户可以自己调。
+  ///
+  /// 原生侧原来是写死的（GPS 1 秒 / 5 米，见 LocationService.kt），嫌耗电的人
+  /// 没地方改。现在是一个下拉档位：1 秒最细（导航类应用的常规取样率，轨迹
+  /// 拐弯不被切角），想省电就往大调。只作用于 **GPS** provider：网络定位仍固定
+  /// 10 秒 —— 基站/Wi-Fi 本来也不会更新得更频。
+  ///
+  /// 可选值写在 [gpsSampleChoices] 里，别处不另开一套：脏值（改坏偏好）一律夹回默认。
+  int gpsIntervalSec = 1;
+  static const gpsSampleChoices = <int>[1, 2, 3, 5, 10, 30];
+
+  void setGpsIntervalSec(int v) {
+    if (!gpsSampleChoices.contains(v)) return;
+    gpsIntervalSec = v;
+    // 服务在跑就立即生效；没在跑只记下来，下次 startService 带上。
+    unawaited(loc.setSampling(v * 1000));
+    persist();
+    _notify();
+  }
+
   void setLocationMode(String v) {
     if (v != 'gps' && v != 'gps_network' && v != 'network') return;
     locationMode = v;
@@ -4569,6 +4589,8 @@ class AppState extends ChangeNotifier {
     adifStripSsid = false;
     locationMode = 'gps_network';
     loc.mode = locationMode;
+    gpsIntervalSec = 1;
+    loc.samplingMs = 1000;
     useSimLocation = false;
     filterLat = 39.9042;
     filterLng = 116.4074;
@@ -5113,6 +5135,10 @@ class AppState extends ChangeNotifier {
       adifStripSsid = p.getBool('adifStripSsid') ?? adifStripSsid;
       locationMode = p.getString('locationMode') ?? locationMode;
       loc.mode = locationMode;
+      gpsIntervalSec = p.getInt('gpsIntervalSec') ?? gpsIntervalSec;
+      // 认不出的档位夹回默认，并把值交给定位服务（启动时就要带上）。
+      if (!gpsSampleChoices.contains(gpsIntervalSec)) gpsIntervalSec = 1;
+      loc.samplingMs = gpsIntervalSec * 1000;
       useSimLocation = p.getBool('useSimLocation') ?? useSimLocation;
       filterLat = p.getDouble('filterLat') ?? filterLat;
       filterLng = p.getDouble('filterLng') ?? filterLng;
@@ -5481,6 +5507,7 @@ class AppState extends ChangeNotifier {
     await p.setString('adifFreq', adifFreq);
     await p.setBool('adifStripSsid', adifStripSsid);
     await p.setString('locationMode', locationMode);
+    await p.setInt('gpsIntervalSec', gpsIntervalSec);
     await p.setBool('useSimLocation', useSimLocation);
     await p.setDouble('filterLat', filterLat);
     await p.setDouble('filterLng', filterLng);

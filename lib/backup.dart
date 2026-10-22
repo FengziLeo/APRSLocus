@@ -163,6 +163,9 @@ const List<BackupGroupSpec> kBackupGroups = [
     'tileCacheOn', 'offlineOnly', 'offlineRegions',
     'adifMode', 'adifSubMode', 'adifBand', 'adifFreq', 'adifStripSsid',
     'locationMode', 'useSimLocation',
+    // GPS 采样间隔：用户为了省电/精度自己选的一档，换机后回到 1 秒
+    // 会表现为「省电设置又失效了」。
+    'gpsIntervalSec',
     'filterLat', 'filterLng', 'filterRadius', 'maxStations', 'maxPackets',
     'onlineWindowMin', 'maxTrackPts', 'filterFollow',
     // 台站保留天数（数据维护）：与 maxTrackPts 同属「本地保留多少数据」的设置，

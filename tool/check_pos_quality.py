@@ -106,6 +106,22 @@ def main() -> int:
          '启动自动定位又退回「按固定延时判一次初始化」—— 加载慢就永远停在已保存位置')
     need('lib/state.dart', 'Future<void> _waitInitialized() async {',
          '缺少 _waitInitialized：没有「等初始化落地」的实现')
+
+    # GPS 采样间隔（用户要求：「定位上报，用户可自调 GPS 采样率」）：
+    # 这条链有三段 —— 偏好 → 定位服务 → 原生 requestLocationUpdates。
+    # 少任何一段都变成「能选、但不生效」，而界面上完全看不出来。
+    need('lib/state.dart', 'loc.samplingMs = gpsIntervalSec * 1000;',
+         '偏好里的采样间隔没交给定位服务（启动时仍是默认 1 秒）')
+    need('lib/services.dart', "'intervalMs': samplingMs",
+         'startService 没把采样间隔带上 —— 原生侧会退回写死的 1 秒')
+    need('lib/services.dart', "'setSampling', {'intervalMs': ms}",
+         '运行中改采样间隔没有通道入口（要重启定位才生效）')
+    need('android/app/src/main/kotlin/com/aprslocus/aprslocus/LocationService.kt',
+         'LocationManager.GPS_PROVIDER, gpsIntervalMs, 5f',
+         '原生侧又用回写死的采样间隔 —— 用户选的那一档不生效')
+    need('android/app/src/main/kotlin/com/aprslocus/aprslocus/LocationService.kt',
+         'fun setSamplingStatic(ms: Int)',
+         '原生侧没有运行中调采样间隔的入口')
     need('lib/app_widget.dart',
          'unawaited(widget.state.ensureLocationRunning());',
          '回到前台没有补一次定位检查 —— 漏掉一次启动就再也恢复不了')

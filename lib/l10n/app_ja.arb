@@ -4337,5 +4337,8 @@
   "devLockTitle": "開発者用の合言葉",
   "devLockTip": "ロック中。長押しで合言葉を入力",
   "devLockWrong": "合言葉が違います",
-  "cracCertVerified": "確認済み"
+  "cracCertVerified": "確認済み",
+  "gpsSampleTitle": "GPS サンプリング間隔",
+  "gpsSampleSec": "{s} 秒",
+  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}}
 }

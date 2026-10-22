@@ -158,16 +158,17 @@ class MainActivity : FlutterActivity() {
             when (call.method) {
                 "startService" -> {
                     val mode = call.argument<String>("mode") ?: "gps_network"
+                    val intervalMs = (call.argument<Number>("intervalMs") ?: 0).toInt()
                     if (mode == LocationService.MODE_KEEPALIVE) {
                         // 模拟位置模式：不需要定位权限，但**仍需前台服务**，
                         // 否则应用一切到后台就会被冻结/回收：
                         // APRS-IS 连接断开、信标定时器停摆、地图不再刷新。
-                        startLocationService(mode)
+                        startLocationService(mode, intervalMs)
                         result.success(true)
                     } else if (!hasPermissions()) {
                         result.error("NO_PERMISSION", "缺少定位权限", null)
                     } else {
-                        startLocationService(mode)
+                        startLocationService(mode, intervalMs)
                         result.success(true)
                     }
                 }
@@ -178,6 +179,13 @@ class MainActivity : FlutterActivity() {
                 "setLocationMode" -> {
                     val mode = call.argument<String>("mode") ?: "gps_network"
                     LocationService.setModeStatic(mode)
+                    result.success(true)
+                }
+                // GPS 采样间隔（用户可调，见设置页的「GPS 采样间隔」）：
+                // 服务在跑就立即重建 provider 监听，没在跑就只记下来。
+                "setSampling" -> {
+                    val ms = (call.argument<Number>("intervalMs") ?: 0).toInt()
+                    LocationService.setSamplingStatic(ms)
                     result.success(true)
                 }
                 "notifDiag" -> {
@@ -1346,9 +1354,14 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun startLocationService(mode: String = LocationService.MODE_GPS_NETWORK) {
+    private fun startLocationService(
+        mode: String = LocationService.MODE_GPS_NETWORK,
+        intervalMs: Int = 0
+    ) {
         val intent = Intent(this, LocationService::class.java).apply {
             putExtra(LocationService.EXTRA_MODE, mode)
+            // 0 = 没指定：保持服务里现有的值（Dart 侧每次启动都会带上）
+            if (intervalMs > 0) putExtra(LocationService.EXTRA_INTERVAL, intervalMs)
         }
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

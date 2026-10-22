@@ -9724,4 +9724,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get cracCertVerified => "確認済み";
 
+  @override
+  String get gpsSampleTitle => "GPS サンプリング間隔";
+
+  @override
+  String gpsSampleSec(String s) => "$s 秒";
+
 }

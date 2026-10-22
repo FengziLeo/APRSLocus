@@ -1509,6 +1509,17 @@ class _BeaconSettingsPageState extends State<BeaconSettingsPage> {
                   ),
                 ]),
               ),
+              // GPS 采样间隔（用户要求：「定位上报，用户可自调 GPS 采样率」）。
+              // 只在本平台真的能生效、而且真的会采样时才出现 —— 纯网络模式不注册
+              // GPS provider，iOS 的 CoreLocation 没有定时采样，桌面是 IP 定位。
+              if (st.locationMode != 'network' && gpsSamplingPlatformSupported)
+                SettingsChoice<int>(
+                  S.of(context).gpsSampleTitle,
+                  value: st.gpsIntervalSec,
+                  options: AppState.gpsSampleChoices,
+                  labelOf: (v) => S.of(context).gpsSampleSec('$v'),
+                  onChanged: st.setGpsIntervalSec,
+                ),
               // 诚实说清「网络辅助」的取舍：有用户报过「开了网络定位后位置
               // 飞来飞去」—— 那不是 bug，而是基站/Wi-Fi 定位本来就有几百米误差。
               // 说不清楚用户就会以为是应用坏了。纯网络模式下换一条更贴切的说明。

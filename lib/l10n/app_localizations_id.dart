@@ -10013,4 +10013,10 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get cracCertVerified => "Terverifikasi";
 
+  @override
+  String get gpsSampleTitle => "Sampling GPS";
+
+  @override
+  String gpsSampleSec(String s) => "$s dtk";
+
 }

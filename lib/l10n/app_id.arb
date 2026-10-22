@@ -4337,5 +4337,8 @@
   "devLockTitle": "Kode pengembang",
   "devLockTip": "Terkunci. Tekan lama lalu masukkan kode.",
   "devLockWrong": "Kode salah",
-  "cracCertVerified": "Terverifikasi"
+  "cracCertVerified": "Terverifikasi",
+  "gpsSampleTitle": "Sampling GPS",
+  "gpsSampleSec": "{s} dtk",
+  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}}
 }

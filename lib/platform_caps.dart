@@ -41,3 +41,12 @@ bool get motionPlatformSupported =>
     !kIsWeb &&
     (defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.iOS);
+
+/// 「GPS 采样间隔」在本平台是否真的有效。
+///
+/// 只有 Android 能控：`LocationManager.requestLocationUpdates` 的 `minTime`
+/// 就是采样间隔。iOS 的 CoreLocation 没有「定时采样」这一说（由系统按精度
+/// 与移动状态自己决定），桌面走的是 IP 网络定位。摆一个改了不生效的档位
+/// 比不摆更糟，所以这些平台干脆不显示。
+bool get gpsSamplingPlatformSupported =>
+    !kIsWeb && defaultTargetPlatform == TargetPlatform.android;

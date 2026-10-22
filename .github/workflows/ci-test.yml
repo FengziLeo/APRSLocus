@@ -390,6 +390,11 @@ jobs:
       - name: Test map follow mode persistence
         run: flutter test test/map_follow_mode_persist_test.dart
 
+      # GPS 采样间隔（用户要求「用户可自调 GPS 采样率」）：偏好 → 定位服务 →
+      # 原生三段都得接上，少一段就变成「能选但不生效」，而界面上看不出来。
+      - name: Test GPS sampling interval
+        run: flutter test test/gps_sampling_persist_test.dart
+
       # 历史轨迹导出 GPX（用户要求）：GPX 是**给别人读的文件**，时间少个 Z、
       # 海拔补个 0、断档不断段，在这里都不会报错 —— 只有导进 Strava / Garmin /
       # Google Earth 之后才看得见。所以把这几条意图逐字钉在 CI。

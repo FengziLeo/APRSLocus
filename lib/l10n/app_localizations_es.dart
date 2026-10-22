@@ -10062,4 +10062,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get cracCertVerified => "Verificado";
 
+  @override
+  String get gpsSampleTitle => "Muestreo GPS";
+
+  @override
+  String gpsSampleSec(String s) => "$s s";
+
 }

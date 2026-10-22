@@ -18,6 +18,12 @@ class LocService {
   /// 定位模式：'gps' = 纯 GPS；'gps_network' = GPS + 网络辅助；
   /// 'network' = 纯网络（只用基站 / Wi-Fi，不注册 GPS）
   String mode = 'gps_network';
+  /// GPS 采样间隔（毫秒）：用户在设置页可以调（默认 1000）。
+  ///
+  /// 原来是原生侧写死的 1 秒 / 5 米；现在由这里带上，服务启动时随
+  /// `startService` 一起传，运行中改动走 [setSampling]。只作用于 GPS provider ——
+  /// 网络定位固定 10 秒（基站/Wi-Fi 本来也不会更新得更频）。
+  int samplingMs = 1000;
   /// 定位回调。
   ///
   /// [lastKnown] 为真表示这**不是**实时定位，而是系统缓存的「上次已知位置」
@@ -219,8 +225,9 @@ class LocService {
       }
       // 先订阅事件通道，避免漏掉服务启动后的初始定位
       _listenEvents();
-      // 启动前台定位服务（携带定位模式）
-      await _channel.invokeMethod('startService', {'mode': mode});
+      // 启动前台定位服务（携带定位模式与采样间隔）
+      await _channel.invokeMethod('startService',
+          {'mode': mode, 'intervalMs': samplingMs});
       _running = true;
       _notifDirty = true; // 同上：服务刚起，去重不能把首次刷新吃掉
       onStatus?.call('GPS 定位中…');
@@ -237,6 +244,18 @@ class LocService {
     mode = m;
     try {
       await _channel.invokeMethod('setLocationMode', {'mode': m});
+    } catch (_) {}
+  }
+
+  /// 调 GPS 采样间隔（毫秒）。服务在跑时立即生效，没在跑只记下来 ——
+  /// 下一次 [start] 会把它随 `startService` 一起带过去。
+  Future<void> setSampling(int ms) async {
+    if (ms <= 0) return;
+    samplingMs = ms;
+    // 仅保活时没有 provider 监听，没必要惊动原生
+    if (!_running || _keepAliveMode) return;
+    try {
+      await _channel.invokeMethod('setSampling', {'intervalMs': ms});
     } catch (_) {}
   }
 

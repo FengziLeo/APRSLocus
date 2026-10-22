@@ -5016,5 +5016,8 @@
   "devLockTitle": "开发人员口令",
   "devLockTip": "已锁定，长按输口令",
   "devLockWrong": "口令不对",
-  "cracCertVerified": "已认证"
+  "cracCertVerified": "已认证",
+  "gpsSampleTitle": "GPS 采样间隔",
+  "gpsSampleSec": "{s} 秒",
+  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}}
 }

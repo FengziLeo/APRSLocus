@@ -4337,5 +4337,8 @@
   "devLockTitle": "Código de desarrollador",
   "devLockTip": "Bloqueado. Mantén pulsado e introduce el código.",
   "devLockWrong": "Código incorrecto",
-  "cracCertVerified": "Verificado"
+  "cracCertVerified": "Verificado",
+  "gpsSampleTitle": "Muestreo GPS",
+  "gpsSampleSec": "{s} s",
+  "@gpsSampleSec": {"placeholders": {"s": {"type": "String"}}}
 }

@@ -9624,6 +9624,12 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get cracCertVerified => "已认证";
 
+  @override
+  String get gpsSampleTitle => "GPS 采样间隔";
+
+  @override
+  String gpsSampleSec(String s) => "$s 秒";
+
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -19244,5 +19250,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get cracCertVerified => "已認證";
+
+  @override
+  String get gpsSampleTitle => "GPS 取樣間隔";
+
+  @override
+  String gpsSampleSec(String s) => "$s 秒";
 
 }

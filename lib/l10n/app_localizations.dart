@@ -17607,6 +17607,18 @@ abstract class AppLocalizations {
   /// **'已认证'**
   String get cracCertVerified;
 
+  /// No description provided for @gpsSampleTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'GPS 采样间隔'**
+  String get gpsSampleTitle;
+
+  /// No description provided for @gpsSampleSec.
+  ///
+  /// In zh, this message translates to:
+  /// **'{s} 秒'**
+  String gpsSampleSec(String s);
+
 }
 
 class _AppLocalizationsDelegate

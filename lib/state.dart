@@ -5935,6 +5935,30 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  /// 回到前台时补一次「定位到底起没起」（幂等，很便宜）。
+  ///
+  /// 起因：启动那条自动定位路径只要有一次没走到（权限弹窗还没答、启动竞态、
+  /// 前台服务被系统掐掉），界面就会一直停在「已保存位置」或「定位失败」，
+  /// 而**没有任何东西**会自己恢复它 —— 用户只能去「模拟位置」再切回来
+  /// （用户报的正是这个）。切回前台是最自然的补一次时机。
+  Future<void> ensureLocationRunning() async {
+    if (_disposed || !initialized || !oobeDone) return;
+    if (useSimLocation) return; // 模拟位置由保活服务兼顾，切换时机另有路径
+    if (_phoneGpsPaused) return; // 外置源供位期间手机侧本就该待机
+    if (loc.running) {
+      // 服务说自己在跑，可能只是 Dart 侧的标记：真被系统掐过时，界面会停在
+      // 「已保存位置」而再也没有定位。问一次原生（仅 Android 有这个服务）。
+      if (defaultTargetPlatform == TargetPlatform.android &&
+          !await loc.serviceAlive()) {
+        _log(LogLevel.warn, '定位', '前台服务已不在，回到前台时重新启动');
+        loc.stop();
+        await startTracking();
+      }
+      return;
+    }
+    await startTracking();
+  }
+
   /// OOBE 完成后的定位引导：请求定位权限并启动定位，失败不阻塞（可手动再开）
   Future<void> _requestLocationAfterOobe() async {
     if (_disposed || useSimLocation) return;

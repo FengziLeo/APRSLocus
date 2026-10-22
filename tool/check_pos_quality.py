@@ -106,6 +106,9 @@ def main() -> int:
          '启动自动定位又退回「按固定延时判一次初始化」—— 加载慢就永远停在已保存位置')
     need('lib/state.dart', 'Future<void> _waitInitialized() async {',
          '缺少 _waitInitialized：没有「等初始化落地」的实现')
+    need('lib/app_widget.dart',
+         'unawaited(widget.state.ensureLocationRunning());',
+         '回到前台没有补一次定位检查 —— 漏掉一次启动就再也恢复不了')
     # 外接 GPS 模块**启用着但早已断流**时，不准再拿它当挡粗点的理由：
     # 室内/纯网络模式下那等于永远没有位置（同一个用户报告的另一半）。
     forbid('lib/state.dart', 'if (coarse && nmeaGpsOn) return;',

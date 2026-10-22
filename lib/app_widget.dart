@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -521,6 +522,13 @@ class _AppWidgetSyncState extends State<AppWidgetSync>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    // 回到前台：补一次「定位到底起没起」。启动那条自动定位路径只要漏掉一次
+    // （权限弹窗还没答、启动竞态、前台服务被系统掐掉），界面就一直停在
+    // 「已保存位置」，而且没有任何东西会自己恢复（见 ensureLocationRunning）。
+    if (state == AppLifecycleState.resumed) {
+      unawaited(widget.state.ensureLocationRunning());
+      return;
+    }
     // 切到后台前再同步一次：用户回到桌面时看到的就是最新的那份
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {

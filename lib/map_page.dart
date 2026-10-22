@@ -2825,50 +2825,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Widget _beaconBar() {
     final st = widget.state;
     final on = st.beaconEnabled;
-    // 文案**全部**由结构化的 beaconPhase 分派（不再拿中文字符串做 == 比较，
-    // 也不再在这里重算「会不会发射」的条件 —— 那必须与 state.dart 的
-    // canAutoBeacon 同源，否则又会回「倒计时走着却不发射」的老毛病）。
-    // 三种「不发射」都要如实说原因：信标关 / 射频信标没开 / 当前是粗定位。
-    final label = switch (st.beaconPhase) {
-      BeaconPhase.off => S.of(context).beaconOffChip,
-      BeaconPhase.rfDisabled => S.of(context).beaconRfBeaconOff,
-      // 连上但还没点「开始上报」：提示去点那个正式按钮（见 ReportActions）。
-      BeaconPhase.needConfirm => S.of(context).beaconNeedConfirm,
-      BeaconPhase.coarseFix => S.of(context).beaconCoarseFix,
-      // 开了「强制接受网络定位自动上报」时它**会真的发射**，所以这一档跟的是
-      // 倒计时；但文案里必须点明「发的是网络定位（粗）」—— 见 [BeaconPhase.coarseForced]。
-      BeaconPhase.coarseForced =>
-        S.of(context).beaconCoarseForced(st.nextBeaconIn),
-      // 佳明档：把**来源**说清楚 + 心率（用户明确要「主屏能看到心率」）。
-      // 只写倒计时的话，用户会以为发的是手机定位（两者可能差几十公里）。
-      BeaconPhase.garmin => S.of(context).beaconGarminNext(
-        st.nextBeaconIn,
-        st.myHr == null ? '--' : '${st.myHr}',
-      ),
-      // 外接 GPS 模块档：同理把来源说清楚（否则用户会以为发的是手机定位）。
-      // 模块没带心率，所以没有佳明那一档的 ❤ 字段。
-      BeaconPhase.spp => S.of(context).beaconSppNext(st.nextBeaconIn),
-      BeaconPhase.imminent => S.of(context).beaconImminent,
-      BeaconPhase.counting => S.of(context).beaconNextIn(st.nextBeaconIn),
-      BeaconPhase.disconnected => S.of(context).beaconNotConnected,
-      BeaconPhase.waitingFix => st.nextBeaconIn,
-    };
-    // 颜色：非绿 = 「现在这一发不能当作正常 GPS 上报看」。
-    //   * coarseFix / coarseForced → 橙（粗定位）；强制那档虽然是绿的语义
-    //     （会发射），但内容同样是粗点，用绿色会与正常 GPS 上报混为一谈；
-    //   * garmin → 红（发的是手表的位置，可能差几十公里）；
-    //   * spp → 绿（外接 GPS 模块就在车上/窗边，发的就是本机位置，精度反而
-    //     比手机高）—— 只需在文案里点明来源，不能像佳明那样吓人。
-    // 改成 switch 而不是嵌套三元：档位会继续长，三元叠到第四层就没法读了。
-    final c = !on
-        ? C.slate
-        : switch (st.beaconPhase) {
-            BeaconPhase.needConfirm => C.orange,
-            BeaconPhase.coarseFix => C.orange,
-            BeaconPhase.coarseForced => C.orange,
-            BeaconPhase.garmin => C.red,
-            _ => C.green,
-          };
+    // 文案与颜色都从 widgets.dart 的 beaconBarText / beaconBarColor 来：
+    // 精简模式的状态条用的是同一份，两处不再各写一套（见那两个函数的说明）。
+    final label = beaconBarText(context, st);
+    final c = beaconBarColor(st);
     return ClickCursor(
       child: GestureDetector(
         onTap: _showMyPanel,

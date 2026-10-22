@@ -87,6 +87,7 @@ class _LiteShellState extends State<LiteShell> {
             children: [
               _statusLine(),
               _tabs(),
+              _reportBar(),
               Expanded(child: _pages()),
             ],
           ),
@@ -102,7 +103,6 @@ class _LiteShellState extends State<LiteShell> {
       listenable: st,
       builder: (context, _) {
         final up = st.anyLinkUp;
-        final phase = st.beaconPhase;
         return Container(
           height: 46,
           padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -141,13 +141,52 @@ class _LiteShellState extends State<LiteShell> {
                 ),
               ),
               const Spacer(),
-              // 只在真的在倒计时的时候报秒。未连、未确认、粗定位这些阶段在设备
-              // 面板与设置页里各有交代，这里不再堆一行小字。
-              if (phase == BeaconPhase.counting)
-                Text(
-                  '${st.beaconSecondsLeft}s',
-                  style: ts(11.5, c: C.slate),
+              // 秒数不在这里——它归下面那条上报状态条（同一件事只说一遍）。
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// 上报状态条：现在这一发是什么、以及「自动 / 单次」与「立即上报」。
+  ///
+  /// 用户 2026-10-22：「极简模式下保留手动发射状态条」。地图页底部那条横杠在精简
+  /// 模式里没有位置（这一套外壳没有地图），于是一个只想手动发一包的人得跑进设置页。
+  /// 这一条把那个入口捉回来：文案与颜色直接取 [beaconBarText] / [beaconBarColor]，
+  /// 与地图页同一个判据；右侧就是三处共用的 [ReportActions]。
+  ///
+  /// 只一行、不摆符号与详细档的参量：精简模式要的就是这一行。
+  Widget _reportBar() {
+    return ListenableBuilder(
+      listenable: st,
+      builder: (context, _) {
+        final c = beaconBarColor(st);
+        return Container(
+          padding: const EdgeInsets.fromLTRB(14, 6, 10, 6),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: C.border, width: 0.5)),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                st.beaconEnabled
+                    ? Icons.send_rounded
+                    : Icons.notifications_off_rounded,
+                size: 14,
+                color: c,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  beaconBarText(context, st),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: ts(11.5, c: C.ink, w: FontWeight.w600),
                 ),
+              ),
+              const SizedBox(width: 6),
+              ReportActions(state: st),
             ],
           ),
         );

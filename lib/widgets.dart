@@ -868,6 +868,50 @@ class ReportActions extends StatelessWidget {
   }
 }
 
+/// 上报状态条那一句话：当前档位 → 文案。
+///
+/// 地图页底部那条横杠与精简模式的状态条共用这一份。以前这段 switch 只活在地图页
+/// 里，精简模式想要一句同样的文案就只能再拄一遍 —— 两套文案分开演化过一次，
+/// 结果是同一件事在两个界面上说法不一样。
+String beaconBarText(BuildContext context, AppState st) {
+  final s = S.of(context);
+  return switch (st.beaconPhase) {
+    BeaconPhase.off => s.beaconOffChip,
+    BeaconPhase.rfDisabled => s.beaconRfBeaconOff,
+    // 连上但还没点「开始上报」：提示去点那个正式按钮（见 ReportActions）。
+    BeaconPhase.needConfirm => s.beaconNeedConfirm,
+    BeaconPhase.coarseFix => s.beaconCoarseFix,
+    // 开了「强制接受网络定位自动上报」时它**会真的发射**，所以这一档跟的是
+    // 倒计时；但文案里必须点明「发的是网络定位（粗）」。
+    BeaconPhase.coarseForced => s.beaconCoarseForced(st.nextBeaconIn),
+    // 佳明档：把**来源**说清楚 + 心率（用户明确要「主屏能看到心率」）。
+    BeaconPhase.garmin => s.beaconGarminNext(
+        st.nextBeaconIn,
+        st.myHr == null ? '--' : '${st.myHr}',
+      ),
+    // 外接 GPS 模块档：同理把来源说清楚；模块没带心率，所以没有那一段。
+    BeaconPhase.spp => s.beaconSppNext(st.nextBeaconIn),
+    BeaconPhase.imminent => s.beaconImminent,
+    BeaconPhase.counting => s.beaconNextIn(st.nextBeaconIn),
+    BeaconPhase.disconnected => s.beaconNotConnected,
+    BeaconPhase.waitingFix => st.nextBeaconIn,
+  };
+}
+
+/// 上报状态条的颜色：非绿 = 「现在这一发不能当作正常 GPS 上报看」。
+///
+/// 与 [beaconBarText] 同源，两处界面共用的就是这一份判据。
+Color beaconBarColor(AppState st) {
+  if (!st.beaconEnabled) return C.slate;
+  return switch (st.beaconPhase) {
+    BeaconPhase.needConfirm => C.orange,
+    BeaconPhase.coarseFix => C.orange,
+    BeaconPhase.coarseForced => C.orange,
+    BeaconPhase.garmin => C.red,
+    _ => C.green,
+  };
+}
+
 /// Round small button
 class RoundIconBtn extends StatelessWidget {
   final IconData icon;

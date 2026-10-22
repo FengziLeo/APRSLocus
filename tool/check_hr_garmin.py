@@ -320,7 +320,9 @@ def main() -> int:
     # 只写倒计时的话，用户会以为发的是手机定位 —— 两者可能差几十公里。
     need('lib/state.dart', 'if (garmin.on && garmin.fresh) return BeaconPhase.garmin;',
          '佳明没有自己的上报档 —— 横杠只会显示普通倒计时，看不出位置来自手表')
-    need('lib/map_page.dart', 'BeaconPhase.garmin =>',
+    # 横杠文案已收到 widgets.dart 的 beaconBarText（地图页与精简模式共用一份），
+    # 所以这一条对着那个文件查，而不是地图页。
+    need('lib/widgets.dart', 'BeaconPhase.garmin =>',
          '上报横杠没有佳明档的文案（应带来源与心率）')
     need('lib/l10n/app_zh.arb', 'beaconGarminNext',
          '缺少 beaconGarminNext 文案 —— 横杠上的「佳明 · 倒计时 · 心率」拼不出来')
